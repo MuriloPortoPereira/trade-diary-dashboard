@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mukas Hub - Diário Profissional</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="layout">
+
+<!-- ── TOPBAR ── -->
+<header id="topbar">
+  <div class="topbar-left">
+    <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16"><path d="M8 1L1 4v8l7 3 7-3V4L8 1zm0 2.2l4.5 1.94L8 7.08 3.5 5.14 8 3.2zM2.5 6.5l5 2.16v4.84L2.5 11.3V6.5zm6 7V8.66l5-2.16V11.3l-5 2.2z"/></svg>
+      </div>
+      <div class="logo-name">Mukas <span>Hub</span> <span style="font-size:11px;color:var(--muted);font-weight:500">desktop</span></div>
+    </div>
+    <div class="acct-pill" id="acctPill" onclick="openModal('accountModal')">
+      <div class="acct-dot" id="acctDot" style="background:var(--blue)"></div>
+      <div>
+        <div class="acct-name" id="acctPillName" data-i18n="topbar.selectAccount">Selecionar conta</div>
+        <div class="acct-type" id="acctPillType">—</div>
+      </div>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="lang-selector" id="langSelector">
+      <button class="lang-btn" onclick="toggleLangMenu()" id="langBtn" title="Idioma">
+        <span class="lang-flag" id="langFlag">🇧🇷</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="lang-menu" id="langMenu">
+        <button class="lang-option active" onclick="setLanguage('pt-BR')" data-lang="pt-BR">
+          <span class="lang-flag">🇧🇷</span>
+          <span>Português</span>
+        </button>
+        <button class="lang-option" onclick="setLanguage('en-US')" data-lang="en-US">
+          <span class="lang-flag">🇺🇸</span>
+          <span>English</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <div class="cot-widget" id="cotWidget" title="Cotação USD/BRL">
+      <span class="cot-label">USD</span>
+      <input class="cot-input" id="cotInput" type="number" step="0.01" min="1" value="5.80" onchange="setCotacao(+this.value)">
+      <button class="cot-refresh" id="cotRefreshBtn" onclick="fetchCotacao()" title="Atualizar cotação">
+        <svg id="cotIcon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('tradeModal')" data-i18n="topbar.newTrade">+ Novo Trade</button>
+  </div>
+</header>
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<nav id="sidebar">
+  <div class="sidebar-section">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span data-i18n="nav.dashboard">Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showPage('calendar')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span data-i18n="nav.calendar">Diário</span>
+    </div>
+    <div class="nav-item" onclick="showPage('log')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span data-i18n="nav.log">Trades</span>
+      <span class="badge" id="sideTradeCount">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('stats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span data-i18n="nav.stats">Análises</span>
+    </div>
+    <div class="nav-item" onclick="showPage('premarket')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span data-i18n="nav.premarket">Rotina do Trade</span>
+    </div>
+    <div class="nav-item" onclick="showPage('strategyHub')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+      <span data-i18n="nav.strategies">Estratégias</span>
+    </div>
+    <div class="nav-item" onclick="showPage('documents')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+      <span data-i18n="nav.documents">Documentos</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label" data-i18n="nav.tools">Ferramentas</div>
+    <div class="nav-item" onclick="showPage('studyHub')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 8h6"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+      <span data-i18n="nav.simulations">Simulações</span>
+    </div>
+    <div class="nav-item" onclick="showPage('import')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span data-i18n="nav.import">Importações</span>
+    </div>
+    <div class="nav-item" onclick="showPage('setup')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+      <span data-i18n="nav.setup">Risco & Setup</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-stats" id="topbarStats">
+      <div class="sidebar-stat-saldo">
+        <span class="tb-stat-lbl" data-i18n="sidebar.balance">Saldo</span>
+        <span class="tb-badge" id="topBadge">—</span>
+        <span class="sidebar-balance-change" id="sideBalanceChange">—</span>
+      </div>
+      <div class="sidebar-stat-grid">
+        <div class="tb-stat"><span class="tb-stat-lbl" data-i18n="sidebar.week">Semana</span><span class="tb-stat-val" id="tbWeek">—</span><span class="tb-stat-sub" id="tbWeekSub"></span></div>
+        <div class="tb-stat"><span class="tb-stat-lbl" data-i18n="sidebar.month">Mês</span><span class="tb-stat-val" id="tbMonth">—</span><span class="tb-stat-sub" id="tbMonthSub"></span></div>
+        <div class="tb-stat"><span class="tb-stat-lbl" data-i18n="sidebar.ddCurrent">DD Atual</span><span class="tb-stat-val" id="tbDD">—</span><span class="tb-stat-sub" id="tbDDSub"></span></div>
+        <div class="tb-stat"><span class="tb-stat-lbl" data-i18n="sidebar.goal">Meta</span><span class="tb-stat-val" id="tbGoal">—</span><span class="tb-stat-sub" id="tbGoalSub"></span></div>
+      </div>
+    </div>
+    <div class="sidebar-meta-nav">
+      <div class="nav-item nav-item-meta" onclick="showPage('notifications')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span data-i18n="nav.notifications">Notificações</span>
+      </div>
+      <div class="nav-item nav-item-meta" onclick="showPage('accounts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h2"/></svg>
+        <span data-i18n="nav.accounts">Contas</span>
+      </div>
+      <div class="nav-item nav-item-meta" onclick="showPage('partners')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/><path d="M8 8l8 8"/></svg>
+        <span data-i18n="nav.partners">Parceiros</span>
+      </div>
+      <div class="nav-item nav-item-meta" onclick="showPage('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="nav.profile">Perfil</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main id="main">
+
+<!-- ════ DASHBOARD ════ -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="dash.kicker">Command Center</div>
+      <div class="page-title" data-i18n="dash.title">Dashboard</div>
+      <div class="page-sub" id="dashSub" data-i18n="dash.sub">Visão geral da performance, risco e consistência.</div>
+    </div>
+    <div class="page-actions">
+      <select class="btn btn-ghost btn-sm" id="dashPeriod" onchange="renderDashboard()">
+        <option value="all" data-i18n="dash.period.all">Todo período</option>
+        <option value="today" data-i18n="dash.period.today">Hoje</option>
+        <option value="month" data-i18n="dash.period.month">Este mês</option>
+        <option value="week" data-i18n="dash.period.week">Esta semana</option>
+        <option value="year" data-i18n="dash.period.year">Este ano</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('log')" data-i18n="dash.openTrades">Abrir trades</button>
+    </div>
+  </div>
+  <div class="metrics-row metrics-row-hero" id="dashMetrics"></div>
+
+  <div class="dashboard-command-grid">
+    <div class="chart-card board-card board-card-xl">
+      <div class="board-header">
+        <div>
+          <div class="chart-title" data-i18n="dash.riskCenter">Centro de Risco</div>
+          <div class="board-title" data-i18n="dash.riskSub">Proteção da conta e exposição operacional</div>
+        </div>
+      </div>
+      <div class="risk-command-grid">
+        <div class="risk-highlight-panel">
+          <div class="risk-highlight-label" id="riskIdealLabel" data-i18n="dash.riskIdeal">Risco ideal por trade</div>
+          <div class="risk-highlight-value" id="riskIdealTrade">—</div>
+          <div class="risk-highlight-sub" id="riskIdealTradeSub">—</div>
+        </div>
+        <div class="risk-progress-stack" id="riskProgress"></div>
+      </div>
+      <div class="risk-alert-list" id="riskSignals"></div>
+    </div>
+
+    <div class="chart-card board-card">
+      <div class="board-header">
+        <div>
+          <div class="chart-title" data-i18n="dash.stratRadar">Radar de Estratégias</div>
+          <div class="board-title" data-i18n="dash.stratSub">O que mais está pagando agora</div>
+        </div>
+      </div>
+      <div id="dashStrategyBoard" class="strategy-board"></div>
+    </div>
+  </div>
+
+  <div class="dashboard-chart-stack">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center"><span id="equityChartTitle" data-i18n="dash.equityChart">Curva de Equity</span><button class="btn btn-ghost btn-sm" id="eqModeBtn" onclick="toggleEqMode()" style="font-size:10px;padding:2px 8px" data-i18n="dash.equityPct">% retorno</button></div>
+        <div class="chart-wrap" style="height:220px"><canvas id="equityChart"></canvas></div>
+      </div>
+      <div class="chart-card"><div class="chart-title" id="wlChartTitle" data-i18n="dash.wlChart">Distribuição W/L</div><div class="chart-wrap" style="height:220px"><canvas id="wlChart"></canvas></div></div>
+    </div>
+
+    <div class="chart-grid-3">
+      <div class="chart-card"><div class="chart-title" id="rBarChartTitle" data-i18n="dash.rChart">R-Múltiplos</div><div class="chart-wrap" style="height:150px"><canvas id="rBarChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="wdayChartTitle" data-i18n="dash.wdayChart">P/L por Dia da Semana</div><div class="chart-wrap" style="height:150px"><canvas id="wdayChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="monthEvChartTitle" data-i18n="dash.monthChart">Evolução Mensal</div><div class="chart-wrap" style="height:150px"><canvas id="monthEvChart"></canvas></div></div>
+    </div>
+
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title" id="stratDashChartTitle" data-i18n="dash.stratChart">P/L por Estratégia</div><div class="chart-wrap" style="height:160px"><canvas id="stratDashChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="emoDashChartTitle" data-i18n="dash.emoChart">Win Rate por Emoção</div><div class="chart-wrap" style="height:160px"><canvas id="emoDashChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="dashboard-lower-grid">
+    <div class="table-card dashboard-recent-trades">
+      <div class="table-header"><div class="table-title" data-i18n="dash.recentTrades">Trades Recentes</div><button class="btn btn-ghost btn-sm" onclick="showPage('log')" data-i18n="dash.viewAll">Ver todos</button></div>
+      <div class="dashboard-table-scroll">
+        <table class="tbl"><thead><tr><th data-i18n="th.date">Data</th><th data-i18n="th.symbol">Símbolo</th><th data-i18n="th.type">Tipo</th><th>Modo</th><th data-i18n="th.entry">Entrada</th><th data-i18n="th.exit">Saída</th><th data-i18n="th.r">R</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.status">Status</th></tr></thead>
+        <tbody id="recentTrades"></tbody></table>
+      </div>
+    </div>
+
+    <aside class="dashboard-side-column">
+      <div class="chart-card board-card">
+        <div class="board-header">
+          <div>
+            <div class="chart-title" data-i18n="dash.visualDiary">Diário Visual</div>
+            <div class="board-title" id="dashCalendarMonth">—</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('calendar')" data-i18n="dash.openCalendar">Abrir</button>
+        </div>
+        <div id="dashCalendarMini" class="dash-calendar-mini"></div>
+        <div id="dashWeekBreakdown" class="week-breakdown"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ════ LOG ════ -->
+<div class="page" id="page-log">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="log.kicker">Operações</div>
+      <div class="page-title" data-i18n="log.title">Histórico de Operações</div>
+      <div class="page-sub" data-i18n="log.sub">Gerencie, filtre e revise todas as suas operações</div>
+    </div>
+    <div class="page-actions">
+      <select id="filterAccount" class="btn btn-ghost btn-sm" onchange="renderLog()">
+        <option value="active" data-i18n="log.currentAccount">Conta atual</option>
+        <option value="all" data-i18n="log.allAccounts">Todas contas</option>
+      </select>
+      <select id="filterStrategy" class="btn btn-ghost btn-sm" onchange="renderLog()">
+        <option value="" data-i18n="log.allStrategies">Todas estratégias</option>
+      </select>
+      <div class="log-date-range">
+        <input type="date" id="filterDateStart" class="log-date-input" aria-label="Data inicial" onchange="renderLog()">
+        <span data-i18n="log.dateUntil">até</span>
+        <input type="date" id="filterDateEnd" class="log-date-input" aria-label="Data final" onchange="renderLog()">
+        <button class="log-date-clear" onclick="clearLogDateRange()" data-i18n="log.clearPeriod">Limpar período</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('tradeModal')" data-i18n="log.newTrade">+ Novo Trade</button>
+    </div>
+  </div>
+
+  <div id="logReadOnlyNotice" style="display:none;margin-bottom:12px"></div>
+
+  <div class="metrics-row metrics-row-compact" id="logMetrics"></div>
+
+  <div id="incompleteAlert" style="display:none" class="alert alert-warn incomplete-alert">
+    ⚠ <strong><span id="incompleteCount">0</span> trade(s) com dados incompletos</strong> — <button class="btn-link-warn" onclick="completeAllIncompleteTrades()">completar agora</button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header trade-log-header">
+      <div class="table-title" data-i18n="log.allTrades">Todos os Trades</div>
+      <div class="table-actions trade-log-actions">
+        <span class="text-muted text-mono" id="logCount" style="font-size:11px">0 <span data-i18n="log.records">registros</span></span>
+        <div id="bulkHint" class="bulk-hint" data-i18n="log.hint">Selecione trades para editar, completar incompletos, duplicar ou excluir.</div>
+        <div id="bulkBar">
+          <span id="bulkCount" style="font-size:12px;color:var(--muted)">0 <span data-i18n="log.selected">selecionados</span></span>
+          <button class="btn btn-ghost btn-sm" id="bulkEditBtn" onclick="editSelectedTrades()" data-i18n="log.edit">✏ Editar</button>
+          <button class="btn btn-ghost btn-sm" id="bulkCompleteBtn" onclick="completeSelectedIncompleteTrades()" data-i18n="log.complete">✓ Completar incompletos</button>
+          <button class="btn btn-ghost btn-sm" onclick="duplicateSelectedTrades()" data-i18n="log.duplicate">⧉ Duplicar</button>
+          <button class="btn btn-danger btn-sm" onclick="bulkDelete()" data-i18n="log.delete">🗑 Excluir</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearSelection()" data-i18n="log.cancel">✕ Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="logTable">
+        <thead>
+          <tr id="logThead" style="position:sticky;top:0;background:var(--bg1);z-index:10">
+            <th class="td-chk"><input type="checkbox" id="chkAll" onchange="toggleSelectAll(this)" style="accent-color:var(--accent)"></th>
+            <th class="sortable" onclick="sortLog('idx')"># <span class="sort-ind" id="si-idx"></span></th>
+            <th class="sortable" onclick="sortLog('date')"><span data-i18n="th.date">Data</span> <span class="sort-ind" id="si-date">↓</span></th>
+            <th class="sortable" onclick="sortLog('symbol')"><span data-i18n="th.symbol">Símbolo</span> <span class="sort-ind" id="si-symbol"></span></th>
+            <th data-i18n="th.market">Mercado</th>
+            <th class="sortable" onclick="sortLog('direction')"><span data-i18n="th.type">Tipo</span> <span class="sort-ind" id="si-direction"></span></th>
+            <th data-i18n="th.entry">Entrada</th><th data-i18n="th.stop">Stop</th><th data-i18n="th.tp">Alvo</th><th data-i18n="th.exit">Saída</th>
+            <th data-i18n="th.qty">Qtd</th><th data-i18n="th.riskUsd">Risco $</th>
+            <th class="sortable" onclick="sortLog('r')"><span data-i18n="th.r">R</span> <span class="sort-ind" id="si-r"></span></th>
+            <th class="sortable" onclick="sortLog('pnl')"><span data-i18n="th.pnl">P/L</span> <span class="sort-ind" id="si-pnl"></span></th>
+            <th data-i18n="th.pnlPct">P/L%</th>
+            <th class="sortable" onclick="sortLog('strategy')"><span data-i18n="th.strategy">Estratégia</span> <span class="sort-ind" id="si-strategy"></span></th>
+            <th class="sortable" onclick="sortLog('emotion')"><span data-i18n="th.emotion">Emoção</span> <span class="sort-ind" id="si-emotion"></span></th>
+            <th data-i18n="th.plan">Plano</th><th data-i18n="th.disc">Disc</th>
+            <th class="sortable" onclick="sortLog('status')"><span data-i18n="th.status">Status</span> <span class="sort-ind" id="si-status"></span></th>
+            <th data-i18n="th.actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="logTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CALENDÁRIO ════ -->
+<div class="page" id="page-calendar">
+  <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
+    <div><div class="page-kicker" data-i18n="cal.kicker">Diário</div><div class="page-title" data-i18n="cal.title">Diário de Performance</div><div class="page-sub" data-i18n="cal.sub">Sua evolução operacional por sessão, semana e mês</div></div>
+    <div class="calendar-toolbar flex gap-8 ml-auto" style="flex-shrink:0;flex-wrap:wrap;align-items:center">
+      <!-- Date picker rápido -->
+      <div class="calendar-month-control" style="display:flex;gap:4px;align-items:center;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px 10px">
+        <input type="month" id="calMonthPicker" class="calendar-month-input" onchange="calGoToMonth(this.value)" style="background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace">
+      </div>
+      <!-- Modo -->
+      <div class="calendar-view-toggle" style="display:flex;gap:2px;background:var(--bg2);border-radius:8px;padding:3px">
+        <button class="tab-btn calendar-mode-btn active" id="calBtnWeek" onclick="setCalView('week')" data-i18n="cal.monthly">Mensal</button>
+        <button class="tab-btn calendar-mode-btn" id="calBtnBiweek" onclick="setCalView('biweek')" data-i18n="cal.biweekly">Quinzenal</button>
+      </div>
+    </div>
+  </div>
+  <div class="metrics-row" id="calStats"></div>
+  <div class="calendar-card">
+    <div class="calendar-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="cal-nav-btn" onclick="calNav(-1)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center">‹</button>
+        <div class="cal-title" id="calTitle">Abril 2026</div>
+        <button class="cal-nav-btn" onclick="calNav(1)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+    </div>
+    <div id="calGridWrap"></div>
+  </div>
+  <div class="table-card" id="calDayDetail" style="display:none">
+    <div class="table-header"><div class="table-title" id="calDayTitle" data-i18n="cal.dayTrades">Trades do dia</div></div>
+    <table class="tbl">
+      <thead><tr><th data-i18n="th.symbol">Símbolo</th><th data-i18n="th.dir">Dir</th><th data-i18n="th.entry">Entrada</th><th data-i18n="th.exit">Saída</th><th data-i18n="th.r">R</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.status">Status</th></tr></thead>
+      <tbody id="calDayTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════ STATS ════ -->
+<div class="page" id="page-stats">
+  <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
+    <div><div class="page-kicker" data-i18n="stats.kicker">Insights</div><div class="page-title" data-i18n="stats.title">Análises</div><div class="page-sub" data-i18n="stats.sub">Leitura completa da performance, consistência e contexto operacional</div></div>
+    <div class="flex gap-8 ml-auto" style="flex-wrap:wrap;align-items:center">
+      <select class="btn btn-ghost btn-sm stats-filter-select" id="statAccount" onchange="onStatsAccountChange()">
+        <option value="all" data-i18n="stats.allAccounts">Todas as contas</option>
+      </select>
+      <select class="btn btn-ghost btn-sm stats-filter-select" id="statPeriod" onchange="toggleCustomPeriod()">
+        <option value="custom" selected data-i18n="stats.custom">Personalizado</option>
+        <option value="week" data-i18n="stats.thisWeek">Esta semana</option>
+        <option value="month" data-i18n="stats.thisMonth">Este mês</option>
+        <option value="year" data-i18n="stats.thisYear">Este ano</option>
+      </select>
+      <div id="customPeriodBar" style="display:flex;gap:6px;align-items:center" class="flex">
+        <input type="date" id="statDateFrom" onchange="renderStats()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:5px 9px;font-size:11px">
+        <span style="color:var(--muted);font-size:11px" data-i18n="stats.until">até</span>
+        <input type="date" id="statDateTo" onchange="renderStats()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:5px 9px;font-size:11px">
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-nav" id="statTabNav">
+    <button class="tab-btn active" onclick="switchStatTab('overview',this)" data-i18n="stats.tab.overview">Visão Geral</button>
+    <button class="tab-btn" onclick="switchStatTab('strategy',this)" data-i18n="stats.tab.strategy">Por Estratégia</button>
+    <button class="tab-btn" onclick="switchStatTab('time',this)" data-i18n="stats.tab.time">Por Tempo</button>
+    <button class="tab-btn" onclick="switchStatTab('psych',this)" data-i18n="stats.tab.psych">Psicológico</button>
+    <button class="tab-btn" onclick="switchStatTab('simulation',this)" data-i18n="stats.tab.simulation">Simulação</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="statTab-overview">
+    <div class="metrics-row" id="statsMetrics"></div>
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="stats.riskTitle">Risco, Stops e Taxas</div>
+      <div id="statsRiskLeakageRows" class="risk-insight-grid"></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.equityChart">Curva de Equity</div><div class="chart-wrap" style="height:180px"><canvas id="stEqChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wlChart">Distribuição W/L</div><div class="chart-wrap" style="height:180px"><canvas id="stWLChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.rChart">R-Múltiplos</div><div class="chart-wrap" style="height:140px"><canvas id="stRChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wdChart">P/L por Dia da Semana</div><div class="chart-wrap" style="height:140px"><canvas id="stWdChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.monthChart">Evolução Mensal</div><div class="chart-wrap" style="height:140px"><canvas id="stMonthChart"></canvas></div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.ddChart">Equity × Drawdown</div><div class="chart-wrap" style="height:150px"><canvas id="stDdChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.histChart">Histograma P/L</div><div class="chart-wrap" style="height:150px"><canvas id="stHistChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card">
+        <div class="chart-title" data-i18n="stats.metricsTable">Tabela de Métricas</div>
+        <div id="statsMetTable"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title" data-i18n="stats.streak">Streak & Sequências</div>
+        <div id="statsStreakRows"></div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)"></div>
+        <div id="stSymRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BY STRATEGY -->
+  <div id="statTab-strategy" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.stratPnl">P/L por Estratégia</div><div class="chart-wrap" style="height:180px"><canvas id="stStratPnlChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.stratWR">Win Rate por Estratégia</div><div class="chart-wrap" style="height:180px"><canvas id="stStratWRChart"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="stats.stratCompare">Comparativo de Estratégias</div>
+        <div class="strategy-compare-toolbar">
+          <label class="strategy-compare-toolbar-label" data-i18n="stats.compareLabel">Comparar:</label>
+          <div class="strategy-compare-toolbar-controls">
+            <select id="stStratA" class="strategy-compare-select" onchange="renderStats()"><option value="" data-i18n="stats.stratA">Estratégia A</option></select>
+            <span class="strategy-compare-toolbar-vs" data-i18n="stats.vs">vs</span>
+            <select id="stStratB" class="strategy-compare-select" onchange="renderStats()"><option value="" data-i18n="stats.stratB">Estratégia B</option></select>
+          </div>
+        </div>
+      </div>
+      <table class="tbl"><thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.wins">Wins</th><th data-i18n="th.wr">WR%</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.pf">PF</th><th data-i18n="th.exp">Expectância</th><th data-i18n="th.sharpe">Sharpe</th><th data-i18n="th.sortino">Sortino</th><th data-i18n="th.calmar">Calmar</th><th data-i18n="th.recFactor">Fator Rec.</th></tr></thead><tbody id="stStratBody"></tbody></table>
+    </div>
+    <div id="stStratCompare" class="strategy-compare-shell" style="display:none;margin-top:14px">
+      <div id="stCmpEmpty" class="chart-card strategy-compare-empty" style="display:none"></div>
+      <div id="stCmpFull" class="strategy-compare-full" style="display:none">
+        <div class="chart-card strategy-compare-hero">
+          <div class="table-header">
+            <div class="table-title" data-i18n="stats.compPanel">Painel da Comparação</div>
+            <div class="text-muted text-mono" id="stCmpInsights"></div>
+          </div>
+          <div class="chart-wrap" style="height:240px"><canvas id="stCmpEquityChart"></canvas></div>
+        </div>
+        <div class="strategy-compare-cards" id="stCmpCards"></div>
+        <div class="strategy-compare-grid">
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compBars">Barras comparativas</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpMetricBarsChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpMetricExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpMetricSummary"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compDist">Distribuição dos resultados</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpOutcomeChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpOutcomeExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpOutcomeSummary"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compTiming">Timing médio</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpTimingChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpTimingExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpTimingSummary"></div>
+          </div>
+        </div>
+        <div class="strategy-compare-cards">
+          <div class="chart-card" id="stCmpA"></div>
+          <div class="chart-card" id="stCmpB"></div>
+        </div>
+        <div class="table-card">
+          <div class="table-header"><div class="table-title" data-i18n="stats.compSummary">Resumo final</div></div>
+          <table class="tbl">
+            <thead><tr><th data-i18n="th.metric">Métrica</th><th data-i18n="th.stratA">Estratégia A</th><th data-i18n="th.stratB">Estratégia B</th><th data-i18n="th.leads">Lidera</th></tr></thead>
+            <tbody id="stCmpSummaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BY TIME -->
+  <div id="statTab-time" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.monthPnl">P/L por Mês</div><div class="chart-wrap" style="height:180px"><canvas id="stMonthPnlChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wdWR">Win Rate por Dia da Semana</div><div class="chart-wrap" style="height:180px"><canvas id="stWdWRChart"></canvas></div></div>
+    </div>
+    <div class="metrics-row" id="stTimeCards"></div>
+    <div class="chart-card"><div class="chart-title" data-i18n="stats.hourHeatmap">Trades por Horário (acionamento)</div><div id="stHourHeatmap" style="padding:10px"></div></div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.wdPerf">Desempenho por Dia da Semana</div></div>
+      <table class="tbl"><thead><tr><th data-i18n="th.period">Período</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th></tr></thead><tbody id="stTimeBody"></tbody></table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.timingStrat">Timing por Estratégia</div></div>
+      <table class="tbl"><thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.placedTime">Hora colocada</th><th data-i18n="th.trigTime">Hora acionada</th><th data-i18n="th.exitTime">Hora saída</th><th data-i18n="th.avgDuration">Duração média</th></tr></thead><tbody id="stTimeStrategyBody"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SIMULATION -->
+  <div id="statTab-simulation" style="display:none">
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="stats.monteCarlo">Simulação Monte Carlo — Próximas N Trades</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px">
+        <div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simAccount">Conta</label>
+              <select id="simAccount" onchange="loadSimFromAccount()">
+                <option value="manual" data-i18n="stats.simManual">Manual</option>
+              </select>
+            </div>
+            <div class="field-group"><label data-i18n="stats.simTrades">Número de trades</label><input type="number" id="simN" value="20" min="5" max="200" oninput="renderSimulation()"></div>
+          </div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simWR">Win Rate (%)</label><div class="iu"><input type="number" id="simWR" value="55" min="1" max="99" step="0.1" oninput="renderSimulation()" onchange="clampSimulationWinRateInput();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simBalance">Saldo atual da conta</label><input type="number" id="simBalance" value="1000" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"></div>
+          </div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simRiskPct">Risco por trade (%)</label><div class="iu"><input type="number" id="simRiskPct" value="1" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simRiskUsd">Risco por trade ($)</label><input type="number" id="simRisk" value="10" min="0" step="0.01" readonly></div>
+          </div>
+          <div class="field-group" style="margin-bottom:10px">
+            <label data-i18n="stats.simRRR">RRR Alvo (personalizado)</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select id="simRRR" onchange="renderSimulation()" style="flex:1">
+                <option value="0.618">0.618R</option>
+                <option value="1">1R (1:1)</option>
+                <option value="1.1" selected>1.1R</option>
+                <option value="1.141">1.141R</option>
+                <option value="1.618">1.618R</option>
+                <option value="2">2R (1:2)</option>
+                <option value="3">3R (1:3)</option>
+                <option value="custom" data-i18n="stats.simCustom">Personalizado</option>
+              </select>
+              <input type="number" id="simRRRCustom" value="1.1" step="0.001" min="0.1" style="width:80px;display:none" oninput="renderSimulation()">
+            </div>
+          </div>
+          <div class="form-grid fg-2">
+            <div class="field-group"><label data-i18n="stats.simGoalPct">Meta (%)</label><div class="iu"><input type="number" id="simGoalPct" value="10" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simGoalUsd">Meta ($)</label><input type="number" id="simGoalDay" value="100" step="0.01" readonly></div>
+            <div class="field-group"><label data-i18n="stats.simStopPct">Stop (%)</label><div class="iu"><input type="number" id="simStopPct" value="2" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simStopUsd">Stop ($)</label><input type="number" id="simStopDay" value="20" step="0.01" readonly></div>
+          </div>
+        </div>
+        <div>
+          <div class="metrics-row" id="simCards" style="margin-bottom:12px;grid-template-columns:1fr 1fr"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px" id="simSummary"></div>
+          <div id="simPlan" class="status-list compact"></div>
+        </div>
+      </div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.simChartTitle">Monte Carlo — 100 cenários de curva de equity</div><div class="chart-wrap" style="height:200px"><canvas id="simChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- PSICOLÓGICO NAS STATS -->
+  <div id="statTab-psych" style="display:none">
+    <div class="metrics-row" id="statPsychCards"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.emoWR">Win Rate por Emoção (durante)</div><div class="chart-wrap" style="height:180px"><canvas id="statEmoWRChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.emoPnl">P/L médio por Emoção</div><div class="chart-wrap" style="height:180px"><canvas id="statEmoPnlChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.discWR">Disciplina × Win Rate</div><div class="chart-wrap" style="height:180px"><canvas id="statDiscWRChart"></canvas></div><div class="analysis-summary-grid" id="statDiscSummary"></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.errors">Erros mais frequentes</div><div class="chart-wrap" style="height:160px"><canvas id="statErrorsChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.hesitation">Trades por hesitação (perdidos)</div><div id="statHesitationWrap" style="padding:10px"></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.planChart">P/L por status de plano seguido</div><div class="chart-wrap" style="height:180px"><canvas id="statPlanChart"></canvas></div><div class="analysis-summary-grid" id="statPlanSummary"></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.emoAnalysis">Análise por Emoção</div></div>
+      <table class="tbl">
+        <thead><tr><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.avgPnl">P/L médio</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.followedPlan">Seguiu plano</th><th data-i18n="th.avgDisc">Disciplina média</th></tr></thead>
+        <tbody id="statEmoBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRÉ-MARKET ════ -->
+<div class="page" id="page-premarket">
+  <div class="page-header flex gap-12" style="align-items:flex-start">
+    <div>
+      <div class="page-kicker" data-i18n="pm.kicker">Rotina</div>
+      <div class="page-title" data-i18n="pm.title">Rotina do Trade</div>
+      <div class="page-sub" data-i18n="pm.sub">Disciplina diária e planos de trading por conta</div>
+    </div>
+    <div class="flex gap-8 ml-auto" style="align-items:center">
+      <button class="btn btn-ghost btn-sm" onclick="shiftPMMonth(-1)" style="padding:4px 10px;font-size:16px;line-height:1">‹</button>
+      <span id="pmMonthLabel" style="font-size:13px;font-weight:600;min-width:120px;text-align:center;color:var(--text)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="shiftPMMonth(1)" style="padding:4px 10px;font-size:16px;line-height:1">›</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:14px">
+    <div class="chart-card">
+      <div class="chart-title" style="display:flex;align-items:center;gap:8px">
+        <span data-i18n="pm.disciplineMonth">Disciplina no mês</span>
+        <span id="pmDisciplinePct" style="color:var(--cyan);font-weight:700;font-size:13px"></span>
+      </div>
+      <div class="chart-wrap" style="height:160px"><canvas id="pmDisciplineChart"></canvas></div>
+    </div>
+    <div class="setup-card" style="padding:14px 16px">
+      <div class="setup-card-title" style="margin-bottom:4px" data-i18n="pm.resultPeriod">Resultado no período</div>
+      <div id="pmResultStats"></div>
+    </div>
+  </div>
+
+  <div class="metrics-row" id="pmCorrelCards"></div>
+
+  <div class="setup-card" style="overflow-x:auto;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="setup-card-title" data-i18n="pm.checklist">Checklist do mês</div>
+      <div style="font-size:11px;color:var(--muted)">
+        <span data-i18n="pm.accumulated">Disciplina acumulada:</span> <span id="pmMetaMes" style="color:var(--cyan);font-weight:700">0%</span>
+      </div>
+    </div>
+    <div id="pmHabitGrid"></div>
+  </div>
+
+  <div class="setup-card" style="padding:16px;margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="setup-card-title" data-i18n="pm.manageHabits">Gerenciar hábitos</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pmHabitMgr').style.display=document.getElementById('pmHabitMgr').style.display==='none'?'block':'none'" data-i18n="pm.editBtn">Editar ▾</button>
+    </div>
+    <div id="pmHabitMgr" style="display:none">
+      <div id="pmHabitList" style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div class="field-group" style="flex:1">
+          <input id="pmNewHabit" type="text" placeholder="Novo hábito…" data-i18n-ph="pm.newHabit">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addPMHabit()" data-i18n="pm.addHabit">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PSICOLÓGICO ════ -->
+<div class="page" id="page-psych">
+  <div class="page-header">
+    <div class="page-kicker" data-i18n="psych.kicker">Psicologia</div>
+    <div class="page-title" data-i18n="psych.title">Psicológico</div>
+    <div class="page-sub" data-i18n="psych.sub">Comportamento, disciplina e qualidade emocional por trade</div>
+  </div>
+
+  <div class="metrics-row" style="margin-bottom:20px">
+    <div class="metric-card c-green"><div class="m-label" data-i18n="psych.bestEmo">Melhor Emoção</div><div class="m-value green" id="bestEmotion">—</div><div class="m-sub" id="bestEmotionWR">—</div></div>
+    <div class="metric-card c-red"><div class="m-label" data-i18n="psych.worstEmo">Pior Emoção</div><div class="m-value red" id="worstEmotion">—</div><div class="m-sub" id="worstEmotionWR">—</div></div>
+    <div class="metric-card c-blue"><div class="m-label" data-i18n="psych.followedPlan">Seguiu Plano</div><div class="m-value blue" id="followedPlanRate">—</div><div class="m-sub" data-i18n="psych.ofTrades">dos trades</div></div>
+    <div class="metric-card c-yellow"><div class="m-label" data-i18n="psych.avgDisc">Disc. Médio</div><div class="m-value yellow" id="avgDisc">—</div><div class="m-sub" data-i18n="psych.pts">/ 5 pontos</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="psych.emoWR">Win Rate por Emoção</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="emotionChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="psych.discScore">Score de Disciplina</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="discChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title" data-i18n="psych.emoAnalysis">Análise por Emoção</div></div>
+    <table class="tbl">
+      <thead><tr><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.followedPlan">Seguiu Plano</th><th data-i18n="th.avgDisc">Disc. Médio</th></tr></thead>
+      <tbody id="psychTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════ ESTRATÉGIAS ════ -->
+<div class="page" id="page-strategyHub">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="strat.kicker">Playbook</div>
+      <div class="page-title" data-i18n="strat.title">Estratégias</div>
+      <div class="page-sub" data-i18n="strat.sub">Quais setups estão pagando, onde a execução está falhando e como defender o risco.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('stats')" data-i18n="strat.openAnalytics">Abrir análises</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('setup')" data-i18n="strat.editLibrary">Editar biblioteca</button>
+    </div>
+  </div>
+
+  <div class="metrics-row metrics-row-compact" id="strategyHubMetrics"></div>
+
+  <div class="strategy-hub-layout">
+    <div class="chart-card">
+      <div class="table-header"><div class="table-title" data-i18n="strat.map">Mapa de estratégias</div></div>
+      <div id="strategyHubBoard" class="strategy-board strategy-board-large"></div>
+    </div>
+    <div class="chart-card">
+      <div class="table-header"><div class="table-title" data-i18n="strat.focus">Foco operacional</div></div>
+      <div id="strategyHubFocus" class="status-list"></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title" data-i18n="strat.detailed">Comparativo detalhado</div></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.sharpe">Sharpe</th><th data-i18n="th.sortino">Sortino</th><th data-i18n="th.calmar">Calmar</th><th data-i18n="th.recFactor">Fator Rec.</th><th data-i18n="th.best">Melhor</th><th data-i18n="th.lastUsed">Último uso</th></tr></thead>
+        <tbody id="strategyHubTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SIMULAÇÕES ════ -->
+<div class="page" id="page-studyHub">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="sim.kicker">Hub Integrado</div>
+      <div class="page-title" data-i18n="sim.title">Simulações</div>
+      <div class="page-sub" data-i18n="sim.sub">Simuladores, planos e ferramentas do Mukas Hub rodam aqui de forma nativa, no mesmo fluxo visual do app.</div>
+    </div>
+  </div>
+
+  <div class="tab-nav study-hub-tabs" id="studyHubTabs">
+    <button class="tab-btn active" onclick="switchStudyHubTab('propfirm', this)">
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16V9"/><path d="M12 16V6"/><path d="M16 16v-4"/><path d="M20 16V8"/></svg></span>
+      <span data-i18n="sim.tabPropfirm">PropFirm Simulator</span>
+    </button>
+    <button class="tab-btn" onclick="switchStudyHubTab('plano', this)">
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5h6"/><path d="M9 10h6"/><path d="M9 14h6"/><path d="M9 18h4"/></svg></span>
+      <span data-i18n="sim.tabPlano">Plano de Trade</span>
+    </button>
+    <button class="tab-btn" onclick="switchStudyHubTab('tradesim', this)">
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/><path d="M4 20h16"/></svg></span>
+      <span data-i18n="sim.tabTradesim">Trade Simulator</span>
+    </button>
+    <button class="tab-btn" onclick="switchStudyHubTab('mental', this)">
+      <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/></svg></span>
+      <span data-i18n="sim.tabMental">Ferramentas Mentais</span>
+    </button>
+  </div>
+
+  <div id="studyHubNativeRoot" class="study-hub-native-root">
+    <input type="hidden" id="hubCot" value="5.80">
+    <span id="hubCotBadge" style="display:none">R$ 5,80</span>
+    <div id="studyHubLegacyApp" class="embed-mode"></div>
+    <div class="toast" id="hubToast"></div>
+  </div>
+</div>
+
+<!-- ════ IMPORT/EXPORT ════ -->
+<div class="page" id="page-import">
+  <div class="page-header">
+    <div class="page-kicker" data-i18n="import.kicker">Sistema</div>
+    <div class="page-title" data-i18n="import.title">Importações & Backup</div>
+    <div class="page-sub" data-i18n="import.sub">Importe relatório, restaure backup e exporte recortes personalizados</div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchImportTab('csv')" data-i18n="import.tabImport">Importar Operações</button>
+    <button class="tab-btn" onclick="switchImportTab('export')" data-i18n="import.tabExport">Exportar / Backup</button>
+  </div>
+
+  <div id="importTab-csv">
+    <div class="import-entry-grid">
+      <div class="setup-card import-primary-card">
+        <div class="setup-card-title" data-i18n="import.cardTitle">Importar Operações</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.cardInfo">Envie o ReportHistory em XLSX, HTML ou CSV. O diário detecta colunas, abre prévia e só salva depois da confirmação.</div>
+        <input id="importReportInput" type="file" accept=".csv,.xlsx,.html,.htm,.txt" onchange="handleReportUpload(event)" style="display:none">
+        <div class="import-dropzone">
+          <div class="import-dropzone-body">
+            <div class="import-dropzone-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="import-dropzone-title" data-i18n="import.dropTitle">Selecione arquivo para importar</div>
+            <div class="import-dropzone-sub" data-i18n="import.dropSub">XLSX, HTML ou CSV</div>
+            <div class="import-dropzone-actions"><button class="btn btn-ghost btn-sm" onclick="triggerFileInput('importReportInput')" data-i18n="import.selectFile">Selecionar arquivo</button></div>
+          </div>
+        </div>
+        <div id="csvPreview" class="import-preview-shell"></div>
+      </div>
+
+      <div class="import-side-stack">
+        <div class="setup-card test-data-card">
+          <div class="setup-card-title" data-i18n="import.testData">Dados de teste</div>
+          <div class="alert alert-info test-data-card-copy" style="margin-bottom:12px" data-i18n="import.testInfo">Para fins de teste e apresentação, você pode carregar uma base demonstrativa com trades simulados. Isso ajuda a validar dashboard, análises e filtros sem depender de uma importação real.</div>
+          <div class="test-data-card-actions">
+            <button class="btn btn-ghost" onclick="loadTickmillDemoImport()" data-i18n="import.loadTest">Carregar dados de teste</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="importTab-export" style="display:none">
+    <div class="import-export-grid">
+      <div class="setup-card import-backup-card">
+        <div class="setup-card-title" data-i18n="import.backupTitle">Backup completo</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.backupInfo">Use backup completo para trocar de máquina ou voltar versões com tudo preservado.</div>
+        <div class="backup-action-grid">
+          <button class="btn btn-ghost" onclick="exportJSON()" data-i18n="import.exportBackup">↓ Exportar backup completo</button>
+          <input id="importBackupInput" type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+          <button class="btn btn-ghost" onclick="triggerFileInput('importBackupInput')" data-i18n="import.importBackup">↑ Importar backup completo</button>
+        </div>
+        <div id="backupSummary" class="alert alert-info import-backup-summary" style="margin:0" data-i18n="import.backupSummary">Resumo aparece aqui antes de restaurar ou após exportar.</div>
+      </div>
+
+      <div class="setup-card import-csv-move-card">
+        <div class="setup-card-title" data-i18n="import.moveTitle">Movimentação de Trades</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.moveInfo">Importe arquivo de trades ou exporte recortes personalizados em CSV para análise e troca de dados.</div>
+        <div class="import-move-actions">
+          <input id="importTradesInput" type="file" accept=".csv,.xlsx,.html,.htm,.txt" onchange="handleReportUpload(event)" style="display:none">
+          <button class="btn btn-ghost" onclick="triggerFileInput('importTradesInput')" data-i18n="import.importTrades">↑ Importar arquivo de trades</button>
+        </div>
+        <div class="sep"></div>
+        <div class="setup-card-title import-subsection-title" data-i18n="import.exportCustomTitle">Exportar CSV personalizado</div>
+        <div class="export-filter-grid">
+          <div class="field-group">
+            <label data-i18n="import.startDate">Data inicial</label>
+            <input type="date" id="exportStartDate">
+          </div>
+          <div class="field-group">
+            <label data-i18n="import.endDate">Data final</label>
+            <input type="date" id="exportEndDate">
+          </div>
+          <div class="field-group">
+            <label data-i18n="import.account">Conta</label>
+            <select id="exportAccount">
+              <option value="" data-i18n="import.all">Todas</option>
+            </select>
+          </div>
+        </div>
+        <div class="export-action-row">
+          <button class="btn btn-primary" onclick="exportCSVCustom()" data-i18n="import.exportCustomBtn">↓ Exportar CSV personalizado</button>
+          <button class="btn btn-ghost" onclick="exportCSV()" data-i18n="import.exportAllBtn">↓ Exportar todos os trades</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DOCUMENTOS ════ -->
+<div class="page" id="page-documents">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="docs.kicker">Conhecimento</div>
+      <div class="page-title" data-i18n="docs.title">Documentos</div>
+      <div class="page-sub" data-i18n="docs.sub">Observações de trades, notas do dia e documentos do seu processo operacional.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" id="docCreateBtn" onclick="createDocumentFromActiveFolder()" data-i18n="docs.newNote">+ Nova anotação geral</button>
+      <button class="btn btn-danger btn-sm" id="docDeleteBtn" onclick="deleteCurrentDocument()" style="display:none" data-i18n="docs.delete">Excluir</button>
+      <button class="btn btn-primary btn-sm" onclick="saveCurrentDocument()" data-i18n="docs.save">Salvar</button>
+    </div>
+  </div>
+
+  <div class="doc-shell">
+    <div class="chart-card doc-nav-card">
+      <div id="docFolders" class="doc-folder-list" style="padding:12px"></div>
+    </div>
+
+    <div class="chart-card doc-list-card">
+      <div class="table-header">
+        <div class="table-title" id="docListTitle">Notas</div>
+        <span class="text-muted text-mono" id="docListCount" style="font-size:10px">0 itens</span>
+      </div>
+      <div id="docEntries" class="doc-entry-list"></div>
+    </div>
+
+    <div class="chart-card doc-editor-card">
+      <div class="doc-editor-header">
+        <div>
+          <div class="table-title" id="docEditorHeading" data-i18n="docs.selectNote">Selecione uma nota</div>
+          <div class="doc-editor-meta" id="docEditorMeta" data-i18n="docs.selectNoteHint">Escolha um item na coluna central para editar.</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="docOpenTradeBtn" onclick="openDocumentTrade()" style="display:none" data-i18n="docs.viewTrade">Ver trade ↗</button>
+      </div>
+      <div id="docTradeContext" class="doc-trade-context" style="display:none"></div>
+      <div class="field-group" style="margin-bottom:12px">
+        <label data-i18n="docs.titleLabel">Título</label>
+        <input type="text" id="docEditorTitle" data-i18n-ph="docs.titlePlaceholder" placeholder="Título do documento">
+      </div>
+      <div class="doc-toolbar">
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('bold')" title="Negrito">B</button>
+        <button type="button" class="doc-toolbar-btn doc-toolbar-italic" onclick="formatDocumentSelection('italic')" title="Itálico">I</button>
+        <button type="button" class="doc-toolbar-btn doc-toolbar-underline" onclick="formatDocumentSelection('underline')" title="Sublinhado">U</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('h1')" title="Título 1">H1</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('h2')" title="Título 2">H2</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('list')" title="Lista">•</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('quote')" title="Citação">"</button>
+        <button type="button" class="doc-toolbar-btn" onclick="triggerDocumentImageUpload()" title="Adicionar imagem" aria-label="Adicionar imagem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+        <input type="file" id="docImageInput" class="doc-image-input" accept="image/*,image/jpeg,image/png,image/gif,image/webp" multiple onchange="addDocumentImages(event)">
+      </div>
+      <textarea id="docEditorBody" class="doc-editor-body" data-i18n-ph="docs.bodyPlaceholder" placeholder="Escreva aqui suas observações, lições e contexto da operação..."></textarea>
+      <div id="docMedia" class="doc-media-panel"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SETUP ════ -->
+<div class="page" id="page-setup">
+  <div class="page-header flex gap-12" style="align-items:flex-start">
+    <div><div class="page-kicker" data-i18n="setup.kicker">Risco</div><div class="page-title" data-i18n="setup.title">Conta e Setup</div><div class="page-sub" data-i18n="setup.sub">Parâmetros da conta, limites de risco e biblioteca operacional</div></div>
+    <div class="ml-auto"><button class="btn btn-primary btn-sm" onclick="saveConfig()" data-i18n="setup.save">💾 Salvar</button></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="setup.accountRisk">Conta e Risco</div>
+      <div class="form-grid fg-2">
+        <div class="field-group"><label data-i18n="setup.initialBalance">Saldo Inicial ($)</label><input type="number" id="cfg-balance" placeholder="1000" step="0.01" oninput="previewSetupRiskFromForm()"></div>
+        <div class="field-group"><label data-i18n="setup.goalPct">Meta da Conta (%)</label><div class="iu"><input type="number" id="cfg-goal" placeholder="10" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.riskPerTrade">Risco por Trade (%)</label><div class="iu"><input type="number" id="cfg-risk" placeholder="1" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddDaily">DD Diário (%)</label><div class="iu"><input type="number" id="cfg-dd-daily" placeholder="2" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddWeekly">DD Semanal (%)</label><div class="iu"><input type="number" id="cfg-dd-weekly" placeholder="5" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddMonthly">DD Mensal (%)</label><div class="iu"><input type="number" id="cfg-dd-monthly" placeholder="8" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddMax">DD Máximo (%)</label><div class="iu"><input type="number" id="cfg-dd" placeholder="10" step="0.5" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.defaultTf">Timeframe Padrão</label><select id="cfg-tf"><option>1M</option><option>2M</option><option>5M</option><option>15M</option><option>30M</option><option>1H</option><option>4H</option><option>1D</option></select></div>
+        <div class="field-group"><label data-i18n="setup.defaultSymbol">Símbolo Padrão</label><input type="text" id="cfg-sym-default" placeholder="US30, EURUSD..."></div>
+      </div>
+    </div>
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="setup.calcTitle">Cálculos da Conta Ativa</div>
+      <div class="account-calc-grid">
+        <div><span data-i18n="setup.calcInitial">Saldo inicial</span><strong id="setupInitialBalance">—</strong></div>
+        <div><span data-i18n="setup.calcCashflow">Aportes líquidos</span><strong id="setupCashflowNet">—</strong></div>
+        <div><span data-i18n="setup.calcCurrent">Saldo atual</span><strong id="setupCurrentBalance">—</strong></div>
+        <div><span data-i18n="setup.calcRisk">Risco por trade</span><strong id="setupRiskPerTrade">—</strong></div>
+        <div><span data-i18n="setup.calcDdDaily">DD diário</span><strong id="setupDailyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdWeekly">DD semanal</span><strong id="setupWeeklyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdMonthly">DD mensal</span><strong id="setupMonthlyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdMax">DD máximo</span><strong id="setupMaxDdLimit">—</strong></div>
+      </div>
+      <div class="alert alert-info" style="margin-top:12px" data-i18n="setup.calcInfo">Saldo atual = saldo inicial + aportes − retiradas + P/L dos trades. Risco, DD diário, semanal, mensal e máximo usam o capital ajustado da conta ativa.</div>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.cashflow">Aportes e Retiradas</div>
+    <div class="form-grid fg-4" style="margin-bottom:10px">
+      <div class="field-group"><label data-i18n="setup.flowType">Tipo</label><select id="setup-flow-type"><option value="deposit" data-i18n="setup.deposit">Aporte</option><option value="withdrawal" data-i18n="setup.withdrawal">Retirada</option></select></div>
+      <div class="field-group"><label data-i18n="setup.flowDate">Data</label><input type="date" id="setup-flow-date"></div>
+      <div class="field-group"><label data-i18n="setup.flowAmount">Valor ($)</label><input type="number" id="setup-flow-amount" placeholder="100" step="0.01"></div>
+      <div class="field-group"><label data-i18n="setup.flowNote">Observação</label><input type="text" id="setup-flow-note" data-i18n-ph="setup.optional" placeholder="Opcional"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="addSetupCashflowFromForm()" data-i18n="setup.addFlow">+ Adicionar movimento</button>
+    </div>
+    <div id="setupCashflowList" class="account-cashflow-list"></div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.strategies">Estratégias <span style="font-size:10px;color:var(--muted);font-weight:400">— editar, remover e adicionar</span></div>
+    <div class="tag-list" id="strategyTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newStrategy" data-i18n-ph="setup.newStrategy" placeholder="Nova estratégia...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('strategy')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.emotions">Emoções</div>
+    <div class="tag-list" id="emotionTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newEmotion" data-i18n-ph="setup.newEmotion" placeholder="Nova emoção...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('emotion')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.markets">Mercados</div>
+    <div class="tag-list" id="marketTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newMarket" data-i18n-ph="setup.newMarket" placeholder="Novo mercado...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('market')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div style="margin-top:6px">
+    <button class="btn btn-danger btn-sm" onclick="clearAll()" data-i18n="setup.clearAll">⚠ Limpar todos os dados</button>
+  </div>
+</div>
+
+<!-- ════ NOTIFICAÇÕES ════ -->
+<div class="page" id="page-notifications">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="notif.kicker">Monitoramento</div>
+      <div class="page-title" data-i18n="notif.title">Notificações</div>
+      <div class="page-sub" data-i18n="notif.sub">Alertas de risco, processo e registros que pedem revisão.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('documents')" data-i18n="notif.openDocs">Abrir documentos</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('setup')" data-i18n="notif.reviewSetup">Revisar setup</button>
+    </div>
+  </div>
+  <div id="notificationFeed" class="notification-list"></div>
+</div>
+
+<!-- ════ CONTAS ════ -->
+<div class="page" id="page-accounts">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="accounts.kicker">Estrutura</div>
+      <div class="page-title" data-i18n="accounts.title">Contas</div>
+      <div class="page-sub" data-i18n="accounts.sub">Painel consolidado das contas, limites de risco e performance por carteira.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('setup')" data-i18n="accounts.riskSetup">Risco & setup</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('accountModal')" data-i18n="accounts.manage">Gerenciar contas</button>
+    </div>
+  </div>
+
+  <div class="metrics-row metrics-row-compact" id="accountsMetrics"></div>
+  <div id="accountsOverview" class="account-overview-grid"></div>
+</div>
+
+<!-- ════ PARCEIROS ════ -->
+<div class="page" id="page-partners">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="partners.kicker">Ecossistema</div>
+      <div class="page-title" data-i18n="partners.title">Parceiros</div>
+      <div class="page-sub" data-i18n="partners.sub">Cadastre afiliados de prop firms, apoio por BTC e links de suporte quando quiser ativar esta área.</div>
+    </div>
+  </div>
+
+  <div class="partner-config-grid">
+    <div class="setup-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="partners.affiliates">Afiliados de Prop Firms</div>
+        <button class="btn btn-ghost btn-sm" id="partnerAddAffiliateBtn" type="button" onclick="addPartnerAffiliate()" data-i18n="partners.addAffiliate">Adicionar afiliado</button>
+      </div>
+      <div id="partnerAffiliatesEditor" class="partner-affiliates-editor"></div>
+    </div>
+
+    <div class="setup-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="partners.support">Apoio / Doação</div>
+      </div>
+      <div class="partner-support-form">
+        <div class="field-group">
+          <label data-i18n="partners.btcAddress">Endereço BTC</label>
+          <input type="text" id="partnerBtcAddress" data-i18n-ph="partners.btcPlaceholder" placeholder="Cole aqui o endereço BTC" onchange="updatePartnerSupportField('btcAddress',this.value)">
+        </div>
+        <div class="field-group">
+          <label data-i18n="partners.coffeeLink">Link Buy Me a Coffee / apoio</label>
+          <input type="url" id="partnerCoffeeUrl" placeholder="https://buymeacoffee.com/..." onchange="updatePartnerSupportField('coffeeUrl',this.value)">
+        </div>
+        <input id="partnerBtcQrInput" type="file" accept="image/*" onchange="handlePartnerBtcQrUpload(event)" style="display:none">
+        <div id="partnerBtcQrPreview"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="partnersGrid" class="partner-grid"></div>
+</div>
+
+<!-- ════ PERFIL ════ -->
+<div class="page" id="page-profile">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="profile.kicker">Operador</div>
+      <div class="page-title" data-i18n="profile.title">Perfil</div>
+      <div class="page-sub" data-i18n="profile.sub">Resumo local do operador, configuração atual e próximos focos de execução.</div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="chart-card" id="profileHero"></div>
+    <div class="chart-card" id="profileRiskPanel"></div>
+  </div>
+
+  <div class="profile-grid profile-grid-secondary">
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="profile.library">Biblioteca operacional</div>
+      <div id="profileTags"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="profile.focus">Focos imediatos</div>
+      <div id="profileFocus" class="status-list"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- ════ MODAL: NOVO TRADE ════ -->
+<div class="modal-overlay" id="tradeModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="tradeModalTitle" data-i18n="modal.trade.register">Registrar Trade</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('tradeModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Linha 0: conta -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;background:var(--bg2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">
+        <div class="field-group" style="margin-bottom:0;flex:1">
+          <label style="font-size:10px" data-i18n="modal.trade.account">Conta</label>
+          <select id="t-account" onchange="onAccountChange()" style="background:transparent;border:none;color:var(--text);font-size:12px;font-weight:600;padding:0"></select>
+        </div>
+        <div id="t-acct-info" style="font-size:10px;color:var(--muted);text-align:right"></div>
+      </div>
+      <!-- Linha 1: ativo + data + mercado + tipo -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.symbol">Símbolo <span class="required">*</span></label>
+          <div style="position:relative">
+            <input type="text" id="t-symbol" placeholder="US30, EURUSD..." list="symbolsList" oninput="this.value=this.value.toUpperCase();updateMarketFromSymbol()">
+            <datalist id="symbolsList"></datalist>
+          </div>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.entryDate">Data de Entrada <span class="required">*</span></label>
+          <input type="date" id="t-date" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.market">Mercado</label>
+          <select id="t-market"></select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.direction">Direção <span class="required">*</span></label>
+          <select id="t-direction">
+            <option value="Long">Long ▲</option>
+            <option value="Short">Short ▼</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Linha 2: preços -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.entryPrice">Preço de Entrada <span class="required">*</span></label>
+          <input type="number" id="t-entry" step="0.01">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.stopLoss">Stop Loss <span class="required">*</span></label>
+          <input type="number" id="t-stop" step="0.01" oninput="calcRR()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.takeProfit">Take Profit</label>
+          <input type="number" id="t-tp" step="0.01" oninput="calcRR()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.exitPrice">Preço de Saída</label>
+          <input type="number" id="t-exit" step="0.01" oninput="calcRR()">
+        </div>
+      </div>
+
+      <!-- Linha 3: risco e resultado — MODO % -->
+      <div id="modePercentFields">
+        <div class="form-grid fg-4" style="margin-bottom:12px">
+          <div class="field-group">
+            <label data-i18n="modal.trade.riskPct">Risco % da conta</label>
+            <div class="iu"><input type="number" id="t-riskpct" step="0.01" placeholder="Ex: 1.0" oninput="calcRR()"><span class="u">%</span></div>
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.riskUsd">Risco em $ (auto)</label>
+            <input type="number" id="t-riskusd" step="0.01" placeholder="Auto" readonly style="background:var(--bg3);color:var(--teal,#00d68f)">
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.rRealized">R Realizado (auto)</label>
+            <input type="number" id="t-r" step="0.01" placeholder="Auto" readonly style="background:var(--bg3)">
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.pnl">P/L $ (auto ou manual)</label>
+            <input type="number" id="t-pnl" step="0.01" placeholder="Auto" oninput="calcRR()">
+          </div>
+        </div>
+      </div>
+      <!-- Linha 4: estratégia + datas/horários -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.strategy">Estratégia</label>
+          <select id="t-strategy"></select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.exitDate">Data de Saída</label>
+          <input type="date" id="t-exitdate" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.timePlaced">Hora colocada</label>
+          <input type="time" id="t-placedtime">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.timeOpen">Hora acionada</label>
+          <input type="time" id="t-opentime" oninput="updateTradeDurationField()">
+        </div>
+      </div>
+      <div class="form-grid fg-3" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.timeExit">Hora de Saída</label>
+          <input type="time" id="t-exittime" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.duration">Duração (auto)</label>
+          <input type="text" id="t-duration" readonly style="background:var(--bg3);color:var(--muted)">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.fees">Fees / Comissão ($)</label>
+          <input type="number" id="t-fees" step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- PSICOLÓGICO EXPANDIDO -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px" data-i18n="modal.trade.psych">🧠 Psicológico</div>
+
+      <!-- Emoções -->
+      <div class="form-grid fg-3" style="margin-bottom:12px">
+        <div class="field-group"><label data-i18n="modal.trade.emoBefore">Emoção ANTES</label><select id="t-emo-before" onchange="autoDisc()"></select></div>
+        <div class="field-group"><label data-i18n="modal.trade.emoDuring">Emoção DURANTE</label><select id="t-emotion" onchange="autoDisc()"></select></div>
+        <div class="field-group"><label data-i18n="modal.trade.emoAfter">Emoção APÓS</label><select id="t-emo-after" onchange="autoDisc()"></select></div>
+      </div>
+
+      <!-- Seguiu o plano + desvio (sempre visível) -->
+      <div class="form-grid fg-2" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.followedPlan">Seguiu o Plano?</label>
+          <select id="t-followedplan" onchange="togglePlanDeviation()">
+            <option value="">—</option>
+            <option value="sim" data-i18n="modal.trade.planYes">✓ Sim — seguiu 100%</option>
+            <option value="nao" data-i18n="modal.trade.planNo">✗ Não seguiu</option>
+            <option value="parcial" data-i18n="modal.trade.planPartial">~ Parcial</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.planDeviation">O que fez diferente do plano?</label>
+          <input type="text" id="t-plan-deviation" data-i18n-ph="modal.trade.planDeviationPh" placeholder="O que mudou na execução, entrada, saída ou gestão?">
+        </div>
+      </div>
+
+      <!-- Confiança (0-100%) + Disciplina auto -->
+      <div class="form-grid fg-2" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.confidence">Confiança antes do trade (0–100%)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="range" id="t-confidence" min="0" max="100" step="5" value="60" oninput="document.getElementById('t-conf-val').textContent=this.value+'%';autoDisc()" style="flex:1;accent-color:var(--blue)">
+            <span id="t-conf-val" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--blue)">60%</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.discipline">Disciplina (0–100%, auto-calculado)</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="range" id="t-discipline" min="0" max="100" step="5" value="70" oninput="this.dataset.manual='1';document.getElementById('t-disc-val').textContent=this.value+'%'" style="flex:1;accent-color:var(--purple)">
+            <span id="t-disc-val" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--purple)">70%</span>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="autoDisc(true)" title="Recalcular automático">↺</button>
+          </div>
+          <div style="font-size:9px;color:var(--dim);margin-top:2px" id="discExplain"></div>
+        </div>
+      </div>
+
+      <!-- Erros predefinidos -->
+      <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px" data-i18n-html="modal.trade.errorsLabel">
+        Erros cometidos <span style="color:var(--dim);font-weight:400;text-transform:none">— clique para marcar</span>
+      </div>
+      <div id="errorChips" class="error-chip-grid"></div>
+
+      <!-- Breakeven -->
+      <div class="form-grid fg-3" style="margin-bottom:10px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.result">Resultado</label>
+          <select id="t-result-type" onchange="autoDisc()">
+            <option value="" data-i18n="modal.trade.resultAuto">Auto (por P/L)</option>
+            <option value="WIN">WIN ✓</option>
+            <option value="LOSS">LOSS ✗</option>
+            <option value="BE">Breakeven ≈</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.mistakeDetail">Detalhe do erro cometido</label>
+          <input type="text" id="t-mistake" data-i18n-ph="modal.trade.mistakePh" placeholder="O que aconteceu, o que senti..." oninput="autoDisc()">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg3);border-radius:7px;padding:8px 10px;border:1px solid var(--border);width:100%">
+            <input type="checkbox" id="t-hesitation" onchange="autoDisc()" style="accent-color:var(--yellow);width:14px;height:14px">
+            <span data-i18n-html="modal.trade.hesitation">⚠ <strong style="color:var(--yellow)">Hesitei</strong> — não executei o trade</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label data-i18n="modal.trade.remarks">Observações / Análise</label>
+        <textarea id="t-remarks" data-i18n-ph="modal.trade.remarksPh" placeholder="Contexto, setup, lições aprendidas, análise pós-trade..."></textarea>
+      </div>
+      <!-- Upload de imagens -->
+      <div style="margin-top:10px">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📎 Imagens do Trade</div>
+        <input type="file" id="t-images" accept="image/*,image/jpeg,image/png,image/gif,image/webp" multiple onchange="previewTradeImages(event)" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px dashed var(--border2);border-radius:7px;padding:8px 12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="font-size:11px;color:var(--muted);flex:1" data-i18n="modal.trade.addImages">Adicionar imagens (JPEG, PNG, GIF, WEBP)</span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="triggerFileInput('t-images')" data-i18n="modal.trade.selectImages">Selecionar</button>
+        </div>
+        <div id="t-images-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div id="tradeModalFlow" class="trade-modal-flow">
+        <span id="tradeModalFlowLabel" class="trade-modal-flow-label"></span>
+        <div class="trade-modal-flow-actions">
+          <button class="btn btn-ghost btn-sm" id="tradeModalPrevBtn" onclick="openPreviousBulkIncompleteTrade()" disabled data-i18n="modal.trade.prev">Anterior</button>
+          <button class="btn btn-ghost btn-sm" id="tradeModalNextBtn" onclick="openNextBulkIncompleteTrade()" disabled data-i18n="modal.trade.next">Próximo</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeModal('tradeModal')" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="tradeModalSaveBtn" onclick="saveTrade()" data-i18n="modal.trade.save">Salvar Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: CONTA ════ -->
+<div class="modal-overlay" id="accountModal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-hdr">
+      <div class="modal-title" data-i18n="modal.account.title">Gerenciar Contas</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('accountModal')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:80vh;overflow-y:auto">
+      <div id="accountList" style="margin-bottom:16px"></div>
+      <button class="btn btn-primary btn-sm" onclick="newAccount()" data-i18n="modal.account.newAccount">+ Nova Conta</button>
+      <div id="accountForm" style="display:none;margin-top:14px;background:var(--bg2);border-radius:10px;padding:16px">
+        <div class="setup-card-title" style="margin-bottom:12px" id="acctFormTitle" data-i18n="modal.account.newAccount">Nova Conta</div>
+        <div class="form-grid fg-3" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.name">Nome da conta <span class="required">*</span></label><input type="text" id="af-name" data-i18n-ph="modal.account.namePh" placeholder="Ex: Pessoal CFD, Prop FTMO..."></div>
+          <div class="field-group"><label data-i18n="modal.account.type">Tipo</label>
+            <select id="af-type" onchange="onAcctTypeChange()">
+              <option value="cfd_pct" data-i18n="modal.account.typeCfd">CFD / % (Forex, Índices CFD)</option>
+              <option value="prop_pct" data-i18n="modal.account.typeProp">Prop Firm % (FTMO, 5ers...)</option>
+              <option value="crypto" data-i18n="modal.account.typeCrypto">Crypto</option>
+            </select>
+          </div>
+          <div class="field-group"><label data-i18n="modal.account.color">Cor</label>
+            <input type="color" id="af-color" value="#4d7cfe" style="width:100%;height:36px;border-radius:7px;border:1px solid var(--border2);background:var(--bg2)">
+          </div>
+        </div>
+        <div class="form-grid fg-3" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.initialBalance">Saldo inicial ($)</label><input type="number" id="af-balance" placeholder="1000" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.defaultRisk">Risco padrão por trade</label>
+            <div class="iu"><input type="number" id="af-risk" placeholder="1" step="0.1"><span class="u" id="af-risk-unit">%</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px" data-i18n="modal.account.riskRules">Regras de Risco</div>
+        <div class="form-grid fg-4" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.ddDaily">DD máx diário</label><div class="iu"><input type="number" id="af-dd-daily" placeholder="2" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddWeekly">DD máx semanal</label><div class="iu"><input type="number" id="af-dd-weekly" placeholder="5" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddMonthly">DD máx mensal</label><div class="iu"><input type="number" id="af-dd-monthly" placeholder="8" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddTotal">DD máx total</label><div class="iu"><input type="number" id="af-dd-total" placeholder="10" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.goalPct">Meta lucro</label><div class="iu"><input type="number" id="af-goal" placeholder="10" step="0.1"><span class="u">%</span></div></div>
+        </div>
+        <div class="form-grid fg-3" style="margin-bottom:12px">
+          <div class="field-group"><label data-i18n="modal.account.goalWeek">Meta semanal ($)</label><input type="number" id="af-goal-week" placeholder="200" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.goalMonth">Meta mensal ($)</label><input type="number" id="af-goal-month" placeholder="500" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.goalTotal">Meta total ($)</label><input type="number" id="af-goal-total" placeholder="2000" step="0.01"></div>
+        </div>
+        <div class="account-cashflow-panel">
+          <div class="setup-card-title" style="margin-bottom:10px" data-i18n="setup.cashflow">Aportes e Retiradas</div>
+          <div class="form-grid fg-4" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="setup.flowType">Tipo</label><select id="af-flow-type"><option value="deposit" data-i18n="setup.deposit">Aporte</option><option value="withdrawal" data-i18n="setup.withdrawal">Retirada</option></select></div>
+            <div class="field-group"><label data-i18n="setup.flowDate">Data</label><input type="date" id="af-flow-date"></div>
+            <div class="field-group"><label data-i18n="setup.flowAmount">Valor ($)</label><input type="number" id="af-flow-amount" placeholder="100" step="0.01"></div>
+            <div class="field-group"><label data-i18n="setup.flowNote">Observação</label><input type="text" id="af-flow-note" data-i18n-ph="setup.optional" placeholder="Opcional"></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <button class="btn btn-ghost btn-sm" onclick="addAccountCashflowFromForm()" data-i18n="setup.addFlow">+ Adicionar movimento</button>
+          </div>
+          <div id="accountCashflowList" class="account-cashflow-list"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="saveAccount()" data-i18n="modal.account.save">💾 Salvar conta</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('accountForm').style.display='none'" data-i18n="modal.cancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="csvConfirmModal">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-hdr">
+      <div class="modal-title" data-i18n="modal.import.title">Confirmar Importação</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('csvConfirmModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="csvConfirmPreview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('csvConfirmModal')" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmImport()" id="confirmImportBtn" data-i18n="modal.import.confirmBtn">Importar <span id="importCount">0</span> trades</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="appDialogModal">
+  <div class="modal app-dialog">
+    <div class="modal-hdr">
+      <div class="modal-title" id="appDialogTitle" data-i18n="modal.dialog.title">Confirmar ação</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeAppDialog()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="app-dialog-copy" id="appDialogBody"></div>
+      <div class="field-group app-dialog-input" id="appDialogInputWrap" style="display:none">
+        <label id="appDialogInputLabel" data-i18n="modal.dialog.inputLabel">Valor</label>
+        <input type="text" id="appDialogInput">
+        <div class="app-dialog-error" id="appDialogError"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAppDialog()" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="appDialogConfirmBtn" onclick="confirmAppDialog()" data-i18n="modal.dialog.confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
