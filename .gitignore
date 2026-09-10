@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.next/
+vendor/
+target/
+venv/
+.venv/
+generated/
+logs/
+.serena/cache/
+.serena/logs/
+.agents/skills/
