@@ -39,17 +39,17 @@ calculateSimulationSizing({balance=0,riskPct=0,goalPct=0,stopPct=0}={})
 // Retorno: {balance, riskPct, goalPct, stopPct, riskUsd, goalUsd, stopUsd}
 ```
 
-- [ ] Fixar expectativas no código original usando `node:test`/`node:vm`.
+- [x] Fixar expectativas no código original usando `node:test`/`node:vm`.
   Caso nominal: saldo 1000, percentuais 1/5/3 => valores 10/50/30.
   Incluir defaults, inválidos, negativos, `parseFloat`, dinheiro arredondado primeiro,
   percentuais >100, overflow, TypeError para null e ausência de mutação.
-- [ ] Executar `node --test tests/simulation-sizing.test.cjs` antes de alterar aplicação.
-- [ ] Registrar smoke baseline em navegador isolado: carga, navegação e simulação.
-- [ ] Extrair funções sem reescrever cálculos; publicar `TradeDiarySimulationSizing` por IIFE.
-- [ ] Manter declarações globais com assinaturas iguais delegando ao domínio.
-- [ ] Executar testes contra domínio e wrappers; conferir script e ausência de dependências DOM/IO.
-- [ ] Executar smoke após extração, `node --check` e `git diff --check`.
-- [ ] Revisar com agente independente; atualizar mapa/progresso e criar commit conceitual.
+- [x] Executar `node --test tests/simulation-sizing.test.cjs` antes de alterar aplicação.
+- [x] Registrar smoke baseline em navegador isolado: carga, navegação e simulação.
+- [x] Extrair funções sem reescrever cálculos; publicar `TradeDiarySimulationSizing` por IIFE.
+- [x] Manter declarações globais com assinaturas iguais delegando ao domínio.
+- [x] Executar testes contra domínio e wrappers; conferir script e ausência de dependências DOM/IO.
+- [x] Executar smoke após extração, `node --check` e `git diff --check`.
+- [x] Revisar com agente independente; atualizar mapa/progresso e criar commit conceitual.
 
 ## Arquivos >1.000 linhas: exceções temporárias
 `app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 1.

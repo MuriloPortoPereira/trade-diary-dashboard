@@ -53,7 +53,7 @@ Não foram adicionados hooks globais nem alterados modelos, permissões ou orça
 - Serena para código interno. Limitar caminho, símbolo e tamanho de resposta.
 - Context7 somente para documentação externa; nunca enviar dados/código privado.
 - Superpowers: planejamento arquitetural, caracterização, revisão e verificação; execução direta para ajustes triviais.
-- Onboarding operacional fica em `AGENTS.md` e nos mapas; não duplicar arquivos inteiros em memórias Serena.
+- Onboarding operacional fica em `AGENTS.md` e nos mapas; memória Serena `core` aponta para essas fontes, sem duplicar conteúdo.
 
 ## Verificação do projeto
 
@@ -66,7 +66,7 @@ node scripts/browser-smoke.cjs
 git diff --check
 ```
 
-O caminho `src/...` passa a existir no lote 1. Resultado efetivo: [progresso](refactoring-progress.md).
+Domínio extraído no lote 1. Resultado efetivo: [progresso](refactoring-progress.md).
 Lint, typecheck, formatador e build não existem no baseline; não foram simulados ou marcados como aprovados.
 
 Smoke requer Chrome/Chromium instalado. Por padrão usa `google-chrome`;
@@ -77,7 +77,10 @@ o probe acessa somente a aplicação e seus recursos externos, nunca o perfil pe
 Verifica CDN Chart.js, inicialização, navegação, tab de simulação, handler inline,
 valores 10/50/30, API global, storage inalterado e retorno ao dashboard.
 Requer rede para os recursos CDN/fontes e falha em erros de script ou assets locais ausentes.
-Não cobre todos os fluxos nem compara pixels.
+Resultado coletado após `load + 250ms`; não captura erros assíncronos posteriores,
+erros silenciados ou mensagens de `console.error`. Verifica Chart.js real pela versão.
+Storage é comparado somente entre navegação e simulação, após bootstrap.
+Não cobre todos os fluxos, migrações de dados nem compara pixels.
 
 ## Fontes consultadas
 

@@ -22,13 +22,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Idioma/câmbio | `TRANSLATIONS`, `applyLanguage`, `fetchCotacao` |
 | Visual | `styles.css`; localizar classe/ID da feature antes de abrir |
 
-## Primeira extração planejada
+## Simulação: primeiro domínio extraído
 
 - Domínio: `src/modules/simulation/domain/calculate-simulation-sizing.js`.
 - Testes: `tests/simulation-sizing.test.cjs`.
 - Compatibilidade: chamadas existentes em `app.js` e script carregado por `index.html`.
-- Esses caminhos estão planejados na criação do mapa; consultar o progresso para confirmar
-  criação e verificações. A baseline não tem suíte de testes.
+- `TradeDiarySimulationSizing`: parsing numérico, arredondamento e dimensionamento puro.
+- Smoke: `scripts/browser-smoke.cjs`; demais regras de simulação permanecem em `app.js`.
+- Resultados e limites de cobertura: [progresso](refactoring-progress.md).
 
 ## Documentação sob demanda
 

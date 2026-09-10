@@ -22,7 +22,7 @@ function browserProbe() {
       passed.push(name);
     };
     try {
-      check('Chart.js loaded', typeof Chart === 'function');
+      check('Chart.js loaded', typeof Chart === 'function' && Chart.version === '4.4.1');
       check('dashboard active', document.querySelector('#page-dashboard.active'));
       const storageBefore = Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]));
       const nav = document.querySelector('.nav-item[onclick*="\'stats\'"]');

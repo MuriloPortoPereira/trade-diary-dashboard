@@ -250,3 +250,9 @@ Desenvolvido por **Murilo Porto Pereira**.
 Este projeto está distribuído sob a licença MIT.
 
 Consulte o arquivo [LICENSE](./LICENSE) para mais detalhes.
+
+
+## Desenvolvimento e arquitetura
+
+Mapa, hotspots, plano incremental e verificações: [docs/architecture](docs/architecture/README.md).
+Instruções para agentes: [AGENTS.md](AGENTS.md).
