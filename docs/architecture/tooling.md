@@ -17,6 +17,13 @@ seus nomes não foram adicionados automaticamente à lista de ferramentas nativa
 Na próxima sessão/reinicialização, conferir `/mcp` e ativar a raiz com `activate_project`.
 As skills instaladas ficam disponíveis na próxima interação; os SKILL.md usados foram lidos nesta sessão.
 
+Atualização do lote 2: Serena e Context7 estão disponíveis como ferramentas nativas.
+Raiz ativada com `activate_project`; `find_symbol` e `find_referencing_symbols` usados no CSV.
+Context7 não foi consultado: o lote não exige documentação externa.
+Caveman local lido. Superpowers não foi exposto no catálogo de skills desta sessão;
+a tentativa de conferir `~/.codex/plugins/installed_plugins.json` encontrou caminho inexistente.
+Mantido o registro anterior de instalação; revisão independente e verificações executadas diretamente, sem reinstalação.
+
 ## Instalar em outra máquina
 
 ```bash
@@ -61,6 +68,8 @@ Não foram adicionados hooks globais nem alterados modelos, permissões ou orça
 node --test tests/*.test.cjs
 node --check app.js
 node --check src/modules/simulation/domain/calculate-simulation-sizing.js
+node --check src/modules/data-transfer/infrastructure/serialize-trades-csv.js
+node --check tests/trades-csv.test.cjs
 node --check scripts/browser-smoke.cjs
 node scripts/browser-smoke.cjs
 git diff --check
@@ -76,6 +85,8 @@ Chrome headless roda com `--no-sandbox` para compatibilidade do ambiente de test
 o probe acessa somente a aplicação e seus recursos externos, nunca o perfil pessoal.
 Verifica CDN Chart.js, inicialização, navegação, tab de simulação, handler inline,
 valores 10/50/30, API global, storage inalterado e retorno ao dashboard.
+No lote 2, soma três checks CSV: saída com arrays/aspas/vírgula/LF, default `trades`
+e compatibilidade de helper/cabeçalhos. Total: 14 checks; não realiza download real.
 Requer rede para os recursos CDN/fontes e falha em erros de script ou assets locais ausentes.
 Resultado coletado após `load + 250ms`; não captura erros assíncronos posteriores,
 erros silenciados ou mensagens de `console.error`. Verifica Chart.js real pela versão.

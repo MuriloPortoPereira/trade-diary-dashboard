@@ -31,6 +31,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Smoke: `scripts/browser-smoke.cjs`; demais regras de simulação permanecem em `app.js`.
 - Resultados e limites de cobertura: [progresso](refactoring-progress.md).
 
+## Transferência de dados: serialização CSV
+
+- Adaptador de formato: `src/modules/data-transfer/infrastructure/serialize-trades-csv.js`.
+- Namespace: `TradeDiaryTradesCSV`; recebe registros e devolve texto, sem DOM/IO/estado global da aplicação.
+- Compatibilidade em `app.js`: `TRADE_CSV_HEADERS` referencia o mesmo array; `csvCell` e `buildTradesCSV(list=trades)` delegam.
+- Consumidor: `exportTradesCSV`; filtros, download/Blob e importação permanecem no legado.
+- Carga: sizing, serializer CSV, `app.js`, nesta ordem, como scripts clássicos síncronos.
+- Testes: `tests/trades-csv.test.cjs`; smoke CSV em `scripts/browser-smoke.cjs`.
+
 ## Documentação sob demanda
 
 - [Arquitetura atual](current-architecture.md): stack, números, hotspots e riscos.

@@ -51,8 +51,18 @@ calculateSimulationSizing({balance=0,riskPct=0,goalPct=0,stopPct=0}={})
 - [x] Executar smoke após extração, `node --check` e `git diff --check`.
 - [x] Revisar com agente independente; atualizar mapa/progresso e criar commit conceitual.
 
+## Segundo lote: serialização CSV
+
+- [x] Caracterizar o legado antes da extração: 11 testes CSV e 14 checks no navegador passaram.
+- [x] Extrair para `src/modules/data-transfer/infrastructure/serialize-trades-csv.js`:
+  adaptador de formato conforme a fronteira `data-transfer` documentada, sem novas camadas ou IO.
+- [x] Preservar `TRADE_CSV_HEADERS`, `csvCell` e `buildTradesCSV(list=trades)` em `app.js`.
+- [x] Carregar o namespace `TradeDiaryTradesCSV` entre sizing e `app.js`, sem async/defer/ESM.
+- [x] Validar 49 testes, 14 checks no navegador, sintaxe e diff; revisar independentemente.
+- Download, filtros e importação permanecem no legado. Próximo lote proposto: métricas puras.
+
 ## Arquivos >1.000 linhas: exceções temporárias
-`app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 1.
+`app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 2.
 Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobertura ampla;
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: lotes 2–7 reduzem JS; lote 8 separa apresentação.

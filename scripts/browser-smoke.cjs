@@ -39,6 +39,11 @@ function browserProbe() {
       check('goal USD', document.getElementById('simGoalDay').value === '50.00');
       check('stop USD', document.getElementById('simStopDay').value === '30.00');
       check('legacy API', calculateSimulationSizing({balance: 1000, riskPct: 1}).riskUsd === 10);
+      const csvHeader = 'date,symbol,direction,placedTime,openTime,exitDate,exitTime,entry,exit,stop,tp,qty,riskUsd,riskPct,r,pnl,status,market,strategy,emotion,errors,remarks';
+      const csvRow = ['"2026-09-10"', ...Array(19).fill('""'), '"pressa; ""erro"""', '"a,b\nlinha 2"'].join(',');
+      check('CSV global serialization', buildTradesCSV([{date: '2026-09-10', errors: ['pressa', '"erro"'], remarks: 'a,b\nlinha 2'}]) === csvHeader + '\n' + csvRow);
+      check('CSV default trades', buildTradesCSV() === buildTradesCSV(trades));
+      check('CSV helper compatibility', csvCell(['a', 'b']) === '"a; b"' && TRADE_CSV_HEADERS.join(',') === csvHeader);
       check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
       showPage('dashboard');
@@ -103,7 +108,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 11, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 14, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

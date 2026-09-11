@@ -4294,17 +4294,14 @@ function importJSON(e){
   r.readAsText(f);
 }
 
-const TRADE_CSV_HEADERS = ['date','symbol','direction','placedTime','openTime','exitDate','exitTime','entry','exit','stop','tp','qty','riskUsd','riskPct','r','pnl','status','market','strategy','emotion','errors','remarks'];
+const TRADE_CSV_HEADERS = TradeDiaryTradesCSV.TRADE_CSV_HEADERS;
 
 function csvCell(value){
-  const raw=Array.isArray(value)?value.join('; '):value;
-  const text=raw==null?'':String(raw);
-  return `"${text.replace(/"/g,'""')}"`;
+  return TradeDiaryTradesCSV.csvCell(value);
 }
 
 function buildTradesCSV(list=trades){
-  const rows=(Array.isArray(list)?list:[]).map(t=>TRADE_CSV_HEADERS.map(h=>csvCell(t[h])).join(','));
-  return TRADE_CSV_HEADERS.join(',')+'\n'+rows.join('\n');
+  return TradeDiaryTradesCSV.buildTradesCSV(list);
 }
 
 function downloadTextFile(content,filename,type='text/csv'){
