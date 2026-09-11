@@ -19,7 +19,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Documentos | `getDocumentEntries`, `saveCurrentDocument`, `renderDocumentsPage` |
 | Parceiros | `ensurePartnerHubConfig`, `renderPartnersPage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
-| Idioma/câmbio | `TRANSLATIONS`, `applyLanguage`, `fetchCotacao` |
+| Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
 | Visual | `styles.css`; localizar classe/ID da feature antes de abrir |
 
 ## Simulação: primeiro domínio extraído
@@ -37,8 +37,20 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Namespace: `TradeDiaryTradesCSV`; recebe registros e devolve texto, sem DOM/IO/estado global da aplicação.
 - Compatibilidade em `app.js`: `TRADE_CSV_HEADERS` referencia o mesmo array; `csvCell` e `buildTradesCSV(list=trades)` delegam.
 - Consumidor: `exportTradesCSV`; filtros, download/Blob e importação permanecem no legado.
-- Carga: sizing, serializer CSV, `app.js`, nesta ordem, como scripts clássicos síncronos.
+- Carga: sizing antes do serializer CSV; ambos antes de `app.js`, como scripts clássicos síncronos.
 - Testes: `tests/trades-csv.test.cjs`; smoke CSV em `scripts/browser-smoke.cjs`.
+
+## Preferências: idiomas
+
+- Registro: `src/modules/preferences/presentation/translation-catalog.js` (`LANGUAGES`, `TRANSLATIONS`).
+- Catálogos: `locales/{pt-BR,en-US}/{trading,workspace,dialogs-and-labels}.js`, relativos à pasta acima.
+- `trading`: navegação, dashboard, diário, análises e rotina; `workspace`: importação, documentos e configurações;
+  `dialogs-and-labels`: modais, avisos, aliases, datas e rótulos dinâmicos.
+- UI: `language-selector.js` (`t`, `initLanguageSelector`, `toggleLangMenu`, `closeLangMenu`, `setLanguage`, `applyLanguage`).
+- Todos continuam globais de scripts clássicos; `currentLanguage` e sua leitura de storage permanecem em `app.js`.
+- Ordem: registro, fragmentos por idioma na ordem acima, seletor, `app.js`. `Object.assign` preserva sobrescritas e ordem das chaves.
+- Testes: `tests/language-selector.test.cjs`; fingerprints das 585 strings por idioma e efeitos do seletor.
+- Smoke: troca EN/PT via handlers reais em perfil isolado; demais dados de storage devem permanecer iguais.
 
 ## Documentação sob demanda
 

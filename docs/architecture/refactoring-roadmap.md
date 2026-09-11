@@ -16,6 +16,7 @@ Não separar arquitetura, nomenclatura e comportamento no mesmo lote.
 | 0 | Ambiente e mapa | Git limpo, MCPs com chamadas reais | AGENTS, mapa, ADRs |
 | 1 | Sizing da simulação | Caracterização de parsing, arredondamento e wrappers | Primeiro domínio isolado |
 | 2 | Serialização CSV | Colunas, quoting, arrays, vazios e default `trades` | Serializer + wrapper compatível |
+| 2b | Catálogos e seletor de idioma | Strings/chaves/ordem, fallback, storage e smoke EN/PT | Oito arquivos de apresentação com 10–253 linhas |
 | 3 | Métricas puras | Trades abertos/fechados, perdas/empates, filtros e datas | Regras de analytics |
 | 4 | Persistência | Round-trip de backup, chaves, seeds, dados antigos, falhas | Adaptador de storage sem migração |
 | 5 | `saveTrade` | Payloads, validação, status e sequência de efeitos | Preparação da operação e use case |
@@ -61,8 +62,20 @@ calculateSimulationSizing({balance=0,riskPct=0,goalPct=0,stopPct=0}={})
 - [x] Validar 49 testes, 14 checks no navegador, sintaxe e diff; revisar independentemente.
 - Download, filtros e importação permanecem no legado. Próximo lote proposto: métricas puras.
 
+## Lote 2b: redução do bloco de idiomas
+
+Priorizado após pedido de redução mais significativa dos arquivos. Dados declarativos e UI
+de idioma formam um corte de baixo risco; métricas continuam como próximo lote de domínio.
+
+- [x] Caracterizar 585 strings por idioma e oito cenários antes da extração; smoke com 18 checks passou no legado.
+- [x] Separar registro, seis fragmentos por idioma/contexto e seletor: oito arquivos, todos abaixo de 300 linhas.
+- [x] Manter funções globais e leitura de `currentLanguage` no mesmo ponto da composição de `app.js`.
+- [x] Validar 58 testes, 18 checks no navegador, sintaxe e diff.
+- [x] Revisar independentemente a movimentação exata, globals, catálogos e ordem dos scripts.
+- `app.js`: 11.052 para 9.770 linhas (menos 1.282). Sem mudança de textos, runtime ou armazenamento.
+
 ## Arquivos >1.000 linhas: exceções temporárias
-`app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 2.
+`app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 2b.
 Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobertura ampla;
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: lotes 2–7 reduzem JS; lote 8 separa apresentação.

@@ -70,6 +70,7 @@ node --check app.js
 node --check src/modules/simulation/domain/calculate-simulation-sizing.js
 node --check src/modules/data-transfer/infrastructure/serialize-trades-csv.js
 node --check tests/trades-csv.test.cjs
+node --check tests/language-selector.test.cjs
 node --check scripts/browser-smoke.cjs
 node scripts/browser-smoke.cjs
 git diff --check
@@ -87,6 +88,9 @@ Verifica CDN Chart.js, inicialização, navegação, tab de simulação, handler
 valores 10/50/30, API global, storage inalterado e retorno ao dashboard.
 No lote 2, soma três checks CSV: saída com arrays/aspas/vírgula/LF, default `trades`
 e compatibilidade de helper/cabeçalhos. Total: 14 checks; não realiza download real.
+No lote 2b, soma quatro checks de idioma: handler EN, catálogo renderizado, handler PT e
+preservação dos dados de storage exceto `appLanguage`. Total atual: 18 checks.
+Somente o perfil temporário recebe a escolha de idioma; não acessa dados pessoais.
 Requer rede para os recursos CDN/fontes e falha em erros de script ou assets locais ausentes.
 Resultado coletado após `load + 250ms`; não captura erros assíncronos posteriores,
 erros silenciados ou mensagens de `console.error`. Verifica Chart.js real pela versão.

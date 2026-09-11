@@ -134,9 +134,8 @@ nodeTest('HTML loads serializer once between sizing and app.js as synchronous cl
     src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
   }));
   const localScripts = scripts.filter(script => script.src && !script.src.startsWith('https://'));
-  assert.deepEqual(localScripts.map(script => script.src), [
-    'src/modules/simulation/domain/calculate-simulation-sizing.js', serializerPath, 'app.js',
-  ]);
+  const csvOrder = ['src/modules/simulation/domain/calculate-simulation-sizing.js', serializerPath, 'app.js'];
+  assert.deepEqual(localScripts.map(script => script.src).filter(src => csvOrder.includes(src)), csvOrder);
   for (const script of localScripts) {
     assert.doesNotMatch(script.attributes, /\b(?:async|defer|nomodule)\b/i);
     const type = script.attributes.match(/\btype\s*=\s*['"]([^'"]*)['"]/i)?.[1];

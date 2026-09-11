@@ -86,5 +86,6 @@ de transição, acompanhada no [roadmap](refactoring-roadmap.md).
 - A baseline não oferece testes de regressão nem pipeline. Verificações do primeiro lote serão
   registradas no [progresso](refactoring-progress.md), somente após execução.
 
-Primeira extração concluída: cálculo de dimensionamento da simulação.
-Estado atual: `app.js` com 11.055 linhas e domínio novo com 29 linhas. Ver [mapa compacto](project-map.md).
+Extrações concluídas: sizing, serialização CSV e apresentação de idiomas.
+Estado após lote 2b: `app.js` com 9.770 linhas; oito arquivos de idioma com 10–253 linhas.
+Números da auditoria acima permanecem históricos. Ver [mapa compacto](project-map.md).

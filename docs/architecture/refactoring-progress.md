@@ -23,9 +23,16 @@
 - Sintaxe de app/serializer/teste/smoke e `git diff --check` passaram. `app.js`: 11.055 para 11.052 linhas.
 - Revisão independente CSV: sem achados bloqueantes; 1.031 comparações diferenciais com o commit anterior passaram em VM.
 - Serena nativa ativada na raiz; símbolos e referências CSV consultados. Context7 disponível, sem necessidade de documentação externa.
+- Lote 2b, solicitado para reduzir arquivos extensos: idiomas em oito arquivos de apresentação, de 10 a 253 linhas.
+- `app.js`: 11.052 para 9.770 linhas, redução de 1.282 linhas. Catálogos separados por idioma e contexto funcional.
+- Caracterização anterior à extração: oito testes de idioma e 18 checks no navegador passaram no legado.
+- Após extração: 58 testes totais, 0 falhas/skip; 18 checks no navegador; sintaxe dos scripts alterados e diff aprovados.
+- Preservadas as 585 strings e a ordem das chaves de cada idioma por fingerprints; funções movidas sem reescrita.
+- Seletor mantém globals, fallback e efeitos; `currentLanguage` permanece inicializado no mesmo ponto de `app.js`.
+- Revisão independente sem bloqueios: seis funções (61 linhas) e 53.123 bytes de catálogos movidos exatamente; 1.170 entradas preservadas.
 
 ## Current
-- Lotes 1–2 concluídos; migração completa permanece incremental.
+- Lotes 1–2 e 2b de idiomas concluídos; monólitos ainda exigem próximos cortes por responsabilidade.
 
 ## Next
 - Lote 3 proposto: métricas puras, após caracterizar trades abertos/fechados, perdas/empates, filtros e datas.
@@ -37,6 +44,7 @@
 - Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.
 - Sem comparação visual por pixels, teste de migração ou validação completa de Monte Carlo.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
+- Idiomas: smoke cobre EN/PT e preservação dos demais dados; não compara pixels de todas as telas nem recarga do navegador após escolha.
 - CDN e cotação dependem de rede. Lint/typecheck/format/build inexistentes, não reportados como aprovados.
 
 ## Decisions
@@ -45,3 +53,5 @@
 - Memória Serena contém somente ponte para documentos canônicos, evitando duplicação de contexto.
 - CSV é adaptador de formato em Infrastructure conforme arquitetura alvo; não é regra de negócio. Sem abstração de IO adicional.
 - Default `trades` fica no wrapper; namespace não depende do estado da aplicação. Ordem dos scripts permanece contrato explícito.
+- Idiomas são apresentação: registro e fragmentos clássicos com `Object.assign` na ordem original; sem novas APIs públicas ou wrappers redundantes.
+- Catálogos passam a carregar antes de `app.js`; somente dados são inicializados. Leitura de storage e bootstrap mantêm a sequência anterior.
