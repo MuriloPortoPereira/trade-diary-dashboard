@@ -32,11 +32,16 @@
 - Revisão independente sem bloqueios: seis funções (61 linhas) e 53.123 bytes de catálogos movidos exatamente; 1.170 entradas preservadas.
 
 ## Current
-- Lotes 1–2 e 2b de idiomas concluídos; monólitos ainda exigem próximos cortes por responsabilidade.
+- Lotes 1–2 e 2b concluídos. Análise global de 2026-09-11 documentada; nenhuma nova extração executada nesta etapa.
+- Inventários cobrem JS nativo/StudyHub, 6.090 linhas de CSS, 15 páginas e quatro modais; destinos propostos e contratos registrados.
+- Verificação repetida sobre `5c9859f`: 58 testes e 18 checks no navegador passaram; cobertura continua restrita aos fluxos existentes.
+- Revisão independente da análise sem bloqueios; fronteiras/nomes corrigidos. Mapas conferidos contra 38 blocos CSS contínuos, 15 páginas e quatro modais.
+- Somente documentação alterada; 17 arquivos de aplicação/testes comparados byte a byte com HEAD, sem diferenças.
 
 ## Next
-- Lote 3 proposto: métricas puras, após caracterizar trades abertos/fechados, perdas/empates, filtros e datas.
-- Escolher um lote por vez no [roadmap](refactoring-roadmap.md); não iniciar migração ampla de IO ou UI.
+- Primeiro preparar cobertura visual/funcional das quatro abas StudyHub e extrair o sufixo CSS em quatro arquivos ordenados (G1).
+- Seguir as prioridades revistas do [roadmap](refactoring-roadmap.md), com inventários da [análise global](modularization-analysis.md).
+- Métricas continuam frente de domínio pendente; um lote por vez, sem reescrita de UI/IO/cálculos.
 
 ## Risks
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
@@ -55,3 +60,5 @@
 - Default `trades` fica no wrapper; namespace não depende do estado da aplicação. Ordem dos scripts permanece contrato explícito.
 - Idiomas são apresentação: registro e fragmentos clássicos com `Object.assign` na ordem original; sem novas APIs públicas ou wrappers redundantes.
 - Catálogos passam a carregar antes de `app.js`; somente dados são inicializados. Leitura de storage e bootstrap mantêm a sequência anterior.
+- Revisão global: primeiro separar arquivos preservando blocos, closures e ordem; depois separar camadas com entradas explícitas.
+- CSS por feature preserva regras tardias e media queries; HTML estático permanece no shell até decisão própria sobre composição.

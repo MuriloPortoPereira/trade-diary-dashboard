@@ -8,7 +8,7 @@
 ## Restrições globais
 Sem reescrita, mudança de produto/API/storage, runtime dependency ou push.
 Caracterizar antes de extrair; testar, verificar sintaxe e revisar diff depois.
-Não separar arquitetura, nomenclatura e comportamento no mesmo lote.
+Não misturar arquitetura, nomenclatura e comportamento no mesmo lote.
 
 ## Lotes
 | Ordem | Entrega | Proteção necessária | Saída |
@@ -26,6 +26,27 @@ Não separar arquitetura, nomenclatura e comportamento no mesmo lote.
 | 9 | Compatibilidade antiga | Todos consumidores migrados e revisados | Remover wrappers aprovados |
 
 Próximos lotes são propostas: executar individualmente com testes adequados; não representam autorização para alterar comportamento.
+
+## Prioridade revista após análise global de 2026-09-11
+
+O pedido de organizar o projeto inteiro amplia o foco de pequenas regras para blocos coesos de CSS e UI.
+A numeração acima identifica as frentes históricas; a sequência recomendada abaixo passa a orientar a execução.
+Inventários completos e condições: [análise global](modularization-analysis.md).
+
+| Sequência | Entrega independente | Evidência exigida antes e depois |
+|---|---|---|
+| G1 | CSS legado StudyHub: sufixo 4880–6090 em quatro arquivos ordenados | Ampliar smoke das quatro abas; baseline visual; comparar bytes/cascata e geometria nos breakpoints |
+| G2 | CSS comum e demais páginas em blocos contíguos do mapa | Regras/ordem sem perdas; telas, estados e responsividade dos componentes afetados |
+| G3 | JS de páginas e componentes por feature, uma responsabilidade por commit | Declarações preservadas, handlers/globals, fluxo de navegação, modais e efeitos de estado |
+| G4 | Domínios de métricas, timing, risco e simulação, individualmente | Caracterização numérica, limites, defaults, relógio/RNG e compatibilidade dos consumidores |
+| G5 | Importação, backup e persistência por formato/coordenação/IO | Fixtures, deduplicação, restauração parcial/completa, chaves e sequência de efeitos |
+| G6 | StudyHub: montagem, runtime isolado e intraday; depois subferramentas | Closure intacta, template/pontes, console, quatro módulos, storage e cálculos determinísticos |
+| G7 | HTML de autoria e remoção de compatibilidade, se ainda necessários | ADR próprio para composição estática; DOM/IDs/handlers/carga equivalentes, todos consumidores migrados |
+
+G2–G6 contêm vários lotes pequenos: não executar uma frente inteira como um único commit.
+Intercalar CSS/JS da mesma feature é permitido, mas não misturar movimento de estilos com mudança de cálculo.
+G1 deve preparar sua própria cobertura antes de extrair; os 18 checks atuais não são suficientes para equivalência visual.
+O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função. HTML permanece estático até G7.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
@@ -78,6 +99,6 @@ de idioma formam um corte de baixo risco; métricas continuam como próximo lote
 `app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 2b.
 Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobertura ampla;
 um corte por tamanho causaria mudança simultânea de vários contratos.
-Responsáveis e remoção da exceção: lotes 2–7 reduzem JS; lote 8 separa apresentação.
-`TRANSLATIONS` é majoritariamente dado declarativo; extração futura não precisa mudar chaves.
+Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
+Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.

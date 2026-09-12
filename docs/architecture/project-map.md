@@ -54,6 +54,8 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 ## Documentação sob demanda
 
+- [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.
+- Inventários de extração: [JavaScript](javascript-extraction-map.md), [CSS/cascata](css-extraction-map.md), [HTML/páginas](html-extraction-map.md).
 - [Arquitetura atual](current-architecture.md): stack, números, hotspots e riscos.
 - [Catálogo de módulos](module-map.md): entradas e dependências por feature.
 - [Arquitetura alvo](target-architecture.md) e [dependências](dependency-rules.md): fronteiras novas.

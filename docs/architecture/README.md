@@ -10,6 +10,10 @@ Comece pelo [mapa compacto](project-map.md). Abra somente a feature necessária.
 | [Dependências](dependency-rules.md) | Direção e compatibilidade |
 | [Roadmap](refactoring-roadmap.md) | Lotes e primeiro plano executável |
 | [Progresso](refactoring-progress.md) | Entregue, próximo e limitações |
+| [Análise global](modularization-analysis.md) | Diagnóstico atualizado e estratégia de preservação |
+| [Extração JavaScript](javascript-extraction-map.md) | Destinos por responsabilidade, dependências e contratos |
+| [Extração CSS](css-extraction-map.md) | Fronteiras de todo stylesheet, cascata e primeiro corte |
+| [Extração HTML](html-extraction-map.md) | Todas as páginas/modais, handlers e validação por fluxo |
 | [Ferramentas](tooling.md) | Instalação, verificação e comandos |
 | [ADR-001](adr/001-incremental-classic-scripts.md) | Scripts clássicos durante transição |
 | [ADR-002](adr/002-characterization-tests.md) | Testes de caracterização |
