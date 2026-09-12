@@ -56,6 +56,20 @@ function browserProbe() {
       const withoutLanguage = values => Object.fromEntries(Object.entries(values).filter(([key]) => key !== 'appLanguage'));
       check('language changes preserve application data', JSON.stringify(withoutLanguage(storageBefore)) === JSON.stringify(withoutLanguage(
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)])))));
+      document.getElementById('langBtn').click();
+      check('language menu opens', document.getElementById('langMenu').classList.contains('open'));
+      document.querySelector('main').click();
+      check('outside click closes language menu', !document.getElementById('langMenu').classList.contains('open'));
+      document.getElementById('hamburger').click();
+      check('sidebar opens with overlay', document.getElementById('sidebar').classList.contains('open') &&
+        document.getElementById('sidebar-overlay').classList.contains('show'));
+      document.getElementById('sidebar-overlay').click();
+      check('overlay closes sidebar', !document.getElementById('sidebar').classList.contains('open') &&
+        !document.getElementById('sidebar-overlay').classList.contains('show'));
+      document.getElementById('hamburger').click();
+      nav.click();
+      check('navigation closes sidebar', document.querySelector('#page-stats.active') && nav.classList.contains('active') &&
+        !document.getElementById('sidebar').classList.contains('open') && !document.getElementById('sidebar-overlay').classList.contains('show'));
       showPage('studyHub');
       for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
         document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
@@ -123,7 +137,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 22, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 27, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

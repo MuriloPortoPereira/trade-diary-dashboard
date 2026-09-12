@@ -28,7 +28,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 
 - `index.html`: estrutura e chamadas inline dos símbolos públicos.
 - `app.js`: ordem de bootstrap, globals de apresentação e estado ainda legado.
-- `styles.css` seguido dos quatro CSS StudyHub: classes/IDs e ordem da cascata.
+- Quatro CSS base/shell/preferências, `styles.css` e quatro CSS StudyHub: classes/IDs e ordem da cascata.
 - `window.sh_*`: ponte pública para funções privadas do IIFE legado.
 - JSON de backup e chaves localStorage: contrato de dados existente.
 
@@ -46,7 +46,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/language-selector.test.cjs` | Conteúdo integral dos catálogos, fallback, efeitos do seletor e carga dos scripts |
 | `src/modules/study-hub/presentation/legacy-*.css` | Quatro blocos contíguos: controles, sequência de trades, recuperação e overrides de integração; 174–359 linhas |
 | `tests/study-hub-styles.test.cjs` | Fingerprint dos bytes concatenados na ordem dos links |
+| `src/styles/foundation.css`, `shell-layout.css`, `navigation-and-account-summary.css` | Base visual e shell compartilhados; arquivos de 43–408 linhas |
+| `src/modules/preferences/presentation/preferences-widgets.css` | Cotação e seletor de idioma, incluindo keyframe cot-spin |
+| `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b e G1; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

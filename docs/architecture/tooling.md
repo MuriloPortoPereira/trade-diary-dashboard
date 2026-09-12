@@ -135,6 +135,57 @@ Git local usa `core.autocrlf=input`; o primeiro stage normalizou dois arquivos n
 `whitespace=-blank-at-eof,cr-at-eol` preserva separadores finais e CRLF herdados;
 demais verificações de whitespace permanecem ativas. `git diff --check` e `--cached --check` passaram.
 
+## Comparação visual do shell (G2a)
+
+```bash
+node scripts/shell-style-check.cjs capture /tmp/shell-before
+node scripts/shell-style-check.cjs compare /tmp/shell-before /tmp/shell-after
+```
+
+Capturar antes de editar CSS; comparar depois, usando diretórios novos. O runner reutiliza o
+Chrome/CDP isolado e a fixture do StudyHub; importar essa fixture não executa o CLI StudyHub.
+São 196 casos: 15 páginas em 390/1080/1440px e dashboard mais dez estados em 14 larguras
+(390, 1440 e breakpoint ±1/igual para 440, 720, 1080, 1240).
+
+Estados: sidebar aberta, navegação com hover, botão/menu/opção de idioma, foco e hover de cotação,
+hover da conta e modais de conta/operação abertos. Hover é forçado via CDP; foco usa `.focus()` com
+assertion do elemento ativo. O smoke soma cinco checks de menu, clique externo, sidebar, overlay e
+navegação; total 27. O teste de bytes G1 continua protegendo todos os nove links de CSS.
+
+A comparação exige igualdade exata de estilos, geometria, fontes e storage; exige zero console/runtime errors
+e assets locais ausentes. Verifica `cot-spin` antes de desativar animações e carrega explicitamente
+todas as faces declaradas após cada montagem para evitar diferenças incidentais nos pesos baixados durante o layout inicial.
+Requer rede para Chart.js e fontes. `getElementById` no runner evita nomes globais ambíguos quando
+o StudyHub monta seu template com IDs repetidos; esse comportamento legado não foi modificado.
+
+Pixels são comparados por `scripts/compare-browser-images.py` quando hashes PNG diferem.
+Esse teste visual opcional requer Python 3 e Pillow (já disponíveis no ambiente); nenhuma dependência
+foi adicionada à aplicação, ao smoke ou à suíte Node. Limites por imagem: até 64 pixels diferentes,
+até 20 pixels com delta maior que 1 e delta máximo de 20/255 por canal. Dimensões e formato RGB são exigidos.
+Estes limites foram definidos após controle repetido do código original revelar antialiasing variável
+em cantos arredondados, ícones e sombras. A tolerância é numérica, não identifica bordas automaticamente;
+alterações maiores falham e nenhuma região é mascarada.
+Seis casos sintéticos verificaram identidade, ruído aceito, excesso de pixels, excesso de pixels fortes,
+contraste e dimensões. O relatório `pixel-comparison.json` lista cada imagem com diferença aceita.
+
+```bash
+# Comparar artefatos existentes sem abrir outra sessão de navegador:
+node scripts/shell-style-check.cjs compare-saved /tmp/shell-before /tmp/shell-after
+```
+
+`compare-saved` confia nos hashes do relatório; use artefatos íntegros gerados pelo runner.
+G2a retomou em 2026-09-12 após perda dos processos e artefatos temporários da sessão anterior.
+Referência reconstruída dos assets de `387d9ec` em pasta temporária, com o mesmo runner da extração.
+Resultados preservados nesta sessão em `/tmp/trade-diary-g2-stable-{baseline,control,after}`:
+196 estados exatos; controle original repetido com 159 pixels diferentes em 28 imagens;
+extração com 202 pixels em 14 imagens. Todos dentro dos limites; zero erros de console/runtime.
+Artefatos são temporários e devem ser recapturados em outras sessões/ambientes.
+
+Limites: viewport de 1.000px de altura, estados iniciais das páginas e dois modais sem submissão.
+Não cobre todas as subabas, inputs, variações de dados nem animações em movimento. Os estilos base
+permanecem globais; arquivos não são carregados por página. `.gitattributes` preserva os bytes dos
+quatro novos CSS, incluindo LF/CRLF e separadores finais herdados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

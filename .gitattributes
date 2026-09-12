@@ -2,3 +2,7 @@
 # These blocks retain original blank separators at EOF; other whitespace checks stay enabled.
 styles.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/study-hub/presentation/legacy-*.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/foundation.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/shell-layout.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/preferences/presentation/preferences-widgets.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/navigation-and-account-summary.css -text whitespace=-blank-at-eof,cr-at-eol

@@ -49,6 +49,15 @@ G1 preparou cobertura antes da extração: fingerprint integral do CSS, smoke de
 G2 deve ampliar essa cobertura para cada novo componente/estado afetado.
 O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função. HTML permanece estático até G7.
 
+## G2a: base visual e shell
+
+- Prefixo histórico 1–699 separado em quatro arquivos, preservando ordem e bytes.
+- Cobertura preparada antes da extração: 196 casos visuais e smoke ampliado para 27 checks.
+- `styles.css` mantém 4.180 linhas; responsividade e estilos das páginas ainda residuais.
+- Próximo candidato G2b: primeiro bloco residual `page-surfaces-and-headers.css` (baseline 700–945),
+  com revisão dos consumidores e cobertura dos estados afetados antes de mover.
+- Não executar todo G2 de uma vez; G3–G6 continuam frentes independentes.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

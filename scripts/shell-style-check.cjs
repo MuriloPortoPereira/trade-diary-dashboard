@@ -1,0 +1,160 @@
+// Usage: capture <new-directory> | compare <baseline-directory> <new-directory>
+// Reuses the isolated CDP browser and deterministic fixture from the StudyHub checks.
+const assert = require('node:assert/strict');
+const {mkdir, readFile, writeFile} = require('node:fs/promises');
+const path = require('node:path');
+const {createHash} = require('node:crypto');
+const {execFileSync} = require('node:child_process');
+const openBrowser = require('./lib/study-hub-browser.cjs');
+const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
+
+const widths = [390, ...[440, 720, 1080, 1240].flatMap(w => [w - 1, w, w + 1]), 1440];
+const pageWidths = [390, 1080, 1440];
+const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
+  'cotacao-focus', 'cotacao-hover', 'account-hover', 'account-modal', 'trade-modal'];
+const hash = value => createHash('sha256').update(value).digest('hex');
+
+function inspectShell() {
+  const properties = ['display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
+    'padding', 'margin', 'gap', 'grid-template-columns', 'flex-direction', 'align-items', 'justify-content',
+    'overflow', 'color', 'background', 'border', 'border-radius', 'box-shadow', 'outline', 'font-family',
+    'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform'];
+  const snapshot = [...document.querySelectorAll('body,body *')].filter(el => el.getClientRects().length).map(el => {
+    const style = getComputedStyle(el), rect = el.getBoundingClientRect();
+    return {tag: el.tagName, id: el.id, class: el.getAttribute('class'),
+      rect: [rect.x, rect.y, rect.width, rect.height].map(n => Math.round(n * 1000) / 1000),
+      styles: Object.fromEntries(properties.map(key => [key, style.getPropertyValue(key)])),
+      before: el.matches('.nav-item,.logo-mark,.acct-pill,.page-header>div:first-child') ? getComputedStyle(el, '::before').cssText +
+        ['content', ...properties].map(key => getComputedStyle(el, '::before').getPropertyValue(key)).join('|') : null,
+      text: el.children.length ? null : el.textContent, value: 'value' in el ? el.value : null};
+  });
+  return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
+    storage: Object.fromEntries(Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])),
+    fonts: [...document.fonts].filter(font => font.status === 'loaded').map(font => `${font.family}:${font.weight}`).sort(),
+    sheetsLoaded: [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet)};
+}
+
+async function capture(directory) {
+  await mkdir(directory, {recursive: false});
+  const browser = await openBrowser(path.resolve(__dirname, '..'));
+  const report = {version: 1, widths, pageWidths, states, cases: []};
+  try {
+    await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
+    await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
+    await browser.command('Emulation.setDeviceMetricsOverride', {width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false});
+    await browser.command('Page.navigate', {url: browser.url});
+    await browser.evaluate(`new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Page load timeout')), 20000);
+      const done = () => { clearTimeout(timer); resolve(true); };
+      if (document.readyState === 'complete') done(); else addEventListener('load', done, {once: true});
+    })`);
+    assert.equal(await browser.evaluate('Chart.version'), '4.4.1');
+    // Eagerly load every declared face: splitting links can change which unused weights
+    // the browser downloads during transient layout, without changing the final CSS.
+    await browser.evaluate(`document.fonts.ready.then(() => Promise.all([...document.fonts].map(font => font.load())))`);
+    report.animation = await browser.evaluate(`(() => {
+      document.getElementById('cotRefreshBtn').classList.add('spinning');
+      const style = getComputedStyle(document.getElementById('cotIcon')), result = [style.animationName, style.animationDuration, style.animationIterationCount];
+      document.getElementById('cotRefreshBtn').classList.remove('spinning'); return result;
+    })()`);
+    assert.deepEqual(report.animation, ['cot-spin', '0.8s', 'infinite']);
+    await browser.evaluate(`Chart.defaults.animation = false;
+      const style = document.createElement('style');
+      style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
+      document.head.append(style);`);
+    await browser.command('DOM.enable');
+    await browser.command('CSS.enable');
+    const {root} = await browser.command('DOM.getDocument');
+    const pages = await browser.evaluate(`[...document.querySelectorAll('.page')].map(el => el.id.slice(5))`);
+    assert.equal(pages.length, 15);
+    report.pages = pages;
+    for (const width of widths) {
+      await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
+      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states];
+      for (const name of cases) {
+        const page = pages.includes(name) ? name : 'dashboard';
+        await browser.evaluate(`document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
+          closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
+          document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0);`);
+        let hover;
+        if (['sidebar-open', 'nav-hover'].includes(name)) {
+          await browser.evaluate(`document.getElementById('hamburger').click();
+            if (!document.getElementById('sidebar').classList.contains('open') || !document.getElementById('sidebar-overlay').classList.contains('show')) throw new Error('Sidebar did not open');`);
+          if (name === 'nav-hover') hover = '#sidebar .nav-item:not(.active)';
+        }
+        if (name.startsWith('language-')) {
+          if (name === 'language-hover') hover = '#langBtn';
+          else await browser.evaluate(`document.getElementById('langBtn').click();
+            if (!document.getElementById('langMenu').classList.contains('open')) throw new Error('Language menu did not open');`);
+          if (name === 'language-option-focus') {
+            hover = '.lang-option[data-lang="en-US"]';
+            await browser.evaluate(`document.querySelector('.lang-option[data-lang="en-US"]').focus();
+              if (document.activeElement !== document.querySelector('.lang-option[data-lang="en-US"]')) throw new Error('Language option did not focus');`);
+          }
+        }
+        if (name === 'cotacao-focus') await browser.evaluate(`document.getElementById('cotInput').focus();
+          if (document.activeElement !== document.getElementById('cotInput')) throw new Error('Exchange input did not focus');`);
+        if (name === 'cotacao-hover') hover = '#cotRefreshBtn';
+        if (name === 'account-hover') hover = '#acctPill';
+        if (name === 'account-modal') await browser.evaluate(`document.getElementById('acctPill').click(); if (!document.getElementById('accountModal').classList.contains('open')) throw new Error('Account modal did not open');`);
+        if (name === 'trade-modal') await browser.evaluate(`document.querySelector('#topbar [data-i18n="topbar.newTrade"]').click();
+          if (!document.getElementById('tradeModal').classList.contains('open')) throw new Error('Trade modal did not open');`);
+        let nodeId;
+        if (hover) {
+          ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));
+          assert.ok(nodeId, `Hover target missing: ${hover}`);
+          await browser.command('CSS.forcePseudoState', {nodeId, forcedPseudoClasses: ['hover']});
+        }
+        // StudyHub can introduce additional font faces when its template is mounted.
+        await browser.evaluate(`(async () => {
+          await document.fonts.ready;
+          await Promise.all([...document.fonts].map(font => font.load()));
+          await (${settle})();
+        })()`);
+        const state = await browser.evaluate(`(${inspectShell})()`);
+        assert.equal(state.activePage, `page-${page}`);
+        assert.ok(state.sheetsLoaded && state.snapshot.length > 30);
+        for (const family of ['Inter', 'Syne', 'DM Mono']) assert.ok(state.fonts.some(font => font.replaceAll('"', '').startsWith(family + ':')), `Font not loaded: ${family}`);
+        const file = `${width}-${name}`;
+        await writeFile(path.join(directory, file + '.json'), JSON.stringify(state));
+        const {data} = await browser.command('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
+        const png = Buffer.from(data, 'base64');
+        await writeFile(path.join(directory, file + '.png'), png);
+        report.cases.push({name: file, nodes: state.snapshot.length, stateHash: hash(JSON.stringify(state)), imageHash: hash(png)});
+        if (nodeId) await browser.command('CSS.forcePseudoState', {nodeId, forcedPseudoClasses: []});
+      }
+      console.log(`Captured ${width}px: ${cases.length} shell/page states.`);
+    }
+    assert.deepEqual(browser.missing, [], 'Missing local assets');
+    assert.deepEqual(browser.errors, [], 'Console/runtime errors');
+    await writeFile(path.join(directory, 'report.json'), JSON.stringify(report, null, 2));
+    return report;
+  } finally { await browser.close(); }
+}
+
+async function main() {
+  const [mode, beforeDirectory, afterDirectory] = process.argv.slice(2);
+  assert.ok(['capture', 'compare', 'compare-saved'].includes(mode) && beforeDirectory && (mode === 'capture' || afterDirectory),
+    'Usage: capture <new-directory> | compare <baseline-directory> <new-directory> | compare-saved <before-directory> <after-directory>');
+  if (mode === 'capture') {
+    const report = await capture(path.resolve(beforeDirectory));
+    console.log(`PASS: baseline ${report.cases.length} cases; zero console/runtime errors.`);
+    return;
+  }
+  const before = JSON.parse(await readFile(path.join(beforeDirectory, 'report.json'), 'utf8'));
+  const after = mode === 'compare' ? await capture(path.resolve(afterDirectory))
+    : JSON.parse(await readFile(path.join(afterDirectory, 'report.json'), 'utf8'));
+  const withoutImageHashes = report => ({...report, cases: report.cases.map(({imageHash, ...state}) => state)});
+  assert.deepEqual(withoutImageHashes(after), withoutImageHashes(before), 'Style/geometry/font/storage differences; inspect JSON artifacts');
+  const noise = [];
+  for (const [index, entry] of after.cases.entries()) {
+    if (entry.imageHash === before.cases[index].imageHash) continue;
+    const result = JSON.parse(execFileSync('python3', [path.join(__dirname, 'compare-browser-images.py'),
+      path.join(beforeDirectory, entry.name + '.png'), path.join(afterDirectory, entry.name + '.png')], {encoding: 'utf8'}));
+    assert.ok(result.accepted, `Pixel difference: ${entry.name}`);
+    noise.push({name: entry.name, ...result});
+  }
+  await writeFile(path.join(afterDirectory, 'pixel-comparison.json'), JSON.stringify(noise, null, 2));
+  console.log(`PASS: ${after.cases.length} states identical; ${noise.length} images with bounded rasterization differences (${noise.reduce((sum, entry) => sum + entry.pixels, 0)} pixels).`);
+}
+main().catch(error => { console.error(error.message); process.exitCode = 1; });

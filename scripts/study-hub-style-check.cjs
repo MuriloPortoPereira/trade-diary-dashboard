@@ -131,4 +131,5 @@ async function main() {
   assert.deepEqual(differences, [], 'Visual/computed-style/storage differences; inspect saved JSON and PNG artifacts');
   console.log(`PASS: ${after.cases.length} cases match baseline (screenshots, computed styles, geometry and storage).`);
 }
-main().catch(error => { console.error(error.message); process.exitCode = 1; });
+module.exports = {deterministicFixture, settle};
+if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });

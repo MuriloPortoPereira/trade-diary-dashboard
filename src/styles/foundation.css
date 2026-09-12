@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg0: #030607;
+  --bg1: #081014;
+  --bg2: #0d171c;
+  --bg3: #122129;
+  --bg4: #18313b;
+  --bg5: #0f1f27;
+  --border: rgba(33, 213, 237, 0.10);
+  --border-strong: rgba(33, 213, 237, 0.22);
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --text: #eef8fb;
+  --muted: #8ba3ad;
+  --dim: #506a74;
+  --accent: #22d5ed;
+  --accent-strong: #45ebff;
+  --accent-soft: rgba(34, 213, 237, 0.14);
+  --green: #45e07b;
+  --green-soft: rgba(69, 224, 123, 0.14);
+  --red: #ff5d68;
+  --red-soft: rgba(255, 93, 104, 0.14);
+  --yellow: #ffce67;
+  --yellow-soft: rgba(255, 206, 103, 0.14);
+  --blue: #63a9ff;
+  --blue-soft: rgba(99, 169, 255, 0.14);
+  --purple: #8f8dff;
+  --purple-soft: rgba(143, 141, 255, 0.14);
+  --radius-xs: 10px;
+  --radius-sm: 16px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --topbar-h: 74px;
+  --sidebar-w: 278px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  min-height: 100%;
+  max-width: 100%;
+}
+
+body {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    linear-gradient(90deg, rgba(34, 213, 237, 0.055), transparent 18%, transparent 82%, rgba(99, 169, 255, 0.035)),
+    linear-gradient(135deg, #010304 0%, #05090b 42%, #020506 100%);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+}
+
+body::before,
+body::after {
+  display: none;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  color: inherit;
+}
+
+select option,
+select optgroup {
+  color: #050b0d;
+  background: #f4f8f9;
+}
+
+code {
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--accent);
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 213, 237, 0.18);
+  border-radius: 999px;
+}
+

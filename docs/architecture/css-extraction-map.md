@@ -1,7 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 executado: os quatro destinos `legacy-*.css` existem; demais destinos continuam propostos.
+G1 e G2a executados: quatro `legacy-*.css` e quatro destinos do prefixo 1–699 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 700–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -79,6 +80,21 @@ O smoke foi ampliado para as quatro abas e a baseline visual determinística foi
 Bytes concatenados preservados integralmente; resultados e limites em [progresso](refactoring-progress.md).
 Depois repetir o método com prefixos/sufixos ou segmentos intermediários explicitamente ordenados;
 não inserir todos os arquivos de feature depois de um `styles.css` residual que contenha sobrescritas tardias.
+
+## Segundo corte executado (G2a, 2026-09-12)
+
+Prefixo 1–699 extraído nos quatro destinos da tabela: foundation, shell-layout,
+preferences-widgets e navigation-and-account-summary. Links nessa ordem antes do residual;
+os quatro CSS G1 continuam depois dele. `styles.css`: 4.879 para 4.180 linhas.
+
+Foundation mantém `@import` absoluto Google Fonts na primeira instrução. Nenhuma URL relativa no prefixo.
+Preferences preserva o keyframe `cot-spin`; responsividade e complementos tardios permanecem no residual.
+A regra agrupada com `.acct-pill`, `.tb-stat`, `.btn`, `.tab-btn`, `.mode-btn` continua global.
+Não corrigir incidentalmente referências já indefinidas a `--border2`/`--cyan`.
+O bloco de navegação tem 408 linhas: mantém sidebar, logo e resumo coesos; não foi subdividido por tamanho.
+
+Proteção: fingerprint integral anterior preservado; runner shell cobre 15 páginas em três larguras e
+10 estados do shell nos limites 440/720/1080/1240. Resultados e limites em [progresso](refactoring-progress.md).
 
 ## Validação exigida
 
