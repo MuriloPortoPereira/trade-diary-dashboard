@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2b, `styles.css` mantém o trecho original 946–4879 (3.934 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2c, `styles.css` mantém o trecho original 1060–4879 (3.820 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -80,6 +80,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Uso compartilhado entre páginas: manter carga global e ordem, inclusive pseudo-elementos e seletores por inline style.
 - Teste integral de bytes em `tests/study-hub-styles.test.cjs`; runner visual do shell também captura máscaras,
   pseudo-elementos dos cards e as cinco abas de análise. Limites em [tooling](tooling.md).
+
+## Botões e datas: estilos (G2c)
+
+- `src/styles/page-actions.css`: 114 linhas de botões, variantes/tamanhos, opções de análise e intervalo de datas do diário.
+- Carrega depois de `page-surfaces-and-headers.css`, antes do residual; media queries e complementos tardios mantêm a posição original.
+- Uso global: shell, páginas, controles gerados e modais. Handlers e estado permanecem no legado.
+- Runner shell verifica hover, foco, filtragem e limpeza pelos controles reais; opções nativas têm suas cores computadas amostradas.
+- Teste integral de bytes permanece em `tests/study-hub-styles.test.cjs`; uso/limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

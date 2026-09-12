@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1, G2a e G2b executados: quatro `legacy-*.css` e cinco destinos do prefixo 1–945 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 946–4879.
+G1 e G2a–G2c executados: quatro `legacy-*.css` e seis destinos do prefixo 1–1059 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1060–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -107,6 +107,17 @@ Mantidos os pseudo-elementos das superfícies e cabeçalhos, máscaras, animaç�
 seletores de espaçamento por inline style e overrides responsivos tardios.
 Baseline preparada antes do corte: 211 casos, incluindo cinco abas de análise e seus filhos diretos.
 O fingerprint do CSS permanece o mesmo, sem atualização de expectativa.
+
+## Quarto corte executado (G2c)
+
+Bloco histórico 946–1059 em `src/styles/page-actions.css`: 114 linhas, 2.183 bytes, 16 regras completas.
+Link depois de superfícies/cabeçalhos e antes de `styles.css`, agora com 3.820 linhas.
+Sem URL, import, media query ou keyframe. Overrides em 1080/440 permanecem no residual.
+Preservados hover, foco, `filter`, tamanhos, flex, `color-scheme` e cores de opções dos selects.
+
+Baseline ampliada antes do corte: 323 casos. Inclui filtragem/limpeza de datas por eventos reais,
+hover de primary/ghost/ícone/limpeza e foco nos dois campos. Nenhuma mudança de handlers ou dados.
+Fingerprint integral mantido; limites de controles nativos documentados em [tooling](tooling.md).
 
 ## Validação exigida
 

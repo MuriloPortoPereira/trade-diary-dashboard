@@ -51,7 +51,6 @@
 - Comparador de pixels: seis casos de identidade/aceitação/rejeição/dimensões passaram; Pillow já disponível, somente na verificação visual opcional.
 - `app.js`, handlers e ordem dos scripts preservados; sem runtime dependencies, push ou deploy.
 
-## Current
 - G2b concluído: `src/styles/page-surfaces-and-headers.css` com 246 linhas/10.037 bytes.
 - `styles.css`: 4.180 para 3.934 linhas; dez links preservam os 162.576 bytes originais concatenados.
 - Antes do corte: fingerprint integral, 27 checks no navegador e baseline ampliada para 211 casos.
@@ -61,8 +60,18 @@
 - Runner inclui pseudo-elementos das superfícies/cabeçalhos, cinco abas de análise por handlers reais e fade-up antes de desativar animações.
 - `app.js`, scripts e handlers preservados; somente um link acrescentado no HTML. Sem novas dependências, push ou deploy.
 
+## Current
+- G2c concluído: `src/styles/page-actions.css` com 114 linhas/2.183 bytes; 16 regras completas.
+- `styles.css`: 3.934 para 3.820 linhas; onze links preservam os 162.576 bytes originais concatenados, também no índice Git.
+- Caracterização antes do corte: fingerprint integral, smoke 27 e baseline ampliada para 323 casos.
+- Após extração: 59 testes Node, 27 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- 323 estados exatos; 19 imagens com 54 pixels de diferença dentro da tolerância existente, sem ampliar limites. Zero erros de console/runtime e assets locais ausentes.
+- Cobertura inclui hover/foco, cores de opções, filtro e limpeza pelos controles reais; fixture conserva os dois trades após limpar datas.
+- Primeiro ensaio falhou por redeclaração de `const ids` no contexto CDP; IIFEs corrigiram somente o runner, seguido de nova baseline antes do corte.
+- Sem alteração de `app.js`, handlers, APIs, dados persistidos ou dependências. Apenas um link inserido no HTML; sem push/deploy.
+
 ## Next
-- G2c: revisar botões e intervalos de datas (baseline 946–1059), primeiro bloco residual, e caracterizar estados/consumidores antes de extrair.
+- G2d: revisar cards, indicadores e tooltips (baseline 1060–1359), primeiro bloco residual, e preparar cobertura dos estados antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -74,7 +83,8 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a/G2b cobrem estados iniciais das 15 páginas em três larguras, shell em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
+- G2a–G2c cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
+- G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
 - Idiomas: smoke cobre EN/PT e preservação dos demais dados; não compara pixels de todas as telas nem recarga do navegador após escolha.
@@ -94,3 +104,4 @@
 - `.gitattributes` impede normalização LF/CRLF somente nos cinco CSS; exceção de whitespace restrita a CRLF e separadores vazios herdados no EOF. Bytes do índice também comparados à baseline.
 - G2a: base visual/shell em `src/styles`, widgets em apresentação de preferências; responsividade e complementos tardios continuam no residual, na mesma ordem.
 - G2b: superfícies/cabeçalhos são apresentação comum em `src/styles`; máscaras data: e overrides tardios mantêm posição original.
+- G2c: ações comuns em `src/styles/page-actions.css`, com carga global; overrides responsivos e handlers continuam no legado.

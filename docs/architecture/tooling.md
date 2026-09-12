@@ -200,6 +200,25 @@ dentro da tolerância já documentada, sem ampliar limites. Smoke permanece com 
 O fingerprint integral existente passou antes/depois sem alteração do hash esperado.
 Os limites de viewport, dados sintéticos, subfluxos não cobertos e comparação numérica de pixels permanecem.
 
+## Botões e intervalos de datas (G2c)
+
+Snapshot versão 3 no runner shell: 323 casos, incluindo oito estados de ações em todas as 14 larguras.
+Acrescenta `min-height`, `flex`, `flex-wrap`, `filter`, `color-scheme` e cores computadas das opções de análise.
+Hover de botões primary/ghost/ícone e limpeza; foco nos dois inputs de data; filtro e limpeza por eventos reais.
+Datas 2026-09-10 selecionam `visual-win`; limpar restaura `visual-win` e `visual-loss`, sem mudar a fixture.
+O teste reinicia os filtros entre cenários. Não clica em exclusão nem submete operação.
+
+O primeiro ensaio detectou `const ids` repetido no contexto persistente de `Runtime.evaluate`.
+IIFEs passaram a delimitar essas variáveis no runner; a aplicação não foi alterada para contornar a falha.
+Serena ativo na raiz; investigação CSS do subagente usou busca localizada/parsing como alternativa ao MCP indisponível naquele contexto.
+Limites anteriores mantidos; seletor nativo de datas e popup nativo de opções não são capturados.
+Amostra das opções verifica suas cores computadas, sem alegar cobertura do popup.
+
+G2c: referência anterior ao corte em `/tmp/trade-diary-g2c-before`, resultado em `/tmp/trade-diary-g2c-after`.
+323 estados idênticos; 19 imagens com 54 pixels de diferença dentro dos limites anteriores.
+Zero erros de console/runtime, 27 checks no smoke e fingerprint integral sem mudança de expectativa.
+Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

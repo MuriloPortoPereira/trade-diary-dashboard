@@ -11,6 +11,8 @@ const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
 const widths = [390, ...[440, 720, 1080, 1240].flatMap(w => [w - 1, w, w + 1]), 1440];
 const pageWidths = [390, 1080, 1440];
 const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
+const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
+  'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
 const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
   'cotacao-focus', 'cotacao-hover', 'account-hover', 'account-modal', 'trade-modal'];
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -20,7 +22,8 @@ function inspectShell() {
     'padding', 'margin', 'gap', 'grid-template-columns', 'flex-direction', 'align-items', 'justify-content',
     'overflow', 'color', 'background', 'border', 'border-radius', 'box-shadow', 'outline', 'font-family',
     'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
-    'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat'];
+    'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
+    'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -35,6 +38,8 @@ function inspectShell() {
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
+    selectOptions: [...document.querySelectorAll('.stats-filter-select option')].map(el => ({value: el.value,
+      color: getComputedStyle(el).color, background: getComputedStyle(el).backgroundColor})),
     storage: Object.fromEntries(Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])),
     fonts: [...document.fonts].filter(font => font.status === 'loaded').map(font => `${font.family}:${font.weight}`).sort(),
     sheetsLoaded: [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet)};
@@ -43,7 +48,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 2, widths, pageWidths, statTabs, states, cases: []};
+  const report = {version: 3, widths, pageWidths, statTabs, states, actionStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -81,10 +86,10 @@ async function capture(directory) {
     report.pages = pages;
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
-      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states,
+      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states, ...actionStates,
         ...(pageWidths.includes(width) ? statTabs.map(tab => `stats-${tab}`) : [])];
       for (const name of cases) {
-        const page = name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        const page = name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
           document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0);`);
@@ -95,6 +100,33 @@ async function capture(directory) {
             if (getComputedStyle(document.getElementById(${JSON.stringify('statTab-' + tab)})).display !== 'block') throw new Error('Stats tab did not open');`);
         }
         let hover;
+        if (page === 'log') await browser.evaluate(`document.querySelector('#page-log .log-date-clear').click();`);
+        if (name.startsWith('actions-')) {
+          if (name === 'actions-primary-hover') hover = '#page-log .page-actions .btn-primary';
+          if (name === 'actions-ghost-hover') hover = '#filterAccount';
+          if (name === 'actions-icon-hover') {
+            await browser.evaluate(`document.querySelector('#page-log .page-actions .btn-primary').click();
+              if (!document.getElementById('tradeModal').classList.contains('open')) throw new Error('Trade modal did not open');`);
+            hover = '#tradeModal .btn-icon';
+          }
+          if (['actions-date-start-focus', 'actions-date-end-focus'].includes(name)) {
+            const id = name === 'actions-date-start-focus' ? 'filterDateStart' : 'filterDateEnd';
+            await browser.evaluate(`document.getElementById(${JSON.stringify(id)}).focus();
+              if (document.activeElement !== document.getElementById(${JSON.stringify(id)})) throw new Error('Date input did not focus');`);
+          }
+          if (['actions-date-filtered', 'actions-date-clear-hover', 'actions-date-cleared'].includes(name)) {
+            await browser.evaluate(`(() => { for (const id of ['filterDateStart', 'filterDateEnd']) {
+              const input = document.getElementById(id); input.value = '2026-09-10'; input.dispatchEvent(new Event('change', {bubbles: true}));
+            }
+            const ids = [...document.querySelectorAll('#logTbody input[type="checkbox"]')].map(el => el.dataset.id);
+            if (JSON.stringify(ids) !== '["visual-win"]') throw new Error('Date filter did not select the expected trade'); })()`);
+            if (name === 'actions-date-clear-hover') hover = '#page-log .log-date-clear';
+            if (name === 'actions-date-cleared') await browser.evaluate(`(() => { document.querySelector('#page-log .log-date-clear').click();
+              const ids = [...document.querySelectorAll('#logTbody input[type="checkbox"]')].map(el => el.dataset.id).sort();
+              if (document.getElementById('filterDateStart').value || document.getElementById('filterDateEnd').value ||
+                JSON.stringify(ids) !== '["visual-loss","visual-win"]') throw new Error('Clearing dates did not restore the trades'); })()`);
+          }
+        }
         if (['sidebar-open', 'nav-hover'].includes(name)) {
           await browser.evaluate(`document.getElementById('hamburger').click();
             if (!document.getElementById('sidebar').classList.contains('open') || !document.getElementById('sidebar-overlay').classList.contains('show')) throw new Error('Sidebar did not open');`);

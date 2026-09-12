@@ -62,8 +62,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 700–945 extraído em um arquivo de 246 linhas; `styles.css` mantém 3.934 linhas.
 - Cobertura antes do corte: fingerprint integral, 27 checks no navegador e 211 casos visuais;
   inclui máscaras/pseudo-elementos, display das páginas, fade-up e cinco abas de análise.
-- Próximo candidato G2c: `page-actions.css` (baseline 946–1059), hoje primeiro bloco residual;
-  revisar estados de botões/intervalos de datas e consumidores antes de extrair.
+- G2c deu continuidade pelos botões e intervalos de datas, com cobertura dos estados e consumidores antes do corte.
+
+## G2c: botões e intervalos de datas
+
+- Bloco histórico 946–1059 extraído em arquivo de 114 linhas; residual com 3.820 linhas.
+- Baseline anterior ao corte: fingerprint, smoke 27 e 323 casos visuais/funcionais.
+- Preservados controles, hover, foco, filtragem/limpeza e overrides responsivos; sem alterar o JavaScript da aplicação.
+- Próximo candidato G2d: `metric-cards-and-risk-insights.css` (baseline 1060–1359);
+  revisar cards, indicadores e tooltips no body, com cobertura específica antes de mover.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
