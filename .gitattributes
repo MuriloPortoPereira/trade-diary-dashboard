@@ -6,3 +6,4 @@ src/styles/foundation.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/shell-layout.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/preferences/presentation/preferences-widgets.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/navigation-and-account-summary.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/page-surfaces-and-headers.css -text whitespace=-blank-at-eof,cr-at-eol

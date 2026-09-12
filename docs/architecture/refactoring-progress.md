@@ -40,7 +40,6 @@
 - Ferramenta de captura teve seletor com aspas inválidas na primeira execução; corrigido somente no teste, baseline refeita antes da extração.
 - JS da aplicação não alterado. Sem dependências de runtime, push ou deploy.
 
-## Current
 - G2a concluído em 2026-09-12: foundation (109), shell-layout (43), preferences-widgets (139) e navigation-and-account-summary (408 linhas).
 - `styles.css`: 4.879 para 4.180 linhas; 699 linhas movidas. Nove links preservam os 162.576 bytes originais concatenados.
 - Baseline antes do corte: fingerprint CSS, 27 checks no navegador e 196 capturas em perfil isolado.
@@ -52,8 +51,18 @@
 - Comparador de pixels: seis casos de identidade/aceitação/rejeição/dimensões passaram; Pillow já disponível, somente na verificação visual opcional.
 - `app.js`, handlers e ordem dos scripts preservados; sem runtime dependencies, push ou deploy.
 
+## Current
+- G2b concluído: `src/styles/page-surfaces-and-headers.css` com 246 linhas/10.037 bytes.
+- `styles.css`: 4.180 para 3.934 linhas; dez links preservam os 162.576 bytes originais concatenados.
+- Antes do corte: fingerprint integral, 27 checks no navegador e baseline ampliada para 211 casos.
+- Depois: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; revisão independente sem bloqueios.
+- 211 estados exatos (estilos, geometria, máscaras, fontes, display das páginas e storage); zero erros de console/runtime ou assets locais ausentes.
+- 11 capturas com 170 pixels de diferença dentro da tolerância numérica existente; limites não ampliados.
+- Runner inclui pseudo-elementos das superfícies/cabeçalhos, cinco abas de análise por handlers reais e fade-up antes de desativar animações.
+- `app.js`, scripts e handlers preservados; somente um link acrescentado no HTML. Sem novas dependências, push ou deploy.
+
 ## Next
-- G2b: revisar o primeiro bloco residual de superfícies/cabeçalhos (baseline 700–945) no [mapa](css-extraction-map.md) e caracterizar seus estados antes de extrair.
+- G2c: revisar botões e intervalos de datas (baseline 946–1059), primeiro bloco residual, e caracterizar estados/consumidores antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -65,7 +74,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a cobre estados iniciais das 15 páginas em três larguras, shell em 14 larguras e dois modais sem submissão; não cobre toda a aplicação.
+- G2a/G2b cobrem estados iniciais das 15 páginas em três larguras, shell em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
 - Idiomas: smoke cobre EN/PT e preservação dos demais dados; não compara pixels de todas as telas nem recarga do navegador após escolha.
@@ -84,3 +93,4 @@
 - G1: arquivos CSS são apresentação; controles compartilhados continuam carregados nas quatro abas, sem lazy loading ou novas camadas.
 - `.gitattributes` impede normalização LF/CRLF somente nos cinco CSS; exceção de whitespace restrita a CRLF e separadores vazios herdados no EOF. Bytes do índice também comparados à baseline.
 - G2a: base visual/shell em `src/styles`, widgets em apresentação de preferências; responsividade e complementos tardios continuam no residual, na mesma ordem.
+- G2b: superfícies/cabeçalhos são apresentação comum em `src/styles`; máscaras data: e overrides tardios mantêm posição original.

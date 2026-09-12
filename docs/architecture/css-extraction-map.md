@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a executados: quatro `legacy-*.css` e quatro destinos do prefixo 1–699 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 700–4879.
+G1, G2a e G2b executados: quatro `legacy-*.css` e cinco destinos do prefixo 1–945 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 946–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -95,6 +95,18 @@ O bloco de navegação tem 408 linhas: mantém sidebar, logo e resumo coesos; n�
 
 Proteção: fingerprint integral anterior preservado; runner shell cobre 15 páginas em três larguras e
 10 estados do shell nos limites 440/720/1080/1240. Resultados e limites em [progresso](refactoring-progress.md).
+
+## Terceiro corte executado (G2b, 2026-09-12)
+
+Bloco histórico 700–945 em `src/styles/page-surfaces-and-headers.css` (246 linhas, 10.037 bytes).
+Carrega entre navigation-and-account-summary e o residual. `styles.css`: 4.180 para 3.934 linhas;
+encerra a extração em `.page-actions`, preservando `.btn` como início do próximo bloco.
+
+34 regras completas, sem media query ou import. SVGs são `data:`; não há URL relativa a ajustar.
+Mantidos os pseudo-elementos das superfícies e cabeçalhos, máscaras, animação `fade-up`,
+seletores de espaçamento por inline style e overrides responsivos tardios.
+Baseline preparada antes do corte: 211 casos, incluindo cinco abas de análise e seus filhos diretos.
+O fingerprint do CSS permanece o mesmo, sem atualização de expectativa.
 
 ## Validação exigida
 

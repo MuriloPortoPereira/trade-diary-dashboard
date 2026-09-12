@@ -10,6 +10,7 @@ const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240].flatMap(w => [w - 1, w, w + 1]), 1440];
 const pageWidths = [390, 1080, 1440];
+const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
 const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
   'cotacao-focus', 'cotacao-hover', 'account-hover', 'account-modal', 'trade-modal'];
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -18,17 +19,22 @@ function inspectShell() {
   const properties = ['display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
     'padding', 'margin', 'gap', 'grid-template-columns', 'flex-direction', 'align-items', 'justify-content',
     'overflow', 'color', 'background', 'border', 'border-radius', 'box-shadow', 'outline', 'font-family',
-    'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform'];
+    'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
+    'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat'];
+  const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
+  const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
+    [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
   const snapshot = [...document.querySelectorAll('body,body *')].filter(el => el.getClientRects().length).map(el => {
     const style = getComputedStyle(el), rect = el.getBoundingClientRect();
     return {tag: el.tagName, id: el.id, class: el.getAttribute('class'),
       rect: [rect.x, rect.y, rect.width, rect.height].map(n => Math.round(n * 1000) / 1000),
       styles: Object.fromEntries(properties.map(key => [key, style.getPropertyValue(key)])),
-      before: el.matches('.nav-item,.logo-mark,.acct-pill,.page-header>div:first-child') ? getComputedStyle(el, '::before').cssText +
-        ['content', ...properties].map(key => getComputedStyle(el, '::before').getPropertyValue(key)).join('|') : null,
+      before: el.matches(`.nav-item,.logo-mark,.acct-pill,.page-header>div:first-child,${surfaceSelector}`) ? pseudoStyle(el, '::before') : null,
+      after: el.matches('.page-header>div:first-child') ? pseudoStyle(el, '::after') : null,
       text: el.children.length ? null : el.textContent, value: 'value' in el ? el.value : null};
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
+    pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
     storage: Object.fromEntries(Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])),
     fonts: [...document.fonts].filter(font => font.status === 'loaded').map(font => `${font.family}:${font.weight}`).sort(),
     sheetsLoaded: [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet)};
@@ -37,7 +43,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 1, widths, pageWidths, states, cases: []};
+  const report = {version: 2, widths, pageWidths, statTabs, states, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -49,6 +55,11 @@ async function capture(directory) {
       if (document.readyState === 'complete') done(); else addEventListener('load', done, {once: true});
     })`);
     assert.equal(await browser.evaluate('Chart.version'), '4.4.1');
+    report.pageAnimation = await browser.evaluate(`(() => {
+      const style = getComputedStyle(document.querySelector('.page.active'));
+      return [style.animationName, style.animationDuration];
+    })()`);
+    assert.deepEqual(report.pageAnimation, ['fade-up', '0.28s']);
     // Eagerly load every declared face: splitting links can change which unused weights
     // the browser downloads during transient layout, without changing the final CSS.
     await browser.evaluate(`document.fonts.ready.then(() => Promise.all([...document.fonts].map(font => font.load())))`);
@@ -70,12 +81,19 @@ async function capture(directory) {
     report.pages = pages;
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
-      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states];
+      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states,
+        ...(pageWidths.includes(width) ? statTabs.map(tab => `stats-${tab}`) : [])];
       for (const name of cases) {
-        const page = pages.includes(name) ? name : 'dashboard';
+        const page = name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
           document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0);`);
+        if (page === 'stats') {
+          const tab = name.startsWith('stats-') ? name.slice(6) : 'overview';
+          const selector = `#statTabNav [onclick*="'${tab}'"]`;
+          await browser.evaluate(`document.querySelector(${JSON.stringify(selector)}).click();
+            if (getComputedStyle(document.getElementById(${JSON.stringify('statTab-' + tab)})).display !== 'block') throw new Error('Stats tab did not open');`);
+        }
         let hover;
         if (['sidebar-open', 'nav-hover'].includes(name)) {
           await browser.evaluate(`document.getElementById('hamburger').click();
@@ -113,6 +131,7 @@ async function capture(directory) {
         })()`);
         const state = await browser.evaluate(`(${inspectShell})()`);
         assert.equal(state.activePage, `page-${page}`);
+        assert.equal(state.pageDisplays.filter(([, display]) => display !== 'none').length, 1, 'Only the active page is displayed');
         assert.ok(state.sheetsLoaded && state.snapshot.length > 30);
         for (const family of ['Inter', 'Syne', 'DM Mono']) assert.ok(state.fonts.some(font => font.replaceAll('"', '').startsWith(family + ':')), `Font not loaded: ${family}`);
         const file = `${width}-${name}`;

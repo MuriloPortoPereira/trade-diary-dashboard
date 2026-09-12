@@ -54,9 +54,16 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Prefixo histórico 1–699 separado em quatro arquivos, preservando ordem e bytes.
 - Cobertura preparada antes da extração: 196 casos visuais e smoke ampliado para 27 checks.
 - `styles.css` mantém 4.180 linhas; responsividade e estilos das páginas ainda residuais.
-- Próximo candidato G2b: primeiro bloco residual `page-surfaces-and-headers.css` (baseline 700–945),
-  com revisão dos consumidores e cobertura dos estados afetados antes de mover.
+- G2b deu continuidade pelo bloco residual de superfícies/cabeçalhos, com cobertura adicional antes do corte.
 - Não executar todo G2 de uma vez; G3–G6 continuam frentes independentes.
+
+## G2b: superfícies e cabeçalhos
+
+- Bloco histórico 700–945 extraído em um arquivo de 246 linhas; `styles.css` mantém 3.934 linhas.
+- Cobertura antes do corte: fingerprint integral, 27 checks no navegador e 211 casos visuais;
+  inclui máscaras/pseudo-elementos, display das páginas, fade-up e cinco abas de análise.
+- Próximo candidato G2c: `page-actions.css` (baseline 946–1059), hoje primeiro bloco residual;
+  revisar estados de botões/intervalos de datas e consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

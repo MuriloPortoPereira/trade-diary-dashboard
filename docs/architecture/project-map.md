@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2a, `styles.css` mantém o trecho original 700–4879 (4.180 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2b, `styles.css` mantém o trecho original 946–4879 (3.934 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -71,6 +71,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Carga nessa ordem, antes de `styles.css` e dos quatro CSS StudyHub; sobrescritas responsivas permanecem no residual.
 - Contrato integral de bytes/cascata: `tests/study-hub-styles.test.cjs` (nome histórico; cobre todos os links).
 - Comparação visual: `scripts/shell-style-check.cjs`; instruções e limites em [tooling](tooling.md).
+
+## Superfícies e cabeçalhos: estilos (G2b)
+
+- `src/styles/page-surfaces-and-headers.css`: 246 linhas de superfícies de cards/modais, layout das páginas,
+  espaçamento das abas de análise, cabeçalhos e ícones SVG em máscaras CSS.
+- Carrega após `navigation-and-account-summary.css`, antes de `styles.css`; regras responsivas permanecem no residual.
+- Uso compartilhado entre páginas: manter carga global e ordem, inclusive pseudo-elementos e seletores por inline style.
+- Teste integral de bytes em `tests/study-hub-styles.test.cjs`; runner visual do shell também captura máscaras,
+  pseudo-elementos dos cards e as cinco abas de análise. Limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

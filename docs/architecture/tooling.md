@@ -186,6 +186,20 @@ Não cobre todas as subabas, inputs, variações de dados nem animações em mov
 permanecem globais; arquivos não são carregados por página. `.gitattributes` preserva os bytes dos
 quatro novos CSS, incluindo LF/CRLF e separadores finais herdados.
 
+## Ampliação de superfícies e cabeçalhos (G2b)
+
+O mesmo runner shell agora registra 211 casos (196 anteriores + cinco abas de análise em três larguras).
+Snapshot versão 2: pseudo-elementos `::before` das oito superfícies, `::after` dos cabeçalhos,
+máscaras/posições e display das 15 páginas. Verifica também `fade-up` antes de desativar animações.
+Abas usam os botões reais de `switchStatTab`; os filhos diretos entram na comparação de margens.
+Recapturar a baseline ao mudar a versão do snapshot; relatórios G2a não têm os mesmos campos.
+
+G2b: baseline capturada antes de mover CSS em `/tmp/trade-diary-g2b-baseline`, resultado em
+`/tmp/trade-diary-g2b-after`. 211 estados idênticos e zero erros; 11 imagens com 170 pixels diferentes,
+dentro da tolerância já documentada, sem ampliar limites. Smoke permanece com 27 checks.
+O fingerprint integral existente passou antes/depois sem alteração do hash esperado.
+Os limites de viewport, dados sintéticos, subfluxos não cobertos e comparação numérica de pixels permanecem.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
