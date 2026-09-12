@@ -56,6 +56,13 @@ function browserProbe() {
       const withoutLanguage = values => Object.fromEntries(Object.entries(values).filter(([key]) => key !== 'appLanguage'));
       check('language changes preserve application data', JSON.stringify(withoutLanguage(storageBefore)) === JSON.stringify(withoutLanguage(
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)])))));
+      showPage('studyHub');
+      for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
+        document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
+        check(`StudyHub ${tab} tab`, document.querySelector('#page-studyHub.active') &&
+          document.getElementById('studyHubLegacyApp').dataset.loaded === '1' &&
+          document.getElementById(`mod-${tab}`).classList.contains('active'));
+      }
     } catch (error) {
       errors.push(error.stack || String(error));
     }
@@ -83,7 +90,7 @@ async function main() {
     if (pathname === '/favicon.ico') { response.writeHead(204); response.end(); return; }
     const relative = pathname.slice(1);
     // Serve application assets only; never expose tool configuration or repository metadata.
-    const allowed = ['app.js', 'styles.css'].includes(relative) || /^src\/[\w/.-]+\.js$/.test(relative);
+    const allowed = ['app.js', 'styles.css'].includes(relative) || /^src\/[\w/.-]+\.(js|css)$/.test(relative);
     const filename = path.resolve(root, relative);
     if (!allowed || !filename.startsWith(root + path.sep)) {
       response.writeHead(404); response.end(); missing.push(pathname); return;
@@ -116,7 +123,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 18, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 22, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

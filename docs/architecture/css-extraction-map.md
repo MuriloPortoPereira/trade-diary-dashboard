@@ -1,6 +1,7 @@
 # Mapa de extração do CSS
 
-Análise de 2026-09-11 sobre `5c9859f`. Destinos propostos, ainda não criados.
+Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
+G1 executado: os quatro destinos `legacy-*.css` existem; demais destinos continuam propostos.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -67,14 +68,15 @@ Pequenos complementos podem permanecer no legado até um lote com cobertura sufi
 - Há seletores por texto de `style`, como em 793/4624, e `.chart-wrap[style]`. Mover/reformatar inline styles pode mudar matching.
 - Um import Google Fonts e 16 SVGs `data:`; nenhuma URL relativa encontrada. Preservar fontes e fallbacks existentes.
 
-## Primeiro corte recomendado
+## Primeiro corte executado (G1)
 
-Extrair somente o sufixo StudyHub 4880–6090 em quatro arquivos da tabela. Manter
-`styles.css` com o prefixo 1–4879 e adicionar os quatro `<link>` depois dele, nessa ordem.
+Extraído o sufixo StudyHub 4880–6090 em quatro arquivos da tabela.
+`styles.css` mantém o prefixo 1–4879; os quatro `<link>` vêm depois dele, nessa ordem.
 Esse corte retira 1.211 linhas sem reorganizar regras anteriores. Nenhum arquivo novo ultrapassa 359 linhas.
 Os blocos contêm controles compartilhados do legado: todos os quatro continuam carregados em todas as abas.
 
-O lote deve primeiro ampliar o smoke para as quatro abas e criar baseline visual determinística.
+O smoke foi ampliado para as quatro abas e a baseline visual determinística foi capturada antes do corte.
+Bytes concatenados preservados integralmente; resultados e limites em [progresso](refactoring-progress.md).
 Depois repetir o método com prefixos/sufixos ou segmentos intermediários explicitamente ordenados;
 não inserir todos os arquivos de feature depois de um `styles.css` residual que contenha sobrescritas tardias.
 

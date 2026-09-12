@@ -35,7 +35,7 @@ Inventários completos e condições: [análise global](modularization-analysis.
 
 | Sequência | Entrega independente | Evidência exigida antes e depois |
 |---|---|---|
-| G1 | CSS legado StudyHub: sufixo 4880–6090 em quatro arquivos ordenados | Ampliar smoke das quatro abas; baseline visual; comparar bytes/cascata e geometria nos breakpoints |
+| G1 ✓ | CSS legado StudyHub: sufixo 4880–6090 em quatro arquivos ordenados | Ampliar smoke das quatro abas; baseline visual; comparar bytes/cascata e geometria nos breakpoints |
 | G2 | CSS comum e demais páginas em blocos contíguos do mapa | Regras/ordem sem perdas; telas, estados e responsividade dos componentes afetados |
 | G3 | JS de páginas e componentes por feature, uma responsabilidade por commit | Declarações preservadas, handlers/globals, fluxo de navegação, modais e efeitos de estado |
 | G4 | Domínios de métricas, timing, risco e simulação, individualmente | Caracterização numérica, limites, defaults, relógio/RNG e compatibilidade dos consumidores |
@@ -45,7 +45,8 @@ Inventários completos e condições: [análise global](modularization-analysis.
 
 G2–G6 contêm vários lotes pequenos: não executar uma frente inteira como um único commit.
 Intercalar CSS/JS da mesma feature é permitido, mas não misturar movimento de estilos com mudança de cálculo.
-G1 deve preparar sua própria cobertura antes de extrair; os 18 checks atuais não são suficientes para equivalência visual.
+G1 preparou cobertura antes da extração: fingerprint integral do CSS, smoke de quatro abas e comparação visual.
+G2 deve ampliar essa cobertura para cada novo componente/estado afetado.
 O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função. HTML permanece estático até G7.
 
 ## Primeiro lote: sizing

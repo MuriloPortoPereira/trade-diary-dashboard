@@ -1,0 +1,334 @@
+#studyHubLegacyApp{
+  background:transparent;
+  color:var(--text);
+  font-family:'DM Mono', monospace;
+  isolation:isolate;
+}
+
+#studyHubLegacyApp,
+#studyHubLegacyApp button,
+#studyHubLegacyApp input,
+#studyHubLegacyApp select,
+#studyHubLegacyApp textarea,
+#studyHubLegacyApp table,
+#studyHubLegacyApp canvas{
+  font-family:'DM Mono', monospace;
+}
+
+#studyHubLegacyApp .sec,
+#studyHubLegacyApp .out-box,
+#studyHubLegacyApp .ts-panel,
+#studyHubLegacyApp .metric,
+#studyHubLegacyApp .panel,
+#studyHubLegacyApp .sg,
+#studyHubLegacyApp .logbody,
+#studyHubLegacyApp .a-panel{
+  border-color:rgba(255,255,255,.05);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01)),
+    rgba(8,16,20,.92);
+}
+
+#studyHubLegacyApp .sec-hdr,
+#studyHubLegacyApp .ts-panel-header,
+#studyHubLegacyApp .phdr,
+#studyHubLegacyApp .a-phdr,
+#studyHubLegacyApp .tabs-nav{
+  border-color:rgba(255,255,255,.05);
+  background:rgba(255,255,255,.03);
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav .tab-btn.active,
+#studyHubLegacyApp .ts-tab-btn.active{
+  color:#05232a;
+  background:linear-gradient(135deg,#26dff7,#10b9ce);
+  border-color:rgba(34,213,237,.42);
+  border-bottom-color:transparent;
+  box-shadow:0 10px 22px rgba(34,213,237,.18);
+}
+
+#studyHubLegacyApp .btn.primary,
+#studyHubLegacyApp .run-btn{
+  color:#05232a;
+  background:linear-gradient(135deg,#26dff7,#10b9ce);
+  border-color:rgba(34,213,237,.28);
+}
+
+#studyHubLegacyApp #app,
+#studyHubLegacyApp .hub-module,
+#studyHubLegacyApp .tab-panel,
+#studyHubLegacyApp .ts-main,
+#studyHubLegacyApp .fm-main{
+  min-width:0;
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav{
+  position:sticky;
+  top:0;
+  z-index:30;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-bottom-color:rgba(255,255,255,.05);
+  background:rgba(5,12,15,.92);
+  backdrop-filter:blur(14px);
+  overflow-x:visible;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(34,213,237,.28) rgba(255,255,255,.025);
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav::-webkit-scrollbar,
+#studyHubLegacyApp .tbl-wrap::-webkit-scrollbar,
+#studyHubLegacyApp .tbl-scroll::-webkit-scrollbar,
+#studyHubLegacyApp .twrap::-webkit-scrollbar,
+#studyHubLegacyApp .bgrid-outer::-webkit-scrollbar,
+#studyHubLegacyApp .logscroll::-webkit-scrollbar,
+#studyHubLegacyApp .ts-sidebar::-webkit-scrollbar,
+#studyHubLegacyApp .fm-sidebar::-webkit-scrollbar{
+  width:6px;
+  height:6px;
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav::-webkit-scrollbar-track,
+#studyHubLegacyApp .tbl-wrap::-webkit-scrollbar-track,
+#studyHubLegacyApp .tbl-scroll::-webkit-scrollbar-track,
+#studyHubLegacyApp .twrap::-webkit-scrollbar-track,
+#studyHubLegacyApp .bgrid-outer::-webkit-scrollbar-track,
+#studyHubLegacyApp .logscroll::-webkit-scrollbar-track,
+#studyHubLegacyApp .ts-sidebar::-webkit-scrollbar-track,
+#studyHubLegacyApp .fm-sidebar::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.025);
+  border-radius:999px;
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .tbl-wrap::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .tbl-scroll::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .twrap::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .bgrid-outer::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .logscroll::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .ts-sidebar::-webkit-scrollbar-thumb,
+#studyHubLegacyApp .fm-sidebar::-webkit-scrollbar-thumb{
+  background:linear-gradient(90deg, rgba(34,213,237,.24), rgba(69,224,123,.14));
+  border-radius:999px;
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav .tab-btn,
+#studyHubLegacyApp .ts-tab-btn{
+  min-height:34px;
+  border:1px solid rgba(34,213,237,.16);
+  border-radius:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+#studyHubLegacyApp.embed-mode .tabs-nav .tab-btn:hover,
+#studyHubLegacyApp .ts-tab-btn:hover{
+  color:var(--text);
+  border-color:rgba(34,213,237,.3);
+  background:linear-gradient(180deg, rgba(34,213,237,.09), rgba(255,255,255,.025));
+}
+
+#studyHubLegacyApp.embed-mode .tab-panel{
+  padding:18px;
+}
+
+#studyHubLegacyApp .sec,
+#studyHubLegacyApp .out-box,
+#studyHubLegacyApp .ts-panel,
+#studyHubLegacyApp .metric,
+#studyHubLegacyApp .ts-metric,
+#studyHubLegacyApp .panel,
+#studyHubLegacyApp .sg,
+#studyHubLegacyApp .stat-card,
+#studyHubLegacyApp .a-panel,
+#studyHubLegacyApp .logbody{
+  border-radius:8px;
+}
+
+#studyHubLegacyApp .sec-hdr,
+#studyHubLegacyApp .ts-panel-header,
+#studyHubLegacyApp .phdr,
+#studyHubLegacyApp .a-phdr{
+  min-height:42px;
+}
+
+#studyHubLegacyApp .sec-title,
+#studyHubLegacyApp .ts-panel-title,
+#studyHubLegacyApp .ptitle,
+#studyHubLegacyApp .a-ptitle{
+  min-width:0;
+  line-height:1.35;
+}
+
+#studyHubLegacyApp input,
+#studyHubLegacyApp select,
+#studyHubLegacyApp textarea{
+  min-width:0;
+}
+
+#studyHubLegacyApp .fr2,
+#studyHubLegacyApp .g2,
+#studyHubLegacyApp .field-row{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+#studyHubLegacyApp .fr3,
+#studyHubLegacyApp .g3{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+#studyHubLegacyApp .fr4,
+#studyHubLegacyApp .g4{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+#studyHubLegacyApp .fr5{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}
+
+#studyHubLegacyApp .tbl,
+#studyHubLegacyApp .data-table,
+#studyHubLegacyApp .dt-tbl,
+#studyHubLegacyApp .ltable,
+#studyHubLegacyApp .bt{
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+#studyHubLegacyApp th,
+#studyHubLegacyApp td{
+  vertical-align:middle;
+}
+
+#studyHubLegacyApp .tbl-wrap,
+#studyHubLegacyApp .tbl-scroll,
+#studyHubLegacyApp .twrap,
+#studyHubLegacyApp .bgrid-outer,
+#studyHubLegacyApp .logscroll{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(34,213,237,.28) rgba(255,255,255,.025);
+}
+
+#studyHubLegacyApp .tbl-wrap,
+#studyHubLegacyApp .twrap{
+  border-radius:8px;
+}
+
+#studyHubLegacyApp .ts-layout{
+  grid-template-columns:minmax(260px,300px) minmax(0,1fr);
+  min-height:auto;
+}
+
+#studyHubLegacyApp .ts-sidebar,
+#studyHubLegacyApp .fm-sidebar{
+  top:0;
+  align-self:start;
+  max-height:none;
+}
+
+#studyHubLegacyApp .ts-main,
+#studyHubLegacyApp .fm-main{
+  overflow:visible;
+  padding:18px;
+}
+
+#studyHubLegacyApp .metrics-row{
+  grid-template-columns:repeat(5,minmax(132px,1fr));
+}
+
+#studyHubLegacyApp .panels-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+#studyHubLegacyApp .fm-layout{
+  grid-template-columns:minmax(248px,268px) minmax(0,1fr);
+  min-height:auto;
+}
+
+#studyHubLegacyApp .mrow{
+  grid-template-columns:repeat(5,minmax(132px,1fr));
+}
+
+#studyHubLegacyApp .a-totals{
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+}
+
+#studyHubLegacyApp .analytics-grid{
+  grid-template-columns:repeat(4,minmax(220px,1fr));
+}
+
+#studyHubLegacyApp .bgrid{
+  grid-template-columns:repeat(4,minmax(250px,1fr));
+  min-width:1040px;
+}
+
+#studyHubLegacyApp .warning-box{
+  background:rgba(255,206,103,.08);
+  border-color:rgba(255,206,103,.22);
+}
+
+#studyHubLegacyApp .sg{
+  padding:14px;
+}
+
+#studyHubLegacyApp .fm-sidebar .sg .recov-table{
+  table-layout:fixed;
+  font-size:9px;
+}
+
+#studyHubLegacyApp .fm-sidebar .sg .recov-table th,
+#studyHubLegacyApp .fm-sidebar .sg .recov-table td{
+  padding:4px 3px;
+  letter-spacing:0;
+  line-height:1.35;
+  text-align:center;
+  white-space:normal;
+}
+
+#studyHubLegacyApp .fm-sidebar .sg .recov-table th:nth-child(1),
+#studyHubLegacyApp .fm-sidebar .sg .recov-table td:nth-child(1){
+  width:22%;
+}
+
+#studyHubLegacyApp .fm-sidebar .sg .recov-table th:nth-child(2),
+#studyHubLegacyApp .fm-sidebar .sg .recov-table td:nth-child(2),
+#studyHubLegacyApp .fm-sidebar .sg .recov-table th:nth-child(3),
+#studyHubLegacyApp .fm-sidebar .sg .recov-table td:nth-child(3){
+  width:28%;
+}
+
+#studyHubLegacyApp .fm-sidebar .sg .recov-table th:nth-child(4),
+#studyHubLegacyApp .fm-sidebar .sg .recov-table td:nth-child(4){
+  width:22%;
+}
+
+@media(max-width:1200px){
+  #studyHubLegacyApp.embed-mode .tab-panel{padding:14px}
+  #studyHubLegacyApp .ts-layout,
+  #studyHubLegacyApp .fm-layout{grid-template-columns:1fr}
+  #studyHubLegacyApp .ts-sidebar,
+  #studyHubLegacyApp .fm-sidebar{position:static;width:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.05)}
+  #studyHubLegacyApp .metrics-row,
+  #studyHubLegacyApp .mrow{grid-template-columns:repeat(3,minmax(150px,1fr))}
+  #studyHubLegacyApp .panels-grid,
+  #studyHubLegacyApp .analytics-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:720px){
+  #studyHubLegacyApp.embed-mode .tabs-nav{padding:5px 8px}
+  #studyHubLegacyApp.embed-mode .tabs-nav .tab-btn{font-size:8px;min-height:32px;padding:0 10px}
+  #studyHubLegacyApp .metrics-row,
+  #studyHubLegacyApp .mrow,
+  #studyHubLegacyApp .a-totals{grid-template-columns:repeat(2,minmax(140px,1fr))}
+}
+
+
+/* END STUDYHUB INTEGRATED CSS */
+

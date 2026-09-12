@@ -1,0 +1,4 @@
+# Preserve the legacy CSS bytes during incremental extraction (mixed LF/CRLF).
+# These blocks retain original blank separators at EOF; other whitespace checks stay enabled.
+styles.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/study-hub/presentation/legacy-*.css -text whitespace=-blank-at-eof,cr-at-eol

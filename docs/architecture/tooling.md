@@ -89,13 +89,51 @@ valores 10/50/30, API global, storage inalterado e retorno ao dashboard.
 No lote 2, soma três checks CSV: saída com arrays/aspas/vírgula/LF, default `trades`
 e compatibilidade de helper/cabeçalhos. Total: 14 checks; não realiza download real.
 No lote 2b, soma quatro checks de idioma: handler EN, catálogo renderizado, handler PT e
-preservação dos dados de storage exceto `appLanguage`. Total atual: 18 checks.
+preservação dos dados de storage exceto `appLanguage`. Total no lote 2b: 18 checks.
 Somente o perfil temporário recebe a escolha de idioma; não acessa dados pessoais.
 Requer rede para os recursos CDN/fontes e falha em erros de script ou assets locais ausentes.
 Resultado coletado após `load + 250ms`; não captura erros assíncronos posteriores,
 erros silenciados ou mensagens de `console.error`. Verifica Chart.js real pela versão.
 Storage é comparado somente entre navegação e simulação, após bootstrap.
 Não cobre todos os fluxos, migrações de dados nem compara pixels.
+
+## Comparação visual StudyHub (G1)
+
+Smoke ampliado para 22 checks: montagem e navegação pelas quatro abas principais.
+A comparação visual usa Node.js 24 (WebSocket nativo), Chrome/CDP e perfil temporário;
+`scripts/lib/study-hub-browser.cjs` atende somente assets locais da aplicação.
+Nenhuma dependência npm foi adicionada.
+
+```bash
+# Executar capture ANTES da alteração, compare DEPOIS; destinos novos e fora do repositório.
+node scripts/study-hub-style-check.cjs capture /tmp/study-hub-before
+node scripts/study-hub-style-check.cjs compare /tmp/study-hub-before /tmp/study-hub-after
+node --test tests/study-hub-styles.test.cjs
+```
+
+São 64 casos: quatro abas × 16 larguras (390 e breakpoint ±1/igual para 720, 768, 900, 1200, 1600).
+Relógio/RNG/cotação e dados sintéticos fixos; animações desativadas; aguarda fontes/resize/gráficos.
+Salva PNG, JSON com estilos/geometria/storage e relatório SHA-256. Exige igualdade de pixels e estado;
+verifica links carregados/404 e compara console/runtime. Erros preexistentes iguais são tolerados;
+a baseline G1 teve zero. Artefatos desta execução: `/tmp/trade-diary-g1-baseline` e `/tmp/trade-diary-g1-after`.
+São temporários, não versionados; recapturar em cada ambiente e antes de cada próximo corte.
+
+Limites: somente subabas iniciais, viewport de 1.000px de altura, sem scroll/hover/focus;
+snapshot considera elementos renderizados e não comprova demais fluxos ou Monte Carlo.
+Fontes externas dependem da rede; `document.fonts.ready` não garante download bem-sucedido.
+O fingerprint em `tests/study-hub-styles.test.cjs` fixa todo o CSS anterior na ordem efetiva dos links;
+atualizá-lo em mudanças visuais futuras exige nova baseline, não mera aceitação de um hash diferente.
+
+G1: Serena ativada na raiz; CSS inspecionado por cortes localizados e parsing, pois navegação semântica
+está configurada para JavaScript/TypeScript. Context7 disponível, sem necessidade de consulta externa.
+Caveman e skills Superpowers disponíveis e utilizados. Primeira captura falhou por aspas no seletor
+do próprio runner; ajuste local corrigido e baseline concluída antes de mover CSS.
+
+Git local usa `core.autocrlf=input`; o primeiro stage normalizou dois arquivos novos.
+`.gitattributes` fixa `-text` somente no CSS residual e nos quatro blocos legados;
+`git add --renormalize` refez o índice com os bytes originais, conferidos contra HEAD.
+`whitespace=-blank-at-eof,cr-at-eol` preserva separadores finais e CRLF herdados;
+demais verificações de whitespace permanecem ativas. `git diff --check` e `--cached --check` passaram.
 
 ## Fontes consultadas
 

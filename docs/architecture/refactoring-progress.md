@@ -32,22 +32,28 @@
 - Revisão independente sem bloqueios: seis funções (61 linhas) e 53.123 bytes de catálogos movidos exatamente; 1.170 entradas preservadas.
 
 ## Current
-- Lotes 1–2 e 2b concluídos. Análise global de 2026-09-11 documentada; nenhuma nova extração executada nesta etapa.
-- Inventários cobrem JS nativo/StudyHub, 6.090 linhas de CSS, 15 páginas e quatro modais; destinos propostos e contratos registrados.
-- Verificação repetida sobre `5c9859f`: 58 testes e 18 checks no navegador passaram; cobertura continua restrita aos fluxos existentes.
-- Revisão independente da análise sem bloqueios; fronteiras/nomes corrigidos. Mapas conferidos contra 38 blocos CSS contínuos, 15 páginas e quatro modais.
-- Somente documentação alterada; 17 arquivos de aplicação/testes comparados byte a byte com HEAD, sem diferenças.
+- G1 concluído: quatro CSS legados StudyHub em `presentation`, com 344/359/174/334 linhas.
+- `styles.css`: 6.090 → 4.879 linhas; 1.211 linhas movidas sem reescrita. Cinco links mantêm a cascata original.
+- Caracterização anterior ao corte: fingerprint integral do CSS, 22 checks no navegador e 64 capturas determinísticas sem erros.
+- Após extração: 59 testes, 22 checks no navegador, sintaxe de cinco scripts e `git diff --check` aprovados.
+- 64 comparações antes/depois: pixels, estilos computados, geometria e storage idênticos; zero erros de console/runtime e assets locais ausentes.
+- Revisão independente sem bloqueios: concatenação de 162.576 bytes idêntica ao original; cinco CSS parseados sem erros; scripts/handlers intactos.
+- Ferramenta de captura teve seletor com aspas inválidas na primeira execução; corrigido somente no teste, baseline refeita antes da extração.
+- JS da aplicação não alterado. Sem dependências de runtime, push ou deploy.
 
 ## Next
-- Primeiro preparar cobertura visual/funcional das quatro abas StudyHub e extrair o sufixo CSS em quatro arquivos ordenados (G1).
-- Seguir as prioridades revistas do [roadmap](refactoring-roadmap.md), com inventários da [análise global](modularization-analysis.md).
-- Métricas continuam frente de domínio pendente; um lote por vez, sem reescrita de UI/IO/cálculos.
+- G2: escolher um bloco contíguo de CSS comum/feature no [mapa](css-extraction-map.md), preparando cobertura específica antes do corte.
+- Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
+- Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
 ## Risks
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
 - Sem cobertura ampla de persistência, importação, trades, risco por calendário e StudyHub.
 - Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.
-- Sem comparação visual por pixels, teste de migração ou validação completa de Monte Carlo.
+- Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).
+- G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
+- Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
+- Fixture visual fixa relógio/RNG/cotação; fontes externas podem usar fallback. Igualdade observada vale para esse ambiente.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
 - Idiomas: smoke cobre EN/PT e preservação dos demais dados; não compara pixels de todas as telas nem recarga do navegador após escolha.
 - CDN e cotação dependem de rede. Lint/typecheck/format/build inexistentes, não reportados como aprovados.
@@ -62,3 +68,5 @@
 - Catálogos passam a carregar antes de `app.js`; somente dados são inicializados. Leitura de storage e bootstrap mantêm a sequência anterior.
 - Revisão global: primeiro separar arquivos preservando blocos, closures e ordem; depois separar camadas com entradas explícitas.
 - CSS por feature preserva regras tardias e media queries; HTML estático permanece no shell até decisão própria sobre composição.
+- G1: arquivos CSS são apresentação; controles compartilhados continuam carregados nas quatro abas, sem lazy loading ou novas camadas.
+- `.gitattributes` impede normalização LF/CRLF somente nos cinco CSS; exceção de whitespace restrita a CRLF e separadores vazios herdados no EOF. Bytes do índice também comparados à baseline.

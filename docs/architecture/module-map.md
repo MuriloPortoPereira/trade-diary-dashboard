@@ -28,7 +28,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 
 - `index.html`: estrutura e chamadas inline dos símbolos públicos.
 - `app.js`: ordem de bootstrap, globals de apresentação e estado ainda legado.
-- `styles.css`: classes/IDs de todas features e regras integradas do StudyHub.
+- `styles.css` seguido dos quatro CSS StudyHub: classes/IDs e ordem da cascata.
 - `window.sh_*`: ponte pública para funções privadas do IIFE legado.
 - JSON de backup e chaves localStorage: contrato de dados existente.
 
@@ -44,7 +44,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/preferences/presentation/locales/{pt-BR,en-US}/*.js` | Textos por idioma e contexto: trading, workspace, dialogs-and-labels; 123–253 linhas por arquivo |
 | `src/modules/preferences/presentation/language-selector.js` | Tradução, menu e aplicação do idioma ao DOM; mantém os contratos globais |
 | `tests/language-selector.test.cjs` | Conteúdo integral dos catálogos, fallback, efeitos do seletor e carga dos scripts |
+| `src/modules/study-hub/presentation/legacy-*.css` | Quatro blocos contíguos: controles, sequência de trades, recuperação e overrides de integração; 174–359 linhas |
+| `tests/study-hub-styles.test.cjs` | Fingerprint dos bytes concatenados na ordem dos links |
 
-Esses arquivos existem após os lotes 1–2 e o lote 2b de idiomas; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b e G1; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
