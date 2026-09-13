@@ -97,8 +97,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 1843–2043 extraído em apresentação de analytics, 201 linhas; residual com 2.836 linhas.
 - Baseline anterior ao corte: fingerprint e 448 casos, incluindo ranking, comparação completa e alternância de seleções.
 - Preservados bytes, cascata e renderers; cálculos e handlers continuam no legado.
-- Próximo candidato G2h: `calendar-grids.css` (baseline 2044–2284);
-  revisar calendários mini, mensal, semanal e quinzenal, caracterizar consumidores antes de extrair.
+- G2h deu continuidade pelos calendários, com caracterização dos modos e navegação antes do corte.
+
+## G2h: grids e células dos calendários
+
+- Bloco histórico 2044–2284 extraído em apresentação de calendário, 241 linhas; residual com 2.595 linhas.
+- Baseline anterior ao corte: fingerprint e 509 casos, incluindo modos, hover, scroll e datas-limite.
+- Preservados bytes, cascata, renderers e APIs; `month` continua sem botão próprio na UI.
+- Próximo candidato G2i: `trade-tables.css` (baseline 2285–2432);
+  revisar tabelas, ordenação e estados incompletos, caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

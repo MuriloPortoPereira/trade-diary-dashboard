@@ -11,6 +11,7 @@ const {resetMetricTooltip, prepareMetricScenario} = require('./lib/metric-style-
 const {prepareDashboardLayoutScenario} = require('./lib/dashboard-layout-scenarios.cjs');
 const {prepareAccountStyleScenario} = require('./lib/account-style-scenarios.cjs');
 const {prepareStrategyStyleScenario} = require('./lib/strategy-style-scenarios.cjs');
+const {resetCalendarStyleState, prepareCalendarStyleScenario} = require('./lib/calendar-style-scenarios.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
@@ -19,6 +20,8 @@ const metricStates = ['metric-hover', 'metric-tooltip-above', 'metric-tooltip-be
 const strategyStates = ['strategy-rank-mixed', 'strategy-rank-empty', 'strategy-compare-empty', 'strategy-compare-single',
   'strategy-compare-same', 'strategy-compare-swapped', 'strategy-compare-focus', 'strategy-compare-charts'];
 const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
+const calendarStates = ['calendar-month-compat', 'calendar-mini-hover', 'calendar-mini-open', 'calendar-day-hover',
+  'calendar-day-win', 'calendar-day-loss', 'calendar-day-empty', 'calendar-nav-year', 'calendar-leap-month'];
 const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
   'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
 const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
@@ -32,7 +35,8 @@ function inspectShell() {
     'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
     'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
     'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
-    'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align'];
+    'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align',
+    'text-align', 'text-overflow', 'white-space', 'scrollbar-gutter'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -46,7 +50,8 @@ function inspectShell() {
       text: el.children.length ? null : el.textContent, value: 'value' in el ? el.value : null};
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
-    tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card')].filter(el => el.getClientRects().length)
+    calendar: document.querySelector('#page-calendar.active') ? [calYear, calMonth, calViewMode] : null,
+    tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card,#calGridWrap')].filter(el => el.getClientRects().length)
       .map(el => [el.className, el.scrollLeft, el.scrollTop, el.scrollWidth, el.scrollHeight, el.clientWidth, el.clientHeight]),
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
     tooltipSourcesHidden: [...document.querySelectorAll('.m-tip-popup')].every(el => getComputedStyle(el).display === 'none'),
@@ -60,7 +65,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 7, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, cases: []};
+  const report = {version: 8, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -91,6 +96,11 @@ async function capture(directory) {
       return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
     })()`);
     assert.deepEqual(report.riskTransition, ['width', '0.28s', 'ease']);
+    report.calendarTransition = await browser.evaluate(`(() => {
+      const style = getComputedStyle(document.querySelector('.dash-cal-cell'));
+      return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
+    })()`);
+    assert.deepEqual(report.calendarTransition, ['transform, border-color, background', '0.18s, 0.18s, 0.18s', 'ease, ease, ease']);
     await browser.evaluate(`Chart.defaults.animation = false;
       const style = document.createElement('style');
       style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
@@ -108,10 +118,11 @@ async function capture(directory) {
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
-        'strategy-compare-full'];
+        'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', ...(pageWidths.includes(width) ? calendarStates : [])];
       for (const name of cases) {
-        const page = name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        const page = name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
+          (${resetCalendarStyleState})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
           document.getElementById('stStratA').value = ''; document.getElementById('stStratB').value = '';
@@ -127,6 +138,7 @@ async function capture(directory) {
         if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('layout-')) hover = await browser.evaluate(`(${prepareDashboardLayoutScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('strategy-')) await browser.evaluate(`(${prepareStrategyStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('calendar-')) hover = await browser.evaluate(`(${prepareCalendarStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('account-risk-') || name.startsWith('account-cashflow-')) {
           await browser.evaluate(`(${prepareAccountStyleScenario})(${JSON.stringify(name)})`);
         }
@@ -192,7 +204,7 @@ async function capture(directory) {
           await (${settle})();
         })()`);
         const state = await browser.evaluate(`(${inspectShell})()`);
-        assert.equal(state.activePage, `page-${page}`);
+        assert.equal(state.activePage, `page-${name === 'calendar-mini-open' ? 'calendar' : page}`);
         assert.equal(state.pageDisplays.filter(([, display]) => display !== 'none').length, 1, 'Only the active page is displayed');
         assert.ok(state.tooltipSourcesHidden, 'Tooltip source content remains hidden');
         assert.ok(state.sheetsLoaded && state.snapshot.length > 30);

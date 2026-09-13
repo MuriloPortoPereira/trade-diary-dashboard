@@ -95,7 +95,6 @@
 - Primeiro revisor atingiu limite de uso; outro subagente concluiu revisão. Captura também reiniciada após perda de processo/artefatos temporários; detalhes em tooling.
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
-## Current
 - G2g concluído: `src/modules/analytics/presentation/strategy-comparison.css` com 201 linhas/3.455 bytes e 30 regras completas.
 - `styles.css`: 3.037 para 2.836 linhas; quinze links preservam os 162.576 bytes originais concatenados.
 - Caracterização antes do corte: fingerprint integral e baseline ampliada para 448 casos.
@@ -105,8 +104,18 @@
 - Revisão transferida a outro subagente após limite de uso; sem bloqueios. `compare-empty` cobre limpeza da seleção, com trades presentes.
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
+## Current
+- G2h concluído: `src/modules/calendar/presentation/calendar-grids.css` com 241 linhas/4.420 bytes e 32 regras completas.
+- `styles.css`: 2.836 para 2.595 linhas; dezesseis links preservam os 162.576 bytes originais concatenados.
+- Caracterização antes do corte: fingerprint integral e baseline ampliada para 509 casos.
+- 59 testes Node, 27 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- 509 estados exatos; 23 imagens com 190 pixels de diferença dentro da tolerância existente. Zero erros de console/runtime e assets locais ausentes.
+- Cobertura: week/biweek em 17 larguras; month via API, hover, mini/navegação, detalhes e ano/mês bissexto em três larguras.
+- Estado visual do calendário reiniciado entre casos; dados e storage preservados. Janeiro/2027 é verificado antes de retornar a dezembro/2026 para captura.
+- `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
+
 ## Next
-- G2h: revisar calendários mini, mensal, semanal e quinzenal (baseline 2044–2284), primeiro bloco residual; caracterizar consumidores antes de extrair.
+- G2i: revisar tabelas, ordenação e estados incompletos (baseline 2285–2432), primeiro bloco residual; caracterizar consumidores antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -118,11 +127,12 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2g cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
+- G2a–G2h cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verifica scroll horizontal e dimensões/overflow da tabela; a fixture não gera scroll vertical e sticky não possui consumidor encontrado.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
 - G2g usa dois trades sintéticos com estratégias distintas; não audita fórmulas, timing, grandes amostras ou o popup nativo dos seletores.
+- G2h cobre modos e datas-limite com fixture fixa; não audita todas as somas/períodos/fusos. month usa API global; popup nativo do mês e animação em movimento ficam fora.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -148,3 +158,4 @@
 - G2e: layouts do dashboard e containers/cabeçalhos comuns em `src/styles`; preservadas também regras sem consumidor encontrado.
 - G2f: risco/progresso/caixa em apresentação de contas, com carga global; nenhuma extração de cálculo ou persistência neste lote.
 - G2g: ranking e comparação em apresentação de analytics; overrides tardios, handlers e regras numéricas permanecem no legado.
+- G2h: mini e grids do calendário em apresentação de calendar; toolbar/responsividade e comportamento dos handlers permanecem no legado.

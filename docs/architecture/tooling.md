@@ -296,6 +296,26 @@ Um patch do runner foi recusado por contexto antigo; leitura localizada permitiu
 O primeiro revisor atingiu limite de uso; outro subagente concluiu revisão independente sem bloqueios.
 Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
 
+## Grids e células do calendário (G2h)
+
+Snapshot versão 8: 509 casos, os 448 anteriores mais week/biweek em 17 larguras e nove estados
+em 390/1080/1440px. `scripts/lib/calendar-style-scenarios.cjs` reinicia ano/mês/modo/botões/detalhe/scroll
+antes de cada caso. Contas são restauradas em `finally`; dados e storage devem permanecer iguais.
+A UI chama `week` de Mensal e oferece `biweek`; `month` é exercitado pela API global, sem inventar botão.
+Mini e células têm hover forçado via CDP; cliques abrem calendário/detalhes, e dia vazio oculta a tabela.
+Nav cruza dezembro/2026 para janeiro/2027 e retorna; janeiro é assertion intermediária, dezembro é a captura.
+Picker por evento `change` verifica fevereiro/2024 com 29 dias. O popup nativo não é capturado.
+
+Snapshot acrescenta estado ano/mês/modo, dimensões/rolagem de `calGridWrap`, text-align/text-overflow,
+white-space/scrollbar-gutter. Transições transform/border-color/background de 0.18s/ease são verificadas
+antes de desativar animações; não se compara animação em movimento. Somas/períodos/fusos não são auditados integralmente.
+Referência anterior ao corte: `/tmp/trade-diary-g2h-before`; resultado em `/tmp/trade-diary-g2h-after`.
+Antes/depois: 509 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+23 imagens com 190 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Revisão independente confirmou fronteira, bytes, cascata, isolamento e limites da cobertura.
+Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

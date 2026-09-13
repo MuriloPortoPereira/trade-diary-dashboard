@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2g executados: quatro `legacy-*.css` e dez destinos do prefixo 1–2043 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2044–4879.
+G1 e G2a–G2h executados: quatro `legacy-*.css` e onze destinos do prefixo 1–2284 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2285–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -169,6 +169,18 @@ Overrides de `.strategy-board-large` e media queries 1420/720 ficam na posição
 Baseline anterior ao corte: 448 casos. Comparação completa em 17 larguras; ranking positivo/negativo/vazio,
 limpeza, seleção parcial/repetida, troca A/B, foco e gráficos em três larguras.
 Seletores usam `change` real; cálculos, dados persistidos e APIs não mudam. Limites em [tooling](tooling.md).
+
+## Nono corte executado (G2h)
+
+Bloco histórico 2044–2284 em `src/modules/calendar/presentation/calendar-grids.css`:
+241 linhas/4.420 bytes, 32 regras completas. De `.dash-calendar-mini` a `.cal-biweek-total`;
+residual começa em `.tbl` e mantém 2.595 linhas. Sem URL, import ou media query no corte.
+Link após comparação de estratégias, antes do residual. Apresentação de calendário compartilhada com dashboard.
+Overrides 1080/720/440 e controles tardios permanecem na posição original; transições e ellipsis preservados.
+
+Baseline anterior ao corte: 509 casos. `week`/`biweek` em 17 larguras; `month` via API, hover de mini/dia,
+clique do mini, detalhes com ganho/perda/vazio, ano seguinte/anterior e fevereiro bissexto em três larguras.
+Rolagem e dimensões de `calGridWrap` entram no snapshot; limites em [tooling](tooling.md).
 
 ## Validação exigida
 

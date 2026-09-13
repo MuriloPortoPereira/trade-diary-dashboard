@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2g, `styles.css` mantém o trecho original 2044–4879 (2.836 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2h, `styles.css` mantém o trecho original 2285–4879 (2.595 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -121,6 +121,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Renderers: `renderStrategyRows`, `renderDashStrategyBoard`, `renderStrategyCompareCards`; eventos dos seletores continuam em `app.js`.
 - Cenários isolados: `scripts/lib/strategy-style-scenarios.cjs`; ranking positivo/negativo/vazio, comparação completa e alternância de seleções.
 - Overrides tardios e responsivos permanecem no residual. Contrato de bytes e limites em [tooling](tooling.md).
+
+## Calendários: grids e células (G2h)
+
+- `src/modules/calendar/presentation/calendar-grids.css`: 241 linhas do mini calendário, resumo semanal e layouts do calendário.
+- Carrega após `strategy-comparison.css`, antes do residual; overrides 1080/720/440 mantêm sua posição original.
+- Renderers em `app.js`: `renderDashboardCalendar`, `renderCalendar`; navegação e seleção preservadas.
+- UI: `week` aparece como Mensal, `biweek` como Quinzenal; `month` permanece acessível pela API global.
+- Cenários: `scripts/lib/calendar-style-scenarios.cjs`; modos, hover, rolagem, detalhes do dia, mudança de ano e mês bissexto.
+- Resets de estado visual entre capturas, sem mudar contas/trades/storage; limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 
