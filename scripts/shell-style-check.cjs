@@ -9,6 +9,7 @@ const openBrowser = require('./lib/study-hub-browser.cjs');
 const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
 const {resetMetricTooltip, prepareMetricScenario} = require('./lib/metric-style-scenarios.cjs');
 const {prepareDashboardLayoutScenario} = require('./lib/dashboard-layout-scenarios.cjs');
+const {prepareAccountStyleScenario} = require('./lib/account-style-scenarios.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
@@ -28,7 +29,7 @@ function inspectShell() {
     'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
     'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
     'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
-    'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color'];
+    'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -56,7 +57,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 5, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
+  const report = {version: 6, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -82,6 +83,11 @@ async function capture(directory) {
       document.getElementById('cotRefreshBtn').classList.remove('spinning'); return result;
     })()`);
     assert.deepEqual(report.animation, ['cot-spin', '0.8s', 'infinite']);
+    report.riskTransition = await browser.evaluate(`(() => {
+      const style = getComputedStyle(document.querySelector('.risk-progress-fill'));
+      return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
+    })()`);
+    assert.deepEqual(report.riskTransition, ['width', '0.28s', 'ease']);
     await browser.evaluate(`Chart.defaults.animation = false;
       const style = document.createElement('style');
       style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
@@ -97,9 +103,10 @@ async function capture(directory) {
       const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
-        'metric-risk-tones', 'layout-table-scroll'];
+        'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
+        ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty'] : [])];
       for (const name of cases) {
-        const page = name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        const page = name === 'account-cashflow-setup' ? 'setup' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
@@ -114,6 +121,9 @@ async function capture(directory) {
         let hover;
         if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('layout-')) hover = await browser.evaluate(`(${prepareDashboardLayoutScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('account-risk-') || name.startsWith('account-cashflow-')) {
+          await browser.evaluate(`(${prepareAccountStyleScenario})(${JSON.stringify(name)})`);
+        }
         if (page === 'log') await browser.evaluate(`document.querySelector('#page-log .log-date-clear').click();`);
         if (name.startsWith('actions-')) {
           if (name === 'actions-primary-hover') hover = '#page-log .page-actions .btn-primary';

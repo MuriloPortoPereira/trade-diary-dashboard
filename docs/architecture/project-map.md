@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2e, `styles.css` mantém o trecho original 1521–4879 (3.359 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2f, `styles.css` mantém o trecho original 1843–4879 (3.037 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -104,6 +104,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Uso compartilhado entre páginas/modais em `src/styles`; Chart.js, renderers e handlers permanecem no legado.
 - Runner shell acrescenta tabela inferior com rolagem horizontal e hover de card de gráfico.
 - Cenários: `scripts/lib/dashboard-layout-scenarios.cjs`; fixture não produz overflow vertical, e sticky não tem consumidor encontrado.
+
+## Contas: estilos de risco e caixa (G2f)
+
+- `src/modules/accounts/presentation/account-risk-and-cashflow.css`: 322 linhas de risco, progresso, alertas, cálculo visual e caixa.
+- Carrega após `dashboard-and-card-layout.css`, antes do residual; uso no dashboard, setup e editor de contas.
+- Apresentação de contas com carga global; renderers, cálculos, handlers e persistência continuam em `app.js`.
+- `scripts/lib/account-style-scenarios.cjs`: tons de risco, meta, caixa preenchido nos dois renderers e editor vazio.
+- Cenários usam perfil isolado e restauram dados temporários; snapshots protegem storage e contas/trades em memória.
+- Contrato integral de bytes mantido; regras sem consumidor encontrado preservadas e limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

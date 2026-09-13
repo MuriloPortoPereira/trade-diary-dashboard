@@ -54,8 +54,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/metric-style-scenarios.cjs` | Cenários de apresentação com fixture isolada para tons de risco e tooltips |
 | `src/styles/dashboard-and-card-layout.css` | Grids do dashboard, cabeçalhos, cards/tabelas e containers de gráficos comuns; 161 linhas |
 | `scripts/lib/dashboard-layout-scenarios.cjs` | Tabela inferior com rolagem horizontal e hover de card de gráfico na fixture isolada |
+| `src/modules/accounts/presentation/account-risk-and-cashflow.css` | Risco, progresso, alertas e caixa no dashboard/setup/editor; 322 linhas |
+| `scripts/lib/account-style-scenarios.cjs` | Cenários isolados de apresentação de contas, com restauração de dados em memória |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a, G2b, G2c, G2d e G2e; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a, G2b, G2c, G2d, G2e e G2f; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

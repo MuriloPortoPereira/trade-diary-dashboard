@@ -255,6 +255,28 @@ Limites: os dois trades da fixture não geram overflow vertical; não se afirma 
 Serena ativo; revisão independente confirmou o corte, a cascata e a preservação do JavaScript.
 Artefatos temporários; recapturar ao mudar ambiente ou versão do snapshot.
 
+## Risco e caixa da conta (G2f)
+
+Snapshot versão 6: 407 casos; 17 estados de risco misto e 12 de meta/caixa somados aos 378 anteriores.
+`scripts/lib/account-style-scenarios.cjs` usa renderers reais: LOSS -35 em 2026-09-11 gera valores/fills
+safe/warn/danger e alertas safe/warn/danger/neutral; WIN 210 exercita o badge de meta atingida.
+Caixa preenchido: aporte 125 e retirada 25 no editor e no setup, em 390/1080/1440px; editor vazio também capturado.
+O formulário é aberto por `editAccount`; não há submissão nem exclusão. Campos temporários são restaurados em `finally`.
+Comparações antes/depois de cada cenário exigem storage, contas e trades inalterados.
+Snapshot acrescenta text-shadow, text-transform e vertical-align. A transição width/0.28s/ease é verificada
+antes de desativar animações; não se compara a animação em movimento.
+
+Na revisão, o primeiro revisor atingiu limite de uso; outro subagente assumiu a revisão independente.
+Processo e artefatos temporários ficaram indisponíveis após retomada; captura reiniciada com CSS ainda intacto.
+O segundo revisor encontrou vazamento da fixture em memória: `getActiveAccount` recria `accounts`,
+portanto restaurar só cashflows no objeto antigo era insuficiente. O helper passou a restaurar o array original
+em `finally` e comparar também contas/trades; referência contaminada descartada antes de qualquer corte.
+Referência corrigida: `/tmp/trade-diary-g2f-reference`; resultado em `/tmp/trade-diary-g2f-after`.
+407 estados exatos; nove imagens com 62 pixels diferentes dentro dos limites existentes, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes; 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados.
+Recapturar artefatos em outras sessões/ambientes.
+Limites: não é auditoria dos cálculos financeiros; badge-warn e risk-period-label não têm consumidor encontrado.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

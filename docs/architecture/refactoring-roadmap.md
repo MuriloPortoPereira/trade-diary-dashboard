@@ -83,8 +83,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 1360–1520 extraído em arquivo de 161 linhas; residual com 3.359 linhas.
 - Baseline anterior ao corte: fingerprint e 378 casos, incluindo rolagem horizontal da tabela e hover de gráfico.
 - Bytes, cascata, responsividade e JavaScript preservados; não remove classes sem consumidor encontrado.
-- Próximo candidato G2f: `account-risk-and-cashflow.css` (baseline 1521–1842);
-  revisar risco, progresso, alertas e caixa, com caracterização dos consumidores antes de extrair.
+- G2f deu continuidade pelos estilos de risco e caixa, com caracterização dos renderers antes do corte.
+
+## G2f: risco e caixa da conta
+
+- Bloco histórico 1521–1842 extraído em apresentação de contas, 322 linhas; residual com 3.037 linhas.
+- Baseline corrigida anterior ao corte: fingerprint e 407 casos, incluindo tons, meta e caixa no setup/editor.
+- Preservados bytes, cascata e código da aplicação; teste reforça isolamento de contas/trades em memória.
+- Próximo candidato G2g: `strategy-comparison.css` (baseline 1843–2043);
+  revisar ranking e comparação de estratégias, caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
