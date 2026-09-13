@@ -11,3 +11,4 @@ src/styles/page-actions.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/metric-cards-and-risk-insights.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/dashboard-and-card-layout.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/accounts/presentation/account-risk-and-cashflow.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/analytics/presentation/strategy-comparison.css -text whitespace=-blank-at-eof,cr-at-eol

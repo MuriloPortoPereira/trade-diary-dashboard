@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2f executados: quatro `legacy-*.css` e nove destinos do prefixo 1–1842 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1843–4879.
+G1 e G2a–G2g executados: quatro `legacy-*.css` e dez destinos do prefixo 1–2043 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2044–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -157,6 +157,18 @@ Baseline corrigida antes do corte: 407 casos. Tons de risco em 17 larguras, meta
 em 390/1080/1440; armazenamento e dados em memória preservados pelos testes.
 Badge-warn e risk-period-label sem consumidor encontrado permanecem no CSS, sem fabricar UI para validá-los.
 Contrato integral de bytes mantido; falha corrigida no isolamento do runner e limites em [tooling](tooling.md).
+
+## Oitavo corte executado (G2g)
+
+Bloco histórico 1843–2043 em `src/modules/analytics/presentation/strategy-comparison.css`:
+201 linhas/3.455 bytes, 30 regras completas. De `.strategy-board` a `.strategy-compare-winner`;
+residual começa em `.dash-calendar-mini` e mantém 2.836 linhas. Sem URL, import ou media query no corte.
+Link após risco/caixa, antes do residual. Apresentação de analytics usada no dashboard, central e análises.
+Overrides de `.strategy-board-large` e media queries 1420/720 ficam na posição original.
+
+Baseline anterior ao corte: 448 casos. Comparação completa em 17 larguras; ranking positivo/negativo/vazio,
+limpeza, seleção parcial/repetida, troca A/B, foco e gráficos em três larguras.
+Seletores usam `change` real; cálculos, dados persistidos e APIs não mudam. Limites em [tooling](tooling.md).
 
 ## Validação exigida
 

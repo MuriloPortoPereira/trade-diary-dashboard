@@ -10,11 +10,14 @@ const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
 const {resetMetricTooltip, prepareMetricScenario} = require('./lib/metric-style-scenarios.cjs');
 const {prepareDashboardLayoutScenario} = require('./lib/dashboard-layout-scenarios.cjs');
 const {prepareAccountStyleScenario} = require('./lib/account-style-scenarios.cjs');
+const {prepareStrategyStyleScenario} = require('./lib/strategy-style-scenarios.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
 const pageWidths = [390, 1080, 1440];
 const metricStates = ['metric-hover', 'metric-tooltip-above', 'metric-tooltip-below', 'metric-tooltip-hidden', 'metric-risk-tooltip'];
+const strategyStates = ['strategy-rank-mixed', 'strategy-rank-empty', 'strategy-compare-empty', 'strategy-compare-single',
+  'strategy-compare-same', 'strategy-compare-swapped', 'strategy-compare-focus', 'strategy-compare-charts'];
 const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
 const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
   'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
@@ -57,7 +60,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 6, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
+  const report = {version: 7, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -104,16 +107,18 @@ async function capture(directory) {
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
-        ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty'] : [])];
+        ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
+        'strategy-compare-full'];
       for (const name of cases) {
-        const page = name === 'account-cashflow-setup' ? 'setup' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        const page = name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
+          document.getElementById('stStratA').value = ''; document.getElementById('stStratB').value = '';
           document.querySelectorAll('.dashboard-table-scroll,.table-card').forEach(el => { el.scrollLeft = 0; el.scrollTop = 0; });
           document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0); })()`);
         if (page === 'stats') {
-          const tab = name.startsWith('stats-') ? name.slice(6) : 'overview';
+          const tab = name.startsWith('strategy-compare') ? 'strategy' : name.startsWith('stats-') ? name.slice(6) : 'overview';
           const selector = `#statTabNav [onclick*="'${tab}'"]`;
           await browser.evaluate(`document.querySelector(${JSON.stringify(selector)}).click();
             if (getComputedStyle(document.getElementById(${JSON.stringify('statTab-' + tab)})).display !== 'block') throw new Error('Stats tab did not open');`);
@@ -121,6 +126,7 @@ async function capture(directory) {
         let hover;
         if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('layout-')) hover = await browser.evaluate(`(${prepareDashboardLayoutScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('strategy-')) await browser.evaluate(`(${prepareStrategyStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('account-risk-') || name.startsWith('account-cashflow-')) {
           await browser.evaluate(`(${prepareAccountStyleScenario})(${JSON.stringify(name)})`);
         }

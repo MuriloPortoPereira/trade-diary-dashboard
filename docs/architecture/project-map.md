@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2f, `styles.css` mantém o trecho original 1843–4879 (3.037 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2g, `styles.css` mantém o trecho original 2044–4879 (2.836 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -113,6 +113,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `scripts/lib/account-style-scenarios.cjs`: tons de risco, meta, caixa preenchido nos dois renderers e editor vazio.
 - Cenários usam perfil isolado e restauram dados temporários; snapshots protegem storage e contas/trades em memória.
 - Contrato integral de bytes mantido; regras sem consumidor encontrado preservadas e limites em [tooling](tooling.md).
+
+## Analytics: ranking e comparação de estratégias (G2g)
+
+- `src/modules/analytics/presentation/strategy-comparison.css`: 201 linhas de ranking, seletores e painel comparativo.
+- Carrega após `account-risk-and-cashflow.css`, antes do residual; uso no dashboard, central de estratégias e aba de análise.
+- Renderers: `renderStrategyRows`, `renderDashStrategyBoard`, `renderStrategyCompareCards`; eventos dos seletores continuam em `app.js`.
+- Cenários isolados: `scripts/lib/strategy-style-scenarios.cjs`; ranking positivo/negativo/vazio, comparação completa e alternância de seleções.
+- Overrides tardios e responsivos permanecem no residual. Contrato de bytes e limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

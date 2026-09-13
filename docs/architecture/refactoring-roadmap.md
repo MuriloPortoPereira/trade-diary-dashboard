@@ -90,8 +90,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 1521–1842 extraído em apresentação de contas, 322 linhas; residual com 3.037 linhas.
 - Baseline corrigida anterior ao corte: fingerprint e 407 casos, incluindo tons, meta e caixa no setup/editor.
 - Preservados bytes, cascata e código da aplicação; teste reforça isolamento de contas/trades em memória.
-- Próximo candidato G2g: `strategy-comparison.css` (baseline 1843–2043);
-  revisar ranking e comparação de estratégias, caracterizar consumidores antes de extrair.
+- G2g deu continuidade pelo ranking e comparação de estratégias, com caracterização dos seletores antes do corte.
+
+## G2g: ranking e comparação de estratégias
+
+- Bloco histórico 1843–2043 extraído em apresentação de analytics, 201 linhas; residual com 2.836 linhas.
+- Baseline anterior ao corte: fingerprint e 448 casos, incluindo ranking, comparação completa e alternância de seleções.
+- Preservados bytes, cascata e renderers; cálculos e handlers continuam no legado.
+- Próximo candidato G2h: `calendar-grids.css` (baseline 2044–2284);
+  revisar calendários mini, mensal, semanal e quinzenal, caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

@@ -277,6 +277,25 @@ Zero erros de console/runtime ou assets locais ausentes; 59 testes Node, 27 chec
 Recapturar artefatos em outras sessões/ambientes.
 Limites: não é auditoria dos cálculos financeiros; badge-warn e risk-period-label não têm consumidor encontrado.
 
+## Ranking e comparação de estratégias (G2g)
+
+Snapshot versão 7: 448 casos, os 407 anteriores mais comparação completa em 17 larguras e oito estados
+em 390/1080/1440px. `scripts/lib/strategy-style-scenarios.cjs` clona os dois trades da fixture atribuindo
+Breakout/Pullback, preserva contas/trades em `finally` e exige dados e storage inalterados.
+Ranking positivo/negativo/vazio; comparação com seleção parcial, repetida, limpa e invertida; foco no seletor e gráficos.
+A/B usam eventos `change` reais e são zerados entre casos. O runner verifica display do painel, dois cards,
+ordem após inversão, vencedor e quatro gráficos Chart.js visíveis. Capturas incluem cards, gráficos e resumo por rolagem.
+`compare-empty` limpa seleções com trades presentes: não exercita o ramo sem trades do comparador.
+Popup nativo, fórmulas financeiras, timing e grandes amostras ficam fora da cobertura deste corte de CSS.
+
+Referência anterior ao corte: `/tmp/trade-diary-g2g-before`; resultado em `/tmp/trade-diary-g2g-after`.
+Antes/depois: 448 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+21 imagens com 147 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Um patch do runner foi recusado por contexto antigo; leitura localizada permitiu reaplicar sem alterações parciais.
+O primeiro revisor atingiu limite de uso; outro subagente concluiu revisão independente sem bloqueios.
+Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
