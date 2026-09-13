@@ -69,8 +69,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 946–1059 extraído em arquivo de 114 linhas; residual com 3.820 linhas.
 - Baseline anterior ao corte: fingerprint, smoke 27 e 323 casos visuais/funcionais.
 - Preservados controles, hover, foco, filtragem/limpeza e overrides responsivos; sem alterar o JavaScript da aplicação.
-- Próximo candidato G2d: `metric-cards-and-risk-insights.css` (baseline 1060–1359);
-  revisar cards, indicadores e tooltips no body, com cobertura específica antes de mover.
+- G2d deu continuidade pelos cards, indicadores e tooltips, com caracterização específica antes do corte.
+
+## G2d: métricas e indicadores de risco
+
+- Bloco histórico 1060–1359 extraído em arquivo de 300 linhas; residual com 3.520 linhas.
+- Baseline anterior ao corte: fingerprint e 358 casos; inclui tons de risco, tooltips e limite de 1420px.
+- Preservados bytes, cascata, responsividade e código da aplicação; sem mudança de cálculo ou estado.
+- Próximo candidato G2e: `dashboard-and-card-layout.css` (baseline 1360–1520);
+  revisar dashboard e layouts comuns de cards, caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

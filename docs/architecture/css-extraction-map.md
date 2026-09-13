@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2c executados: quatro `legacy-*.css` e seis destinos do prefixo 1–1059 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1060–4879.
+G1 e G2a–G2d executados: quatro `legacy-*.css` e sete destinos do prefixo 1–1359 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1360–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -118,6 +118,18 @@ Preservados hover, foco, `filter`, tamanhos, flex, `color-scheme` e cores de op�
 Baseline ampliada antes do corte: 323 casos. Inclui filtragem/limpeza de datas por eventos reais,
 hover de primary/ghost/ícone/limpeza e foco nos dois campos. Nenhuma mudança de handlers ou dados.
 Fingerprint integral mantido; limites de controles nativos documentados em [tooling](tooling.md).
+
+## Quinto corte executado (G2d)
+
+Bloco histórico 1060–1359 em `src/styles/metric-cards-and-risk-insights.css`: 300 linhas.
+Começa em `.metrics-row` e termina nas variantes de `.m-value`; residual inicia em `.dashboard-command-grid`.
+Link após `page-actions.css`, antes de `styles.css`, agora com 3.520 linhas.
+Grids, cards, tooltips no body e indicadores são apresentação comum; não há nova camada de domínio.
+Overrides em 1420/1080/720 ficam no residual. Bytes, separadores e ordem integral preservados.
+
+Baseline ampliada antes do corte: 358 casos, incluindo 1420±1, tons safe/warn/danger pelo renderer
+existente e tooltips acima/abaixo/ocultos por eventos de mouse. Pseudo-elementos dos cards amostrados.
+Cálculos, handlers e dados não alterados; limites da interação sintética em [tooling](tooling.md).
 
 ## Validação exigida
 

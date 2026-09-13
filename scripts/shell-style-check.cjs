@@ -7,9 +7,12 @@ const {createHash} = require('node:crypto');
 const {execFileSync} = require('node:child_process');
 const openBrowser = require('./lib/study-hub-browser.cjs');
 const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
+const {resetMetricTooltip, prepareMetricScenario} = require('./lib/metric-style-scenarios.cjs');
 
-const widths = [390, ...[440, 720, 1080, 1240].flatMap(w => [w - 1, w, w + 1]), 1440];
+const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
+const metricBoundaryWidths = [1419, 1420, 1421];
 const pageWidths = [390, 1080, 1440];
+const metricStates = ['metric-hover', 'metric-tooltip-above', 'metric-tooltip-below', 'metric-tooltip-hidden', 'metric-risk-tooltip'];
 const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
 const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
   'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
@@ -33,11 +36,12 @@ function inspectShell() {
       rect: [rect.x, rect.y, rect.width, rect.height].map(n => Math.round(n * 1000) / 1000),
       styles: Object.fromEntries(properties.map(key => [key, style.getPropertyValue(key)])),
       before: el.matches(`.nav-item,.logo-mark,.acct-pill,.page-header>div:first-child,${surfaceSelector}`) ? pseudoStyle(el, '::before') : null,
-      after: el.matches('.page-header>div:first-child') ? pseudoStyle(el, '::after') : null,
+      after: el.matches('.page-header>div:first-child,.metric-card') ? pseudoStyle(el, '::after') : null,
       text: el.children.length ? null : el.textContent, value: 'value' in el ? el.value : null};
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
+    tooltipSourcesHidden: [...document.querySelectorAll('.m-tip-popup')].every(el => getComputedStyle(el).display === 'none'),
     selectOptions: [...document.querySelectorAll('.stats-filter-select option')].map(el => ({value: el.value,
       color: getComputedStyle(el).color, background: getComputedStyle(el).backgroundColor})),
     storage: Object.fromEntries(Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])),
@@ -48,7 +52,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 3, widths, pageWidths, statTabs, states, actionStates, cases: []};
+  const report = {version: 4, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -86,13 +90,15 @@ async function capture(directory) {
     report.pages = pages;
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
-      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']), ...states, ...actionStates,
-        ...(pageWidths.includes(width) ? statTabs.map(tab => `stats-${tab}`) : [])];
+      const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
+        ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
+        ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates] : []), 'metric-risk-tones'];
       for (const name of cases) {
-        const page = name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
-        await browser.evaluate(`document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
+        const page = name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
+          document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
-          document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0);`);
+          document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0); })()`);
         if (page === 'stats') {
           const tab = name.startsWith('stats-') ? name.slice(6) : 'overview';
           const selector = `#statTabNav [onclick*="'${tab}'"]`;
@@ -100,6 +106,7 @@ async function capture(directory) {
             if (getComputedStyle(document.getElementById(${JSON.stringify('statTab-' + tab)})).display !== 'block') throw new Error('Stats tab did not open');`);
         }
         let hover;
+        if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
         if (page === 'log') await browser.evaluate(`document.querySelector('#page-log .log-date-clear').click();`);
         if (name.startsWith('actions-')) {
           if (name === 'actions-primary-hover') hover = '#page-log .page-actions .btn-primary';
@@ -164,6 +171,7 @@ async function capture(directory) {
         const state = await browser.evaluate(`(${inspectShell})()`);
         assert.equal(state.activePage, `page-${page}`);
         assert.equal(state.pageDisplays.filter(([, display]) => display !== 'none').length, 1, 'Only the active page is displayed');
+        assert.ok(state.tooltipSourcesHidden, 'Tooltip source content remains hidden');
         assert.ok(state.sheetsLoaded && state.snapshot.length > 30);
         for (const family of ['Inter', 'Syne', 'DM Mono']) assert.ok(state.fonts.some(font => font.replaceAll('"', '').startsWith(family + ':')), `Font not loaded: ${family}`);
         const file = `${width}-${name}`;

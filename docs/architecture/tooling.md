@@ -219,6 +219,24 @@ G2c: referência anterior ao corte em `/tmp/trade-diary-g2c-before`, resultado e
 Zero erros de console/runtime, 27 checks no smoke e fingerprint integral sem mudança de expectativa.
 Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
 
+## Métricas e indicadores de risco (G2d)
+
+Snapshot versão 4: 358 casos, preservando os 323 anteriores e acrescentando 35.
+Inclui dashboard/risco em 1419/1420/1421px, tons safe/warn/danger nas 17 larguras e cinco estados
+em 390/1080/1440px: hover de card, tooltip acima/abaixo/oculto e tooltip de risco com linhas internas.
+`scripts/lib/metric-style-scenarios.cjs` chama o renderer existente com dados sintéticos explícitos,
+sem substituir trades nem gravar storage. Verifica conteúdo, posição/clamping e fontes ocultas dos tooltips;
+o snapshot inclui `::after` dos cards. Reset usa mouseout e aguarda o timeout real entre os casos.
+Eventos DOM exercitam o manager existente; não comprovam hit testing físico, acesso por teclado ou cálculos financeiros.
+
+Referência capturada antes do corte em `/tmp/trade-diary-g2d-before`; comparação em `/tmp/trade-diary-g2d-after`.
+Antes/depois: 358 estados exatos e zero erros de console/runtime ou assets locais ausentes.
+35 imagens com 99 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no smoke, sintaxe e diff passaram; fingerprint integral permanece o original.
+Serena ativo na raiz; revisão independente confirmou bytes, cascata e ausência de URLs relativas no corte.
+Um check auxiliar da revisão presumiu CRLF no link; repetido com o LF observado, passou sem mudança no código.
+Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

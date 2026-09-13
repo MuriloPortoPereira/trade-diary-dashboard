@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2c, `styles.css` mantém o trecho original 1060–4879 (3.820 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2d, `styles.css` mantém o trecho original 1360–4879 (3.520 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -88,6 +88,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Uso global: shell, páginas, controles gerados e modais. Handlers e estado permanecem no legado.
 - Runner shell verifica hover, foco, filtragem e limpeza pelos controles reais; opções nativas têm suas cores computadas amostradas.
 - Teste integral de bytes permanece em `tests/study-hub-styles.test.cjs`; uso/limites em [tooling](tooling.md).
+
+## Métricas e indicadores de risco: estilos (G2d)
+
+- `src/styles/metric-cards-and-risk-insights.css`: 300 linhas de grids, cards, tooltips e indicadores comuns.
+- Carrega após `page-actions.css`, antes do residual; responsividade em 1420/1080/720 permanece na posição original.
+- Apresentação compartilhada em `src/styles`; cálculos e eventos continuam em `app.js`.
+- Runner shell cobre tons safe/warn/danger, hover, pseudo-elementos e tooltip acima/abaixo/oculto.
+- Cenários isolados: `scripts/lib/metric-style-scenarios.cjs`; contrato integral de bytes e limites visuais mantidos.
 
 ## Documentação sob demanda
 
