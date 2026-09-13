@@ -8,6 +8,7 @@ const {execFileSync} = require('node:child_process');
 const openBrowser = require('./lib/study-hub-browser.cjs');
 const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
 const {resetMetricTooltip, prepareMetricScenario} = require('./lib/metric-style-scenarios.cjs');
+const {prepareDashboardLayoutScenario} = require('./lib/dashboard-layout-scenarios.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
@@ -26,7 +27,8 @@ function inspectShell() {
     'overflow', 'color', 'background', 'border', 'border-radius', 'box-shadow', 'outline', 'font-family',
     'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
     'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
-    'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme'];
+    'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
+    'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -40,6 +42,8 @@ function inspectShell() {
       text: el.children.length ? null : el.textContent, value: 'value' in el ? el.value : null};
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
+    tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card')].filter(el => el.getClientRects().length)
+      .map(el => [el.className, el.scrollLeft, el.scrollTop, el.scrollWidth, el.scrollHeight, el.clientWidth, el.clientHeight]),
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
     tooltipSourcesHidden: [...document.querySelectorAll('.m-tip-popup')].every(el => getComputedStyle(el).display === 'none'),
     selectOptions: [...document.querySelectorAll('.stats-filter-select option')].map(el => ({value: el.value,
@@ -52,7 +56,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 4, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
+  const report = {version: 5, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -92,12 +96,14 @@ async function capture(directory) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
       const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
-        ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates] : []), 'metric-risk-tones'];
+        ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
+        'metric-risk-tones', 'layout-table-scroll'];
       for (const name of cases) {
         const page = name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
+          document.querySelectorAll('.dashboard-table-scroll,.table-card').forEach(el => { el.scrollLeft = 0; el.scrollTop = 0; });
           document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0); })()`);
         if (page === 'stats') {
           const tab = name.startsWith('stats-') ? name.slice(6) : 'overview';
@@ -107,6 +113,7 @@ async function capture(directory) {
         }
         let hover;
         if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('layout-')) hover = await browser.evaluate(`(${prepareDashboardLayoutScenario})(${JSON.stringify(name)})`);
         if (page === 'log') await browser.evaluate(`document.querySelector('#page-log .log-date-clear').click();`);
         if (name.startsWith('actions-')) {
           if (name === 'actions-primary-hover') hover = '#page-log .page-actions .btn-primary';

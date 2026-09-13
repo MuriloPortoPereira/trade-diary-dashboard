@@ -69,7 +69,6 @@
 - Primeiro ensaio falhou por redeclaração de `const ids` no contexto CDP; IIFEs corrigiram somente o runner, seguido de nova baseline antes do corte.
 - Sem alteração de `app.js`, handlers, APIs, dados persistidos ou dependências. Apenas um link inserido no HTML; sem push/deploy.
 
-## Current
 - G2d concluído: `src/styles/metric-cards-and-risk-insights.css` com 300 linhas/5.433 bytes e 44 blocos completos.
 - `styles.css`: 3.820 para 3.520 linhas; doze links preservam os 162.576 bytes originais concatenados.
 - Caracterização antes do corte: fingerprint integral e baseline ampliada para 358 casos.
@@ -78,8 +77,17 @@
 - Cobertura ampliada: limite de 1420px, tons safe/warn/danger pelo renderer existente, hover e tooltips acima/abaixo/ocultos.
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
+## Current
+- G2e concluído: `src/styles/dashboard-and-card-layout.css` com 161 linhas/2.740 bytes e 23 regras completas.
+- `styles.css`: 3.520 para 3.359 linhas; treze links preservam os 162.576 bytes originais concatenados.
+- Caracterização antes do corte: fingerprint integral e baseline ampliada para 378 casos.
+- 59 testes Node, 27 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- 378 estados exatos; 22 imagens com 156 pixels de diferença dentro da tolerância existente. Zero erros de console/runtime e assets locais ausentes.
+- Cobertura ampliada: tabela inferior em 17 larguras com scroll horizontal real, geometria da rolagem e hover de card de gráfico.
+- `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
+
 ## Next
-- G2e: revisar dashboard e layouts comuns de cards (baseline 1360–1520), primeiro bloco residual; caracterizar antes de extrair.
+- G2f: revisar risco, progresso, alertas e caixa (baseline 1521–1842), primeiro bloco residual; caracterizar consumidores antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -91,8 +99,9 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2d cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
+- G2a–G2e cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
+- G2e verifica scroll horizontal e dimensões/overflow da tabela; a fixture não gera scroll vertical e sticky não possui consumidor encontrado.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -115,3 +124,4 @@
 - G2b: superfícies/cabeçalhos são apresentação comum em `src/styles`; máscaras data: e overrides tardios mantêm posição original.
 - G2c: ações comuns em `src/styles/page-actions.css`, com carga global; overrides responsivos e handlers continuam no legado.
 - G2d: cards, grids, indicadores e tooltips comuns em `src/styles`; renderers e cálculos permanecem no legado.
+- G2e: layouts do dashboard e containers/cabeçalhos comuns em `src/styles`; preservadas também regras sem consumidor encontrado.

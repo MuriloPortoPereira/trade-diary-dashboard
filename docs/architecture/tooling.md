@@ -237,6 +237,24 @@ Serena ativo na raiz; revisão independente confirmou bytes, cascata e ausência
 Um check auxiliar da revisão presumiu CRLF no link; repetido com o LF observado, passou sem mudança no código.
 Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
 
+## Dashboard e layouts comuns de cards (G2e)
+
+Snapshot versão 5: 378 casos, preservando os 358 anteriores. Acrescenta tabela inferior no viewport
+em 17 larguras e hover de card de gráfico em 390/1080/1440px.
+`scripts/lib/dashboard-layout-scenarios.cjs` rola a tabela real até seu limite horizontal;
+quando há overflow, exige deslocamento positivo. Não altera trades, renderers nem storage.
+O runner reinicia a rolagem entre casos e compara scrollLeft/Top, scrollWidth/Height, clientWidth/Height,
+overflow-x/y, scrollbar-width/color e align-self, além dos campos anteriores.
+
+Referência anterior ao corte em `/tmp/trade-diary-g2e-before`; comparação em `/tmp/trade-diary-g2e-after`.
+Antes/depois: 378 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+22 imagens com 156 pixels de diferença dentro da tolerância existente; limites não ampliados.
+59 testes Node, 27 checks no smoke, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Limites: os dois trades da fixture não geram overflow vertical; não se afirma cobertura de deslocamento vertical positivo.
+`.board-card-sticky` não tem consumidor encontrado; sua regra permanece protegida pelo fingerprint integral.
+Serena ativo; revisão independente confirmou o corte, a cascata e a preservação do JavaScript.
+Artefatos temporários; recapturar ao mudar ambiente ou versão do snapshot.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

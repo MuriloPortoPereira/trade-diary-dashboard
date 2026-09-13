@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2d, `styles.css` mantém o trecho original 1360–4879 (3.520 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2e, `styles.css` mantém o trecho original 1521–4879 (3.359 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -96,6 +96,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação compartilhada em `src/styles`; cálculos e eventos continuam em `app.js`.
 - Runner shell cobre tons safe/warn/danger, hover, pseudo-elementos e tooltip acima/abaixo/oculto.
 - Cenários isolados: `scripts/lib/metric-style-scenarios.cjs`; contrato integral de bytes e limites visuais mantidos.
+
+## Dashboard e layouts comuns de cards: estilos (G2e)
+
+- `src/styles/dashboard-and-card-layout.css`: 161 linhas de grids, painéis, cabeçalhos, tabelas e containers de gráficos.
+- Carrega após `metric-cards-and-risk-insights.css`, antes do residual; overrides responsivos mantêm sua posição original.
+- Uso compartilhado entre páginas/modais em `src/styles`; Chart.js, renderers e handlers permanecem no legado.
+- Runner shell acrescenta tabela inferior com rolagem horizontal e hover de card de gráfico.
+- Cenários: `scripts/lib/dashboard-layout-scenarios.cjs`; fixture não produz overflow vertical, e sticky não tem consumidor encontrado.
 
 ## Documentação sob demanda
 

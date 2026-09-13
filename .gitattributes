@@ -9,3 +9,4 @@ src/styles/navigation-and-account-summary.css -text whitespace=-blank-at-eof,cr-
 src/styles/page-surfaces-and-headers.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/page-actions.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/metric-cards-and-risk-insights.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/dashboard-and-card-layout.css -text whitespace=-blank-at-eof,cr-at-eol

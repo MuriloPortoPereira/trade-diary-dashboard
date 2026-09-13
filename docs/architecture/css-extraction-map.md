@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2d executados: quatro `legacy-*.css` e sete destinos do prefixo 1–1359 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1360–4879.
+G1 e G2a–G2e executados: quatro `legacy-*.css` e oito destinos do prefixo 1–1520 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 1521–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -130,6 +130,19 @@ Overrides em 1420/1080/720 ficam no residual. Bytes, separadores e ordem integra
 Baseline ampliada antes do corte: 358 casos, incluindo 1420±1, tons safe/warn/danger pelo renderer
 existente e tooltips acima/abaixo/ocultos por eventos de mouse. Pseudo-elementos dos cards amostrados.
 Cálculos, handlers e dados não alterados; limites da interação sintética em [tooling](tooling.md).
+
+## Sexto corte executado (G2e)
+
+Bloco histórico 1360–1520 em `src/styles/dashboard-and-card-layout.css`: 161 linhas/2.740 bytes, 23 regras completas.
+Inicia em `.dashboard-command-grid`, termina em `.chart-wrap canvas`; residual começa em `.risk-command-grid`.
+Link após métricas/risco e antes de `styles.css`, agora com 3.359 linhas. Sem URL, import ou media query no corte.
+Layout do dashboard e containers/cabeçalhos comuns são apresentação; carga global e ordem mantidas.
+Overrides em 1420/1240/1080/720/440 permanecem no residual; classes sem consumidor encontrado também são preservadas.
+
+Baseline anterior ao corte: 378 casos. A tabela inferior entra no viewport em 17 larguras, com scroll horizontal real;
+hover de card de gráfico em 390/1080/1440. Snapshot inclui scroll e estilos de overflow/scrollbars/align-self.
+Dois trades não geram overflow vertical; `.board-card-sticky` não tem consumidor encontrado. Sem fixture artificial para esses estados.
+Contrato integral de bytes permanece o mesmo; limites em [tooling](tooling.md).
 
 ## Validação exigida
 

@@ -76,8 +76,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 1060–1359 extraído em arquivo de 300 linhas; residual com 3.520 linhas.
 - Baseline anterior ao corte: fingerprint e 358 casos; inclui tons de risco, tooltips e limite de 1420px.
 - Preservados bytes, cascata, responsividade e código da aplicação; sem mudança de cálculo ou estado.
-- Próximo candidato G2e: `dashboard-and-card-layout.css` (baseline 1360–1520);
-  revisar dashboard e layouts comuns de cards, caracterizar consumidores antes de extrair.
+- G2e deu continuidade pelos layouts do dashboard e cards, com caracterização da tabela inferior antes do corte.
+
+## G2e: dashboard e layouts comuns de cards
+
+- Bloco histórico 1360–1520 extraído em arquivo de 161 linhas; residual com 3.359 linhas.
+- Baseline anterior ao corte: fingerprint e 378 casos, incluindo rolagem horizontal da tabela e hover de gráfico.
+- Bytes, cascata, responsividade e JavaScript preservados; não remove classes sem consumidor encontrado.
+- Próximo candidato G2f: `account-risk-and-cashflow.css` (baseline 1521–1842);
+  revisar risco, progresso, alertas e caixa, com caracterização dos consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
