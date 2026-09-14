@@ -104,8 +104,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 2044–2284 extraído em apresentação de calendário, 241 linhas; residual com 2.595 linhas.
 - Baseline anterior ao corte: fingerprint e 509 casos, incluindo modos, hover, scroll e datas-limite.
 - Preservados bytes, cascata, renderers e APIs; `month` continua sem botão próprio na UI.
-- Próximo candidato G2i: `trade-tables.css` (baseline 2285–2432);
-  revisar tabelas, ordenação e estados incompletos, caracterizar consumidores antes de extrair.
+- G2i deu continuidade por tabelas, ordenação e estados incompletos, caracterizados antes do corte.
+
+## G2i: tabelas e estados de operações
+
+- Bloco histórico 2285–2432 extraído em apresentação de trades, 148 linhas; residual com 2.447 linhas.
+- Baseline anterior ao corte: fingerprint e 559 casos, incluindo scroll, sticky, ordenação, seleção e flags de incompletude.
+- Carga global preserva consumidores de tabelas e badges; bytes, cascata, handlers e dados permanecem iguais.
+- Próximo candidato G2j: `src/styles/form-fields.css` (baseline 2433–2523);
+  revisar campos e estados de formulário, caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

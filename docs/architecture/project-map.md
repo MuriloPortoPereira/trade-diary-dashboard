@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2h, `styles.css` mantém o trecho original 2285–4879 (2.595 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2i, `styles.css` mantém o trecho original 2433–4879 (2.447 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -130,6 +130,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - UI: `week` aparece como Mensal, `biweek` como Quinzenal; `month` permanece acessível pela API global.
 - Cenários: `scripts/lib/calendar-style-scenarios.cjs`; modos, hover, rolagem, detalhes do dia, mudança de ano e mês bissexto.
 - Resets de estado visual entre capturas, sem mudar contas/trades/storage; limites em [tooling](tooling.md).
+
+## Tabelas e estados de operações (G2i)
+
+- `src/modules/trades/presentation/trade-tables.css`: 148 linhas de tabelas, ordenação, seleção, badges e avisos de incompletos.
+- Carrega globalmente após `calendar-grids.css`, antes do residual; `.tbl` e badges mantêm consumidores em outras páginas e no resumo da conta.
+- Renderers e handlers continuam em `app.js`; nenhuma alteração de dados ou APIs.
+- Cenários: `scripts/lib/trade-table-style-scenarios.cjs`; scroll, sticky, ordenação por P/L, seleção, hover/foco, vazio e flags de incompletude.
+- Overrides tardios e responsivos preservados; limites em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

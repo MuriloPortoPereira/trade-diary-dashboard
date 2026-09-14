@@ -316,6 +316,27 @@ Antes/depois: 509 estados exatos, zero erros de console/runtime ou assets locais
 Revisão independente confirmou fronteira, bytes, cascata, isolamento e limites da cobertura.
 Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
 
+## Tabelas e estados de operações (G2i)
+
+Snapshot versão 9: 559 casos, os 509 anteriores mais scroll horizontal do diário em 17 larguras
+e onze estados em 390/1080/1440px. `scripts/lib/trade-table-style-scenarios.cjs` reinicia ordenação,
+indicadores, seleção e scroll antes de cada caso; restaura contas/trades em `finally` e compara dados/storage.
+Ordenação ascendente/descendente por P/L e checkboxes usam cliques reais; limpar seleção usa o segundo clique
+em selecionar todos. Hover de linha/cabeçalho e linha selecionada é forçado por CDP.
+Fixtures contrastam uma linha incompleta, duas completas e badges WIN/LOSS/OPEN/Long/Short; ação de completar
+recebe foco, sem execução nem submissão. Vinte trades temporários pelo renderer do dashboard exercitam
+scroll vertical e cabeçalho sticky, inclusive indicadores incompletos na tabela compacta.
+
+Snapshot acrescenta estado de seleção/ordenação, scroll do wrapper do diário e estilos de bordas/tabela,
+cursor, user-select e sublinhado. A primeira referência falhou: as duas operações base eram marcadas incompletas
+na inicialização, e clones herdavam a marca. A fixture passou a definir flags explicitamente; referência refeita
+antes de mover CSS. Isso caracteriza apresentação das flags, sem auditar a regra que calcula incompletude.
+Referência corrigida: `/tmp/trade-diary-g2i-reference`; comparação: `/tmp/trade-diary-g2i-after`.
+Resultado: 559 estados exatos; 22 imagens com 195 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Revisão independente aprovada; resultados devem ser recapturados em cada ambiente.
+Limites: não testa exclusão, duplicação, conclusão/salvamento nem ordenação por todas as colunas.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

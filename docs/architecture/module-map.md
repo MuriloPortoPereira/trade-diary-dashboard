@@ -60,8 +60,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/strategy-style-scenarios.cjs` | Ranking e comparação por handlers reais, com dados temporários restaurados |
 | `src/modules/calendar/presentation/calendar-grids.css` | Mini calendário, resumo semanal, células e grids mensal/semanal/quinzenal; 241 linhas |
 | `scripts/lib/calendar-style-scenarios.cjs` | Modos, hover, rolagem e navegação/detalhes por handlers reais em perfil isolado |
+| `src/modules/trades/presentation/trade-tables.css` | Tabelas, ordenação, seleção, badges e avisos de incompletos; 148 linhas, carga global |
+| `scripts/lib/trade-table-style-scenarios.cjs` | Ordenação/seleção por handlers reais, flags de apresentação, scroll e sticky em perfil isolado |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a, G2b, G2c, G2d, G2e, G2f, G2g e G2h; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a, G2b, G2c, G2d, G2e, G2f, G2g, G2h e G2i; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

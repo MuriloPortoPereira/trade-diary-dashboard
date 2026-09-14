@@ -12,6 +12,7 @@ const {prepareDashboardLayoutScenario} = require('./lib/dashboard-layout-scenari
 const {prepareAccountStyleScenario} = require('./lib/account-style-scenarios.cjs');
 const {prepareStrategyStyleScenario} = require('./lib/strategy-style-scenarios.cjs');
 const {resetCalendarStyleState, prepareCalendarStyleScenario} = require('./lib/calendar-style-scenarios.cjs');
+const {resetTradeTableStyleState, prepareTradeTableStyleScenario} = require('./lib/trade-table-style-scenarios.cjs');
 
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
@@ -20,6 +21,8 @@ const metricStates = ['metric-hover', 'metric-tooltip-above', 'metric-tooltip-be
 const strategyStates = ['strategy-rank-mixed', 'strategy-rank-empty', 'strategy-compare-empty', 'strategy-compare-single',
   'strategy-compare-same', 'strategy-compare-swapped', 'strategy-compare-focus', 'strategy-compare-charts'];
 const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
+const tableStates = ['table-sort-asc', 'table-sort-desc', 'table-row-hover', 'table-row-selected-hover',
+  'table-select-all', 'table-clear-selection', 'table-sort-hover', 'table-incomplete', 'table-incomplete-focus', 'table-empty', 'table-dashboard-sticky'];
 const calendarStates = ['calendar-month-compat', 'calendar-mini-hover', 'calendar-mini-open', 'calendar-day-hover',
   'calendar-day-win', 'calendar-day-loss', 'calendar-day-empty', 'calendar-nav-year', 'calendar-leap-month'];
 const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
@@ -36,7 +39,8 @@ function inspectShell() {
     'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
     'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
     'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align',
-    'text-align', 'text-overflow', 'white-space', 'scrollbar-gutter'];
+    'text-align', 'text-overflow', 'white-space', 'scrollbar-gutter', 'border-collapse', 'border-spacing',
+    'border-bottom', 'cursor', 'user-select', 'text-decoration', 'text-underline-offset'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -51,7 +55,8 @@ function inspectShell() {
   });
   return {snapshot, activePage: document.querySelector('.page.active')?.id, focus: document.activeElement?.id,
     calendar: document.querySelector('#page-calendar.active') ? [calYear, calMonth, calViewMode] : null,
-    tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card,#calGridWrap')].filter(el => el.getClientRects().length)
+    tradeSelection: document.querySelector('#page-log.active') ? {sort: {...sortState}, ids: [...selectedTrades].sort()} : null,
+    tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card,#calGridWrap,#page-log .table-card > [style="overflow-x:auto"]')].filter(el => el.getClientRects().length)
       .map(el => [el.className, el.scrollLeft, el.scrollTop, el.scrollWidth, el.scrollHeight, el.clientWidth, el.clientHeight]),
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
     tooltipSourcesHidden: [...document.querySelectorAll('.m-tip-popup')].every(el => getComputedStyle(el).display === 'none'),
@@ -65,7 +70,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 8, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, cases: []};
+  const report = {version: 9, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -118,11 +123,13 @@ async function capture(directory) {
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
-        'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', ...(pageWidths.includes(width) ? calendarStates : [])];
+        'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
+        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates] : [])];
       for (const name of cases) {
-        const page = name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+        const page = name.startsWith('table-') && name !== 'table-dashboard-sticky' ? 'log' : name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           (${resetCalendarStyleState})();
+          (${resetTradeTableStyleState})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
           document.getElementById('stStratA').value = ''; document.getElementById('stStratB').value = '';
@@ -143,6 +150,7 @@ async function capture(directory) {
           await browser.evaluate(`(${prepareAccountStyleScenario})(${JSON.stringify(name)})`);
         }
         if (page === 'log') await browser.evaluate(`document.querySelector('#page-log .log-date-clear').click();`);
+        if (name.startsWith('table-')) hover = await browser.evaluate(`(${prepareTradeTableStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('actions-')) {
           if (name === 'actions-primary-hover') hover = '#page-log .page-actions .btn-primary';
           if (name === 'actions-ghost-hover') hover = '#filterAccount';

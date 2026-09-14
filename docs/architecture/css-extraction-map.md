@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2h executados: quatro `legacy-*.css` e onze destinos do prefixo 1–2284 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2285–4879.
+G1 e G2a–G2i executados: quatro `legacy-*.css` e doze destinos do prefixo 1–2432 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2433–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -181,6 +181,20 @@ Overrides 1080/720/440 e controles tardios permanecem na posição original; tra
 Baseline anterior ao corte: 509 casos. `week`/`biweek` em 17 larguras; `month` via API, hover de mini/dia,
 clique do mini, detalhes com ganho/perda/vazio, ano seguinte/anterior e fevereiro bissexto em três larguras.
 Rolagem e dimensões de `calGridWrap` entram no snapshot; limites em [tooling](tooling.md).
+
+## Décimo corte executado (G2i)
+
+Bloco histórico 2285–2432 em `src/modules/trades/presentation/trade-tables.css`:
+148 linhas/2.411 bytes, 23 regras completas. De `.tbl` a `.btn-link-warn`;
+residual começa em `.form-grid` e mantém 2.447 linhas. Sem URL, import ou media query no corte.
+Link após calendário, antes do residual. Carga global preserva tabelas em outras páginas e badge do resumo da conta.
+Seletores, sticky, `!important`, estados e overrides tardios mantêm a ordem original.
+
+Baseline anterior ao corte: 559 casos. Diário com scroll em 17 larguras; ordenação por P/L,
+seleção/limpeza, hover/foco, vazio, badges e incompletos em três larguras.
+Vinte operações temporárias exercitam sticky com scroll vertical no dashboard; dados são restaurados.
+A fixture define flags de incompletude para caracterizar apresentação, sem validar sua recomputação.
+Limites em [tooling](tooling.md).
 
 ## Validação exigida
 
