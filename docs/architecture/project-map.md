@@ -177,6 +177,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Não há consumidor ativo confirmado; `scripts/lib/emotion-picker-style-scenarios.cjs` usa fixture descartável.
 - Estado `.selected` preservado; nenhuma lógica de operação ou configuração foi alterada.
 
+## Tags e edição: estilos (G2o)
+
+- `src/styles/tag-editor.css`: 79 linhas de listas, tags, contagem, botões e estados hover.
+- Compartilhado entre Setup editável e nuvens somente leitura do Profile; carrega antes do residual.
+- `scripts/lib/tag-editor-style-scenarios.cjs` usa renderizadores reais e uma fixture apenas para `.tag-add` sem consumidor.
+- Edição, exclusão, configuração, dados e storage não são modificados pelos cenários.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.

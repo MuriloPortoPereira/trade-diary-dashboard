@@ -71,8 +71,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/upload-zone-style-scenarios.cjs` | Fixture descartável para layout, hover, drag e input oculto da zona de upload |
 | `src/modules/trades/presentation/emotion-picker.css` | Grid e chips de emoção, incluindo estado selecionado; 29 linhas |
 | `scripts/lib/emotion-picker-style-scenarios.cjs` | Fixture descartável para idle, hover e seleção do picker sem mutar dados |
+| `src/styles/tag-editor.css` | Tags compartilhadas entre Setup/Profile, contagem e botões de edição; 79 linhas |
+| `scripts/lib/tag-editor-style-scenarios.cjs` | Cenários reais de tags editáveis/somente leitura e fixture isolada para `.tag-add` |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2n; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2o; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

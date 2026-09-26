@@ -421,6 +421,19 @@ continua igual ao base. A primeira execução reforçada aplicava as cores-base 
 Resultado pós-extração: 59 testes Node, 27 checks no navegador e 616 estados visuais
 idênticos; 24 imagens tiveram 190 pixels de rasterização dentro da tolerância.
 
+## Tags e edição (G2o)
+
+Snapshot versão 15: 631 casos. `scripts/lib/tag-editor-style-scenarios.cjs` cobre em
+390/1080/1440px as tags reais do Setup e Profile, contagem de uso, botões de editar/excluir,
+hovers e wrap. Uma fixture descartável cobre somente `.tag-add`, sem consumidor atual.
+
+A primeira execução esperava `inline-flex`, enquanto `getComputedStyle` normaliza o item externo
+para `flex`. A expectativa foi corrigida e a cobertura ampliada para Profile e tags secundárias
+antes da baseline válida em `/tmp/trade-diary-g2o-reference-v15b`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 631 estados visuais
+idênticos; 35 imagens tiveram 212 pixels de rasterização dentro da tolerância.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

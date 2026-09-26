@@ -149,6 +149,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Grid, cores, dimensões e tipografia preservados; nenhum consumidor ou handler foi criado.
 - Próximo candidato G2o: `src/styles/tag-editor.css` (baseline 2701–2779).
 
+## G2o: tags e edição
+
+- Bloco histórico 2701–2779 extraído para `src/styles/tag-editor.css`, 79 linhas; residual com 2.100 linhas.
+- Baseline anterior ao corte: fingerprint e 631 casos, com Setup/Profile, contagem, botões, hovers e wrap.
+- Renderizadores reais são usados sem confirmar mutações; `.tag-add` sem consumidor usa fixture descartável.
+- Próximo candidato G2p: `src/styles/alerts-and-utilities.css` (baseline 2780–2831).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

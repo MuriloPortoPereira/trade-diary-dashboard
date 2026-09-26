@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2n executados: quatro `legacy-*.css` e dezessete destinos do prefixo 1–2700 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2701–4879.
+G1 e G2a–G2o executados: quatro `legacy-*.css` e dezoito destinos do prefixo 1–2779 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2780–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -250,6 +250,15 @@ começa em `.tag-list` e mantém 2.179 linhas. Link após upload, antes do resid
 
 Nenhum consumidor ativo foi encontrado. Fixture descartável caracteriza idle, pseudo-hover e
 `.selected` em 390/1080/1440px, incluindo grid, cores, dimensões e tipografia sem mutar dados.
+
+## Décimo sexto corte executado (G2o)
+
+Bloco histórico 2701–2779 em `src/styles/tag-editor.css`: 79 linhas/1.375 bytes e oito
+conjuntos de regras completos. De `.tag-list` a `.tag-add`; residual começa em `.alert` e
+mantém 2.100 linhas. Link após o picker de emoções, antes do residual.
+
+Consumidores reais no Setup e Profile cobrem tags editáveis e somente leitura, contagem, botões,
+hovers e wrap; fixture descartável preserva `.tag-add`, que não possui consumidor atual.
 
 ## Validação exigida
 
