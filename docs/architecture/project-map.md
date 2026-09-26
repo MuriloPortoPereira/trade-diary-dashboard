@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2k, `styles.css` mantém o trecho original 2604–4879 (2.276 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2l, `styles.css` mantém o trecho original 2631–4879 (2.249 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -154,6 +154,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Cenários: `scripts/lib/modal-tab-style-scenarios.cjs`; scroll do modal de operação, footers, diálogo com input e abas de importação, calendário e StudyHub.
 - A segunda regra de `.modal-footer` permanece separada e posterior, preservando bordas e alinhamento.
 - Overrides responsivos e específicos do StudyHub permanecem tardios; limites em [tooling](tooling.md).
+
+## Toolbar do calendário (G2l)
+
+- `src/modules/calendar/presentation/calendar-toolbar.css`: 27 linhas do cabeçalho, seletor de mês e botões de modo.
+- Carrega após `modal-and-tabs.css`, antes do residual; consumidor único em `#page-calendar`.
+- Cenário dedicado em `scripts/lib/calendar-style-scenarios.cjs`: foco do picker e valores computados de controles/botões.
+- `.gap-8` tardio mantém gap efetivo de 8px; dimensões e `!important` do bloco permanecem iguais.
+- Demais estados e limites do calendário continuam em [tooling](tooling.md).
 
 ## Documentação sob demanda
 

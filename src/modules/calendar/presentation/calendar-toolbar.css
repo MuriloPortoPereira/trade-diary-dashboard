@@ -1,0 +1,27 @@
+.calendar-toolbar {
+  gap: 12px;
+}
+
+.calendar-month-control,
+.calendar-view-toggle {
+  min-height: 46px;
+  padding: 6px !important;
+}
+
+.calendar-month-control {
+  padding-inline: 14px !important;
+}
+
+.calendar-month-input {
+  width: 150px;
+  min-height: 34px;
+  font-size: 14px !important;
+  font-weight: 700;
+}
+
+.calendar-mode-btn {
+  min-height: 38px;
+  padding: 0 18px;
+  font-size: 13px;
+}
+

@@ -374,6 +374,21 @@ Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 chec
 Limites: não confirma importação nem diálogo, não testa fechamento por Escape e não percorre todas as
 subabas internas do StudyHub legado. Trade/account e 720±1 permanecem cobertos pelos estados existentes.
 
+## Toolbar do calendário (G2l)
+
+Snapshot versão 12: 598 casos, os 595 anteriores mais foco do seletor de mês em 390/1080/1440px.
+`scripts/lib/calendar-style-scenarios.cjs` confirma foco, tipo month, padding, min-height, largura,
+fonte e dimensões dos botões; week/biweek continuam exercitados nas 17 larguras existentes.
+
+A primeira assertion esperava gap de 12px pela regra `.calendar-toolbar`. A medição mostrou 8px:
+`.gap-8` aparece mais tarde no residual e vence por mesma especificidade. A caracterização passou a
+registrar 8px, sem corrigir o comportamento existente, e a baseline foi refeita antes da extração em
+`/tmp/trade-diary-g2l-reference-final`.
+Limite: o popup nativo do input month não é aberto; varia por navegador/OS.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 598 estados visuais
+idênticos; 27 imagens tiveram diferenças limitadas a 157 pixels de rasterização.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

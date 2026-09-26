@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2k executados: quatro `legacy-*.css` e quatorze destinos do prefixo 1–2603 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2604–4879.
+G1 e G2a–G2l executados: quatro `legacy-*.css` e quinze destinos do prefixo 1–2630 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2631–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -219,6 +219,18 @@ A segunda regra de `.modal-footer` mantém posição/especificidade; overrides r
 Baseline anterior ao corte: 595 casos. Seis estados adicionais em 390/1080/1440 cobrem modal rolável,
 footer simples, diálogo com input e abas de importação, calendário e StudyHub. Trade/account e limites 720±1
 permanecem cobertos pelos estados anteriores. Dados e storage não mudam. Limites em [tooling](tooling.md).
+
+## Décimo terceiro corte executado (G2l)
+
+Bloco histórico 2604–2630 em `src/modules/calendar/presentation/calendar-toolbar.css`:
+27 linhas/394 bytes, cinco regras completas. De `.calendar-toolbar` a `.calendar-mode-btn`;
+residual começa em `.upload-zone` e mantém 2.249 linhas. Sem URL, import ou media query no corte.
+Link após modais/abas, antes do residual. Consumidor único: toolbar da página de calendário.
+O utility `.gap-8` aparece depois e mantém gap efetivo de 8px; não reorganizar nem “corrigir” a cascata.
+
+Baseline anterior ao corte: 598 casos. Cenário dedicado em 390/1080/1440 cobre foco do picker,
+padding, dimensões e tipografia computados; week/biweek e responsividade continuam cobertos nas 17 larguras.
+Dados e storage não mudam. Limites em [tooling](tooling.md).
 
 ## Validação exigida
 

@@ -30,7 +30,8 @@ const statTabs = ['overview', 'strategy', 'time', 'psych', 'simulation'];
 const tableStates = ['table-sort-asc', 'table-sort-desc', 'table-row-hover', 'table-row-selected-hover',
   'table-select-all', 'table-clear-selection', 'table-sort-hover', 'table-incomplete', 'table-incomplete-focus', 'table-empty', 'table-dashboard-sticky'];
 const calendarStates = ['calendar-month-compat', 'calendar-mini-hover', 'calendar-mini-open', 'calendar-day-hover',
-  'calendar-day-win', 'calendar-day-loss', 'calendar-day-empty', 'calendar-nav-year', 'calendar-leap-month'];
+  'calendar-day-win', 'calendar-day-loss', 'calendar-day-empty', 'calendar-nav-year', 'calendar-leap-month',
+  'calendar-toolbar-month-focus'];
 const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-focus', 'date-end-focus',
   'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
 const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
@@ -83,7 +84,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 11, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, cases: []};
+  const report = {version: 12, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});

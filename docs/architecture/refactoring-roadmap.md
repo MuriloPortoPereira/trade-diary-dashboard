@@ -125,8 +125,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 2524–2603 extraído em `src/styles/modal-and-tabs.css`, 80 linhas; residual com 2.276 linhas.
 - Baseline anterior ao corte: fingerprint e 595 casos, incluindo modal rolável, footers, diálogo e abas.
 - Carga global preserva consumidores; bytes, cascata, handlers e dados permanecem iguais.
-- Próximo candidato G2l: `src/modules/calendar/presentation/calendar-toolbar.css` (baseline 2604–2630);
-  revisar toolbar, seletor de mês e botões de modo antes de extrair.
+- G2l deu continuidade pela toolbar do calendário, com picker e valores computados caracterizados antes do corte.
+
+## G2l: toolbar do calendário
+
+- Bloco histórico 2604–2630 extraído em apresentação de calendário, 27 linhas; residual com 2.249 linhas.
+- Baseline anterior ao corte: fingerprint e 598 casos, incluindo foco e dimensões dos controles.
+- Bytes, cascata, handlers e dados permanecem iguais; `.gap-8` tardio mantém o gap efetivo existente.
+- Próximo candidato G2m: `src/styles/upload-zone.css` (baseline 2631–2671);
+  revisar upload comum, hover/drag e input oculto antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

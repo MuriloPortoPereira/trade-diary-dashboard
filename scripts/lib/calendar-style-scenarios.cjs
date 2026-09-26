@@ -48,6 +48,22 @@ function prepareCalendarStyleScenario(name) {
         picker.value = value; picker.dispatchEvent(new Event('change', {bubbles: true}));
         if (picker.value !== value) throw new Error('Calendar month picker changed');
       };
+      if (name === 'calendar-toolbar-month-focus') {
+        const picker = document.getElementById('calMonthPicker');
+        const toolbar = document.querySelector('.calendar-toolbar');
+        const monthControl = document.querySelector('.calendar-month-control');
+        const viewToggle = document.querySelector('.calendar-view-toggle');
+        const modeButton = document.getElementById('calBtnWeek');
+        toolbar.scrollIntoView({block: 'center'});
+        picker.focus({preventScroll: true});
+        if (document.activeElement !== picker || picker.type !== 'month') throw new Error('Calendar month picker did not focus');
+        const toolbarStyle = getComputedStyle(toolbar), monthStyle = getComputedStyle(monthControl);
+        const toggleStyle = getComputedStyle(viewToggle), pickerStyle = getComputedStyle(picker), buttonStyle = getComputedStyle(modeButton);
+        if (toolbarStyle.gap !== '8px' || monthStyle.padding !== '6px 14px' || toggleStyle.minHeight !== '46px' ||
+          toggleStyle.padding !== '6px' || pickerStyle.width !== '150px' || pickerStyle.minHeight !== '34px' ||
+          pickerStyle.fontSize !== '14px' || pickerStyle.fontWeight !== '700' || buttonStyle.minHeight !== '38px' ||
+          buttonStyle.padding !== '0px 18px' || buttonStyle.fontSize !== '13px') throw new Error('Calendar toolbar styles changed');
+      }
       if (name === 'calendar-nav-year') {
         pick('2026-12');
         document.querySelector('#page-calendar [onclick="calNav(1)"]').click();

@@ -66,8 +66,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/form-field-style-scenarios.cjs` | Foco e estados de campos no modal real, sem submissão nem persistência |
 | `src/styles/modal-and-tabs.css` | Overlays, estrutura dos modais e abas comuns; 80 linhas, carga global |
 | `scripts/lib/modal-tab-style-scenarios.cjs` | Modais/footers/scroll e alternância de abas por handlers reais |
+| `src/modules/calendar/presentation/calendar-toolbar.css` | Toolbar, seletor de mês e botões de modo do calendário; 27 linhas |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2k; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2l; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
