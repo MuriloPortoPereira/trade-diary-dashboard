@@ -1,5 +1,13 @@
 # Refactoring Progress
 
+## Overall status
+- Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
+- Implementação parcial: sizing, CSV, idiomas, G1 e os cortes G2 registrados abaixo.
+- G2 em andamento; faltam estilos residuais. G3–G6 continuam como frentes de JavaScript, domínio, IO e StudyHub.
+- G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
+- Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
+- Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
+
 ## Completed
 - Baseline `ab0cb63`, branch `develop/clean-architecture`, sem mudanças locais preexistentes.
 - Caveman local; Superpowers 6.3.0 via marketplace; MCPs locais Serena e Context7.
@@ -114,17 +122,17 @@
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
 ## Current
-- G2i concluído: `src/modules/trades/presentation/trade-tables.css` com 148 linhas/2.411 bytes e 23 regras completas.
-- `styles.css`: 2.595 para 2.447 linhas; dezessete links preservam os 162.576 bytes originais concatenados.
-- Caracterização antes do corte: fingerprint integral e baseline ampliada para 559 casos.
-- 59 testes Node, 27 checks no navegador, sintaxe, diff e revisão independente aprovados.
-- 559 estados exatos; 22 imagens com 195 pixels de diferença dentro da tolerância existente. Zero erros de console/runtime e assets locais ausentes.
-- Cobertura: scroll do diário em 17 larguras; ordenação por P/L, seleção/limpeza, hover/foco, vazio, incompletos e sticky em três larguras.
-- Fixture corrigida antes do corte: clones herdavam flags de incompletude da inicialização; flags explícitas agora contrastam linhas completas/incompleta.
-- Dados restaurados após cada cenário; `app.js`, handlers, scripts clássicos, cálculos e dados persistidos preservados.
+- G2j concluído: `src/styles/form-fields.css` com 91 linhas/1.544 bytes e 15 regras completas.
+- `styles.css`: 2.447 para 2.356 linhas; dezoito links preservam os 162.576 bytes originais concatenados.
+- Caracterização antes do corte: fingerprint integral e baseline ampliada para 577 casos.
+- Cobertura: texto, número com unidade, readonly, select e textarea vazio/preenchido em três larguras; grids nas 17 larguras.
+- Primeira tentativa registrou comportamento existente: `applyLanguage` substitui labels traduzidos e remove spans `.required`.
+- Dados e storage permanecem iguais após cada cenário; sem submissão ou eventos de alteração.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing CSS, diff e revisão independente aprovados.
+- 577 estados exatos; 32 imagens com 188 pixels de diferença dentro da tolerância existente. Zero erros de console/runtime e assets locais ausentes.
 
 ## Next
-- G2j: revisar campos e estados de formulário (baseline 2433–2523), primeiro bloco residual; caracterizar consumidores antes de extrair.
+- G2k: revisar modais e abas comuns (baseline 2524–2603), primeiro bloco residual; caracterizar consumidores antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -136,13 +144,14 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2i cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 14 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
+- G2a–G2j cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, dois modais sem submissão e cinco abas de análise; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
 - G2g usa dois trades sintéticos com estratégias distintas; não audita fórmulas, timing, grandes amostras ou o popup nativo dos seletores.
 - G2h cobre modos e datas-limite com fixture fixa; não audita todas as somas/períodos/fusos. month usa API global; popup nativo do mês e animação em movimento ficam fora.
 - G2i caracteriza apresentação das flags de incompletude; não audita sua regra, ordenação de todas as colunas, exclusão, duplicação ou conclusão/salvamento.
+- G2j não testa submissão/validação, popup nativo do select, arraste do textarea ou animação em movimento; `.field-hint` não possui consumidor encontrado.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -170,3 +179,4 @@
 - G2g: ranking e comparação em apresentação de analytics; overrides tardios, handlers e regras numéricas permanecem no legado.
 - G2h: mini e grids do calendário em apresentação de calendar; toolbar/responsividade e comportamento dos handlers permanecem no legado.
 - G2i: tabelas e badges em apresentação de trades, com carga global pelos consumidores existentes; estados e handlers continuam no legado.
+- G2j: campos compartilhados em `src/styles`; overrides responsivos e específicos do StudyHub continuam tardios.

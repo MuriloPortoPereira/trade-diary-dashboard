@@ -14,6 +14,9 @@ const {prepareStrategyStyleScenario} = require('./lib/strategy-style-scenarios.c
 const {resetCalendarStyleState, prepareCalendarStyleScenario} = require('./lib/calendar-style-scenarios.cjs');
 const {resetTradeTableStyleState, prepareTradeTableStyleScenario} = require('./lib/trade-table-style-scenarios.cjs');
 
+const {prepareFormFieldStyleScenario} = require('./lib/form-field-style-scenarios.cjs');
+
+const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
 const pageWidths = [390, 1080, 1440];
@@ -40,7 +43,7 @@ function inspectShell() {
     'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
     'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align',
     'text-align', 'text-overflow', 'white-space', 'scrollbar-gutter', 'border-collapse', 'border-spacing',
-    'border-bottom', 'cursor', 'user-select', 'text-decoration', 'text-underline-offset'];
+    'border-bottom', 'cursor', 'user-select', 'text-decoration', 'text-underline-offset', 'resize', 'appearance'];
   const surfaceSelector = '.balance-card,.chart-card,.calendar-card,.table-card,.setup-card,.metric-card,.account-overview-card,.partner-card';
   const pseudoStyle = (el, pseudo) => Object.fromEntries(['content', ...properties].map(key =>
     [key, getComputedStyle(el, pseudo).getPropertyValue(key)]));
@@ -70,7 +73,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 9, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, cases: []};
+  const report = {version: 10, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -106,6 +109,11 @@ async function capture(directory) {
       return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
     })()`);
     assert.deepEqual(report.calendarTransition, ['transform, border-color, background', '0.18s, 0.18s, 0.18s', 'ease, ease, ease']);
+    report.fieldTransition = await browser.evaluate(`(() => {
+      const style = getComputedStyle(document.getElementById('t-symbol'));
+      return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
+    })()`);
+    assert.deepEqual(report.fieldTransition, ['border-color, background, box-shadow', '0.2s, 0.2s, 0.2s', 'ease, ease, ease']);
     await browser.evaluate(`Chart.defaults.animation = false;
       const style = document.createElement('style');
       style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
@@ -124,13 +132,14 @@ async function capture(directory) {
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
-        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates] : [])];
+        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates] : [])];
       for (const name of cases) {
         const page = name.startsWith('table-') && name !== 'table-dashboard-sticky' ? 'log' : name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name === 'account-cashflow-setup' ? 'setup' : name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' : name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           (${resetCalendarStyleState})();
           (${resetTradeTableStyleState})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
+          document.querySelectorAll('.modal-body').forEach(el => { el.scrollTop = 0; el.scrollLeft = 0; });
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
           document.getElementById('stStratA').value = ''; document.getElementById('stStratB').value = '';
           document.querySelectorAll('.dashboard-table-scroll,.table-card').forEach(el => { el.scrollLeft = 0; el.scrollTop = 0; });
@@ -199,6 +208,7 @@ async function capture(directory) {
         if (name === 'account-modal') await browser.evaluate(`document.getElementById('acctPill').click(); if (!document.getElementById('accountModal').classList.contains('open')) throw new Error('Account modal did not open');`);
         if (name === 'trade-modal') await browser.evaluate(`document.querySelector('#topbar [data-i18n="topbar.newTrade"]').click();
           if (!document.getElementById('tradeModal').classList.contains('open')) throw new Error('Trade modal did not open');`);
+        if (name.startsWith('form-')) await browser.evaluate(`(${prepareFormFieldStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2i, `styles.css` mantém o trecho original 2433–4879 (2.447 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2j, `styles.css` mantém o trecho original 2524–4879 (2.356 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -138,6 +138,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Renderers e handlers continuam em `app.js`; nenhuma alteração de dados ou APIs.
 - Cenários: `scripts/lib/trade-table-style-scenarios.cjs`; scroll, sticky, ordenação por P/L, seleção, hover/foco, vazio e flags de incompletude.
 - Overrides tardios e responsivos preservados; limites em [tooling](tooling.md).
+
+## Campos de formulário (G2j)
+
+- `src/styles/form-fields.css`: 91 linhas de grids, labels, inputs, selects, textarea, unidades e hints.
+- Carrega globalmente após `trade-tables.css`, antes do residual; consumidores incluem operações, simulação, contas, parceiros e StudyHub.
+- Cenários: `scripts/lib/form-field-style-scenarios.cjs`; foco em texto/número/select/textarea, unidade, readonly e conteúdo multilinha.
+- Overrides responsivos e específicos do StudyHub permanecem no residual ou nos arquivos tardios, na posição original.
+- `.field-hint` não possui consumidor encontrado; regra preservada sem criar UI artificial.
 
 ## Documentação sob demanda
 

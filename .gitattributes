@@ -14,3 +14,4 @@ src/modules/accounts/presentation/account-risk-and-cashflow.css -text whitespace
 src/modules/analytics/presentation/strategy-comparison.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/calendar/presentation/calendar-grids.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/trade-tables.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/form-fields.css -text whitespace=-blank-at-eof,cr-at-eol

@@ -337,6 +337,27 @@ Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 chec
 Revisão independente aprovada; resultados devem ser recapturados em cada ambiente.
 Limites: não testa exclusão, duplicação, conclusão/salvamento nem ordenação por todas as colunas.
 
+## Campos de formulário (G2j)
+
+Snapshot versão 10: 577 casos, os 559 anteriores mais seis estados de foco em 390/1080/1440px.
+`scripts/lib/form-field-style-scenarios.cjs` abre o modal real de operações e caracteriza texto,
+número com unidade %, campo readonly, select, textarea vazio e preenchido com múltiplas linhas.
+Valores são somente de apresentação, sem eventos input/change, salvamento ou gravação de dados.
+Cada cenário confirma contas/trades/storage intactos. O runner reinicia scroll dos corpos de modal;
+`scrollIntoView` posiciona o campo em foco. Grids fg-2/3/4 continuam cobertos pelo modal passivo
+nas 17 larguras existentes, incluindo 720±1 e 1080±1. Snapshot acrescenta resize e appearance;
+a declaração de transição dos campos é verificada antes de desabilitar animações.
+
+A primeira caracterização falhou com `Required marker missing`: `applyLanguage` substitui o
+conteúdo dos labels traduzidos por textContent e remove seus spans `.required`. O teste agora
+registra essa ausência existente; comportamento da aplicação não foi corrigido neste lote.
+Artefatos temporários da tentativa inicial desapareceram após troca de ambiente; referência recapturada
+em worktree isolada no commit `f888a4f`, antes de extrair CSS.
+Resultado: 577 estados exatos; 32 imagens com 188 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Limites: sem submissão/validação dos formulários, popup nativo de select, arraste para redimensionar
+textarea ou animação em movimento. `.field-hint` não possui consumidor encontrado; regra preservada.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

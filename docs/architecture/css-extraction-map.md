@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2i executados: quatro `legacy-*.css` e doze destinos do prefixo 1–2432 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2433–4879.
+G1 e G2a–G2j executados: quatro `legacy-*.css` e treze destinos do prefixo 1–2523 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2524–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -195,6 +195,18 @@ seleção/limpeza, hover/foco, vazio, badges e incompletos em três larguras.
 Vinte operações temporárias exercitam sticky com scroll vertical no dashboard; dados são restaurados.
 A fixture define flags de incompletude para caracterizar apresentação, sem validar sua recomputação.
 Limites em [tooling](tooling.md).
+
+## Décimo primeiro corte executado (G2j)
+
+Bloco histórico 2433–2523 em `src/styles/form-fields.css`:
+91 linhas/1.544 bytes, 15 regras completas. De `.form-grid` a `.field-hint`;
+residual começa em `.modal-overlay` e mantém 2.356 linhas. Sem URL, import ou media query no corte.
+Link após tabelas, antes do residual. Carga global preserva campos em operações, simulação, contas, parceiros e StudyHub.
+Overrides tardios e responsivos mantêm a posição original; `.field-hint` sem consumidor encontrado permanece intacto.
+
+Baseline anterior ao corte: 577 casos. Seis estados adicionais em 390/1080/1440 cobrem foco em texto,
+número com unidade, readonly, select e textarea vazio/preenchido. Grids continuam amostrados nas 17 larguras.
+Valores são somente de apresentação; contas, trades e storage permanecem iguais. Limites em [tooling](tooling.md).
 
 ## Validação exigida
 

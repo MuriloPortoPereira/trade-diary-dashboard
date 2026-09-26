@@ -111,8 +111,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 2285–2432 extraído em apresentação de trades, 148 linhas; residual com 2.447 linhas.
 - Baseline anterior ao corte: fingerprint e 559 casos, incluindo scroll, sticky, ordenação, seleção e flags de incompletude.
 - Carga global preserva consumidores de tabelas e badges; bytes, cascata, handlers e dados permanecem iguais.
-- Próximo candidato G2j: `src/styles/form-fields.css` (baseline 2433–2523);
-  revisar campos e estados de formulário, caracterizar consumidores antes de extrair.
+- G2j deu continuidade pelos campos de formulário compartilhados, caracterizados antes do corte.
+
+## G2j: campos de formulário
+
+- Bloco histórico 2433–2523 extraído em `src/styles/form-fields.css`, 91 linhas; residual com 2.356 linhas.
+- Baseline anterior ao corte: fingerprint e 577 casos, incluindo foco, unidades, readonly, select e textarea.
+- Carga global preserva consumidores; bytes, cascata, handlers e dados permanecem iguais.
+- Próximo candidato G2k: `src/styles/modal-and-tabs.css` (baseline 2524–2603);
+  revisar modais, rodapé e abas comuns, especialmente regras separadas de `.modal-footer`.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

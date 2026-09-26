@@ -1,0 +1,91 @@
+.form-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fg-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fg-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fg-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-group label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 12px;
+  font-family: "Inter", sans-serif;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-group textarea {
+  min-height: 88px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+  outline: none;
+  border-color: rgba(34, 213, 237, 0.28);
+  box-shadow: 0 0 0 4px rgba(34, 213, 237, 0.08);
+  background: rgba(34, 213, 237, 0.04);
+}
+
+.field-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.required {
+  color: var(--red);
+}
+
+.iu {
+  position: relative;
+}
+
+.iu .u {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 11px;
+  font-family: "DM Mono", monospace;
+}
+
+.iu input {
+  padding-right: 38px;
+}
+
+.field-hint {
+  color: var(--dim);
+  font-size: 10px;
+}
+
