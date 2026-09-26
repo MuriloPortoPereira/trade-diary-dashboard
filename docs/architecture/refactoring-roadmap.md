@@ -142,6 +142,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Base, hover, `.drag`, input oculto e elementos internos preservados; nenhum consumidor ativo foi inventado.
 - Próximo candidato G2n: `src/modules/trades/presentation/emotion-picker.css` (baseline 2672–2700).
 
+## G2n: seletor de emoções
+
+- Bloco histórico 2672–2700 extraído para apresentação de trades, 29 linhas; residual com 2.179 linhas.
+- Baseline anterior ao corte: fingerprint e 616 casos, incluindo idle, hover e seleção em três larguras.
+- Grid, cores, dimensões e tipografia preservados; nenhum consumidor ou handler foi criado.
+- Próximo candidato G2o: `src/styles/tag-editor.css` (baseline 2701–2779).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

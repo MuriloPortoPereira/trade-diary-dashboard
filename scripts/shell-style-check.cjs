@@ -17,11 +17,13 @@ const {resetTradeTableStyleState, prepareTradeTableStyleScenario} = require('./l
 const {prepareFormFieldStyleScenario} = require('./lib/form-field-style-scenarios.cjs');
 const {resetModalTabStyleState, prepareModalTabStyleScenario} = require('./lib/modal-tab-style-scenarios.cjs');
 const {resetUploadZoneStyleState, prepareUploadZoneStyleScenario} = require('./lib/upload-zone-style-scenarios.cjs');
+const {resetEmotionPickerStyleState, prepareEmotionPickerStyleScenario} = require('./lib/emotion-picker-style-scenarios.cjs');
 
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
 const modalTabStates = ['modal-trade-scroll', 'modal-csv-footer', 'modal-dialog-input',
   'tabs-import-export', 'tabs-calendar-biweek', 'tabs-studyhub-plano'];
 const uploadZoneStates = ['upload-zone-idle', 'upload-zone-hover', 'upload-zone-drag'];
+const emotionPickerStates = ['emotion-picker-idle', 'emotion-picker-hover', 'emotion-picker-selected'];
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
 const pageWidths = [390, 1080, 1440];
@@ -86,7 +88,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 13, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, cases: []};
+  const report = {version: 14, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -145,7 +147,7 @@ async function capture(directory) {
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
-        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates] : [])];
+        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates] : [])];
       for (const name of cases) {
         const page = name === 'tabs-import-export' ? 'import' : name === 'tabs-calendar-biweek' ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : name.startsWith('table-') && name !== 'table-dashboard-sticky' ? 'log' :
@@ -157,6 +159,7 @@ async function capture(directory) {
           (${resetTradeTableStyleState})();
           (${resetModalTabStyleState})();
           (${resetUploadZoneStyleState})();
+          (${resetEmotionPickerStyleState})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           document.querySelectorAll('.modal-body').forEach(el => { el.scrollTop = 0; el.scrollLeft = 0; });
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
@@ -232,6 +235,7 @@ async function capture(directory) {
           await browser.evaluate(`(${prepareModalTabStyleScenario})(${JSON.stringify(name)})`);
         }
         if (name.startsWith('upload-zone-')) hover = await browser.evaluate(`(${prepareUploadZoneStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('emotion-picker-')) hover = await browser.evaluate(`(${prepareEmotionPickerStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

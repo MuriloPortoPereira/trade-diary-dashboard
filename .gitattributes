@@ -18,3 +18,4 @@ src/styles/form-fields.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/modal-and-tabs.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/calendar/presentation/calendar-toolbar.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/upload-zone.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/trades/presentation/emotion-picker.css -text whitespace=-blank-at-eof,cr-at-eol

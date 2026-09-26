@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2m executados: quatro `legacy-*.css` e dezesseis destinos do prefixo 1–2671 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2672–4879.
+G1 e G2a–G2n executados: quatro `legacy-*.css` e dezessete destinos do prefixo 1–2700 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2701–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -241,6 +241,15 @@ completas. De `.upload-zone` a `.upload-sub`; residual começa em `.emotion-grid
 Nenhum consumidor ativo foi encontrado para as classes globais; fixture descartável caracteriza
 base, hover, `.drag`, input oculto, ícone e textos em 390/1080/1440px. Overrides scoped do
 StudyHub continuam carregados depois e o JavaScript de drop permanece intacto.
+
+## Décimo quinto corte executado (G2n)
+
+Bloco histórico 2672–2700 em `src/modules/trades/presentation/emotion-picker.css`:
+29 linhas/515 bytes e quatro regras completas. De `.emotion-grid` a `.emotion-name`; residual
+começa em `.tag-list` e mantém 2.179 linhas. Link após upload, antes do residual.
+
+Nenhum consumidor ativo foi encontrado. Fixture descartável caracteriza idle, pseudo-hover e
+`.selected` em 390/1080/1440px, incluindo grid, cores, dimensões e tipografia sem mutar dados.
 
 ## Validação exigida
 

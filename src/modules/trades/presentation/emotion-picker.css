@@ -1,0 +1,29 @@
+.emotion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.emotion-chip {
+  padding: 14px 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+
+.emotion-chip.selected {
+  border-color: rgba(34, 213, 237, 0.18);
+  background: rgba(34, 213, 237, 0.10);
+}
+
+.emotion-emoji {
+  font-size: 20px;
+}
+
+.emotion-name {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+

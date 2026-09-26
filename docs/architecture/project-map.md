@@ -170,6 +170,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Não há consumidor ativo confirmado das classes globais; `scripts/lib/upload-zone-style-scenarios.cjs` usa fixture descartável.
 - Listeners globais de drag/drop, importadores e dados continuam inalterados em `app.js`.
 
+## Seletor de emoções: estilos (G2n)
+
+- `src/modules/trades/presentation/emotion-picker.css`: 29 linhas de grid, chips, seleção, emoji e rótulo.
+- Carrega após `upload-zone.css`, antes do residual; não existem overrides posteriores encontrados.
+- Não há consumidor ativo confirmado; `scripts/lib/emotion-picker-style-scenarios.cjs` usa fixture descartável.
+- Estado `.selected` preservado; nenhuma lógica de operação ou configuração foi alterada.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.

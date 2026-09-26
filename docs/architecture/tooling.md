@@ -407,6 +407,20 @@ temporariamente o bloco no monólito e reproduziu os mesmos hashes da extração
 captura como condição subpixel transitória do navegador. Controle fresco versus extração passou:
 607 estados idênticos; 29 imagens com 148 pixels de rasterização dentro da tolerância.
 
+## Seletor de emoções (G2n)
+
+Snapshot versão 14: 616 casos, os 607 anteriores mais idle, hover e `.selected` em
+390/1080/1440px. `scripts/lib/emotion-picker-style-scenarios.cjs` monta dois chips em fixture
+descartável e confirma grid, espaçamento, cores, dimensões, tipografia e dados/storage intactos.
+
+Não existe consumidor ativo confirmado nem regra `:hover`; o pseudo-hover registra que o estado
+continua igual ao base. A primeira execução reforçada aplicava as cores-base também ao chip
+`.selected`; a expectativa foi separada e a baseline válida refeita antes do corte em
+`/tmp/trade-diary-g2n-reference-v14c`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 616 estados visuais
+idênticos; 24 imagens tiveram 190 pixels de rasterização dentro da tolerância.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
