@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2j executados: quatro `legacy-*.css` e treze destinos do prefixo 1–2523 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2524–4879.
+G1 e G2a–G2k executados: quatro `legacy-*.css` e quatorze destinos do prefixo 1–2603 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2604–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -207,6 +207,18 @@ Overrides tardios e responsivos mantêm a posição original; `.field-hint` sem 
 Baseline anterior ao corte: 577 casos. Seis estados adicionais em 390/1080/1440 cobrem foco em texto,
 número com unidade, readonly, select e textarea vazio/preenchido. Grids continuam amostrados nas 17 larguras.
 Valores são somente de apresentação; contas, trades e storage permanecem iguais. Limites em [tooling](tooling.md).
+
+## Décimo segundo corte executado (G2k)
+
+Bloco histórico 2524–2603 em `src/styles/modal-and-tabs.css`:
+80 linhas/1.412 bytes, 10 regras completas. De `.modal-overlay` a `.tab-btn.active`;
+residual começa em `.calendar-toolbar` e mantém 2.276 linhas. Sem URL, import ou media query no corte.
+Link após campos, antes do residual. Carga global preserva quatro modais e treze botões de aba.
+A segunda regra de `.modal-footer` mantém posição/especificidade; overrides responsivos e do StudyHub continuam tardios.
+
+Baseline anterior ao corte: 595 casos. Seis estados adicionais em 390/1080/1440 cobrem modal rolável,
+footer simples, diálogo com input e abas de importação, calendário e StudyHub. Trade/account e limites 720±1
+permanecem cobertos pelos estados anteriores. Dados e storage não mudam. Limites em [tooling](tooling.md).
 
 ## Validação exigida
 

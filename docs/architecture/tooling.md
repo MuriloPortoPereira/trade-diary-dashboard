@@ -358,6 +358,22 @@ Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 chec
 Limites: sem submissão/validação dos formulários, popup nativo de select, arraste para redimensionar
 textarea ou animação em movimento. `.field-hint` não possui consumidor encontrado; regra preservada.
 
+## Modais e abas comuns (G2k)
+
+Snapshot versão 11: 595 casos, os 577 anteriores mais seis estados em 390/1080/1440px.
+`scripts/lib/modal-tab-style-scenarios.cjs` caracteriza scroll vertical do modal de operação,
+footer simples do CSV, diálogo com input e abas de importação, calendário e StudyHub pelos handlers reais.
+O snapshot acrescenta `border-top`, `backdrop-filter`, `overscroll-behavior`, modais abertos,
+scroll do corpo, alinhamento do footer e abas ativas. Fingerprint confirma contas, trades e storage intactos.
+
+A primeira referência falhou em `tabs-studyhub-plano`: o runner roteava para `study-hub`, mas o ID real
+é `studyHub`. A aba mudava, porém a página permanecia oculta. O roteamento foi corrigido e a baseline
+foi refeita antes de mover CSS em `/tmp/trade-diary-g2k-reference-corrected`.
+Resultado: 595 estados exatos; 22 imagens com 170 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Limites: não confirma importação nem diálogo, não testa fechamento por Escape e não percorre todas as
+subabas internas do StudyHub legado. Trade/account e 720±1 permanecem cobertos pelos estados existentes.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

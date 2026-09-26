@@ -118,8 +118,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Bloco histórico 2433–2523 extraído em `src/styles/form-fields.css`, 91 linhas; residual com 2.356 linhas.
 - Baseline anterior ao corte: fingerprint e 577 casos, incluindo foco, unidades, readonly, select e textarea.
 - Carga global preserva consumidores; bytes, cascata, handlers e dados permanecem iguais.
-- Próximo candidato G2k: `src/styles/modal-and-tabs.css` (baseline 2524–2603);
-  revisar modais, rodapé e abas comuns, especialmente regras separadas de `.modal-footer`.
+- G2k deu continuidade por modais e abas comuns, com footers e alternância caracterizados antes do corte.
+
+## G2k: modais e abas comuns
+
+- Bloco histórico 2524–2603 extraído em `src/styles/modal-and-tabs.css`, 80 linhas; residual com 2.276 linhas.
+- Baseline anterior ao corte: fingerprint e 595 casos, incluindo modal rolável, footers, diálogo e abas.
+- Carga global preserva consumidores; bytes, cascata, handlers e dados permanecem iguais.
+- Próximo candidato G2l: `src/modules/calendar/presentation/calendar-toolbar.css` (baseline 2604–2630);
+  revisar toolbar, seletor de mês e botões de modo antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
