@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2l executados: quatro `legacy-*.css` e quinze destinos do prefixo 1–2630 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2631–4879.
+G1 e G2a–G2m executados: quatro `legacy-*.css` e dezesseis destinos do prefixo 1–2671 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2672–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -231,6 +231,16 @@ O utility `.gap-8` aparece depois e mantém gap efetivo de 8px; não reorganizar
 Baseline anterior ao corte: 598 casos. Cenário dedicado em 390/1080/1440 cobre foco do picker,
 padding, dimensões e tipografia computados; week/biweek e responsividade continuam cobertos nas 17 larguras.
 Dados e storage não mudam. Limites em [tooling](tooling.md).
+
+## Décimo quarto corte executado (G2m)
+
+Bloco histórico 2631–2671 em `src/styles/upload-zone.css`: 41 linhas/734 bytes e seis regras
+completas. De `.upload-zone` a `.upload-sub`; residual começa em `.emotion-grid` e mantém
+2.208 linhas. Link após a toolbar do calendário e antes do residual.
+
+Nenhum consumidor ativo foi encontrado para as classes globais; fixture descartável caracteriza
+base, hover, `.drag`, input oculto, ícone e textos em 390/1080/1440px. Overrides scoped do
+StudyHub continuam carregados depois e o JavaScript de drop permanece intacto.
 
 ## Validação exigida
 

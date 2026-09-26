@@ -135,6 +135,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Próximo candidato G2m: `src/styles/upload-zone.css` (baseline 2631–2671);
   revisar upload comum, hover/drag e input oculto antes de extrair.
 
+## G2m: upload comum
+
+- Bloco histórico 2631–2671 extraído para `src/styles/upload-zone.css`, 41 linhas; residual com 2.208 linhas.
+- Baseline anterior ao corte: fingerprint e 607 casos, incluindo fixture descartável em três larguras.
+- Base, hover, `.drag`, input oculto e elementos internos preservados; nenhum consumidor ativo foi inventado.
+- Próximo candidato G2n: `src/modules/trades/presentation/emotion-picker.css` (baseline 2672–2700).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

@@ -389,6 +389,24 @@ Limite: o popup nativo do input month não é aberto; varia por navegador/OS.
 Resultado pós-extração: 59 testes Node, 27 checks no navegador e 598 estados visuais
 idênticos; 27 imagens tiveram diferenças limitadas a 157 pixels de rasterização.
 
+## Upload comum (G2m)
+
+Snapshot versão 13: 607 casos, os 598 anteriores mais base, hover e `.drag` em
+390/1080/1440px. `scripts/lib/upload-zone-style-scenarios.cjs` monta e remove uma fixture
+descartável, pois não existe consumidor ativo confirmado para as classes globais.
+
+A fixture verifica padding, raio, alinhamento, input oculto, dimensões do ícone e tipografia;
+o estado `.drag` confirma fundo e borda. O pseudo-hover é forçado pelo CDP. Nenhum arquivo é
+enviado e os listeners/importadores não são exercitados. A primeira captura falhou porque a fixture
+procurava `.page-content`, ausente no dashboard; ela passou a montar diretamente em `#page-dashboard`
+antes da baseline válida em `/tmp/trade-diary-g2m-reference-v13b`.
+
+As duas primeiras comparações repetiram diferenças tipográficas de até 0,031px e excederam
+o limite de pixels, mesmo com os bytes CSS concatenados idênticos. Um controle fresco recolocou
+temporariamente o bloco no monólito e reproduziu os mesmos hashes da extração, isolando a primeira
+captura como condição subpixel transitória do navegador. Controle fresco versus extração passou:
+607 estados idênticos; 29 imagens com 148 pixels de rasterização dentro da tolerância.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

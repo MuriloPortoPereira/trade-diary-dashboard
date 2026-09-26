@@ -163,6 +163,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `.gap-8` tardio mantém gap efetivo de 8px; dimensões e `!important` do bloco permanecem iguais.
 - Demais estados e limites do calendário continuam em [tooling](tooling.md).
 
+## Upload comum: estilos (G2m)
+
+- `src/styles/upload-zone.css`: 41 linhas de zona, estados hover/drag, input oculto, ícone e textos.
+- Carrega após `calendar-toolbar.css`, antes do residual; os overrides scoped do StudyHub permanecem tardios.
+- Não há consumidor ativo confirmado das classes globais; `scripts/lib/upload-zone-style-scenarios.cjs` usa fixture descartável.
+- Listeners globais de drag/drop, importadores e dados continuam inalterados em `app.js`.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.

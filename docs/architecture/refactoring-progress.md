@@ -122,16 +122,15 @@
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
 ## Current
-- G2l concluído: `src/modules/calendar/presentation/calendar-toolbar.css` com 27 linhas/394 bytes e cinco regras completas.
-- `styles.css`: 2.276 para 2.249 linhas; vinte links preservam os 162.576 bytes originais concatenados.
-- Caracterização antes do corte: fingerprint integral e baseline ampliada para 598 casos.
-- Cobertura: foco do seletor, paddings, dimensões e tipografia em três larguras; week/biweek nas 17 larguras existentes.
-- Primeira assertion esperava gap 12px; `.gap-8` tardio mantém 8px por mesma especificidade. Baseline refeita antes do corte.
-- Dados e storage permanecem iguais; handlers, APIs e modos do calendário não mudaram.
-- Após extração: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; 598 estados visuais idênticos e 27 imagens com diferenças limitadas a 157 pixels de rasterização.
+- G2m concluído no código: `src/styles/upload-zone.css` com 41 linhas/734 bytes e seis regras completas.
+- `styles.css`: 2.249 para 2.208 linhas; 21 links preservam os 162.576 bytes originais concatenados.
+- Caracterização antes do corte: fingerprint integral e baseline ampliada para 607 casos.
+- Cobertura: fixture descartável em três larguras para base, hover, `.drag`, input oculto, ícone e textos.
+- Nenhum consumidor ativo global foi encontrado; overrides scoped do StudyHub e listeners globais de drop permanecem inalterados.
+- Após extração: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; controle fresco confirmou 607 estados idênticos e 29 imagens com 148 pixels de rasterização dentro da tolerância.
 
 ## Next
-- G2m: revisar upload comum (baseline 2631–2671), primeiro bloco residual; caracterizar hover, drag e input oculto antes de extrair.
+- G2n: revisar seletor de emoções (baseline 2672–2700), primeiro bloco residual; localizar consumidores e caracterizar seleção antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -143,7 +142,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2l cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2m cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -153,6 +152,7 @@
 - G2j não testa submissão/validação, popup nativo do select, arraste do textarea ou animação em movimento; `.field-hint` não possui consumidor encontrado.
 - G2k não confirma importação nem diálogo, não testa Escape e não cobre todas as subabas internas do StudyHub legado.
 - G2l não abre o popup nativo do input month; esse popup varia por navegador/OS.
+- G2m usa fixture porque não há consumidor global ativo; não dispara drop real nem comprova importadores.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -183,3 +183,4 @@
 - G2j: campos compartilhados em `src/styles`; overrides responsivos e específicos do StudyHub continuam tardios.
 - G2k: overlays, modais e abas compartilhados em `src/styles`; handlers e estado continuam no legado.
 - G2l: toolbar em apresentação de calendário; `calGoToMonth`, `setCalView` e renderização continuam no legado.
+- G2m: upload comum em `src/styles`; fixture documenta CSS sem criar consumidor, e drop/importação continuam no legado.
