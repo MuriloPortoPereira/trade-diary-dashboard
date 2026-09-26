@@ -122,15 +122,15 @@
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
 ## Current
-- G2p concluído no código: `src/styles/alerts-and-utilities.css` com 52 linhas/672 bytes e dez regras completas.
-- `styles.css`: 2.100 para 2.048 linhas; 24 links preservam os 162.576 bytes originais concatenados.
-- Caracterização antes do corte: fingerprint integral e baseline ampliada para 640 casos.
-- Cobertura: info/warn, separador, headers flex responsivos e utilitários em três larguras.
-- `.w-full` sem consumidor e warning isolado usam fixture; contas, trades e storage permanecem intactos.
-- Após extração: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; 640 estados visuais idênticos e 29 imagens com 265 pixels de rasterização dentro da tolerância.
+- G2q concluído no código: `src/modules/trades/presentation/trade-actions.css` com 48 linhas/739 bytes e sete regras completas.
+- `styles.css`: 2.048 para 2.000 linhas; 25 links preservam os 162.576 bytes originais concatenados.
+- Caracterização antes do corte: fingerprint integral e baseline ampliada para 649 casos.
+- Cobertura: barra em lote oculta/visível e fluxo do modal em três larguras.
+- Seleção transitória é reiniciada; contas, trades e storage permanecem intactos.
+- Após extração: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; 649 estados visuais idênticos, com 35 imagens/278 pixels dentro da tolerância; revisão independente sem bloqueios.
 
 ## Next
-- G2q: revisar ações em lote e fluxo do modal (baseline 2832–2879), primeiro bloco residual; caracterizar seleção e visibilidade antes de extrair.
+- G2r: revisar rotina premarket e chips de erro (baseline 2880–2991), primeiro bloco residual; separar internamente somente se consumidores justificarem.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -142,7 +142,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2p cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2q cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -156,6 +156,7 @@
 - G2n usa fixture porque não há consumidor ativo; hover não possui regra própria e deve permanecer igual ao estado-base.
 - G2o não confirma edição/exclusão; exercita apenas renderização e hovers, e `.tag-add` não possui consumidor.
 - G2p não dispara importação nem altera incompletos; `.w-full` não possui consumidor ativo.
+- G2q não executa editar/duplicar/excluir; fluxo visível do modal é estado de apresentação isolado.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -190,3 +191,4 @@
 - G2n: picker em apresentação de trades; fixture documenta CSS sem criar UI ou lógica inexistente.
 - G2o: tags compartilhadas permanecem em `src/styles`; renderizadores e mutações de configuração continuam no legado.
 - G2p: alertas e utilities compartilhados permanecem em `src/styles`; fluxos e overrides específicos continuam nos módulos/residual.
+- G2q: barra em lote e fluxo do modal pertencem à apresentação de trades; handlers continuam no legado.

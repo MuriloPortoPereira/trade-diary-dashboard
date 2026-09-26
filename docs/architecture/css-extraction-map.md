@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2p executados: quatro `legacy-*.css` e dezenove destinos do prefixo 1–2831 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2832–4879.
+G1 e G2a–G2q executados: quatro `legacy-*.css` e vinte destinos do prefixo 1–2879 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2880–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -268,6 +268,14 @@ dez regras completas. De `.alert` a `.w-full`; residual começa em `#bulkBar` e 
 
 Alertas e separadores reais de Import/Setup/Trades e headers responsivos cobrem os consumidores;
 fixture descartável cobre `.w-full`, sem consumidor encontrado, e o tom warning isolado.
+
+## Décimo oitavo corte executado (G2q)
+
+Bloco histórico 2832–2879 em `src/modules/trades/presentation/trade-actions.css`:
+48 linhas/739 bytes e sete regras completas. De `#bulkBar` a `.trade-modal-flow-actions`;
+residual começa em `.pm-check` e mantém 2.000 linhas. Link antes do residual.
+
+Estados reais/isolados cobrem barra oculta, seleção visível e fluxo do modal sem persistir dados.
 
 ## Validação exigida
 

@@ -20,6 +20,7 @@ const {resetUploadZoneStyleState, prepareUploadZoneStyleScenario} = require('./l
 const {resetEmotionPickerStyleState, prepareEmotionPickerStyleScenario} = require('./lib/emotion-picker-style-scenarios.cjs');
 const {resetTagEditorStyleState, prepareTagEditorStyleScenario} = require('./lib/tag-editor-style-scenarios.cjs');
 const {resetAlertUtilityStyleState, prepareAlertUtilityStyleScenario} = require('./lib/alert-utility-style-scenarios.cjs');
+const {resetTradeActionStyleState, prepareTradeActionStyleScenario} = require('./lib/trade-action-style-scenarios.cjs');
 
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
 const modalTabStates = ['modal-trade-scroll', 'modal-csv-footer', 'modal-dialog-input',
@@ -29,6 +30,7 @@ const emotionPickerStates = ['emotion-picker-idle', 'emotion-picker-hover', 'emo
 const tagEditorStates = ['tag-editor-base', 'tag-editor-delete-hover', 'tag-editor-edit-hover',
   'tag-editor-secondary', 'tag-editor-profile'];
 const alertUtilityStates = ['common-alert-info', 'common-alert-warn', 'common-utilities'];
+const tradeActionStates = ['trade-actions-hidden', 'trade-actions-selected', 'trade-actions-modal-flow'];
 const widths = [390, ...[440, 720, 1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
 const metricBoundaryWidths = [1419, 1420, 1421];
 const pageWidths = [390, 1080, 1440];
@@ -93,7 +95,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 16, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, cases: []};
+  const report = {version: 17, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -152,10 +154,10 @@ async function capture(directory) {
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
-        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates] : [])];
+        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates] : [])];
       for (const name of cases) {
         const page = (name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
-          name === 'tabs-studyhub-plano' ? 'studyHub' : name.startsWith('table-') && name !== 'table-dashboard-sticky' ? 'log' :
+          name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
           name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name === 'tag-editor-profile' ? 'profile' :
           (name === 'account-cashflow-setup' || name.startsWith('tag-editor-')) ? 'setup' :
           name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' :
@@ -168,6 +170,7 @@ async function capture(directory) {
           (${resetEmotionPickerStyleState})();
           (${resetTagEditorStyleState})();
           (${resetAlertUtilityStyleState})();
+          (${resetTradeActionStyleState})();
           document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
           document.querySelectorAll('.modal-body').forEach(el => { el.scrollTop = 0; el.scrollLeft = 0; });
           closeLangMenu(); document.activeElement?.blur(); showPage(${JSON.stringify(page)});
@@ -246,6 +249,7 @@ async function capture(directory) {
         if (name.startsWith('emotion-picker-')) hover = await browser.evaluate(`(${prepareEmotionPickerStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('tag-editor-')) hover = await browser.evaluate(`(${prepareTagEditorStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('common-')) hover = await browser.evaluate(`(${prepareAlertUtilityStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('trade-actions-')) hover = await browser.evaluate(`(${prepareTradeActionStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

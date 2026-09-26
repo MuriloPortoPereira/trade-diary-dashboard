@@ -191,6 +191,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `scripts/lib/alert-utility-style-scenarios.cjs` usa consumidores reais e fixture apenas para `.w-full`/warning isolado.
 - Overrides responsivos e específicos de Import/StudyHub permanecem posteriores no residual ou scoped.
 
+## Ações de operações: estilos (G2q)
+
+- `src/modules/trades/presentation/trade-actions.css`: 48 linhas da barra em lote e fluxo de navegação do modal.
+- `scripts/lib/trade-action-style-scenarios.cjs`: barra oculta/selecionada e fluxo visível do modal em três larguras.
+- Seleção altera somente estado transitório; contas, trades e storage permanecem intactos.
+- Handlers de editar/completar/duplicar/excluir continuam no legado.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.

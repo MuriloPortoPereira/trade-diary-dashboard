@@ -75,8 +75,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/tag-editor-style-scenarios.cjs` | Cenários reais de tags editáveis/somente leitura e fixture isolada para `.tag-add` |
 | `src/styles/alerts-and-utilities.css` | Alertas info/warn, separador e utilitários flex/espaçamento/largura; 52 linhas |
 | `scripts/lib/alert-utility-style-scenarios.cjs` | Alertas/separadores reais, headers responsivos e fixture isolada para utilitário sem consumidor |
+| `src/modules/trades/presentation/trade-actions.css` | Barra de ações em lote e navegação do fluxo do modal; 48 linhas |
+| `scripts/lib/trade-action-style-scenarios.cjs` | Estados transitórios da seleção em lote e fluxo do modal, sem persistência |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2p; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2q; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

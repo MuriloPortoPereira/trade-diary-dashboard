@@ -447,6 +447,15 @@ foi refeita antes do corte em `/tmp/trade-diary-g2p-reference-v16b`.
 Resultado pós-extração: 59 testes Node, 27 checks no navegador e 640 estados visuais
 idênticos; 29 imagens tiveram 265 pixels de rasterização dentro da tolerância.
 
+## Ações em lote e fluxo do modal (G2q)
+
+Snapshot versão 17: 649 casos. `scripts/lib/trade-action-style-scenarios.cjs` cobre barra
+oculta, uma seleção e fluxo do modal visível em 390/1080/1440px, sem mutar dados persistidos.
+A primeira expectativa de `inline-flex` foi ajustada para o `flex` normalizado pelo estilo computado;
+a baseline válida foi refeita antes do corte em `/tmp/trade-diary-g2q-reference-v17b`.
+Após o corte, os 649 estados permaneceram idênticos; 35 imagens somaram 278 pixels de
+rasterização dentro da tolerância. Revisão independente sem bloqueios após corrigir a contagem documental para sete regras.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

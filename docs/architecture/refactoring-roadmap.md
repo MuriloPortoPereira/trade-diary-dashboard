@@ -163,6 +163,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Consumidores reais e responsividade preservados; `.w-full` sem consumidor usa fixture descartável.
 - Próximo candidato G2q: `src/modules/trades/presentation/trade-actions.css` (baseline 2832–2879).
 
+## G2q: ações em lote e fluxo do modal
+
+- Bloco histórico 2832–2879 extraído para apresentação de trades, 48 linhas; residual com 2.000 linhas.
+- Baseline anterior ao corte: fingerprint e 649 casos, incluindo barra oculta/visível e fluxo do modal.
+- Estado transitório de seleção é exercitado sem executar mutações ou persistência.
+- Próximo candidato G2r: rotina e chips de erro (baseline 2880–2991).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
