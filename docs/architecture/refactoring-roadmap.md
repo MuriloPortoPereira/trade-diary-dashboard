@@ -156,6 +156,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Renderizadores reais são usados sem confirmar mutações; `.tag-add` sem consumidor usa fixture descartável.
 - Próximo candidato G2p: `src/styles/alerts-and-utilities.css` (baseline 2780–2831).
 
+## G2p: alertas e utilitários
+
+- Bloco histórico 2780–2831 extraído para `src/styles/alerts-and-utilities.css`, 52 linhas; residual com 2.048 linhas.
+- Baseline anterior ao corte: fingerprint e 640 casos, incluindo info/warn, separador e utilities em três larguras.
+- Consumidores reais e responsividade preservados; `.w-full` sem consumidor usa fixture descartável.
+- Próximo candidato G2q: `src/modules/trades/presentation/trade-actions.css` (baseline 2832–2879).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

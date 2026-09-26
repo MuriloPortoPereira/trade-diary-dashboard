@@ -20,3 +20,4 @@ src/modules/calendar/presentation/calendar-toolbar.css -text whitespace=-blank-a
 src/styles/upload-zone.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/emotion-picker.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/tag-editor.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/alerts-and-utilities.css -text whitespace=-blank-at-eof,cr-at-eol

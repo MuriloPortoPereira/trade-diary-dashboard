@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2o executados: quatro `legacy-*.css` e dezoito destinos do prefixo 1–2779 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2780–4879.
+G1 e G2a–G2p executados: quatro `legacy-*.css` e dezenove destinos do prefixo 1–2831 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 2832–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -259,6 +259,15 @@ mantém 2.100 linhas. Link após o picker de emoções, antes do residual.
 
 Consumidores reais no Setup e Profile cobrem tags editáveis e somente leitura, contagem, botões,
 hovers e wrap; fixture descartável preserva `.tag-add`, que não possui consumidor atual.
+
+## Décimo sétimo corte executado (G2p)
+
+Bloco histórico 2780–2831 em `src/styles/alerts-and-utilities.css`: 52 linhas/672 bytes e
+dez regras completas. De `.alert` a `.w-full`; residual começa em `#bulkBar` e mantém
+2.048 linhas. Link após tags, antes do residual.
+
+Alertas e separadores reais de Import/Setup/Trades e headers responsivos cobrem os consumidores;
+fixture descartável cobre `.w-full`, sem consumidor encontrado, e o tom warning isolado.
 
 ## Validação exigida
 

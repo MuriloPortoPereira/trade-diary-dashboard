@@ -434,6 +434,19 @@ antes da baseline válida em `/tmp/trade-diary-g2o-reference-v15b`.
 Resultado pós-extração: 59 testes Node, 27 checks no navegador e 631 estados visuais
 idênticos; 35 imagens tiveram 212 pixels de rasterização dentro da tolerância.
 
+## Alertas e utilitários (G2p)
+
+Snapshot versão 16: 640 casos. `scripts/lib/alert-utility-style-scenarios.cjs` cobre alert
+info real, warning isolado, separador real e headers/utilities em 390/1080/1440px. `.w-full`,
+sem consumidor ativo, usa um nó descartável; dados e storage são comparados antes/depois.
+
+A primeira expectativa comparava `margin-left:auto` literalmente, mas `getComputedStyle` retorna
+o valor resolvido em pixels. A checagem foi mantida na geometria capturada e a baseline válida
+foi refeita antes do corte em `/tmp/trade-diary-g2p-reference-v16b`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 640 estados visuais
+idênticos; 29 imagens tiveram 265 pixels de rasterização dentro da tolerância.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

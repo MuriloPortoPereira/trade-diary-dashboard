@@ -184,6 +184,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `scripts/lib/tag-editor-style-scenarios.cjs` usa renderizadores reais e uma fixture apenas para `.tag-add` sem consumidor.
 - Edição, exclusão, configuração, dados e storage não são modificados pelos cenários.
 
+## Alertas e utilitários: estilos (G2p)
+
+- `src/styles/alerts-and-utilities.css`: 52 linhas de alertas, separador e utilitários flex/espaçamento/largura.
+- Consumidores incluem Import, Setup, Trades e headers de Calendar/Stats/Premarket.
+- `scripts/lib/alert-utility-style-scenarios.cjs` usa consumidores reais e fixture apenas para `.w-full`/warning isolado.
+- Overrides responsivos e específicos de Import/StudyHub permanecem posteriores no residual ou scoped.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.
