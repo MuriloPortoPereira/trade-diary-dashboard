@@ -456,6 +456,13 @@ a baseline válida foi refeita antes do corte em `/tmp/trade-diary-g2q-reference
 Após o corte, os 649 estados permaneceram idênticos; 35 imagens somaram 278 pixels de
 rasterização dentro da tolerância. Revisão independente sem bloqueios após corrigir a contagem documental para sete regras.
 
+## Premarket e chips de erro (G2r)
+
+Snapshot versão 18: 667 casos. `scripts/lib/premarket-error-chip-style-scenarios.cjs`
+cobre grade, dot hover/concluído e chips ocioso/hover/selecionado em 390/1080/1440px.
+A baseline pré-corte está em `/tmp/trade-diary-g2r-reference-v18`. Após separar o boundary
+por feature, os 667 estados permaneceram idênticos; 31 imagens somaram 220 pixels dentro da tolerância.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

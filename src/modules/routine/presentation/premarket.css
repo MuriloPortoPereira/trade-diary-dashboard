@@ -1,0 +1,81 @@
+.pm-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pm-check:hover {
+  border-color: rgba(34, 213, 237, 0.12);
+}
+
+.pm-check input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--green);
+}
+
+/* ── Habit grid ── */
+.pm-grid {
+  display: grid;
+  gap: 3px;
+  min-width: max-content;
+}
+
+.pm-grid-corner {
+  height: 22px;
+}
+
+.pm-grid-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--muted);
+  font-family: monospace;
+  height: 22px;
+}
+
+.pm-grid-label {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text2);
+  padding-right: 8px;
+  height: 26px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
+.pm-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  margin: 2px auto;
+  display: block;
+}
+
+.pm-dot:hover {
+  border-color: rgba(34,213,237,.45);
+  background: rgba(34,213,237,.08);
+}
+
+.pm-dot-done {
+  background: rgba(34,213,237,.75);
+  border-color: rgba(34,213,237,.9);
+}
+
+.pm-dot-done:hover {
+  background: rgba(34,213,237,.9);
+}
+

@@ -198,6 +198,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Seleção altera somente estado transitório; contas, trades e storage permanecem intactos.
 - Handlers de editar/completar/duplicar/excluir continuam no legado.
 
+## Premarket e erros de operação: estilos (G2r)
+
+- `src/modules/routine/presentation/premarket.css`: checklist e grade mensal da rotina.
+- `src/modules/trades/presentation/error-chips.css`: chips do modal de operação.
+- `scripts/lib/premarket-error-chip-style-scenarios.cjs`: seis estados em três larguras, sem persistência.
+- Renderização e handlers continuam em `app.js`; `.pm-check` foi preservado sem consumidor localizado.
+
 ## Documentação sob demanda
 
 - [Análise global de modularização](modularization-analysis.md): desenho atualizado dos cortes e estratégia para preservar código.

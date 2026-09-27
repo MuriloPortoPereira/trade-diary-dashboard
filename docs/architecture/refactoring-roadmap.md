@@ -170,6 +170,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Estado transitório de seleção é exercitado sem executar mutações ou persistência.
 - Próximo candidato G2r: rotina e chips de erro (baseline 2880–2991).
 
+## G2r: premarket e chips de erro
+
+- Bloco histórico 2880–2991 separado por feature: rotina em 81 linhas e chips de trades em 31 linhas; residual com 1.888 linhas.
+- Baseline anterior ao corte: fingerprint e 667 casos, incluindo grade, dot hover/concluído e chips ocioso/hover/selecionado.
+- Estado transitório é reiniciado; contas, trades, premarket persistido e storage são comparados antes/depois.
+- Próximo candidato G2s: data transfer (baseline 2992–3146).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

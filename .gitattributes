@@ -22,3 +22,5 @@ src/modules/trades/presentation/emotion-picker.css -text whitespace=-blank-at-eo
 src/styles/tag-editor.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/alerts-and-utilities.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/trade-actions.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/routine/presentation/premarket.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/trades/presentation/error-chips.css -text whitespace=-blank-at-eof,cr-at-eol
