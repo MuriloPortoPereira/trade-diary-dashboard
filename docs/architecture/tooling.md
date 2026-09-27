@@ -481,6 +481,16 @@ Não houve alteração de `app.js`, normalização de snapshots nem ampliação 
 Resultado final: 685 estados idênticos, 36 imagens/181 pixels de rasterização aceitos;
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## Diálogo comum (G2t)
+
+Snapshot versão 20: 691 casos. `scripts/lib/modal-tab-style-scenarios.cjs` acrescenta
+confirmação sem input com mensagem multilinha e erro real de `requiredValue`, além do input/foco
+já coberto, em 390/1080/1440px. Callback protegido não deve executar; estado é restaurado em
+`finally`, e contas/trades/storage são comparados antes/depois. Baseline pré-corte:
+`/tmp/trade-diary-g2t-reference-v20`. O timer de cotação continua pausado somente no runner.
+Resultado final: 691 estados idênticos; 46 imagens/192 pixels de rasterização aceitos.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

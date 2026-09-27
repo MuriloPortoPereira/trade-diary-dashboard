@@ -28,7 +28,7 @@ const {prepareDataTransferStyleScenario} = require('./lib/data-transfer-style-sc
 const dataTransferStates = ['data-transfer-import', 'data-transfer-export'];
 const dataTransferWidths = [390, 719, 720, 721, 1080, 1419, 1420, 1421, 1440];
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
-const modalTabStates = ['modal-trade-scroll', 'modal-csv-footer', 'modal-dialog-input',
+const modalTabStates = ['modal-trade-scroll', 'modal-csv-footer', 'modal-dialog-input', 'modal-dialog-confirm', 'modal-dialog-error',
   'tabs-import-export', 'tabs-calendar-biweek', 'tabs-studyhub-plano'];
 const uploadZoneStates = ['upload-zone-idle', 'upload-zone-hover', 'upload-zone-drag'];
 const emotionPickerStates = ['emotion-picker-idle', 'emotion-picker-hover', 'emotion-picker-selected'];
@@ -102,7 +102,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 19, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 20, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});

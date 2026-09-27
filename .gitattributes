@@ -25,3 +25,4 @@ src/modules/trades/presentation/trade-actions.css -text whitespace=-blank-at-eof
 src/modules/routine/presentation/premarket.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/error-chips.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/data-transfer/presentation/data-transfer.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/application-dialog.css -text whitespace=-blank-at-eof,cr-at-eol

@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2s, `styles.css` mantém o trecho original 3147–4879 (1.733 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2t, `styles.css` mantém o trecho original 3169–4879 (1.711 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -222,3 +222,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/modules/data-transfer/presentation/data-transfer.css`: 155 linhas de importação, backup e exportação.
 - `scripts/lib/data-transfer-style-scenarios.cjs`: abas reais, layout e dados/storage em nove larguras, incluindo 720±1 e 1420±1.
 - Overrides responsivos permanecem no residual; handlers, importadores, download e restauração continuam em `app.js`.
+
+## Diálogo comum: estilos (G2t)
+
+- `src/styles/application-dialog.css`: largura, texto multilinha, input e erro do diálogo comum.
+- `scripts/lib/modal-tab-style-scenarios.cjs`: input/foco, confirmação sem input e erro por valor incorreto, em três larguras.
+- `openAppDialog`, `confirmAppDialog` e wrappers confirm/notice/prompt permanecem em `app.js`.

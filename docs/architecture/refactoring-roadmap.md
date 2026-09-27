@@ -184,6 +184,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Overrides responsivos mantêm sua posição no residual; não se executam uploads, restauração ou downloads.
 - Próximo candidato G2t: diálogo comum (baseline 3147–3168).
 
+## G2t: diálogo comum
+
+- Bloco histórico 3147–3168 extraído para `src/styles/application-dialog.css`, 22 linhas; residual com 1.711 linhas.
+- Baseline anterior ao corte: fingerprint e 691 casos, incluindo input/foco, confirmação sem input e erro de validação.
+- Handlers e callbacks permanecem no legado; cenários não confirmam ações persistentes.
+- Próximo candidato G2u: rodapé da navegação (baseline 3169–3187).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

@@ -42,6 +42,29 @@ function prepareModalTabStyleScenario(name) {
       document.activeElement !== input || input.value !== 'Cenário visual') throw new Error('Input dialog missing');
   }
 
+  if (name === 'modal-dialog-confirm' || name === 'modal-dialog-error') {
+    const previous = appDialogState;
+    const withError = name === 'modal-dialog-error';
+    try {
+      openAppDialog({title: 'Confirmação de caracterização', message: 'Primeira linha da mensagem.\nSegunda linha para verificar quebras de texto.',
+        input: withError, inputLabel: 'Confirmação', inputValue: 'Valor incorreto', requiredValue: withError ? 'CONFIRMAR' : null,
+        errorText: 'Digite CONFIRMAR para continuar.', danger: true,
+        onConfirm: () => { throw new Error('Visual scenario must not confirm an action'); }});
+      if (withError) document.getElementById('appDialogConfirmBtn').click();
+      const modal = document.getElementById('appDialogModal');
+      const body = document.getElementById('appDialogBody');
+      const inputWrap = document.getElementById('appDialogInputWrap');
+      const error = document.getElementById('appDialogError');
+      if (!modal.classList.contains('open') || getComputedStyle(modal.querySelector('.app-dialog')).maxWidth !== '460px' ||
+        getComputedStyle(body).whiteSpace !== 'pre-line' || !body.textContent.includes('\n') ||
+        getComputedStyle(inputWrap).display !== (withError ? 'block' : 'none') ||
+        (withError && (error.textContent !== 'Digite CONFIRMAR para continuar.' ||
+          getComputedStyle(error).minHeight !== '16px' || getComputedStyle(inputWrap).marginTop !== '14px'))) {
+        throw new Error('Application dialog confirmation/error presentation changed');
+      }
+    } finally { appDialogState = previous; }
+  }
+
   if (name === 'tabs-import-export') {
     switchImportTab('export');
     const active = document.querySelector('#page-import .tab-btn.active');

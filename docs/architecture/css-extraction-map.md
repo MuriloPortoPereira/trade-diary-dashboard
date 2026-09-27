@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2s executados: quatro `legacy-*.css` e vinte e três destinos do prefixo 1–3146 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3147–4879.
+G1 e G2a–G2t executados: quatro `legacy-*.css` e vinte e quatro destinos do prefixo 1–3168 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3169–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -298,6 +298,16 @@ residual começa em `.app-dialog` e mantém 1.733 linhas. Link após chips de er
 Abas reais de importação/exportação são caracterizadas em nove larguras, incluindo 720±1 e
 1420±1. Dados e storage permanecem intactos; uploads, downloads e restauração não são disparados.
 Overrides responsivos continuam no residual.
+
+## Vigésimo primeiro corte executado (G2t)
+
+Bloco histórico 3147–3168 em `src/styles/application-dialog.css`: 22 linhas/291 bytes e
+quatro regras completas. De `.app-dialog` a `.app-dialog-error`; residual começa em
+`.sidebar-footer` e mantém 1.711 linhas. Link após transferência de dados, antes do residual.
+
+Input/foco, confirmação sem input e mensagem multilinha, além de erro de validação por
+valor incorreto, são caracterizados em três larguras. Nenhuma ação de confirmação é executada;
+estado do diálogo é restaurado e contas/trades/storage são conferidos.
 
 ## Validação exigida
 
