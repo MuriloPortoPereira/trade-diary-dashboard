@@ -121,16 +121,18 @@
 - Estado visual do calendário reiniciado entre casos; dados e storage preservados. Janeiro/2027 é verificado antes de retornar a dezembro/2026 para captura.
 - `app.js`, handlers, scripts, cálculos e dados preservados; HTML recebe somente um link. Sem novas dependências de runtime, push ou deploy.
 
+- G2r concluído: premarket em 81 linhas/1.415 bytes e chips de trades em 31 linhas/624 bytes.
+- Validação G2r: 59 testes, 27 checks no navegador e 667 estados visuais idênticos; revisão sem bloqueios.
+
 ## Current
-- G2r concluído no código: premarket em 81 linhas/1.415 bytes e chips de trades em 31 linhas/624 bytes.
-- `styles.css`: 2.000 para 1.888 linhas; 27 links preservam os 162.576 bytes originais concatenados.
-- Caracterização antes do corte: fingerprint integral e baseline ampliada para 667 casos.
-- Cobertura: grade, dot hover/concluído e chips ocioso/hover/selecionado em três larguras.
-- Estado transitório é reiniciado; contas, trades, premarket persistido e storage permanecem intactos.
-- Após o corte final por feature: 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; 667 estados visuais idênticos, com 31 imagens/220 pixels dentro da tolerância; revisão independente sem bloqueios.
+- G2s extraído: `data-transfer/presentation/data-transfer.css`, 155 linhas/2.612 bytes e 23 regras completas.
+- `styles.css`: 1.888 para 1.733 linhas; 28 links preservam os 162.576 bytes originais concatenados.
+- Caracterização pré-corte: baseline ampliada para 685 casos, incluindo as abas de importação/exportação em nove larguras.
+- Contas, trades, configuração, premarket, StudyHub e storage são comparados antes/depois.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 685 estados visuais idênticos, com 36 imagens/181 pixels dentro da tolerância; revisão independente sem bloqueios.
 
 ## Next
-- G2s: extrair importação, backup e exportação (baseline 2992–3146), primeiro bloco residual.
+- G2t: revisar diálogo comum (baseline 3147–3168), primeiro bloco residual.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -142,7 +144,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2r cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2s cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -158,6 +160,7 @@
 - G2p não dispara importação nem altera incompletos; `.w-full` não possui consumidor ativo.
 - G2q não executa editar/duplicar/excluir; fluxo visível do modal é estado de apresentação isolado.
 - G2r não altera hábitos persistidos nem salva trade; `.pm-check` permanece coberto por equivalência de bytes, sem consumidor localizado.
+- G2s caracteriza somente apresentação; upload, importadores, restauração e downloads não são exercitados.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -193,3 +196,5 @@
 - G2o: tags compartilhadas permanecem em `src/styles`; renderizadores e mutações de configuração continuam no legado.
 - G2p: alertas e utilities compartilhados permanecem em `src/styles`; fluxos e overrides específicos continuam nos módulos/residual.
 - G2q: barra em lote e fluxo do modal pertencem à apresentação de trades; handlers continuam no legado.
+- G2r: premarket e chips divididos por consumidor em rotina e trades, com links adjacentes.
+- G2s: layout de transferência pertence à apresentação; overrides responsivos e IO permanecem no legado.

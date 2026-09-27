@@ -463,6 +463,24 @@ cobre grade, dot hover/concluído e chips ocioso/hover/selecionado em 390/1080/1
 A baseline pré-corte está em `/tmp/trade-diary-g2r-reference-v18`. Após separar o boundary
 por feature, os 667 estados permaneceram idênticos; 31 imagens somaram 220 pixels dentro da tolerância.
 
+## Importação, backup e exportação (G2s)
+
+Snapshot versão 19: 685 casos. `scripts/lib/data-transfer-style-scenarios.cjs` visita as duas
+abas por handlers reais em 390/719/720/721/1080/1419/1420/1421/1440px. Verifica layout,
+resumo/seletores e conservação de contas, trades, configuração, premarket, StudyHub e storage.
+Baseline pré-corte válida: `/tmp/trade-diary-g2s-reference-v19b`. Upload, restauração e downloads
+não são executados; a cobertura funcional desses fluxos pertence aos lotes de IO.
+Serena e Context7 disponíveis nesta sessão; raiz Serena ativada e símbolos das abas consultados.
+A primeira ativação omitiu `session_id`; repetida corretamente sem alterar código ou configuração.
+A primeira comparação v19 encontrou cinco casos com única diferença no `cotInput.value`
+(`5.8`/`5.80`): o timer real de cinco minutos cruzou pontos diferentes da captura.
+O runner passou a pausar somente `cotacaoInterval` após load e aguardar `fetchCotacao()`
+com resposta simulada. A baseline válida foi recapturada em
+`/tmp/trade-diary-g2s-reference-v19b`, com CSS anterior e o mesmo harness do resultado.
+Não houve alteração de `app.js`, normalização de snapshots nem ampliação de tolerâncias.
+Resultado final: 685 estados idênticos, 36 imagens/181 pixels de rasterização aceitos;
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

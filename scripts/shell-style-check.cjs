@@ -23,6 +23,10 @@ const {resetAlertUtilityStyleState, prepareAlertUtilityStyleScenario} = require(
 const {resetTradeActionStyleState, prepareTradeActionStyleScenario} = require('./lib/trade-action-style-scenarios.cjs');
 const {resetPremarketErrorChipStyleState, preparePremarketErrorChipStyleScenario} = require('./lib/premarket-error-chip-style-scenarios.cjs');
 
+const {prepareDataTransferStyleScenario} = require('./lib/data-transfer-style-scenarios.cjs');
+
+const dataTransferStates = ['data-transfer-import', 'data-transfer-export'];
+const dataTransferWidths = [390, 719, 720, 721, 1080, 1419, 1420, 1421, 1440];
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
 const modalTabStates = ['modal-trade-scroll', 'modal-csv-footer', 'modal-dialog-input',
   'tabs-import-export', 'tabs-calendar-biweek', 'tabs-studyhub-plano'];
@@ -98,7 +102,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 18, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 19, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -110,6 +114,10 @@ async function capture(directory) {
       if (document.readyState === 'complete') done(); else addEventListener('load', done, {once: true});
     })`);
     assert.equal(await browser.evaluate('Chart.version'), '4.4.1');
+    // A full capture can exceed the five-minute exchange-rate refresh interval.
+    // Settle the fixture response once, then pause only that background timer.
+    await browser.evaluate(`(async () => { clearInterval(cotacaoInterval); cotacaoInterval = null; await fetchCotacao(); })()`);
+    assert.equal(await browser.evaluate('cotacaoInterval'), null);
     report.pageAnimation = await browser.evaluate(`(() => {
       const style = getComputedStyle(document.querySelector('.page.active'));
       return [style.animationName, style.animationDuration];
@@ -152,6 +160,7 @@ async function capture(directory) {
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
       const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
+        ...(dataTransferWidths.includes(width) ? dataTransferStates : []),
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
@@ -159,7 +168,7 @@ async function capture(directory) {
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
         ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates] : [])];
       for (const name of cases) {
-        const page = (name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
+        const page = (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
           name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name.startsWith('premarket-') ? 'premarket' : name === 'tag-editor-profile' ? 'profile' :
           (name === 'account-cashflow-setup' || name.startsWith('tag-editor-')) ? 'setup' :
@@ -255,6 +264,7 @@ async function capture(directory) {
         if (name.startsWith('common-')) hover = await browser.evaluate(`(${prepareAlertUtilityStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('trade-actions-')) hover = await browser.evaluate(`(${prepareTradeActionStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('premarket-') || name.startsWith('trade-error-chip-')) hover = await browser.evaluate(`(${preparePremarketErrorChipStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('data-transfer-')) await browser.evaluate(`(${prepareDataTransferStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

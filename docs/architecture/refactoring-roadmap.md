@@ -177,6 +177,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Estado transitório é reiniciado; contas, trades, premarket persistido e storage são comparados antes/depois.
 - Próximo candidato G2s: data transfer (baseline 2992–3146).
 
+## G2s: importação, backup e exportação
+
+- Bloco histórico 2992–3146 extraído para apresentação de transferência de dados, 155 linhas; residual com 1.733 linhas.
+- Baseline anterior ao corte: fingerprint e 685 casos, incluindo abas reais em nove larguras e limites de 720/1420px.
+- Overrides responsivos mantêm sua posição no residual; não se executam uploads, restauração ou downloads.
+- Próximo candidato G2t: diálogo comum (baseline 3147–3168).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
