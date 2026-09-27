@@ -191,6 +191,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Handlers e callbacks permanecem no legado; cenários não confirmam ações persistentes.
 - Próximo candidato G2u: rodapé da navegação (baseline 3169–3187).
 
+## G2u: rodapé da navegação
+
+- Bloco histórico 3169–3187 extraído para `src/styles/navigation-footer.css`, 19 linhas; residual com 1.692 linhas.
+- Baseline anterior ao corte: fingerprint e 697 casos, incluindo hover, rolagem e seleção ativa de Profile.
+- Regra anterior de margem continua no CSS da navegação; nenhum handler ou dado é alterado.
+- Próximo candidato G2v: grids de estratégias, perfil e parceiros (baseline 3188–3218).
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

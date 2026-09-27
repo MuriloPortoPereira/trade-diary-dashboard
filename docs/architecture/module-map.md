@@ -83,8 +83,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/data-transfer/presentation/data-transfer.css` | Layout da importação, backup, filtros e exportação; 155 linhas |
 | `scripts/lib/data-transfer-style-scenarios.cjs` | Abas reais de importação/exportação em nove larguras, sem IO |
 | `src/styles/application-dialog.css` | Mensagem, input e erro do diálogo comum; 22 linhas |
+| `src/styles/navigation-footer.css` | Layout do rodapé e links secundários da sidebar; 19 linhas |
+| `scripts/lib/navigation-footer-style-scenarios.cjs` | Hover, rolagem e seleção ativa do rodapé em três larguras |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2t; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2u; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

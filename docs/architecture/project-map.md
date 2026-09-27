@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2t, `styles.css` mantém o trecho original 3169–4879 (1.711 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2u, `styles.css` mantém o trecho original 3188–4879 (1.692 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -228,3 +228,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/application-dialog.css`: largura, texto multilinha, input e erro do diálogo comum.
 - `scripts/lib/modal-tab-style-scenarios.cjs`: input/foco, confirmação sem input e erro por valor incorreto, em três larguras.
 - `openAppDialog`, `confirmAppDialog` e wrappers confirm/notice/prompt permanecem em `app.js`.
+
+## Rodapé da navegação: estilos (G2u)
+
+- `src/styles/navigation-footer.css`: três regras tardias do rodapé e links secundários da sidebar.
+- `scripts/lib/navigation-footer-style-scenarios.cjs`: hover, rolagem e seleção ativa/idempotente de Profile em três larguras.
+- Regras anteriores de navegação e `margin-top:auto` permanecem em `navigation-and-account-summary.css`; handlers continuam no legado.

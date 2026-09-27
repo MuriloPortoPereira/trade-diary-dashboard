@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2t executados: quatro `legacy-*.css` e vinte e quatro destinos do prefixo 1–3168 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3169–4879.
+G1 e G2a–G2u executados: quatro `legacy-*.css` e vinte e cinco destinos do prefixo 1–3187 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3188–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -308,6 +308,16 @@ quatro regras completas. De `.app-dialog` a `.app-dialog-error`; residual começ
 Input/foco, confirmação sem input e mensagem multilinha, além de erro de validação por
 valor incorreto, são caracterizados em três larguras. Nenhuma ação de confirmação é executada;
 estado do diálogo é restaurado e contas/trades/storage são conferidos.
+
+## Vigésimo segundo corte executado (G2u)
+
+Bloco histórico 3169–3187 em `src/styles/navigation-footer.css`: 19 linhas/258 bytes e
+três regras completas. De `.sidebar-footer` a `.nav-item-meta`; residual começa em
+`.strategy-hub-layout` e mantém 1.692 linhas. Link após diálogo comum, antes do residual.
+
+Hover, rolagem do rodapé e seleção ativa/idempotente de Profile são caracterizados em três
+larguras. A regra anterior de `margin-top:auto` permanece em `navigation-and-account-summary.css`.
+Dados/storage são conferidos; a transição entre páginas não é validada por esse cenário.
 
 ## Validação exigida
 

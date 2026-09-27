@@ -25,6 +25,9 @@ const {resetPremarketErrorChipStyleState, preparePremarketErrorChipStyleScenario
 
 const {prepareDataTransferStyleScenario} = require('./lib/data-transfer-style-scenarios.cjs');
 
+const {prepareNavigationFooterStyleScenario} = require('./lib/navigation-footer-style-scenarios.cjs');
+const navigationFooterStates = ['navigation-footer-hover', 'navigation-footer-profile'];
+
 const dataTransferStates = ['data-transfer-import', 'data-transfer-export'];
 const dataTransferWidths = [390, 719, 720, 721, 1080, 1419, 1420, 1421, 1440];
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
@@ -102,7 +105,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 20, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 21, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -166,11 +169,11 @@ async function capture(directory) {
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
         ...(pageWidths.includes(width) ? ['account-risk-goal', 'account-cashflow-modal', 'account-cashflow-setup', 'account-cashflow-empty', ...strategyStates] : []),
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
-        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates] : [])];
+        ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates, ...navigationFooterStates] : [])];
       for (const name of cases) {
         const page = (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
-          name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name.startsWith('premarket-') ? 'premarket' : name === 'tag-editor-profile' ? 'profile' :
+          name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name.startsWith('premarket-') ? 'premarket' : (name === 'tag-editor-profile' || name === 'navigation-footer-profile') ? 'profile' :
           (name === 'account-cashflow-setup' || name.startsWith('tag-editor-')) ? 'setup' :
           name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' :
           name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
@@ -265,6 +268,7 @@ async function capture(directory) {
         if (name.startsWith('trade-actions-')) hover = await browser.evaluate(`(${prepareTradeActionStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('premarket-') || name.startsWith('trade-error-chip-')) hover = await browser.evaluate(`(${preparePremarketErrorChipStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('data-transfer-')) await browser.evaluate(`(${prepareDataTransferStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('navigation-footer-')) hover = await browser.evaluate(`(${prepareNavigationFooterStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

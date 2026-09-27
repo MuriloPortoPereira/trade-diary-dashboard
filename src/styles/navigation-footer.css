@@ -1,0 +1,19 @@
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-meta-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item-meta {
+  min-height: 50px;
+  margin-bottom: 0;
+  padding-inline: 14px;
+  font-size: 12px;
+}
+

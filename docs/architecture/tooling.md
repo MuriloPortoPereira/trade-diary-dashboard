@@ -491,6 +491,18 @@ já coberto, em 390/1080/1440px. Callback protegido não deve executar; estado �
 Resultado final: 691 estados idênticos; 46 imagens/192 pixels de rasterização aceitos.
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## Rodapé da navegação (G2u)
+
+Snapshot versão 21: 697 casos. `scripts/lib/navigation-footer-style-scenarios.cjs` cobre
+hover, rolagem e seleção ativa/idempotente de Profile em 390/1080/1440px. A sidebar é aberta
+pelo handler real e o último link é trazido à vista; dados/storage são comparados antes/depois.
+O reset existente fecha a sidebar e zera sua rolagem entre casos. Hover usa pseudoestado CDP;
+Profile já é a página inicial do respectivo cenário, portanto não se alega transição entre páginas.
+Baseline pré-corte: `/tmp/trade-diary-g2u-reference-v21`. Checkpoint local em
+`.agents/state/refactoring-g2u.yaml`; configurações preexistentes continuam fora do commit.
+Resultado final: 697 estados idênticos; 33 imagens/170 pixels de rasterização aceitos.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
