@@ -89,8 +89,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/workspace-grid-style-scenarios.cjs` | Grids reais e parceiros legados ocultos em seis larguras |
 | `src/modules/study-hub/presentation/study-hub-native.css` | Abas/root e estilos nativos preservados; 297 linhas |
 | `scripts/lib/study-hub-native-style-scenarios.cjs` | Quatro abas, hover, foco e rolagem horizontal/sticky em oito larguras |
+| `src/styles/workspace-summaries.css` | Hero do perfil, status/notificações, chips e ranking ampliado; 156 linhas |
+| `scripts/lib/workspace-summary-style-scenarios.cjs` | Tons/neutro/vazio, hero/compact e ranking em seis larguras |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2w; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2x; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

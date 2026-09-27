@@ -533,6 +533,29 @@ Baseline pré-corte: `/tmp/trade-diary-g2w-reference-v23`; checkpoint local em
 Resultado final: 787 estados idênticos; 23 imagens/114 pixels de rasterização aceitos, sem ampliar tolerância.
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## Resumos compartilhados (G2x)
+
+Snapshot versão 24: 823 casos. `scripts/lib/workspace-summary-style-scenarios.cjs` acrescenta
+36 cenários (seis estados em 390/719/720/721/1080/1440px). Hero/compact reais do perfil;
+`renderStatusList` em notificationFeed (safe/warn/danger/info e vazio), `renderAnalysisSummary`
+em statDiscSummary (neutro/quatro tons e vazio), `renderStrategyRows` no ranking ampliado.
+Valores, ações não executadas e textos longos exercitam spacing/wrap. Fixture guarda/restaura
+somente innerHTML antes de cada caso; dados/config/premarket/StudyHub/storage são conferidos.
+
+Ensaio inicial interrompeu antes da extração: neutral chip declarado com alpha 0.025
+é serializado pelo Chrome como 0.024 no estilo computado. Diagnosticados os cinco chips;
+somente expectativa ajustada ao comportamento observado. Os 36 casos direcionados passaram
+antes da baseline completa. CSS permanece com o literal original e o fingerprint anterior.
+Baseline pré-corte original: `/tmp/trade-diary-g2x-reference-v24` (823 casos aprovados).
+Na retomada, processo e artefatos temporários ficaram indisponíveis; baseline reconstruída
+do commit `a374412` em cópia isolada com a mesma caracterização v24. Novos artefatos locais:
+`.agents/state/artifacts/refactoring-g2x/{reference-v24r,after-v24r}`.
+Revisor original concluiu código e atingiu limite de uso na documentação; revisão final
+transferida a outro subagente, somente leitura. Checkpoint: `.agents/state/refactoring-g2x.yaml`;
+artefatos e configurações preexistentes fora do commit.
+Resultado final: 823 estados idênticos; 37 imagens/159 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

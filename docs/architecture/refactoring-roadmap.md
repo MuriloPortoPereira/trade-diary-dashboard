@@ -212,6 +212,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Markup nativo não montado mantém regras intactas; montagem legada, estado e overrides responsivos não alterados.
 - Próximo candidato G2x: resumos compartilhados (baseline 3516–3671), 156 linhas; caracterizar consumidores antes do corte.
 
+## G2x: resumos compartilhados
+
+- Bloco histórico 3516–3671 extraído para `src/styles/workspace-summaries.css`, 156 linhas; residual com 1.208 linhas.
+- Baseline anterior ao corte: fingerprint e 823 casos; 36 novos cenários em seis larguras, incluindo 720±1.
+- Hero/compact do perfil, tons/neutro/vazio de status/chips e ranking ampliado protegidos; renderers, dados e overrides não alterados.
+- Próximo candidato G2y: documentos (baseline 3672–4036), 365 linhas; revisar coesão/consumidores e caracterizar antes do corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

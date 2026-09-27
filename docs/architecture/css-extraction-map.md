@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2w executados: quatro `legacy-*.css` e vinte e sete destinos do prefixo 1–3515 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3516–4879.
+G1 e G2a–G2x executados: quatro `legacy-*.css` e vinte e oito destinos do prefixo 1–3671 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3672–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -345,6 +345,21 @@ Quatro seleções, hover ativo/inativo, foco, rolagem horizontal e sticky são e
 snapshot inclui offsets de rolagem. Classes de grid/card/range do markup nativo não montado
 permanecem protegidas pela identidade integral dos bytes, sem UI sintética.
 Nenhuma mudança na montagem legada, renderers, cálculos ou storage.
+
+## Vigésimo quinto corte executado (G2x)
+
+Bloco histórico 3516–3671 em `src/styles/workspace-summaries.css`: 156 linhas/2.895 bytes,
+25 regras completas. De `.hero-metric-grid` ao padding de `.strategy-board-large .strategy-row`;
+residual começa em `.doc-shell` com 1.208 linhas. Link após StudyHub nativo, antes do residual.
+Estilos compartilhados por perfil, notificações, análises e central de estratégias;
+sem import, media query ou URL relativa. Hero de uma coluna e status com wrap até 720px
+continuam no residual, na ordem anterior.
+
+Baseline pré-corte: 823 casos, incluindo 36 novos cenários em seis larguras.
+Hero/compact reais do perfil; renderers existentes para status/chips em quatro tons,
+neutro, vazio, valores e textos longos; ranking positivo/negativo com padding ampliado.
+Fixture altera somente markup dos consumidores existentes e o restaura antes do próximo caso;
+dados/config/storage são conferidos. Nenhuma ação persistente é executada.
 
 ## Validação exigida
 
