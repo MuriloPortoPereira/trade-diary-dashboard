@@ -42,6 +42,11 @@ const workspaceSummaryStates = ['workspace-summary-profile', 'workspace-summary-
   'workspace-summary-chips', 'workspace-summary-chips-empty', 'workspace-summary-strategy'];
 const workspaceSummaryWidths = [390, 719, 720, 721, 1080, 1440];
 
+const {resetDocumentStyleState, prepareDocumentStyleScenario} = require('./lib/document-style-scenarios.cjs');
+const documentStates = ['documents-empty', 'documents-daily', 'documents-trade-win', 'documents-trade-loss', 'documents-trade-missing-r',
+  'documents-focus', 'documents-toolbar-hover', 'documents-folder-hover', 'documents-entry-hover', 'documents-overflow'];
+const documentWidths = [390, ...[1080, 1240, 1420].flatMap(w => [w - 1, w, w + 1]), 1440];
+
 const dataTransferStates = ['data-transfer-import', 'data-transfer-export'];
 const dataTransferWidths = [390, 719, 720, 721, 1080, 1419, 1420, 1421, 1440];
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
@@ -77,7 +82,7 @@ function inspectShell() {
   const properties = ['display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
     'padding', 'margin', 'gap', 'grid-template-columns', 'flex-direction', 'align-items', 'justify-content',
     'overflow', 'color', 'background', 'border', 'border-radius', 'box-shadow', 'outline', 'font-family',
-    'font-size', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
+    'font-size', 'font-style', 'font-weight', 'line-height', 'letter-spacing', 'opacity', 'visibility', 'z-index', 'transform',
     'left', 'top', 'right', 'bottom', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat',
     'min-height', 'flex', 'flex-wrap', 'filter', 'color-scheme', 'align-self',
     'overflow-x', 'overflow-y', 'scrollbar-width', 'scrollbar-color', 'text-shadow', 'text-transform', 'vertical-align',
@@ -101,6 +106,11 @@ function inspectShell() {
     tradeSelection: document.querySelector('#page-log.active') ? {sort: {...sortState}, ids: [...selectedTrades].sort()} : null,
     tableScroll: [...document.querySelectorAll('.dashboard-table-scroll,.table-card,#calGridWrap,#page-log .table-card > [style="overflow-x:auto"]')].filter(el => el.getClientRects().length)
       .map(el => [el.className, el.scrollLeft, el.scrollTop, el.scrollWidth, el.scrollHeight, el.clientWidth, el.clientHeight]),
+    documentScroll: document.querySelector('#page-documents.active') ?
+      ['docFolders', 'docEntries', 'docEditorBody', 'docMedia'].map(id => {
+        const el = document.getElementById(id);
+        return [id, el.scrollTop, el.scrollHeight, el.clientHeight];
+      }) : null,
     pageDisplays: [...document.querySelectorAll('.page')].map(el => [el.id, getComputedStyle(el).display]),
     studyHubScroll: document.querySelector('#page-studyHub.active') ? (() => {
       const tabs = document.getElementById('studyHubTabs');
@@ -124,7 +134,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 24, workspaceSummaryStates, workspaceSummaryWidths, studyHubNativeStates, studyHubNativeWidths, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 25, documentStates, documentWidths, workspaceSummaryStates, workspaceSummaryWidths, studyHubNativeStates, studyHubNativeWidths, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -186,6 +196,8 @@ async function capture(directory) {
         ...(workspaceGridWidths.includes(width) ? workspaceGridStates : []),
         ...(studyHubNativeWidths.includes(width) ? studyHubNativeStates : []),
         ...(workspaceSummaryWidths.includes(width) ? workspaceSummaryStates : []),
+        ...(documentWidths.includes(width) ? ['documents-general'] : []),
+        ...(pageWidths.includes(width) ? documentStates : []),
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
@@ -193,7 +205,7 @@ async function capture(directory) {
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
         ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates, ...navigationFooterStates] : [])];
       for (const name of cases) {
-        const page = name.startsWith('workspace-summary-status-') ? 'notifications' : name.startsWith('workspace-summary-chips') ? 'stats' :
+        const page = name.startsWith('documents-') ? 'documents' : name.startsWith('workspace-summary-status-') ? 'notifications' : name.startsWith('workspace-summary-chips') ? 'stats' :
           name === 'workspace-summary-profile' ? 'profile' : name === 'workspace-summary-strategy' ? 'strategyHub' : name.startsWith('study-native-') ? 'studyHub' : name.startsWith('workspace-grid-') ? {strategy: 'strategyHub', profile: 'profile', partners: 'partners'}[name.slice('workspace-grid-'.length)] : (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
           name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name.startsWith('premarket-') ? 'premarket' : (name === 'tag-editor-profile' || name === 'navigation-footer-profile') ? 'profile' :
@@ -202,6 +214,7 @@ async function capture(directory) {
           name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           (${resetWorkspaceSummaryStyleState})();
+          (${resetDocumentStyleState})();
           (${resetCalendarStyleState})();
           (${resetTradeTableStyleState})();
           (${resetModalTabStyleState})();
@@ -297,6 +310,7 @@ async function capture(directory) {
         if (name.startsWith('workspace-grid-')) await browser.evaluate(`(${prepareWorkspaceGridStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('study-native-')) hover = await browser.evaluate(`(${prepareStudyHubNativeStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('workspace-summary-')) await browser.evaluate(`(${prepareWorkspaceSummaryStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('documents-')) hover = await browser.evaluate(`(${prepareDocumentStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

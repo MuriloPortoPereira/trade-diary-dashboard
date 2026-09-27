@@ -219,6 +219,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Hero/compact do perfil, tons/neutro/vazio de status/chips e ranking ampliado protegidos; renderers, dados e overrides não alterados.
 - Próximo candidato G2y: documentos (baseline 3672–4036), 365 linhas; revisar coesão/consumidores e caracterizar antes do corte.
 
+## G2y: documentos
+
+- Histórico 3672–4036 extraído em navegação/layout (192 linhas) e editor/mídia (173 linhas), apresentação de documentos.
+- Dois links adjacentes mantêm os seletores agrupados e a posição das regras; residual com 843 linhas.
+- Antes do corte: 41 casos direcionados e 59 testes Node passaram; referência integral imutável de `c34344e` usa runner v25 (864 casos).
+- Renderers/seleção reais com fixture restaurável; notas gerais/diárias/trades/vazio, mídia, foco, hover, overflow e breakpoints protegidos.
+- Validação final: 864 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2z: visão geral de contas (baseline 4037–4151), 115 linhas; caracterizar os dois consumidores antes de extrair.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

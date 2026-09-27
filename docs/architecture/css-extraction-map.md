@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2x executados: quatro `legacy-*.css` e vinte e oito destinos do prefixo 1–3671 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3672–4879.
+G1 e G2a–G2y executados: quatro `legacy-*.css` e trinta destinos do prefixo 1–4036 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4037–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -11,7 +11,7 @@ erros sintáticos; isso não comprova aparência. Serena atende TypeScript; CSS 
 ## Fronteiras contíguas
 
 Os intervalos cobrem o arquivo inteiro, sem cortar regras ou media queries. Nomes são relativos a `src/`.
-A ordem da tabela é a ordem da cascata. São fronteiras possíveis, não 38 arquivos obrigatórios em um único lote.
+A ordem da tabela é a ordem da cascata. São fronteiras possíveis, não arquivos obrigatórios em um único lote.
 Pequenos complementos podem permanecer no legado até um lote com cobertura suficiente.
 
 | Linhas | Destino proposto | Responsabilidade |
@@ -44,7 +44,8 @@ Pequenos complementos podem permanecer no legado até um lote com cobertura sufi
 | 3188–3218 | `styles/workspace-grids.css` | Grids usados por estratégias, perfil e parceiros |
 | 3219–3515 | `modules/study-hub/presentation/study-hub-native.css` | Contêiner nativo, abas e cards |
 | 3516–3671 | `styles/workspace-summaries.css` | Resumos, status, notificações e ranking |
-| 3672–4036 | `modules/documents/presentation/documents.css` | Lista, editor, mídia e estados vazios |
+| 3672–3863 | `modules/documents/presentation/doc-browser-and-layout.css` | Shell/cards, pastas, entradas e metadados |
+| 3864–4036 | `modules/documents/presentation/doc-editor-and-media.css` | Contexto, editor, toolbar, mídia e vazios |
 | 4037–4151 | `modules/accounts/presentation/account-overview.css` | Cards e barras de risco |
 | 4152–4278 | `modules/partners/presentation/partners.css` | Afiliados, suporte e QR |
 | 4279–4291 | `styles/tag-cloud.css` | Complemento tardio das tags |
@@ -360,6 +361,26 @@ Hero/compact reais do perfil; renderers existentes para status/chips em quatro t
 neutro, vazio, valores e textos longos; ranking positivo/negativo com padding ampliado.
 Fixture altera somente markup dos consumidores existentes e o restaura antes do próximo caso;
 dados/config/storage são conferidos. Nenhuma ação persistente é executada.
+
+## Vigésimo sexto corte executado (G2y)
+
+Bloco histórico 3672–4036 dividido em dois componentes contíguos de apresentação:
+`doc-browser-and-layout.css`, 192 linhas/3.386 bytes/24 regras (3672–3863), e
+`doc-editor-and-media.css`, 173 linhas/3.269 bytes/20 regras (3864–4036).
+O segundo começa em `.doc-trade-context`; metadados agrupados permanecem juntos.
+Links adjacentes após resumos compartilhados; residual começa em `.account-overview-grid`
+com 843 linhas. Sem import, media query ou URL relativa; overrides responsivos permanecem tardios.
+O mapa passa a 40 blocos: 34 extraídos e seis residuais. Carga global mantém 35 links CSS.
+
+41 casos direcionados passaram antes do corte. Matriz v25 tem 864 casos: geral em 11
+larguras, incluindo 1080/1240/1420±1; outros dez estados em 390/1080/1440px.
+Renderers e seleção reais cobrem notas gerais/diárias, trades WIN/LOSS/R ausente,
+vazio, editor focado, toolbar/pasta/entrada em hover e scroll de lista/editor/mídia.
+Fixtures restauram referências de configuração/trades/premarket e conferem dados/storage;
+nenhum handler persistente é executado. Referência integral usa cópia imutável de `c34344e`
+com o mesmo runner v25; capturas antes/depois executadas em perfis isolados independentes.
+Resultado: 864 estados idênticos; 48 imagens/197 pixels dentro da tolerância existente,
+zero erros de console/runtime ou assets ausentes; revisão independente sem bloqueios.
 
 ## Validação exigida
 

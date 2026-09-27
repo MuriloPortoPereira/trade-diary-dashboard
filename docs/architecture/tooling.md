@@ -556,6 +556,30 @@ artefatos e configurações preexistentes fora do commit.
 Resultado final: 823 estados idênticos; 37 imagens/159 pixels de rasterização aceitos, sem ampliar tolerância.
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## Documentos (G2y)
+
+Snapshot versão 25: 864 casos. `scripts/lib/document-style-scenarios.cjs` acrescenta
+41 casos: geral em 390/1079/1080/1081/1239/1240/1241/1419/1420/1421/1440px;
+dez variantes em 390/1080/1440px (vazio, diário, trades WIN/LOSS/R ausente, foco,
+hovers da toolbar/pasta/entrada e overflow). Renderers e seletores reais; dez documentos
+com título longo, nota sem conteúdo, texto longo composto por 70 trechos e nove SVGs data: autocontidos.
+Dados/config/premarket temporários restaurados em finally; fingerprint protege memória/storage.
+Nenhuma criação/salvamento/exclusão/formatação/upload/remoção é executada.
+Texto da fixture usa separadores literais `\n`; o overflow vem da quebra visual, sem alegar cobertura multiline.
+
+41 casos direcionados e 59 testes Node passaram antes da extração. A referência integral
+é cópia imutável de `c34344e` com runner/helper v25, capturada em paralelo ao código extraído
+em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2y/{baseline-root,reference-v25,after-v25}`.
+Snapshot acrescenta scroll de Documentos e font-style; limites de pixels permanecem iguais.
+Breakpoint columns 3/2/1, disabled, truncamento, vazio, mídia e tipografia são assertados.
+O contexto de trade não é ocultado pelo retorno antecipado do editor vazio no código atual;
+limitação preexistente mantida, sem ampliação do escopo. Checkpoint: `.agents/state/refactoring-g2y.yaml`.
+Resultado final: 864 estados idênticos; 48 imagens/197 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 35 CSS, diff e revisão independente aprovados.
+Fingerprint integral também conferido no índice Git; configurações/artefatos locais fora do commit.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

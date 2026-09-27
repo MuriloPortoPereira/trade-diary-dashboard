@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2x, `styles.css` mantém o trecho original 3672–4879 (1.208 linhas), incluindo documentos, contas, parceiros e responsividade geral.
+- Após G2y, `styles.css` mantém o trecho original 4037–4879 (843 linhas), incluindo contas, parceiros e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -253,3 +253,11 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/workspace-summaries.css`: métricas do perfil, status/notificações, chips analíticos e espaçamento do ranking ampliado; 156 linhas.
 - `scripts/lib/workspace-summary-style-scenarios.cjs`: seis cenários em seis larguras; real profile e renderers existentes com fixture de markup restaurável.
 - Wrapping de status e hero em uma coluna até 720px permanecem no residual; cálculos, handlers e dados não alterados.
+
+## Documentos: navegação e editor (G2y)
+
+- `src/modules/documents/presentation/doc-browser-and-layout.css`: shell, cards, pastas, entradas e metadados agrupados; 192 linhas.
+- `src/modules/documents/presentation/doc-editor-and-media.css`: contexto do trade, toolbar, textarea, mídia e estados vazios; 173 linhas.
+- Links adjacentes após resumos compartilhados; `.doc-empty` mantém o override tardio e media queries 1420/1240/1080px permanecem no residual.
+- Renderers/seleção em `app.js`: `renderDocumentsPage`, `renderDocumentMedia`, `selectDocumentFolder`, `selectDocumentEntry`; persistência não alterada.
+- `scripts/lib/document-style-scenarios.cjs`: 41 casos de notas gerais/diárias/trades/vazio, foco, hover e overflow; dados temporários restaurados, sem salvar/remover/upload.
