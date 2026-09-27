@@ -27,3 +27,4 @@ src/modules/trades/presentation/error-chips.css -text whitespace=-blank-at-eof,c
 src/modules/data-transfer/presentation/data-transfer.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/application-dialog.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/navigation-footer.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/workspace-grids.css -text whitespace=-blank-at-eof,cr-at-eol

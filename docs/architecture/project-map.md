@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2u, `styles.css` mantém o trecho original 3188–4879 (1.692 linhas), incluindo StudyHub nativo e responsividade geral.
+- Após G2v, `styles.css` mantém o trecho original 3219–4879 (1.661 linhas), incluindo StudyHub nativo e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -234,3 +234,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/navigation-footer.css`: três regras tardias do rodapé e links secundários da sidebar.
 - `scripts/lib/navigation-footer-style-scenarios.cjs`: hover, rolagem e seleção ativa/idempotente de Profile em três larguras.
 - Regras anteriores de navegação e `margin-top:auto` permanecem em `navigation-and-account-summary.css`; handlers continuam no legado.
+
+## Grids compartilhados: estilos (G2v)
+
+- `src/styles/workspace-grids.css`: seis regras de layout de estratégias, perfil e parceiros, preservadas na ordem original.
+- `scripts/lib/workspace-grid-style-scenarios.cjs`: grids reais em seis larguras; inclui perfil secundário, margem do último filho e parceiros legados ocultos.
+- Responsividade até 1420px permanece em `styles.css`; renderers, handlers e dados continuam no legado.

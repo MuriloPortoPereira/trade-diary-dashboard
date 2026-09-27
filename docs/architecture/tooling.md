@@ -503,6 +503,19 @@ Baseline pré-corte: `/tmp/trade-diary-g2u-reference-v21`. Checkpoint local em
 Resultado final: 697 estados idênticos; 33 imagens/170 pixels de rasterização aceitos.
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## Grids compartilhados (G2v)
+
+Snapshot versão 22: 715 casos. `scripts/lib/workspace-grid-style-scenarios.cjs` cobre
+estratégias, ambas as grades do perfil e configuração de parceiros em
+390/1080/1419/1420/1421/1440px. Valida uma/duas colunas, gap, margens, dados/storage e
+`partnersGrid` oculto pelo renderer. Estilos e geometria das proporções são comparados no snapshot.
+A captura inicial interrompeu antes da extração: a expectativa de margem 14px ignorava
+`.page > *:last-child`, que já zera a margem do perfil secundário. Corrigido somente o
+helper; baseline válida refeita em `/tmp/trade-diary-g2v-reference-v22b`.
+Checkpoint local: `.agents/state/refactoring-g2v.yaml`; configurações preexistentes fora do commit.
+Resultado final: 715 estados idênticos; 41 imagens/206 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

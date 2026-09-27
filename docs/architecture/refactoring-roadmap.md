@@ -198,6 +198,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Regra anterior de margem continua no CSS da navegação; nenhum handler ou dado é alterado.
 - Próximo candidato G2v: grids de estratégias, perfil e parceiros (baseline 3188–3218).
 
+## G2v: grids compartilhados
+
+- Bloco histórico 3188–3218 extraído para `src/styles/workspace-grids.css`, 31 linhas; residual com 1.661 linhas.
+- Baseline anterior ao corte: fingerprint e 715 casos; grids reais em seis larguras, incluindo 1420±1.
+- Seletores agrupados, margem do último filho e responsividade mantêm precedência; parceiros legados continuam ocultos.
+- Próximo candidato G2w: StudyHub nativo (baseline 3219–3515), 297 linhas; caracterizar antes do corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

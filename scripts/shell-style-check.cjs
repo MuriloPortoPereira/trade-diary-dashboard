@@ -28,6 +28,10 @@ const {prepareDataTransferStyleScenario} = require('./lib/data-transfer-style-sc
 const {prepareNavigationFooterStyleScenario} = require('./lib/navigation-footer-style-scenarios.cjs');
 const navigationFooterStates = ['navigation-footer-hover', 'navigation-footer-profile'];
 
+const {prepareWorkspaceGridStyleScenario} = require('./lib/workspace-grid-style-scenarios.cjs');
+const workspaceGridStates = ['workspace-grid-strategy', 'workspace-grid-profile', 'workspace-grid-partners'];
+const workspaceGridWidths = [390, 1080, 1419, 1420, 1421, 1440];
+
 const dataTransferStates = ['data-transfer-import', 'data-transfer-export'];
 const dataTransferWidths = [390, 719, 720, 721, 1080, 1419, 1420, 1421, 1440];
 const formStates = ['form-text-focus', 'form-unit-focus', 'form-readonly-focus', 'form-select-focus', 'form-textarea-empty', 'form-textarea-filled'];
@@ -105,7 +109,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 21, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 22, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -164,6 +168,7 @@ async function capture(directory) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
       const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
         ...(dataTransferWidths.includes(width) ? dataTransferStates : []),
+        ...(workspaceGridWidths.includes(width) ? workspaceGridStates : []),
         ...(metricBoundaryWidths.includes(width) ? [] : [...states, ...actionStates]),
         ...(pageWidths.includes(width) ? [...statTabs.map(tab => `stats-${tab}`), ...metricStates, 'layout-chart-hover'] : []),
         'metric-risk-tones', 'layout-table-scroll', 'account-risk-tones',
@@ -171,7 +176,7 @@ async function capture(directory) {
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
         ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates, ...navigationFooterStates] : [])];
       for (const name of cases) {
-        const page = (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
+        const page = name.startsWith('workspace-grid-') ? {strategy: 'strategyHub', profile: 'profile', partners: 'partners'}[name.slice('workspace-grid-'.length)] : (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
           name.startsWith('calendar-') && !name.startsWith('calendar-mini-') ? 'calendar' : name.startsWith('premarket-') ? 'premarket' : (name === 'tag-editor-profile' || name === 'navigation-footer-profile') ? 'profile' :
           (name === 'account-cashflow-setup' || name.startsWith('tag-editor-')) ? 'setup' :
@@ -269,6 +274,7 @@ async function capture(directory) {
         if (name.startsWith('premarket-') || name.startsWith('trade-error-chip-')) hover = await browser.evaluate(`(${preparePremarketErrorChipStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('data-transfer-')) await browser.evaluate(`(${prepareDataTransferStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('navigation-footer-')) hover = await browser.evaluate(`(${prepareNavigationFooterStyleScenario})(${JSON.stringify(name)})`);
+        if (name.startsWith('workspace-grid-')) await browser.evaluate(`(${prepareWorkspaceGridStyleScenario})(${JSON.stringify(name)})`);
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));

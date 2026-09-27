@@ -85,8 +85,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/styles/application-dialog.css` | Mensagem, input e erro do diálogo comum; 22 linhas |
 | `src/styles/navigation-footer.css` | Layout do rodapé e links secundários da sidebar; 19 linhas |
 | `scripts/lib/navigation-footer-style-scenarios.cjs` | Hover, rolagem e seleção ativa do rodapé em três larguras |
+| `src/styles/workspace-grids.css` | Grids compartilhados de estratégias, perfil e parceiros; 31 linhas |
+| `scripts/lib/workspace-grid-style-scenarios.cjs` | Grids reais e parceiros legados ocultos em seis larguras |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2u; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2v; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2u executados: quatro `legacy-*.css` e vinte e cinco destinos do prefixo 1–3187 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3188–4879.
+G1 e G2a–G2v executados: quatro `legacy-*.css` e vinte e seis destinos do prefixo 1–3218 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3219–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -318,6 +318,19 @@ três regras completas. De `.sidebar-footer` a `.nav-item-meta`; residual começ
 Hover, rolagem do rodapé e seleção ativa/idempotente de Profile são caracterizados em três
 larguras. A regra anterior de `margin-top:auto` permanece em `navigation-and-account-summary.css`.
 Dados/storage são conferidos; a transição entre páginas não é validada por esse cenário.
+
+## Vigésimo terceiro corte executado (G2v)
+
+Bloco histórico 3188–3218 em `src/styles/workspace-grids.css`: 31 linhas/503 bytes e
+seis regras completas. De `.strategy-hub-layout` a `.partner-grid`; residual começa em
+`.study-module-grid` e mantém 1.661 linhas. Link após rodapé, antes do residual.
+Seletores agrupados já compartilham layout entre estratégias, perfil e parceiros;
+permanecem em apresentação comum, sem duplicação por página.
+
+Baseline pré-corte: 715 casos. Grids reais em 390/1080/1419/1420/1421/1440px,
+incluindo as duas grades do perfil. Overrides de uma coluna até 1420px ficam no residual;
+a margem zero do último filho da página continua em superfícies/cabeçalhos.
+`partnersGrid` permanece oculto pelo renderer; dados e storage são conferidos.
 
 ## Validação exigida
 
