@@ -516,6 +516,23 @@ Checkpoint local: `.agents/state/refactoring-g2v.yaml`; configurações preexist
 Resultado final: 715 estados idênticos; 41 imagens/206 pixels de rasterização aceitos, sem ampliar tolerância.
 59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
 
+## StudyHub nativo (G2w)
+
+Snapshot versão 23: 787 casos. `scripts/lib/study-hub-native-style-scenarios.cjs` acrescenta
+72 cenários (nove estados em 390/719/720/721/1079/1080/1081/1440px). Usa botões reais para
+as quatro abas, hover ativo/inativo por CDP, foco DOM, scroll horizontal e posição sticky.
+Offsets de tabs/document/main entram no snapshot; cada caso reinicia seleção, foco e rolagem.
+Dados/storage são conferidos. Grids/cards/ranges nativos não montados não recebem UI sintética.
+
+Diagnóstico inicial usou método inexistente `browser.load`; API local inspecionada e substituída
+por `Page.navigate`. Ensaio sticky mediu antes de terminar o `scroll-behavior:smooth` existente;
+rolagem instantânea confirmou pinning em 390/719/1080/1440px. Somente ferramenta corrigida,
+72 casos direcionados passaram antes da baseline completa. A animação de scroll não é testada.
+Baseline pré-corte: `/tmp/trade-diary-g2w-reference-v23`; checkpoint local em
+`.agents/state/refactoring-g2w.yaml`; configurações preexistentes fora do commit.
+Resultado final: 787 estados idênticos; 23 imagens/114 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -28,3 +28,4 @@ src/modules/data-transfer/presentation/data-transfer.css -text whitespace=-blank
 src/styles/application-dialog.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/navigation-footer.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/workspace-grids.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/study-hub/presentation/study-hub-native.css -text whitespace=-blank-at-eof,cr-at-eol

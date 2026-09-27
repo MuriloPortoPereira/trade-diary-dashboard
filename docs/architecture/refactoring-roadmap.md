@@ -205,6 +205,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Seletores agrupados, margem do último filho e responsividade mantêm precedência; parceiros legados continuam ocultos.
 - Próximo candidato G2w: StudyHub nativo (baseline 3219–3515), 297 linhas; caracterizar antes do corte.
 
+## G2w: estilos nativos do StudyHub
+
+- Bloco histórico 3219–3515 extraído para `src/modules/study-hub/presentation/study-hub-native.css`, 297 linhas; residual com 1.364 linhas.
+- Baseline anterior ao corte: fingerprint e 787 casos; 72 novos cenários de abas/root em oito larguras, incluindo 720/1080±1.
+- Markup nativo não montado mantém regras intactas; montagem legada, estado e overrides responsivos não alterados.
+- Próximo candidato G2x: resumos compartilhados (baseline 3516–3671), 156 linhas; caracterizar consumidores antes do corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

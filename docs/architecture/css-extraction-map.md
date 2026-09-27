@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2v executados: quatro `legacy-*.css` e vinte e seis destinos do prefixo 1–3218 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3219–4879.
+G1 e G2a–G2w executados: quatro `legacy-*.css` e vinte e sete destinos do prefixo 1–3515 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 3516–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -331,6 +331,20 @@ Baseline pré-corte: 715 casos. Grids reais em 390/1080/1419/1420/1421/1440px,
 incluindo as duas grades do perfil. Overrides de uma coluna até 1420px ficam no residual;
 a margem zero do último filho da página continua em superfícies/cabeçalhos.
 `partnersGrid` permanece oculto pelo renderer; dados e storage são conferidos.
+
+## Vigésimo quarto corte executado (G2w)
+
+Bloco histórico 3219–3515 em `src/modules/study-hub/presentation/study-hub-native.css`:
+297 linhas/5.774 bytes e 43 regras completas. De `.study-module-grid` ao mínimo de altura
+dos cards em `.study-native-grid`; residual começa em `.hero-metric-grid` com 1.364 linhas.
+Link após grids compartilhados, antes do residual; sem import, media query ou URL relativa.
+Overrides responsivos até 1420/1080/720px continuam depois do bloco, sem reordenação.
+
+Baseline pré-corte: 787 casos, incluindo 72 cenários reais de abas/root em oito larguras.
+Quatro seleções, hover ativo/inativo, foco, rolagem horizontal e sticky são exercitados;
+snapshot inclui offsets de rolagem. Classes de grid/card/range do markup nativo não montado
+permanecem protegidas pela identidade integral dos bytes, sem UI sintética.
+Nenhuma mudança na montagem legada, renderers, cálculos ou storage.
 
 ## Validação exigida
 

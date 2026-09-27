@@ -133,15 +133,18 @@
 - G2u concluído: rodapé em 19 linhas/258 bytes e três regras completas.
 - Validação G2u: 59 testes, 27 checks no navegador e 697 estados idênticos; revisão sem bloqueios.
 
+- G2v concluído: grids compartilhados em 31 linhas/503 bytes e seis regras completas.
+- Validação G2v: 59 testes, 27 checks no navegador e 715 estados idênticos; revisão sem bloqueios.
+
 ## Current
-- G2v extraído: `src/styles/workspace-grids.css`, 31 linhas/503 bytes e seis regras completas.
-- `styles.css`: 1.692 para 1.661 linhas; 31 links preservam os 162.576 bytes originais concatenados.
-- Caracterização pré-corte: baseline ampliada para 715 casos; grids reais de estratégias, perfil e parceiros em seis larguras, incluindo 1420±1.
-- Contas, trades, configuração, premarket, StudyHub e storage permanecem intactos nos cenários.
-- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 715 estados visuais idênticos, com 41 imagens/206 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+- G2w extraído: `src/modules/study-hub/presentation/study-hub-native.css`, 297 linhas/5.774 bytes e 43 regras completas.
+- `styles.css`: 1.661 para 1.364 linhas; 32 links preservam os 162.576 bytes originais concatenados.
+- Caracterização pré-corte: baseline de 787 casos; 72 novos cenários reais de abas/root em oito larguras, incluindo 720/1080±1.
+- Quatro seleções, hover ativo/inativo, foco, rolagem horizontal e sticky; contas/trades/config/premarket/StudyHub/storage preservados.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 787 estados visuais idênticos, com 23 imagens/114 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Next
-- G2w: revisar StudyHub nativo (baseline 3219–3515), primeiro bloco residual; caracterizar antes de extrair.
+- G2x: revisar resumos compartilhados (baseline 3516–3671), primeiro bloco residual; caracterizar consumidores antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -153,7 +156,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2v cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2w cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -173,6 +176,7 @@
 - G2t caracteriza apresentação de confirmação e validação; não executa callbacks de ações nem testa fechamento por Escape.
 - G2u caracteriza hover por CDP e seleção idempotente; não comprova hit testing físico nem transição entre páginas.
 - G2v caracteriza layout visível; grid legado de parceiros oculto tem bytes e display protegidos, sem fabricar conteúdo ou exercer afiliação.
+- G2w caracteriza abas/root montados; grids/cards/ranges nativos não montados têm bytes preservados. Não executa simulações completas, sliders ou mutações das subferramentas.
 - G2c verifica estilos computados das opções e foco nas datas, sem capturar seus popups nativos.
 - Comparação de pixels G2a aceita ruído de rasterização estritamente limitado; hashes de estilos/geometria/fontes/storage continuam exatos.
 - CSV: consumidor testado com download/aviso substituídos em VM; smoke verifica serialização real e globals, sem baixar arquivo.
@@ -213,3 +217,4 @@
 - G2t: diálogo é apresentação comum em `src/styles`; handlers, wrappers e callbacks permanecem no legado.
 - G2u: complemento tardio da navegação em `src/styles`; estilos anteriores e handlers permanecem na posição original.
 - G2v: grids já agrupados entre features em `src/styles`; overrides responsivos e margem do último filho ficam na posição original.
+- G2w: estilos nativos pertencem à apresentação do StudyHub; consumidores legados e regras nativas não montadas são preservados, sem nova abstração.
