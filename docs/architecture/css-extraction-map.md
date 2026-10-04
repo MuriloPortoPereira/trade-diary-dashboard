@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2y executados: quatro `legacy-*.css` e trinta destinos do prefixo 1–4036 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4037–4879.
+G1 e G2a–G2z executados: quatro `legacy-*.css` e trinta e um destinos do prefixo 1–4151 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4152–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -381,6 +381,27 @@ nenhum handler persistente é executado. Referência integral usa cópia imutáv
 com o mesmo runner v25; capturas antes/depois executadas em perfis isolados independentes.
 Resultado: 864 estados idênticos; 48 imagens/197 pixels dentro da tolerância existente,
 zero erros de console/runtime ou assets ausentes; revisão independente sem bloqueios.
+
+## Vigésimo sétimo corte executado (G2z)
+
+Bloco histórico 4037–4151 em `src/modules/accounts/presentation/account-overview.css`:
+115 linhas/2.150 bytes e 16 regras completas. Começa em `.account-overview-grid`, termina
+em `.mini-progress > span`; residual começa em `.partner-card` com 728 linhas.
+Link após editor/mídia de documentos, antes do residual; sem import, media query ou URL relativa.
+Regras comuns anteriores para o card/pseudo-elemento permanecem antes do novo link;
+overrides 1420/720px permanecem no residual. Mapa: 35 blocos extraídos e cinco residuais;
+36 links CSS globais mantêm a cascata.
+
+17 casos direcionados passaram antes do corte: uma conta em oito larguras (390,
+719/720/721, 1419/1420/1421, 1440px); duas contas, vazio e nome longo em 390/720/1440px.
+`renderAccountsPage` preenche o contêiner real. A fixture restaura a referência de `accounts`
+e confere memória/storage; não dispara editar/selecionar/salvar. Em largura estreita, o ponto
+de cor pode encolher com um título longo pelo flex layout existente; a expectativa do teste
+foi ajustada antes do corte. Matriz v26: 881 casos. Referência integral de cópia imutável do
+commit `0bc5a44` com o mesmo runner/helper; capturas em perfis isolados independentes.
+Resultado: 881 estados idênticos; 49 imagens/279 pixels dentro da tolerância existente,
+zero erros de console/runtime ou assets ausentes; revisão independente sem bloqueios.
+Detalhes em [tooling](tooling.md).
 
 ## Validação exigida
 

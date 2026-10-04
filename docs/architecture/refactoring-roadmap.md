@@ -226,7 +226,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Antes do corte: 41 casos direcionados e 59 testes Node passaram; referência integral imutável de `c34344e` usa runner v25 (864 casos).
 - Renderers/seleção reais com fixture restaurável; notas gerais/diárias/trades/vazio, mídia, foco, hover, overflow e breakpoints protegidos.
 - Validação final: 864 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
-- Próximo candidato G2z: visão geral de contas (baseline 4037–4151), 115 linhas; caracterizar os dois consumidores antes de extrair.
+- Próximo candidato G2z: visão geral de contas (baseline 4037–4151), 115 linhas; caracterizar o contêiner e o renderer antes de extrair.
+
+## G2z: visão geral de contas
+
+- Histórico 4037–4151 extraído para `src/modules/accounts/presentation/account-overview.css`, 115 linhas; residual com 728 linhas.
+- 17 casos de caracterização passaram antes do corte; matriz v26 de 881 casos usa referência imutável de `0bc5a44`.
+- Grid/cards/estatísticas/barras e 1420/720px cobertos; renderers, cálculos e handlers permanecem em `app.js`.
+- Validação final: 881 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2aa: parceiros (baseline 4152–4278), 127 linhas; caracterizar consumidores antes de extrair.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

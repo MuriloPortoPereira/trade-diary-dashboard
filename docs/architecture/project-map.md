@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2y, `styles.css` mantém o trecho original 4037–4879 (843 linhas), incluindo contas, parceiros e responsividade geral.
+- Após G2z, `styles.css` mantém o trecho original 4152–4879 (728 linhas), incluindo parceiros e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -261,3 +261,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Links adjacentes após resumos compartilhados; `.doc-empty` mantém o override tardio e media queries 1420/1240/1080px permanecem no residual.
 - Renderers/seleção em `app.js`: `renderDocumentsPage`, `renderDocumentMedia`, `selectDocumentFolder`, `selectDocumentEntry`; persistência não alterada.
 - `scripts/lib/document-style-scenarios.cjs`: 41 casos de notas gerais/diárias/trades/vazio, foco, hover e overflow; dados temporários restaurados, sem salvar/remover/upload.
+
+## Contas: visão geral (G2z)
+
+- `src/modules/accounts/presentation/account-overview.css`: grid, cards, resumo, estatísticas e barras de risco; 115 linhas.
+- Carrega após os dois CSS de documentos, antes do residual; `.account-overview-card` preserva as regras comuns anteriores e os overrides tardios em 1420/720px.
+- Consumidor: contêiner `#accountsOverview` em `index.html`, preenchido por `renderAccountsPage` em `app.js`; cálculo de risco e ações permanecem no legado.
+- `scripts/lib/account-overview-style-scenarios.cjs`: 17 cenários de conta única, duas contas, vazio e nome longo; memória/storage restaurados.

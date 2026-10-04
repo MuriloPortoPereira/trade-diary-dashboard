@@ -32,3 +32,4 @@ src/modules/study-hub/presentation/study-hub-native.css -text whitespace=-blank-
 src/styles/workspace-summaries.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/documents/presentation/doc-browser-and-layout.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/documents/presentation/doc-editor-and-media.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/accounts/presentation/account-overview.css -text whitespace=-blank-at-eof,cr-at-eol

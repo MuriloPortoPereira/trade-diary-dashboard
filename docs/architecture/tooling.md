@@ -580,6 +580,29 @@ Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
 59 testes Node, 27 checks no navegador, sintaxe, parsing de 35 CSS, diff e revisão independente aprovados.
 Fingerprint integral também conferido no índice Git; configurações/artefatos locais fora do commit.
 
+## Visão geral de contas (G2z)
+
+Snapshot versão 26: 881 casos. `scripts/lib/account-overview-style-scenarios.cjs`
+acrescenta 17 casos: conta única em 390/719/720/721/1419/1420/1421/1440px;
+duas contas, vazio e nome longo em 390/720/1440px. Renderer `renderAccountsPage`
+e contêiner reais; dois cards exercitam ações ativa/inativa sem acioná-las.
+Grid 2→1 coluna até 1420px, estatísticas e barras 4/3→1 coluna até 720px,
+composição do cabeçalho, ponto de cor e pseudo-elemento são assertados e capturados.
+Fixture restaura `accounts` em finally e confere memória/storage, sem persistir dados.
+Em 390px, nome longo encolhe o ponto de cor por flex; caracterização inicial esperava
+11px fixos, falhou e foi ajustada ao comportamento observado antes da extração.
+
+17 casos direcionados e 59 testes Node passaram antes do corte. A referência integral
+é cópia imutável de `0bc5a44` com runner/helper v26, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2z/{baseline-root,reference-v26,after-v26}`.
+Checkpoint: `.agents/state/refactoring-g2z.yaml`. Resultado final: 881 estados
+idênticos; 49 imagens/279 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 36 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
