@@ -1,0 +1,127 @@
+.partner-card {
+  min-height: 220px;
+}
+
+.partner-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.partner-affiliates-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.partner-affiliate-editor-card {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.partner-affiliate-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.partner-affiliate-form-grid,
+.partner-support-form {
+  display: grid;
+  gap: 10px;
+}
+
+.partner-affiliate-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+
+.partner-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.partner-empty-title {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.partner-empty-copy {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.partner-card.safe {
+  border-color: rgba(69, 224, 123, 0.16);
+}
+
+.partner-card.warn {
+  border-color: rgba(255, 206, 103, 0.18);
+}
+
+.partner-card.info {
+  border-color: rgba(34, 213, 237, 0.16);
+}
+
+.partner-card-copy {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.partner-card-meta {
+  margin-top: 24px;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+}
+
+.partner-support-preview {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.partner-inline-mono {
+  font-family: "DM Mono", monospace;
+  word-break: break-all;
+}
+
+.partner-qr-shell {
+  display: grid;
+  gap: 10px;
+}
+
+.partner-qr-image {
+  width: 148px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.partner-qr-image-preview {
+  width: 132px;
+}
+
+.partner-support-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+

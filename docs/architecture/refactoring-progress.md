@@ -150,14 +150,19 @@
 - 41 casos direcionados passaram antes do corte; matriz v25 ampliada para 864 casos, com referência imutável de `c34344e`.
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 864 estados visuais idênticos, com 48 imagens/197 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
-## Current
 - G2z extraído: `src/modules/accounts/presentation/account-overview.css`, 115 linhas/2.150 bytes/16 regras.
 - `styles.css`: 843 para 728 linhas; 36 links preservam os 162.576 bytes originais concatenados.
 - 17 cenários direcionados passaram antes do corte; matriz v26 ampliada para 881 casos, com referência imutável de `0bc5a44`.
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 881 estados visuais idênticos, com 49 imagens/279 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
+## Current
+- G2aa extraído: `src/modules/partners/presentation/partners.css`, 127 linhas/2.076 bytes/21 regras.
+- `styles.css`: 728 para 601 linhas; 37 links preservam os 162.576 bytes originais concatenados.
+- 32 casos direcionados passaram antes do corte; matriz v27 ampliada para 913 casos, com referência imutável de `f1d90a3`.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 913 estados visuais idênticos, com 48 imagens/254 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+
 ## Next
-- G2aa: parceiros (baseline 4152–4278), 127 linhas; caracterizar consumidores antes de extrair.
+- G2ab: complemento tardio de tags (baseline 4279–4291), 13 linhas; caracterizar consumidor antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -169,7 +174,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2z cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2aa cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -190,6 +195,7 @@
 - G2u caracteriza hover por CDP e seleção idempotente; não comprova hit testing físico nem transição entre páginas.
 - G2v caracteriza layout visível; grid legado de parceiros oculto tem bytes e display protegidos, sem fabricar conteúdo ou exercer afiliação.
 - G2w caracteriza abas/root montados; grids/cards/ranges nativos não montados têm bytes preservados. Não executa simulações completas, sliders ou mutações das subferramentas.
+- G2aa não salva/remove afiliados, nem executa upload/remoção de QR; classes legadas sem consumidor atual protegidas por bytes.
 - G2z não seleciona/edita contas nem audita cálculos de risco. Nome longo estreito encolhe o ponto de cor por flex; comportamento preexistente mantido.
 - G2y não salva/formata/exclui documentos nem executa upload/remoção de mídia. O retorno antecipado do editor vazio pode preservar contexto de trade anterior; limitação preexistente, sem correção neste lote.
 - G2x usa payloads de apresentação nos renderers reais; não audita geração de alertas, cálculo de chips/ranking, navegação das ações ou mutações persistentes.
@@ -237,3 +243,4 @@
 - G2x: resumos compartilhados permanecem em `src/styles`; renderers/geração dos dados e overrides responsivos continuam na posição original.
 - G2y: documentos em dois componentes contíguos de apresentação; carga global, metadados agrupados, override tardio de vazio e responsividade mantidos.
 - G2z: visão geral de contas em `presentation`; renderer, cálculo, handlers e overrides responsivos continuam na posição original.
+- G2aa: estilos de parceiros em `presentation`; configuração, handlers e overrides responsivos continuam na posição original.

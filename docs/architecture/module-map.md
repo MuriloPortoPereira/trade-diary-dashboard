@@ -96,8 +96,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/document-style-scenarios.cjs` | Renderers/seleção reais com fixture temporária; 41 casos sem persistência |
 | `src/modules/accounts/presentation/account-overview.css` | Grid/cards, métricas e barras da visão geral de contas; 115 linhas |
 | `scripts/lib/account-overview-style-scenarios.cjs` | 17 estados de conta única/múltipla/vazia/nome longo e breakpoints sem persistência |
+| `src/modules/partners/presentation/partners.css` | Editor de afiliados, estados vazios, apoio e QR; 127 linhas |
+| `scripts/lib/partner-style-scenarios.cjs` | Vazio/afiliados/QR em oito larguras, sem mutação persistente |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2z; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2aa; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2z executados: quatro `legacy-*.css` e trinta e um destinos do prefixo 1–4151 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4152–4879.
+G1 e G2a–G2aa executados: quatro `legacy-*.css` e trinta e dois destinos do prefixo 1–4278 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4279–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -402,6 +402,25 @@ commit `0bc5a44` com o mesmo runner/helper; capturas em perfis isolados independ
 Resultado: 881 estados idênticos; 49 imagens/279 pixels dentro da tolerância existente,
 zero erros de console/runtime ou assets ausentes; revisão independente sem bloqueios.
 Detalhes em [tooling](tooling.md).
+
+## Vigésimo oitavo corte executado (G2aa)
+
+Bloco histórico 4152–4278 em `src/modules/partners/presentation/partners.css`:
+127 linhas/2.076 bytes e 21 regras completas. Começa em `.partner-card`, termina em
+`.partner-support-actions`; residual começa em `.tag-cloud-block` com 601 linhas.
+Link após visão geral de contas, antes do residual; sem import, media query ou URL relativa.
+Regras comuns anteriores de cards e overrides tardios 1420/720px permanecem na posição
+original. Mapa: 36 blocos extraídos e quatro residuais; 37 links CSS globais.
+
+32 casos direcionados passaram antes do corte: vazio, dois afiliados e QR, somente afiliado,
+somente QR em oito larguras (390, 719/720/721, 1419/1420/1421, 1440px).
+`renderPartnersPage` preenche consumidores reais; fixture restaura configuração e confere
+memória/storage, sem acionar salvar/upload/remover. `.partner-card*`, preview/mono legados
+e variante da imagem pequena seguem preservados por identidade de bytes, sem consumidor ativo.
+Matriz v27: 913 casos. Referência integral de cópia imutável do commit `f1d90a3` com
+runner/helper idênticos; capturas em perfis isolados independentes. Resultado: 913 estados
+idênticos; 48 imagens/254 pixels dentro da tolerância existente, zero erros de console/runtime
+ou assets ausentes; revisão independente sem bloqueios. Detalhes em [tooling](tooling.md).
 
 ## Validação exigida
 

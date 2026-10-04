@@ -236,6 +236,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Validação final: 881 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - Próximo candidato G2aa: parceiros (baseline 4152–4278), 127 linhas; caracterizar consumidores antes de extrair.
 
+## G2aa: parceiros
+
+- Histórico 4152–4278 extraído para `src/modules/partners/presentation/partners.css`, 127 linhas; residual com 601 linhas.
+- 32 casos de caracterização passaram antes do corte; matriz v27 de 913 casos usa referência imutável de `f1d90a3`.
+- Editor, estados vazios, afiliados, QR e breakpoints 1420/720px cobertos; handlers/configuração permanecem em `app.js`.
+- Validação final: 913 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2ab: complemento tardio das tags (baseline 4279–4291), 13 linhas; caracterizar o consumidor antes de extrair.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

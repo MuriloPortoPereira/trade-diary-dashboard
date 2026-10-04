@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2z, `styles.css` mantém o trecho original 4152–4879 (728 linhas), incluindo parceiros e responsividade geral.
+- Após G2aa, `styles.css` mantém o trecho original 4279–4879 (601 linhas), incluindo tags, movimento e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -268,3 +268,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Carrega após os dois CSS de documentos, antes do residual; `.account-overview-card` preserva as regras comuns anteriores e os overrides tardios em 1420/720px.
 - Consumidor: contêiner `#accountsOverview` em `index.html`, preenchido por `renderAccountsPage` em `app.js`; cálculo de risco e ações permanecem no legado.
 - `scripts/lib/account-overview-style-scenarios.cjs`: 17 cenários de conta única, duas contas, vazio e nome longo; memória/storage restaurados.
+
+## Parceiros: editor e apoio (G2aa)
+
+- `src/modules/partners/presentation/partners.css`: 127 linhas de editor de afiliados, estados vazios, apoio e QR; carregado após a visão geral de contas e antes do residual.
+- Consumidores ativos: `#partnerAffiliatesEditor`, `.partner-support-form`, `#partnerBtcQrPreview` e `renderPartnersPage`; `#partnersGrid` legado permanece oculto.
+- `scripts/lib/partner-style-scenarios.cjs`: 32 estados de vazio/afiliados/QR nas larguras 390, 719/720/721, 1419/1420/1421 e 1440px; fixture restaura configuração/storage.
+- Regras legadas de `.partner-card` e classes sem markup ativo seguem intactas; overrides responsivos permanecem tardios.

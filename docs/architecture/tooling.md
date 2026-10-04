@@ -603,6 +603,27 @@ Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
 independente aprovados. Fingerprint integral também conferido no índice Git;
 configurações/artefatos locais fora do commit.
 
+## Parceiros (G2aa)
+
+Snapshot versão 27: 913 casos. `scripts/lib/partner-style-scenarios.cjs` acrescenta
+32 casos: vazio, afiliados+QR, só afiliado e só QR em 390/719/720/721/1419/1420/1421/1440px.
+`renderPartnersPage`/contêineres reais exercitam cards do editor, estados vazios,
+grade de campos e prévia de imagem SVG data: autocontida. QR é decodificado antes da captura.
+Fixture restaura `config` em finally e confere memória/storage; nenhum handler de edição,
+salvamento, upload ou remoção é acionado. O grid legado segue oculto; regras sem consumidor
+ativo são preservadas pelo fingerprint integral, sem fabricar interface.
+
+32 casos direcionados e 59 testes Node passaram antes do corte. Referência integral em
+cópia imutável de `f1d90a3` com runner/helper v27, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2aa/{baseline-root,reference-v27,after-v27}`.
+Checkpoint: `.agents/state/refactoring-g2aa.yaml`. Resultado final: 913 estados
+idênticos; 48 imagens/254 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 37 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
