@@ -72,7 +72,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/trades/presentation/emotion-picker.css` | Grid e chips de emoção, incluindo estado selecionado; 29 linhas |
 | `scripts/lib/emotion-picker-style-scenarios.cjs` | Fixture descartável para idle, hover e seleção do picker sem mutar dados |
 | `src/styles/tag-editor.css` | Tags compartilhadas entre Setup/Profile, contagem e botões de edição; 79 linhas |
-| `scripts/lib/tag-editor-style-scenarios.cjs` | Cenários reais de tags editáveis/somente leitura e fixture isolada para `.tag-add` |
+| `scripts/lib/tag-editor-style-scenarios.cjs` | Tags editáveis/somente leitura, fixture `.tag-add` e nuvem do perfil em nove estados |
 | `src/styles/alerts-and-utilities.css` | Alertas info/warn, separador e utilitários flex/espaçamento/largura; 52 linhas |
 | `scripts/lib/alert-utility-style-scenarios.cjs` | Alertas/separadores reais, headers responsivos e fixture isolada para utilitário sem consumidor |
 | `src/modules/trades/presentation/trade-actions.css` | Barra de ações em lote e navegação do fluxo do modal; 48 linhas |
@@ -98,8 +98,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `scripts/lib/account-overview-style-scenarios.cjs` | 17 estados de conta única/múltipla/vazia/nome longo e breakpoints sem persistência |
 | `src/modules/partners/presentation/partners.css` | Editor de afiliados, estados vazios, apoio e QR; 127 linhas |
 | `scripts/lib/partner-style-scenarios.cjs` | Vazio/afiliados/QR em oito larguras, sem mutação persistente |
+| `src/styles/tag-cloud.css` | Espaçamento/títulos dos três grupos de tags do perfil; 13 linhas |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2aa; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2ab; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

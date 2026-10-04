@@ -624,6 +624,25 @@ Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
 independente aprovados. Fingerprint integral também conferido no índice Git;
 configurações/artefatos locais fora do commit.
 
+## Nuvem de tags do perfil (G2ab)
+
+Snapshot versão 28: 922 casos. `scripts/lib/tag-editor-style-scenarios.cjs` foi ampliado
+com nove casos de `renderProfilePage`: configuração padrão, sem tags e com texto longo
+em 390/720/1440px. Três grupos/títulos reais exercitam margem entre irmãos,
+espaçamento do título, tamanho, peso, tracking e caixa alta. Fixture restaura `config`
+e confere memória/storage, sem acionar edição ou salvamento.
+
+Nove casos direcionados e 59 testes Node passaram antes do corte. Referência integral
+em cópia imutável de `3f434a9` com runner/helper v28, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2ab/{baseline-root,reference-v28,after-v28}`.
+Checkpoint: `.agents/state/refactoring-g2ab.yaml`. Resultado final: 922 estados
+idênticos; 53 imagens/223 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 38 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

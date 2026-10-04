@@ -52,4 +52,35 @@ function prepareTagEditorStyleScenario(name) {
   return null;
 }
 
-module.exports = {resetTagEditorStyleState, prepareTagEditorStyleScenario};
+function prepareTagCloudStyleScenario(name) {
+  const fingerprint = () => JSON.stringify({accounts, trades, config, preMarketData, studyHubState,
+    storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
+  const before = fingerprint();
+  const previousConfig = config;
+  try {
+    if (name === 'tag-cloud-empty') config = {...config, strategies: [], emotions: [], markets: []};
+    if (name === 'tag-cloud-long') config = {...config,
+      strategies: ['Estratégia de caracterização com texto extenso para observar a quebra de linha no perfil'],
+      emotions: ['Emoção de caracterização com texto extenso'],
+      markets: ['Mercado de caracterização com texto extenso']};
+    renderProfilePage();
+    const root = document.getElementById('profileTags');
+    const blocks = [...root.querySelectorAll('.tag-cloud-block')];
+    if (blocks.length !== 3 || blocks.some((block, index) =>
+      block.querySelectorAll('.tag').length !== (name === 'tag-cloud-empty' ? 0 : name === 'tag-cloud-long' ? 1 : config[['strategies', 'emotions', 'markets'][index]].length))) {
+      throw new Error('Profile tag cloud groups changed');
+    }
+    for (const [index, block] of blocks.entries()) {
+      const heading = block.querySelector('.tag-cloud-title');
+      const style = getComputedStyle(heading);
+      if (getComputedStyle(block).marginTop !== (index ? '18px' : '0px') ||
+        style.marginBottom !== '10px' || style.fontSize !== '10px' ||
+        style.fontWeight !== '800' || style.textTransform !== 'uppercase' ||
+        style.letterSpacing !== '1.6px') throw new Error('Profile tag cloud style changed');
+    }
+    root.scrollIntoView({block: 'center'});
+  } finally { config = previousConfig; }
+  if (before !== fingerprint()) throw new Error('Tag cloud fixture changed data or storage');
+}
+
+module.exports = {resetTagEditorStyleState, prepareTagEditorStyleScenario, prepareTagCloudStyleScenario};

@@ -244,6 +244,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Validação final: 913 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - Próximo candidato G2ab: complemento tardio das tags (baseline 4279–4291), 13 linhas; caracterizar o consumidor antes de extrair.
 
+## G2ab: complemento tardio das tags
+
+- Histórico 4279–4291 extraído para `src/styles/tag-cloud.css`, 13 linhas; residual com 588 linhas.
+- Nove casos de caracterização passaram antes do corte; matriz v28 de 922 casos usa referência imutável de `3f434a9`.
+- Perfil com tags padrão/vazias/longas e tipografia/espaçamento protegidos; renderer/estado permanecem em `app.js`.
+- Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2ac: animação `fade-up` (baseline 4292–4303), 12 linhas; caracterizar antes de extrair.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

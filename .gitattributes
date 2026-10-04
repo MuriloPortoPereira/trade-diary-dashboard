@@ -34,3 +34,4 @@ src/modules/documents/presentation/doc-browser-and-layout.css -text whitespace=-
 src/modules/documents/presentation/doc-editor-and-media.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/accounts/presentation/account-overview.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/partners/presentation/partners.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/tag-cloud.css -text whitespace=-blank-at-eof,cr-at-eol

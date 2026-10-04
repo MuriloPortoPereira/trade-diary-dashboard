@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2aa, `styles.css` mantém o trecho original 4279–4879 (601 linhas), incluindo tags, movimento e responsividade geral.
+- Após G2ab, `styles.css` mantém o trecho original 4292–4879 (588 linhas), incluindo movimento e responsividade geral.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -275,3 +275,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidores ativos: `#partnerAffiliatesEditor`, `.partner-support-form`, `#partnerBtcQrPreview` e `renderPartnersPage`; `#partnersGrid` legado permanece oculto.
 - `scripts/lib/partner-style-scenarios.cjs`: 32 estados de vazio/afiliados/QR nas larguras 390, 719/720/721, 1419/1420/1421 e 1440px; fixture restaura configuração/storage.
 - Regras legadas de `.partner-card` e classes sem markup ativo seguem intactas; overrides responsivos permanecem tardios.
+
+## Perfil: complemento tardio das tags (G2ab)
+
+- `src/styles/tag-cloud.css`: 13 linhas de espaçamento dos três grupos e títulos da nuvem de tags; carregado após parceiros e antes do residual.
+- Consumidor: `renderProfilePage` preenche `#profileTags`; `.tag-list`/`.tag` anteriores continuam em `src/styles/tag-editor.css`.
+- `scripts/lib/tag-editor-style-scenarios.cjs` inclui nove estados de nuvem padrão/vazia/texto longo em 390/720/1440px; dados e storage restaurados.

@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2aa executados: quatro `legacy-*.css` e trinta e dois destinos do prefixo 1–4278 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4279–4879.
+G1 e G2a–G2ab executados: quatro `legacy-*.css` e trinta e três destinos do prefixo 1–4291 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4292–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -421,6 +421,22 @@ Matriz v27: 913 casos. Referência integral de cópia imutável do commit `f1d90
 runner/helper idênticos; capturas em perfis isolados independentes. Resultado: 913 estados
 idênticos; 48 imagens/254 pixels dentro da tolerância existente, zero erros de console/runtime
 ou assets ausentes; revisão independente sem bloqueios. Detalhes em [tooling](tooling.md).
+
+## Vigésimo nono corte executado (G2ab)
+
+Bloco histórico 4279–4291 em `src/styles/tag-cloud.css`: 13 linhas/223 bytes e duas
+regras completas. De `.tag-cloud-block + .tag-cloud-block` ao título; residual começa em
+`@keyframes fade-up` com 588 linhas. Link após parceiros, antes do residual; sem import,
+media query ou URL relativa. As regras anteriores de `.tag-list`/`.tag` permanecem intactas.
+Mapa: 37 blocos extraídos e três residuais; 38 links CSS globais.
+
+Nove casos direcionados passaram antes do corte: perfil padrão, sem tags e com textos longos
+em 390/720/1440px. `renderProfilePage` cria os três grupos reais; fixture restaura config
+e confere dados/storage. Helper existente de tags foi ampliado, sem nova abstração.
+Matriz v28: 922 casos. Referência integral da cópia imutável de `3f434a9` com runner/helper
+idênticos; capturas em perfis isolados independentes. Resultado: 922 estados idênticos;
+53 imagens/223 pixels dentro da tolerância existente, zero erros de console/runtime ou assets
+ausentes; revisão independente sem bloqueios. Detalhes em [tooling](tooling.md).
 
 ## Validação exigida
 
