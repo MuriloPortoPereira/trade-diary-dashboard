@@ -284,6 +284,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Depois do corte: 62 testes Node, 31 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
 - Próximo lote G3b: outro renderer pequeno de apresentação, após caracterizar seus efeitos e consumidores.
 
+## G3b: renderer de parceiros
+
+- `renderPartnersPage` movida intacta de `app.js` para `src/modules/partners/presentation/partners-page.js` (37 linhas).
+- `index.html` carrega a declaração global antes do perfil e de `app.js`; seis handlers de parceiros, `showPage` e `refreshAll` continuam iguais.
+- Antes do corte: quatro testes de caracterização e 66 testes Node passaram; baseline visual v29 de 922 estados do commit `f5a11a0`.
+- Depois do corte: 66 testes Node, 35 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
+- Próximo candidato G3c: `renderAccountsPage`, após caracterizar cálculos chamados e layout/consumidores.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

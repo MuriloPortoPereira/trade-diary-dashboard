@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3b registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3a extraído: `renderProfilePage` de `app.js` para `src/modules/profile/presentation/profile-page.js`, 48 linhas movidas intactas.
-- API global e consumidores `showPage`/`refreshAll` preservados; script clássico síncrono carregado imediatamente antes de `app.js`.
-- Caracterização pré-corte: três testes do renderer e 62 testes Node no total; baseline visual v29 de 922 estados do commit `47371b4`.
-- Após o corte: 62 testes Node, 31 checks no navegador, sintaxe e diff aprovados; 922 estados visuais idênticos, com 56 imagens/372 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+- G3b extraído: `renderPartnersPage` de `app.js` para `src/modules/partners/presentation/partners-page.js`, 37 linhas movidas intactas.
+- API global e consumidores de navegação, refresh e handlers de parceiros preservados; script clássico síncrono antes do perfil e de `app.js`.
+- Caracterização pré-corte: quatro testes do renderer e 66 testes Node no total; baseline visual v29 de 922 estados do commit `f5a11a0`.
+- Após o corte: 66 testes Node, 35 checks no navegador, sintaxe e diff aprovados; 922 estados visuais idênticos, com 47 imagens/168 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Next
-- G3b: escolher outro renderer coeso de apresentação, caracterizar consumidores e preservar globals/ordem dos scripts antes de extrair.
+- G3c: avaliar `renderAccountsPage` como próximo renderer coeso; caracterizar consumidores e preservar globals/ordem dos scripts antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -261,3 +261,4 @@
 - G2ad: media queries gerais de desktop/tablet em `src/styles`; bytes, ordem da cascata e overrides mobile posteriores preservados.
 - G2ae: media queries mobile em `src/styles`; link substitui `styles.css` na mesma posição e mantém as regras StudyHub posteriores.
 - G3a: renderer de perfil em `presentation`; mantém leituras de estado e chamadas de métricas/risco/alertas no momento da renderização, sem nova camada.
+- G3b: renderer de parceiros em `presentation`; configuração, IO, salvamento e callbacks inline permanecem no legado.

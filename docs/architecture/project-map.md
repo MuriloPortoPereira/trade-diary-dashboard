@@ -17,7 +17,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | StudyHub | `renderStudyHub`, `syncStudyHubLegacyInputs`, `shInitLegacyModule` |
 | Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `getDocumentEntries`, `saveCurrentDocument`, `renderDocumentsPage` |
-| Parceiros | `ensurePartnerHubConfig`, `renderPartnersPage` |
+| Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
@@ -276,6 +276,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidores ativos: `#partnerAffiliatesEditor`, `.partner-support-form`, `#partnerBtcQrPreview` e `renderPartnersPage`; `#partnersGrid` legado permanece oculto.
 - `scripts/lib/partner-style-scenarios.cjs`: 32 estados de vazio/afiliados/QR nas larguras 390, 719/720/721, 1419/1420/1421 e 1440px; fixture restaura configuração/storage.
 - Regras legadas de `.partner-card` e classes sem markup ativo seguem intactas; overrides responsivos permanecem tardios.
+
+## Parceiros: renderer de página (G3b)
+
+- `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage` global, movida sem reescrita de `app.js`; script clássico síncrono antes do perfil e de `app.js`.
+- Estado/configuração, salvamento, upload e handlers inline continuam no legado; `showPage`, `refreshAll` e callbacks de edição mantêm os consumidores.
+- `tests/partners-page.test.cjs` caracteriza vazio, afiliado/QR, escaping, handlers e ausência de alvos; smoke navega a parceiros e exercita refresh.
+- Matriz visual v29 comparou 922 estados com a referência anterior ao corte; todos idênticos, com 47 imagens/168 pixels dentro da tolerância existente.
 
 ## Perfil: complemento tardio das tags (G2ab)
 

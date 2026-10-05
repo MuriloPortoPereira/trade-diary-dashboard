@@ -694,6 +694,17 @@ referência a captura de `47371b4` em
 56 imagens/372 pixels de rasterização dentro da tolerância existente; zero erros de
 console/runtime. Corpo da função movido byte a byte; 62 testes Node e sintaxe aprovados.
 
+## Renderer de parceiros (G3b)
+
+`tests/partners-page.test.cjs` caracterizou antes do corte hub vazio/preenchido,
+escaping, handlers inline e ausência de nós obrigatórios. O smoke abre parceiros,
+verifica afiliados/QR, grade legada oculta e `refreshAll` (35 checks).
+Referência visual v29 de `f5a11a0` em
+`.agents/state/artifacts/refactoring-g3a/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3b/after-v29`. Resultado: 922 estados idênticos,
+47 imagens/168 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 66 testes Node e sintaxe aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

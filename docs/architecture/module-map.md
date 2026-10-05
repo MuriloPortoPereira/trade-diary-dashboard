@@ -97,6 +97,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/accounts/presentation/account-overview.css` | Grid/cards, métricas e barras da visão geral de contas; 115 linhas |
 | `scripts/lib/account-overview-style-scenarios.cjs` | 17 estados de conta única/múltipla/vazia/nome longo e breakpoints sem persistência |
 | `src/modules/partners/presentation/partners.css` | Editor de afiliados, estados vazios, apoio e QR; 127 linhas |
+| `src/modules/partners/presentation/partners-page.js` | Renderer global de parceiros, 37 linhas movidas intactas de `app.js` |
+| `tests/partners-page.test.cjs` | Caracterização de vazio, afiliados/QR, alvos ausentes e ordem de carga |
 | `scripts/lib/partner-style-scenarios.cjs` | Vazio/afiliados/QR em oito larguras, sem mutação persistente |
 | `src/styles/tag-cloud.css` | Espaçamento/títulos dos três grupos de tags do perfil; 13 linhas |
 | `src/styles/page-motion.css` | `@keyframes fade-up` usado pela página ativa; 12 linhas |
@@ -106,6 +108,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3b; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
