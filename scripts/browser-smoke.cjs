@@ -89,6 +89,14 @@ function browserProbe() {
       refreshAll();
       check('partners refresh renders again', document.querySelector('#page-partners.active') &&
         document.getElementById('partnerAffiliatesEditor').textContent.trim().length > 0);
+      const accountsNav = document.querySelector('.nav-item[onclick="showPage(\'accounts\')"]');
+      accountsNav.click();
+      check('accounts navigation and global renderer', document.querySelector('#page-accounts.active') && typeof renderAccountsPage === 'function');
+      check('accounts metrics rendered', document.querySelectorAll('#accountsMetrics .metric-card').length === 4);
+      check('accounts overview rendered', document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      refreshAll();
+      check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
+        document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
       showPage('studyHub');
       for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
         document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
@@ -156,7 +164,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 35, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 39, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

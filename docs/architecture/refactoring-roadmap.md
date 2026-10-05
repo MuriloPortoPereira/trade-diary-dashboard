@@ -292,6 +292,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Depois do corte: 66 testes Node, 35 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
 - Próximo candidato G3c: `renderAccountsPage`, após caracterizar cálculos chamados e layout/consumidores.
 
+## G3c: renderer de contas
+
+- `renderAccountsPage` movida intacta de `app.js` para `src/modules/accounts/presentation/accounts-page.js` (46 linhas).
+- `index.html` carrega a declaração global antes dos renderers de parceiros/perfil e de `app.js`; `saveAccount`, exclusão, `showPage` e `refreshAll` continuam iguais.
+- Antes do corte: quatro testes de caracterização e 70 testes Node passaram; baseline visual v29 de 922 estados do commit `bc3ef23`.
+- Depois do corte: 70 testes Node, 39 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
+- Próximo lote G3d: selecionar outro renderer coeso após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

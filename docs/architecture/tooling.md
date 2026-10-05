@@ -705,6 +705,16 @@ Referência visual v29 de `f5a11a0` em
 47 imagens/168 pixels de rasterização dentro da tolerância existente; zero erros de
 console/runtime. Corpo da função movido byte a byte; 66 testes Node e sintaxe aprovados.
 
+## Renderer de contas (G3c)
+
+`tests/accounts-page.test.cjs` caracterizou antes do corte contas múltiplas, vazio,
+alvos opcionais e ordem de carga. O smoke abre contas, verifica métricas e overview e
+exercita `refreshAll` (39 checks). Referência visual v29 de `bc3ef23` em
+`.agents/state/artifacts/refactoring-g3b/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3c/after-v29`. Resultado: 922 estados idênticos,
+59 imagens/291 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 70 testes Node e sintaxe aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

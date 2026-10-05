@@ -267,7 +267,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/modules/accounts/presentation/account-overview.css`: grid, cards, resumo, estatísticas e barras de risco; 115 linhas.
 - Carrega após os dois CSS de documentos, antes dos CSS responsivos; `.account-overview-card` preserva as regras comuns anteriores e os overrides tardios em 1420/720px.
-- Consumidor: contêiner `#accountsOverview` em `index.html`, preenchido por `renderAccountsPage` em `app.js`; cálculo de risco e ações permanecem no legado.
+- Consumidor: contêiner `#accountsOverview` em `index.html`, preenchido por `renderAccountsPage` em `src/modules/accounts/presentation/accounts-page.js`; cálculo de risco e ações permanecem no legado.
 - `scripts/lib/account-overview-style-scenarios.cjs`: 17 cenários de conta única, duas contas, vazio e nome longo; memória/storage restaurados.
 
 ## Parceiros: editor e apoio (G2aa)
@@ -283,6 +283,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Estado/configuração, salvamento, upload e handlers inline continuam no legado; `showPage`, `refreshAll` e callbacks de edição mantêm os consumidores.
 - `tests/partners-page.test.cjs` caracteriza vazio, afiliado/QR, escaping, handlers e ausência de alvos; smoke navega a parceiros e exercita refresh.
 - Matriz visual v29 comparou 922 estados com a referência anterior ao corte; todos idênticos, com 47 imagens/168 pixels dentro da tolerância existente.
+
+## Contas: renderer de página (G3c)
+
+- `src/modules/accounts/presentation/accounts-page.js`: `renderAccountsPage` global, movida intacta de `app.js`; script clássico síncrono antes dos renderers de parceiros/perfil e de `app.js`.
+- Estado, cálculos de risco, salvamento e handlers continuam no legado; `saveAccount`, exclusão, `showPage` e `refreshAll` preservam os consumidores.
+- `tests/accounts-page.test.cjs` caracteriza contas múltiplas, vazio, alvos opcionais e ordem de carga; smoke abre contas e exercita refresh.
+- Matriz visual v29 comparou 922 estados com G3b; todos idênticos, com 59 imagens/291 pixels dentro da tolerância existente.
 
 ## Perfil: complemento tardio das tags (G2ab)
 
