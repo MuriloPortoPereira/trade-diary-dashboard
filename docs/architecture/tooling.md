@@ -643,6 +643,25 @@ Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
 independente aprovados. Fingerprint integral também conferido no índice Git;
 configurações/artefatos locais fora do commit.
 
+## Animação de entrada (G2ac)
+
+Snapshot versão 29: mesmos 922 casos da versão 28. Antes do corte, CSSOM confirmou
+uma única regra `fade-up` com 0% (opacity 0, translateY(10px)) e 100% (opacity 1,
+translateY(0px)); dashboard, perfil e parceiros ativos computam `fade-up 0.28s ease`.
+O runner registra e afirma esses quadros antes do override que desativa animações para
+capturas estáveis. O fingerprint integral protege também os 144 bytes da regra e sua ordem.
+
+59 testes Node passaram antes do corte. Referência integral em cópia imutável de
+`080c0d7` com runner v29, capturada em paralelo ao código extraído em perfis isolados.
+Artefatos duráveis locais: `.agents/state/artifacts/refactoring-g2ac/{baseline-root,reference-v29,after-v29}`.
+O primeiro revisor independente atingiu limite de uso; revisão somente leitura transferida
+a outro subagente. Checkpoint: `.agents/state/refactoring-g2ac.yaml`.
+Resultado final: 922 estados idênticos; 62 imagens/303 pixels de rasterização aceitos,
+sem ampliar tolerância. Zero erros de console/runtime ou assets locais ausentes nos dois
+perfis. 59 testes Node, 27 checks no navegador, sintaxe, parsing de 39 CSS, diff e
+revisão independente aprovados. Fingerprint integral conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

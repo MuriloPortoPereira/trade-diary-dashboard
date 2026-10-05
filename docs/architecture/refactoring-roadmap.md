@@ -252,6 +252,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - Próximo candidato G2ac: animação `fade-up` (baseline 4292–4303), 12 linhas; caracterizar antes de extrair.
 
+## G2ac: animação de entrada
+
+- Histórico 4292–4303 extraído para `src/styles/page-motion.css`, 12 linhas; residual com 576 linhas.
+- Antes do corte: CSSOM dos quadros 0%/100%, três páginas ativas e 59 testes Node passaram; matriz v29 mantém 922 casos.
+- Ordem da regra, animação `.page.active` e media queries tardias preservadas.
+- Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2ad: responsividade desktop/tablet (baseline 4304–4563), 260 linhas; caracterizar pontos de quebra antes do corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

@@ -146,7 +146,7 @@ function inspectShell() {
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '..'));
-  const report = {version: 28, tagCloudStates, tagCloudWidths, partnerStates, partnerWidths, accountOverviewStates, accountOverviewWidths, documentStates, documentWidths, workspaceSummaryStates, workspaceSummaryWidths, studyHubNativeStates, studyHubNativeWidths, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
+  const report = {version: 29, tagCloudStates, tagCloudWidths, partnerStates, partnerWidths, accountOverviewStates, accountOverviewWidths, documentStates, documentWidths, workspaceSummaryStates, workspaceSummaryWidths, studyHubNativeStates, studyHubNativeWidths, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
@@ -162,6 +162,19 @@ async function capture(directory) {
     // Settle the fixture response once, then pause only that background timer.
     await browser.evaluate(`(async () => { clearInterval(cotacaoInterval); cotacaoInterval = null; await fetchCotacao(); })()`);
     assert.equal(await browser.evaluate('cotacaoInterval'), null);
+    report.fadeUpKeyframes = await browser.evaluate(`(() => {
+      const rules = [];
+      for (const sheet of document.styleSheets) {
+        if (!sheet.href?.startsWith(location.origin)) continue;
+        for (const rule of sheet.cssRules) {
+          if (rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'fade-up') {
+            rules.push([...rule.cssRules].map(frame => [frame.keyText, frame.style.opacity, frame.style.transform]));
+          }
+        }
+      }
+      return rules;
+    })()`);
+    assert.deepEqual(report.fadeUpKeyframes, [[['0%', '0', 'translateY(10px)'], ['100%', '1', 'translateY(0px)']]]);
     report.pageAnimation = await browser.evaluate(`(() => {
       const style = getComputedStyle(document.querySelector('.page.active'));
       return [style.animationName, style.animationDuration];

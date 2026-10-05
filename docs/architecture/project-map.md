@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2ab, `styles.css` mantém o trecho original 4292–4879 (588 linhas), incluindo movimento e responsividade geral.
+- Após G2ac, `styles.css` mantém o trecho original 4304–4879 (576 linhas), com as media queries gerais de desktop/tablet e mobile.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -281,3 +281,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/tag-cloud.css`: 13 linhas de espaçamento dos três grupos e títulos da nuvem de tags; carregado após parceiros e antes do residual.
 - Consumidor: `renderProfilePage` preenche `#profileTags`; `.tag-list`/`.tag` anteriores continuam em `src/styles/tag-editor.css`.
 - `scripts/lib/tag-editor-style-scenarios.cjs` inclui nove estados de nuvem padrão/vazia/texto longo em 390/720/1440px; dados e storage restaurados.
+
+## Shell: animação de entrada (G2ac)
+
+- `src/styles/page-motion.css`: `@keyframes fade-up` de 12 linhas, carregado após a nuvem de tags e antes das media queries residuais.
+- Consumidor: `.page.active` em `src/styles/page-surfaces-and-headers.css`; nome, duração, easing e quadros originais preservados.
+- `scripts/shell-style-check.cjs`: CSSOM caracteriza os quadros 0% e 100% antes de desativar animações para as capturas estáveis.

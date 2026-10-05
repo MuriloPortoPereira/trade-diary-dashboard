@@ -160,14 +160,19 @@
 - 32 casos direcionados passaram antes do corte; matriz v27 ampliada para 913 casos, com referência imutável de `f1d90a3`.
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 913 estados visuais idênticos, com 48 imagens/254 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
-## Current
 - G2ab extraído: `src/styles/tag-cloud.css`, 13 linhas/223 bytes e duas regras.
 - `styles.css`: 601 para 588 linhas; 38 links preservam os 162.576 bytes originais concatenados.
 - Nove casos direcionados passaram antes do corte; matriz v28 ampliada para 922 casos, com referência imutável de `3f434a9`.
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
+## Current
+- G2ac extraído: `src/styles/page-motion.css`, 12 linhas/144 bytes e um `@keyframes` completo.
+- `styles.css`: 588 para 576 linhas; 39 links preservam os 162.576 bytes originais concatenados.
+- Caracterização pré-corte: CSSOM dos quadros 0%/100% e animação em três páginas; matriz v29 mantém 922 casos, com referência imutável de `080c0d7`.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 62 imagens/303 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+
 ## Next
-- G2ac: animação `fade-up` (baseline 4292–4303), 12 linhas; caracterizar antes de extrair.
+- G2ad: responsividade desktop/tablet (baseline 4304–4563), 260 linhas; caracterizar pontos de quebra antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -179,7 +184,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2ab cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2ac cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -200,6 +205,7 @@
 - G2u caracteriza hover por CDP e seleção idempotente; não comprova hit testing físico nem transição entre páginas.
 - G2v caracteriza layout visível; grid legado de parceiros oculto tem bytes e display protegidos, sem fabricar conteúdo ou exercer afiliação.
 - G2w caracteriza abas/root montados; grids/cards/ranges nativos não montados têm bytes preservados. Não executa simulações completas, sliders ou mutações das subferramentas.
+- G2ac caracteriza quadros CSSOM e declaração da página; não avalia percepção da animação quadro a quadro.
 - G2ab caracteriza renderização da nuvem, sem edição ou persistência; regras anteriores de tags permanecem compartilhadas.
 - G2aa não salva/remove afiliados, nem executa upload/remoção de QR; classes legadas sem consumidor atual protegidas por bytes.
 - G2z não seleciona/edita contas nem audita cálculos de risco. Nome longo estreito encolhe o ponto de cor por flex; comportamento preexistente mantido.
@@ -251,3 +257,4 @@
 - G2z: visão geral de contas em `presentation`; renderer, cálculo, handlers e overrides responsivos continuam na posição original.
 - G2aa: estilos de parceiros em `presentation`; configuração, handlers e overrides responsivos continuam na posição original.
 - G2ab: complemento da nuvem de tags em `src/styles`, após parceiros; renderer/estado não mudam.
+- G2ac: keyframes comuns em `src/styles`; consumidor `.page.active` e timing permanecem anteriores, media queries tardias intactas.
