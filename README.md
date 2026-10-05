@@ -119,7 +119,8 @@ A versão pública foi organizada de forma mínima para facilitar análise e dep
 trade-diary-dashboard/
 ├── index.html
 ├── app.js
-├── styles.css
+├── src/styles/
+├── src/modules/
 ├── README.md
 └── LICENSE
 ```
@@ -128,7 +129,7 @@ trade-diary-dashboard/
 |---|---|
 | `index.html` | Estrutura principal da aplicação |
 | `app.js` | Regras de interação, cálculos e comportamento do dashboard |
-| `styles.css` | Estilos visuais da interface |
+| `src/styles/` e `src/modules/*/presentation/*.css` | Estilos visuais carregados na ordem de `index.html` |
 | `README.md` | Documentação do projeto |
 | `LICENSE` | Licença de uso |
 

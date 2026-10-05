@@ -36,7 +36,7 @@ Inventários completos e condições: [análise global](modularization-analysis.
 | Sequência | Entrega independente | Evidência exigida antes e depois |
 |---|---|---|
 | G1 ✓ | CSS legado StudyHub: sufixo 4880–6090 em quatro arquivos ordenados | Ampliar smoke das quatro abas; baseline visual; comparar bytes/cascata e geometria nos breakpoints |
-| G2 | CSS comum e demais páginas em blocos contíguos do mapa | Regras/ordem sem perdas; telas, estados e responsividade dos componentes afetados |
+| G2 ✓ | CSS comum e demais páginas em blocos contíguos do mapa | Regras/ordem sem perdas; telas, estados e responsividade dos componentes afetados |
 | G3 | JS de páginas e componentes por feature, uma responsabilidade por commit | Declarações preservadas, handlers/globals, fluxo de navegação, modais e efeitos de estado |
 | G4 | Domínios de métricas, timing, risco e simulação, individualmente | Caracterização numérica, limites, defaults, relógio/RNG e compatibilidade dos consumidores |
 | G5 | Importação, backup e persistência por formato/coordenação/IO | Fixtures, deduplicação, restauração parcial/completa, chaves e sequência de efeitos |
@@ -267,6 +267,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Ordem de 1420, 1240 e 1080px e override de altura da sidebar preservados; 40 links mantêm fingerprint integral do CSS.
 - Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - Próximo candidato G2ae: responsividade mobile (baseline 4564–4879), 316 linhas; caracterizar antes de extrair.
+
+## G2ae: responsividade mobile
+
+- Histórico 4564–4879 extraído para `src/styles/responsive-mobile.css`, 316 linhas; `styles.css` removido após esgotar o residual.
+- Antes do corte: 59 testes Node e matriz v29 de 922 estados, incluindo 440/720±1; referência imutável de `63ed009`.
+- Link substituído na mesma posição, antes dos quatro CSS StudyHub; 40 links mantêm fingerprint integral dos 162.576 bytes.
+- Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- G2 concluído. Próxima frente G3: JavaScript de páginas/componentes por feature, uma responsabilidade por lote.
 
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,

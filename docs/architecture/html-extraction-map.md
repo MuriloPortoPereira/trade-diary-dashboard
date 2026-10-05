@@ -47,12 +47,13 @@ A página StudyHub chamada “Simulações” é outro conjunto de ferramentas; 
 As funções em atributos inline continuam globais. Preservar `this`, `event`, argumentos e retorno.
 Não remover `page-psych` por ausência na navegação; a API de navegação ainda a conhece.
 
-## Ordem atual de carga
+## Ordem de carga na baseline do mapa
 
 1. Chart.js 4.4.1 síncrono no head, linha 7; `styles.css`, linha 8.
 2. DOM completo, incluindo páginas e modais.
 3. Sizing; CSV; registro de idiomas; três fragmentos PT; três EN; seletor; `app.js`, linhas 1433–1443.
 
+O CSS atual é carregado por 40 links ordenados em `index.html`; `styles.css` foi extraído integralmente em G2.
 Manter scripts clássicos síncronos. A ordem dos catálogos é significativa.
 As referências em strings de `app.js` e do StudyHub ampliam a superfície de handlers além do HTML estático.
 

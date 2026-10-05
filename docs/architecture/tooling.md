@@ -673,6 +673,16 @@ rasterização dentro da tolerância existente, zero erros de console/runtime.
 59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
 Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
 
+## Responsividade mobile (G2ae)
+
+Snapshot versão 29: 922 casos, incluindo 390, 439/440/441 e 719/720/721px.
+Referência pré-corte de `63ed009` em
+`.agents/state/artifacts/refactoring-g2ae/reference-v29`; captura pós-corte no
+mesmo runner em `after-v29`. Resultado: 922 estados idênticos; 62 imagens/369 pixels
+de rasterização dentro da tolerância existente, zero erros de console/runtime.
+59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
+Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

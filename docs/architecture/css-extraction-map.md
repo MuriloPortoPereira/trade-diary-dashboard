@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2ad executados: quatro `legacy-*.css` e trinta e cinco destinos do prefixo 1–4563 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4564–4879.
+G1 e G2a–G2ae executados: quatro `legacy-*.css` e trinta e seis destinos do prefixo 1–4879 existem.
+Não resta CSS em `styles.css`; o link anterior agora aponta para `responsive-mobile.css`.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -465,6 +465,17 @@ três media queries completas de 1420, 1240 e 1080px. O residual contém 316 lin
 Antes do corte, matriz v29 de 922 estados e 59 testes Node passaram. A mesma matriz
 após o corte manteve 922 estados idênticos; 46 imagens/263 pixels dentro da tolerância
 existente. Fingerprint integral dos 162.576 bytes e ordem das media queries preservados.
+
+## Trigésimo segundo corte executado (G2ae)
+
+Bloco histórico 4564–4879 em `src/styles/responsive-mobile.css`: 316 linhas/4.966 bytes,
+duas media queries completas de 720 e 440px. O link substitui `styles.css` na mesma
+posição, antes dos quatro CSS legados StudyHub; `styles.css` foi removido. Mapa:
+40 blocos extraídos, nenhum residual e 40 links CSS globais.
+
+Antes do corte, matriz v29 de 922 estados e 59 testes Node passaram. Depois do corte,
+922 estados idênticos; 62 imagens/369 pixels dentro da tolerância existente. Os 40
+links preservam os 162.576 bytes originais, inclusive o final misto LF/CRLF.
 
 ## Validação exigida
 

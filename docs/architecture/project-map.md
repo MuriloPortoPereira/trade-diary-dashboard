@@ -20,7 +20,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Parceiros | `ensurePartnerHubConfig`, `renderPartnersPage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
-| Visual | `src/styles/`, CSS de preferências/StudyHub e `styles.css`; consultar o mapa CSS |
+| Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
 
 ## Simulação: primeiro domínio extraído
 
@@ -56,8 +56,8 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
-- Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2ad, `src/styles/responsive-desktop-tablet.css` contém as media queries gerais de 1420/1240/1080px (histórico 4304–4563); `styles.css` mantém 720/440px (histórico 4564–4879, 316 linhas).
+- Carregados nessa ordem depois de `src/styles/responsive-mobile.css`; todos ativos nas quatro abas. Sem alterações de regras.
+- Após G2ae, `src/styles/responsive-desktop-tablet.css` contém 1420/1240/1080px (histórico 4304–4563) e `src/styles/responsive-mobile.css` contém 720/440px (histórico 4564–4879); não há CSS residual em `styles.css`.
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -68,7 +68,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `src/styles/shell-layout.css`: layout e topbar (43 linhas).
 - `src/modules/preferences/presentation/preferences-widgets.css`: cotação e idioma (139 linhas).
 - `src/styles/navigation-and-account-summary.css`: sidebar, logo, navegação e resumo (408 linhas).
-- Carga nessa ordem, antes de `styles.css` e dos quatro CSS StudyHub; sobrescritas responsivas permanecem no residual.
+- Carga nessa ordem, antes dos CSS responsivos e dos quatro CSS StudyHub; sobrescritas permanecem nos arquivos responsivos.
 - Contrato integral de bytes/cascata: `tests/study-hub-styles.test.cjs` (nome histórico; cobre todos os links).
 - Comparação visual: `scripts/shell-style-check.cjs`; instruções e limites em [tooling](tooling.md).
 
@@ -76,7 +76,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/styles/page-surfaces-and-headers.css`: 246 linhas de superfícies de cards/modais, layout das páginas,
   espaçamento das abas de análise, cabeçalhos e ícones SVG em máscaras CSS.
-- Carrega após `navigation-and-account-summary.css`, antes de `styles.css`; regras responsivas permanecem no residual.
+- Carrega após `navigation-and-account-summary.css`, antes dos CSS responsivos; regras responsivas permanecem nesses arquivos.
 - Uso compartilhado entre páginas: manter carga global e ordem, inclusive pseudo-elementos e seletores por inline style.
 - Teste integral de bytes em `tests/study-hub-styles.test.cjs`; runner visual do shell também captura máscaras,
   pseudo-elementos dos cards e as cinco abas de análise. Limites em [tooling](tooling.md).
@@ -84,7 +84,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Botões e datas: estilos (G2c)
 
 - `src/styles/page-actions.css`: 114 linhas de botões, variantes/tamanhos, opções de análise e intervalo de datas do diário.
-- Carrega depois de `page-surfaces-and-headers.css`, antes do residual; media queries e complementos tardios mantêm a posição original.
+- Carrega depois de `page-surfaces-and-headers.css`, antes dos CSS responsivos; media queries e complementos tardios mantêm a posição original.
 - Uso global: shell, páginas, controles gerados e modais. Handlers e estado permanecem no legado.
 - Runner shell verifica hover, foco, filtragem e limpeza pelos controles reais; opções nativas têm suas cores computadas amostradas.
 - Teste integral de bytes permanece em `tests/study-hub-styles.test.cjs`; uso/limites em [tooling](tooling.md).
@@ -92,7 +92,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Métricas e indicadores de risco: estilos (G2d)
 
 - `src/styles/metric-cards-and-risk-insights.css`: 300 linhas de grids, cards, tooltips e indicadores comuns.
-- Carrega após `page-actions.css`, antes do residual; responsividade em 1420/1080/720 permanece na posição original.
+- Carrega após `page-actions.css`, antes dos CSS responsivos; responsividade em 1420/1080/720 permanece na posição original.
 - Apresentação compartilhada em `src/styles`; cálculos e eventos continuam em `app.js`.
 - Runner shell cobre tons safe/warn/danger, hover, pseudo-elementos e tooltip acima/abaixo/oculto.
 - Cenários isolados: `scripts/lib/metric-style-scenarios.cjs`; contrato integral de bytes e limites visuais mantidos.
@@ -100,7 +100,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Dashboard e layouts comuns de cards: estilos (G2e)
 
 - `src/styles/dashboard-and-card-layout.css`: 161 linhas de grids, painéis, cabeçalhos, tabelas e containers de gráficos.
-- Carrega após `metric-cards-and-risk-insights.css`, antes do residual; overrides responsivos mantêm sua posição original.
+- Carrega após `metric-cards-and-risk-insights.css`, antes dos CSS responsivos; overrides responsivos mantêm sua posição original.
 - Uso compartilhado entre páginas/modais em `src/styles`; Chart.js, renderers e handlers permanecem no legado.
 - Runner shell acrescenta tabela inferior com rolagem horizontal e hover de card de gráfico.
 - Cenários: `scripts/lib/dashboard-layout-scenarios.cjs`; fixture não produz overflow vertical, e sticky não tem consumidor encontrado.
@@ -108,7 +108,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Contas: estilos de risco e caixa (G2f)
 
 - `src/modules/accounts/presentation/account-risk-and-cashflow.css`: 322 linhas de risco, progresso, alertas, cálculo visual e caixa.
-- Carrega após `dashboard-and-card-layout.css`, antes do residual; uso no dashboard, setup e editor de contas.
+- Carrega após `dashboard-and-card-layout.css`, antes dos CSS responsivos; uso no dashboard, setup e editor de contas.
 - Apresentação de contas com carga global; renderers, cálculos, handlers e persistência continuam em `app.js`.
 - `scripts/lib/account-style-scenarios.cjs`: tons de risco, meta, caixa preenchido nos dois renderers e editor vazio.
 - Cenários usam perfil isolado e restauram dados temporários; snapshots protegem storage e contas/trades em memória.
@@ -117,15 +117,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Analytics: ranking e comparação de estratégias (G2g)
 
 - `src/modules/analytics/presentation/strategy-comparison.css`: 201 linhas de ranking, seletores e painel comparativo.
-- Carrega após `account-risk-and-cashflow.css`, antes do residual; uso no dashboard, central de estratégias e aba de análise.
+- Carrega após `account-risk-and-cashflow.css`, antes dos CSS responsivos; uso no dashboard, central de estratégias e aba de análise.
 - Renderers: `renderStrategyRows`, `renderDashStrategyBoard`, `renderStrategyCompareCards`; eventos dos seletores continuam em `app.js`.
 - Cenários isolados: `scripts/lib/strategy-style-scenarios.cjs`; ranking positivo/negativo/vazio, comparação completa e alternância de seleções.
-- Overrides tardios e responsivos permanecem no residual. Contrato de bytes e limites em [tooling](tooling.md).
+- Overrides tardios e responsivos permanecem nos CSS responsivos. Contrato de bytes e limites em [tooling](tooling.md).
 
 ## Calendários: grids e células (G2h)
 
 - `src/modules/calendar/presentation/calendar-grids.css`: 241 linhas do mini calendário, resumo semanal e layouts do calendário.
-- Carrega após `strategy-comparison.css`, antes do residual; overrides 1080/720/440 mantêm sua posição original.
+- Carrega após `strategy-comparison.css`, antes dos CSS responsivos; overrides 1080/720/440 mantêm sua posição original.
 - Renderers em `app.js`: `renderDashboardCalendar`, `renderCalendar`; navegação e seleção preservadas.
 - UI: `week` aparece como Mensal, `biweek` como Quinzenal; `month` permanece acessível pela API global.
 - Cenários: `scripts/lib/calendar-style-scenarios.cjs`; modos, hover, rolagem, detalhes do dia, mudança de ano e mês bissexto.
@@ -134,7 +134,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Tabelas e estados de operações (G2i)
 
 - `src/modules/trades/presentation/trade-tables.css`: 148 linhas de tabelas, ordenação, seleção, badges e avisos de incompletos.
-- Carrega globalmente após `calendar-grids.css`, antes do residual; `.tbl` e badges mantêm consumidores em outras páginas e no resumo da conta.
+- Carrega globalmente após `calendar-grids.css`, antes dos CSS responsivos; `.tbl` e badges mantêm consumidores em outras páginas e no resumo da conta.
 - Renderers e handlers continuam em `app.js`; nenhuma alteração de dados ou APIs.
 - Cenários: `scripts/lib/trade-table-style-scenarios.cjs`; scroll, sticky, ordenação por P/L, seleção, hover/foco, vazio e flags de incompletude.
 - Overrides tardios e responsivos preservados; limites em [tooling](tooling.md).
@@ -142,15 +142,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Campos de formulário (G2j)
 
 - `src/styles/form-fields.css`: 91 linhas de grids, labels, inputs, selects, textarea, unidades e hints.
-- Carrega globalmente após `trade-tables.css`, antes do residual; consumidores incluem operações, simulação, contas, parceiros e StudyHub.
+- Carrega globalmente após `trade-tables.css`, antes dos CSS responsivos; consumidores incluem operações, simulação, contas, parceiros e StudyHub.
 - Cenários: `scripts/lib/form-field-style-scenarios.cjs`; foco em texto/número/select/textarea, unidade, readonly e conteúdo multilinha.
-- Overrides responsivos e específicos do StudyHub permanecem no residual ou nos arquivos tardios, na posição original.
+- Overrides responsivos e específicos do StudyHub permanecem nos CSS responsivos ou nos arquivos tardios, na posição original.
 - `.field-hint` não possui consumidor encontrado; regra preservada sem criar UI artificial.
 
 ## Modais e abas comuns (G2k)
 
 - `src/styles/modal-and-tabs.css`: 80 linhas de overlay, estrutura dos modais e navegação por abas.
-- Carrega globalmente após `form-fields.css`, antes do residual; quatro modais e treze botões de aba mantêm consumidores existentes.
+- Carrega globalmente após `form-fields.css`, antes dos CSS responsivos; quatro modais e treze botões de aba mantêm consumidores existentes.
 - Cenários: `scripts/lib/modal-tab-style-scenarios.cjs`; scroll do modal de operação, footers, diálogo com input e abas de importação, calendário e StudyHub.
 - A segunda regra de `.modal-footer` permanece separada e posterior, preservando bordas e alinhamento.
 - Overrides responsivos e específicos do StudyHub permanecem tardios; limites em [tooling](tooling.md).
@@ -158,7 +158,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Toolbar do calendário (G2l)
 
 - `src/modules/calendar/presentation/calendar-toolbar.css`: 27 linhas do cabeçalho, seletor de mês e botões de modo.
-- Carrega após `modal-and-tabs.css`, antes do residual; consumidor único em `#page-calendar`.
+- Carrega após `modal-and-tabs.css`, antes dos CSS responsivos; consumidor único em `#page-calendar`.
 - Cenário dedicado em `scripts/lib/calendar-style-scenarios.cjs`: foco do picker e valores computados de controles/botões.
 - `.gap-8` tardio mantém gap efetivo de 8px; dimensões e `!important` do bloco permanecem iguais.
 - Demais estados e limites do calendário continuam em [tooling](tooling.md).
@@ -166,21 +166,21 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Upload comum: estilos (G2m)
 
 - `src/styles/upload-zone.css`: 41 linhas de zona, estados hover/drag, input oculto, ícone e textos.
-- Carrega após `calendar-toolbar.css`, antes do residual; os overrides scoped do StudyHub permanecem tardios.
+- Carrega após `calendar-toolbar.css`, antes dos CSS responsivos; os overrides scoped do StudyHub permanecem tardios.
 - Não há consumidor ativo confirmado das classes globais; `scripts/lib/upload-zone-style-scenarios.cjs` usa fixture descartável.
 - Listeners globais de drag/drop, importadores e dados continuam inalterados em `app.js`.
 
 ## Seletor de emoções: estilos (G2n)
 
 - `src/modules/trades/presentation/emotion-picker.css`: 29 linhas de grid, chips, seleção, emoji e rótulo.
-- Carrega após `upload-zone.css`, antes do residual; não existem overrides posteriores encontrados.
+- Carrega após `upload-zone.css`, antes dos CSS responsivos; não existem overrides posteriores encontrados.
 - Não há consumidor ativo confirmado; `scripts/lib/emotion-picker-style-scenarios.cjs` usa fixture descartável.
 - Estado `.selected` preservado; nenhuma lógica de operação ou configuração foi alterada.
 
 ## Tags e edição: estilos (G2o)
 
 - `src/styles/tag-editor.css`: 79 linhas de listas, tags, contagem, botões e estados hover.
-- Compartilhado entre Setup editável e nuvens somente leitura do Profile; carrega antes do residual.
+- Compartilhado entre Setup editável e nuvens somente leitura do Profile; carrega antes dos CSS responsivos.
 - `scripts/lib/tag-editor-style-scenarios.cjs` usa renderizadores reais e uma fixture apenas para `.tag-add` sem consumidor.
 - Edição, exclusão, configuração, dados e storage não são modificados pelos cenários.
 
@@ -189,7 +189,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `src/styles/alerts-and-utilities.css`: 52 linhas de alertas, separador e utilitários flex/espaçamento/largura.
 - Consumidores incluem Import, Setup, Trades e headers de Calendar/Stats/Premarket.
 - `scripts/lib/alert-utility-style-scenarios.cjs` usa consumidores reais e fixture apenas para `.w-full`/warning isolado.
-- Overrides responsivos e específicos de Import/StudyHub permanecem posteriores no residual ou scoped.
+- Overrides responsivos e específicos de Import/StudyHub permanecem posteriores nos CSS responsivos ou scoped.
 
 ## Ações de operações: estilos (G2q)
 
@@ -221,7 +221,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/modules/data-transfer/presentation/data-transfer.css`: 155 linhas de importação, backup e exportação.
 - `scripts/lib/data-transfer-style-scenarios.cjs`: abas reais, layout e dados/storage em nove larguras, incluindo 720±1 e 1420±1.
-- Overrides responsivos permanecem no residual; handlers, importadores, download e restauração continuam em `app.js`.
+- Overrides responsivos permanecem nos CSS responsivos; handlers, importadores, download e restauração continuam em `app.js`.
 
 ## Diálogo comum: estilos (G2t)
 
@@ -239,11 +239,11 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/styles/workspace-grids.css`: seis regras de layout de estratégias, perfil e parceiros, preservadas na ordem original.
 - `scripts/lib/workspace-grid-style-scenarios.cjs`: grids reais em seis larguras; inclui perfil secundário, margem do último filho e parceiros legados ocultos.
-- Responsividade até 1420px permanece em `styles.css`; renderers, handlers e dados continuam no legado.
+- Responsividade até 1420px permanece em `src/styles/responsive-desktop-tablet.css`; renderers, handlers e dados continuam no legado.
 
 ## StudyHub: estilos nativos (G2w)
 
-- `src/modules/study-hub/presentation/study-hub-native.css`: abas/root e estilos de markup nativo; 297 linhas, carregadas antes do residual.
+- `src/modules/study-hub/presentation/study-hub-native.css`: abas/root e estilos de markup nativo; 297 linhas, carregadas antes dos CSS responsivos.
 - `scripts/lib/study-hub-native-style-scenarios.cjs`: quatro abas, hover ativo/inativo, foco e rolagem horizontal/sticky em oito larguras.
 - Markup nativo de grids/cards/ranges não é montado pelo renderer atual; regras preservadas sem fabricar consumidores.
 - Overrides responsivos, montagem legada, handlers, cálculos e storage permanecem na posição original.
@@ -252,33 +252,33 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/styles/workspace-summaries.css`: métricas do perfil, status/notificações, chips analíticos e espaçamento do ranking ampliado; 156 linhas.
 - `scripts/lib/workspace-summary-style-scenarios.cjs`: seis cenários em seis larguras; real profile e renderers existentes com fixture de markup restaurável.
-- Wrapping de status e hero em uma coluna até 720px permanecem no residual; cálculos, handlers e dados não alterados.
+- Wrapping de status e hero em uma coluna até 720px permanecem nos CSS responsivos; cálculos, handlers e dados não alterados.
 
 ## Documentos: navegação e editor (G2y)
 
 - `src/modules/documents/presentation/doc-browser-and-layout.css`: shell, cards, pastas, entradas e metadados agrupados; 192 linhas.
 - `src/modules/documents/presentation/doc-editor-and-media.css`: contexto do trade, toolbar, textarea, mídia e estados vazios; 173 linhas.
-- Links adjacentes após resumos compartilhados; `.doc-empty` mantém o override tardio e media queries 1420/1240/1080px permanecem no residual.
+- Links adjacentes após resumos compartilhados; `.doc-empty` mantém o override tardio e media queries 1420/1240/1080px permanecem nos CSS responsivos.
 - Renderers/seleção em `app.js`: `renderDocumentsPage`, `renderDocumentMedia`, `selectDocumentFolder`, `selectDocumentEntry`; persistência não alterada.
 - `scripts/lib/document-style-scenarios.cjs`: 41 casos de notas gerais/diárias/trades/vazio, foco, hover e overflow; dados temporários restaurados, sem salvar/remover/upload.
 
 ## Contas: visão geral (G2z)
 
 - `src/modules/accounts/presentation/account-overview.css`: grid, cards, resumo, estatísticas e barras de risco; 115 linhas.
-- Carrega após os dois CSS de documentos, antes do residual; `.account-overview-card` preserva as regras comuns anteriores e os overrides tardios em 1420/720px.
+- Carrega após os dois CSS de documentos, antes dos CSS responsivos; `.account-overview-card` preserva as regras comuns anteriores e os overrides tardios em 1420/720px.
 - Consumidor: contêiner `#accountsOverview` em `index.html`, preenchido por `renderAccountsPage` em `app.js`; cálculo de risco e ações permanecem no legado.
 - `scripts/lib/account-overview-style-scenarios.cjs`: 17 cenários de conta única, duas contas, vazio e nome longo; memória/storage restaurados.
 
 ## Parceiros: editor e apoio (G2aa)
 
-- `src/modules/partners/presentation/partners.css`: 127 linhas de editor de afiliados, estados vazios, apoio e QR; carregado após a visão geral de contas e antes do residual.
+- `src/modules/partners/presentation/partners.css`: 127 linhas de editor de afiliados, estados vazios, apoio e QR; carregado após a visão geral de contas e antes dos CSS responsivos.
 - Consumidores ativos: `#partnerAffiliatesEditor`, `.partner-support-form`, `#partnerBtcQrPreview` e `renderPartnersPage`; `#partnersGrid` legado permanece oculto.
 - `scripts/lib/partner-style-scenarios.cjs`: 32 estados de vazio/afiliados/QR nas larguras 390, 719/720/721, 1419/1420/1421 e 1440px; fixture restaura configuração/storage.
 - Regras legadas de `.partner-card` e classes sem markup ativo seguem intactas; overrides responsivos permanecem tardios.
 
 ## Perfil: complemento tardio das tags (G2ab)
 
-- `src/styles/tag-cloud.css`: 13 linhas de espaçamento dos três grupos e títulos da nuvem de tags; carregado após parceiros e antes do residual.
+- `src/styles/tag-cloud.css`: 13 linhas de espaçamento dos três grupos e títulos da nuvem de tags; carregado após parceiros e antes dos CSS responsivos.
 - Consumidor: `renderProfilePage` preenche `#profileTags`; `.tag-list`/`.tag` anteriores continuam em `src/styles/tag-editor.css`.
 - `scripts/lib/tag-editor-style-scenarios.cjs` inclui nove estados de nuvem padrão/vazia/texto longo em 390/720/1440px; dados e storage restaurados.
 
@@ -290,6 +290,12 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Shell: responsividade desktop/tablet (G2ad)
 
-- `src/styles/responsive-desktop-tablet.css`: três media queries completas de 1420/1240/1080px, 260 linhas; link após `page-motion.css` e antes do residual mobile.
+- `src/styles/responsive-desktop-tablet.css`: três media queries completas de 1420/1240/1080px, 260 linhas; link após `page-motion.css` e antes de `responsive-mobile.css`.
 - Regras afetam shell, sidebar, dashboards, documentos, grids e StudyHub. A ordem preserva o override de `#sidebar` (`100dvh` em 1240px; `100vh` em 1080px).
 - Matriz v29 caracteriza 922 estados, incluindo 1080/1240/1420±1; 922 estados idênticos após o corte, com 46 imagens/263 pixels dentro da tolerância existente.
+
+## Shell: responsividade mobile (G2ae)
+
+- `src/styles/responsive-mobile.css`: duas media queries completas de 720/440px, 316 linhas; ocupa a posição anterior de `styles.css`, antes dos quatro CSS legados StudyHub.
+- `styles.css` foi removido após esgotar o residual; nenhum script, dado persistido ou seletor mudou.
+- Matriz v29 inclui 390, 439/440/441 e 719/720/721px; demais larguras e páginas continuam na comparação integral.
