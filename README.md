@@ -30,7 +30,7 @@ git switch --track origin/refactor/clean-architecture-progress
 python3 -m http.server 8000
 ```
 
-Abra [http://localhost:8000](http://localhost:8000). A versão publicada usa arquivos estáticos; não há compilação. A conexão com a internet é necessária para carregar Chart.js pelo CDN, fontes externas e para consultar a cotação USD/BRL. A biblioteca XLSX é carregada pelo CDN apenas quando uma importação de planilha exige isso.
+Abra [http://localhost:8000](http://localhost:8000). A versão publicada usa arquivos estáticos; não há compilação. Chart.js pelo CDN, fontes externas e a consulta da cotação USD/BRL exigem conexão com a internet; os arquivos locais continuam disponíveis sem ela. A biblioteca XLSX é carregada pelo CDN apenas quando uma importação de planilha exige isso.
 
 A branch `refactor/clean-architecture-progress` contém o trabalho incremental de refatoração. A aplicação continua usando scripts clássicos síncronos; a ordem dos `<script>` e `<link>` em `index.html` faz parte do contrato de compatibilidade.
 
