@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3d registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3e registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3d extraído: `renderDocumentsPage` de `app.js` para `src/modules/documents/presentation/documents-page.js`, 137 linhas movidas intactas.
-- API global, seleção, estado, navegação, refresh e callbacks preservados; script clássico síncrono antes dos outros renderers e de `app.js`.
-- Caracterização pré-corte: cinco testes do renderer e 75 testes Node no total; baseline visual v29 de 922 estados do commit `3b95e19`.
-- Após o corte: 75 testes Node, 43 checks no navegador, sintaxe e diff aprovados; 922 estados visuais idênticos, com 52 imagens/188 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+- G3e extraído: `renderPremarket` de `app.js` para `src/modules/routine/presentation/premarket-page.js`, 60 linhas movidas intactas.
+- API global, mês atual, conta ativa, hábitos, navegação, refresh e callbacks preservados; script clássico síncrono antes dos outros renderers e de `app.js`.
+- Caracterização pré-corte: quatro testes do renderer e 79 testes Node no total; baseline visual v29 de 922 estados do commit `21688f4`.
+- Após o corte: 79 testes Node, 47 checks no navegador, sintaxe e diff aprovados; 922 estados visuais idênticos, com 52 imagens/191 pixels dentro da tolerância existente; revisão independente sem achados.
 
 ## Next
-- G3e: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3f: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -264,3 +264,4 @@
 - G3b: renderer de parceiros em `presentation`; configuração, IO, salvamento e callbacks inline permanecem no legado.
 - G3c: renderer de contas em `presentation`; contas/risco são consultados na chamada e salvamento/exclusão continuam no legado.
 - G3d: renderer de documentos em `presentation`; estado de pasta/seleção, mídia, ações e persistência continuam no legado.
+- G3e: renderer do premarket em `presentation`; estado de mês/hábitos, navegação e persistência continuam no legado.

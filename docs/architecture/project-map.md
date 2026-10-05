@@ -11,7 +11,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots` |
 | Análises/calendário | `renderStats`, `renderStatsPsych`, `renderCalendar` |
-| Rotina | `renderPremarket`, `savePM`, `preMarketData` |
+| Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
 | StudyHub | `renderStudyHub`, `syncStudyHubLegacyInputs`, `shInitLegacyModule` |
@@ -204,7 +204,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `src/modules/routine/presentation/premarket.css`: checklist e grade mensal da rotina.
 - `src/modules/trades/presentation/error-chips.css`: chips do modal de operação.
 - `scripts/lib/premarket-error-chip-style-scenarios.cjs`: seis estados em três larguras, sem persistência.
-- Renderização e handlers continuam em `app.js`; `.pm-check` foi preservado sem consumidor localizado.
+- Renderer da página em `src/modules/routine/presentation/premarket-page.js`; handlers e persistência continuam em `app.js`; `.pm-check` foi preservado sem consumidor localizado.
+
+## Premarket: renderer de página (G3e)
+
+- `src/modules/routine/presentation/premarket-page.js`: `renderPremarket` global, 60 linhas movidas intactas de `app.js`; script clássico síncrono antes dos outros renderers e de `app.js`.
+- Estado de mês, conta ativa, hábitos, ações e persistência continuam no legado; `showPage`, `refreshAll`, navegação mensal e edição de hábitos preservam os consumidores.
+- `tests/premarket-page.test.cjs` caracteriza resultados, grade, fevereiro bissexto, ausência de alvo e ordem de carga; smoke abre a rotina e exercita refresh.
+- Matriz visual v29 comparou 922 estados com G3d; todos idênticos, com 52 imagens/191 pixels dentro da tolerância existente.
 
 ## Documentação sob demanda
 

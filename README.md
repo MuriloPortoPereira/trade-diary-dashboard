@@ -88,7 +88,7 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 | Preparação, auditoria e mapas | Concluídos |
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
 | G1–G2: CSS | Concluídos; 40 arquivos CSS carregados na ordem original |
-| G3: JavaScript por feature | Em andamento; renderers de perfil, parceiros e contas extraídos |
+| G3: JavaScript por feature | Em andamento; renderers de perfil, parceiros, contas, documentos e premarket extraídos |
 | G4: regras de domínio | Pendente por lotes de métricas, timing, risco e simulação |
 | G5: persistência/importação | Pendente por formato, coordenação e IO |
 | G6: StudyHub | Pendente; runtime legado exige isolamento gradual |

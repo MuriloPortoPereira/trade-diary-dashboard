@@ -97,6 +97,15 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      const premarketNav = document.querySelector('.nav-item[onclick="showPage(\'premarket\')"]');
+      premarketNav.click();
+      check('premarket navigation and global renderer', document.querySelector('#page-premarket.active') && typeof renderPremarket === 'function');
+      check('premarket month results rendered', document.getElementById('pmMonthLabel').textContent.trim().length > 0 &&
+        document.getElementById('pmResultStats').textContent.includes('Trades no mês'));
+      check('premarket habit grid rendered', document.querySelectorAll('#pmHabitGrid .pm-grid-day').length >= 28);
+      refreshAll();
+      check('premarket refresh renders again', document.querySelector('#page-premarket.active') &&
+        document.querySelectorAll('#pmHabitGrid .pm-grid-day').length >= 28);
       const documentsNav = document.querySelector('.nav-item[onclick="showPage(\'documents\')"]');
       documentsNav.click();
       check('documents navigation and global renderer', document.querySelector('#page-documents.active') && typeof renderDocumentsPage === 'function');
@@ -173,7 +182,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 43, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 47, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

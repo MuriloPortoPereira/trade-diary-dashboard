@@ -725,6 +725,16 @@ lista/editor e exercita `refreshAll` (43 checks). Referência visual v29 de
 byte a byte; 922 estados idênticos, 52 imagens/188 pixels de rasterização dentro da
 tolerância existente, zero erros de console/runtime; 75 testes Node, sintaxe e diff aprovados.
 
+## Renderer do premarket (G3e)
+
+`tests/premarket-page.test.cjs` caracterizou antes do corte resultados mensais,
+grade de hábitos, fevereiro bissexto e ausência da grade. O smoke abre a rotina,
+verifica resultados e grade e exercita `refreshAll` (47 checks). Referência visual
+v29 de `21688f4` em `.agents/state/artifacts/refactoring-g3d/after-v29`; pós-corte
+em `.agents/state/artifacts/refactoring-g3e/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 52 imagens/191 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 79 testes Node, sintaxe e diff aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
