@@ -18,5 +18,5 @@ Comece pelo [mapa compacto](project-map.md). Abra somente a feature necessária.
 | [ADR-001](adr/001-incremental-classic-scripts.md) | Scripts clássicos durante transição |
 | [ADR-002](adr/002-characterization-tests.md) | Testes de caracterização |
 
-Baseline auditado: `ab0cb63`; branch `develop/clean-architecture`.
+Baseline histórico auditado: `ab0cb63` na branch `develop/clean-architecture`; trabalho incremental atual em `refactor/clean-architecture-progress`.
 Linhas do baseline são referências históricas; localize símbolos após cada extração.

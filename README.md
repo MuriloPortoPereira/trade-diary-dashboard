@@ -1,259 +1,109 @@
-<div align="center">
-
 # Trade Diary Dashboard
 
-Dashboard web para registro, análise e acompanhamento de operações de trading.
+Aplicação web estática para registrar operações de trading, acompanhar contas e risco, analisar resultados e organizar estudos. Funciona no navegador com HTML, CSS, JavaScript clássico, Chart.js e `localStorage`; não há backend, login ou etapa de build.
 
-Projeto front-end desenvolvido para centralizar métricas operacionais, controle de risco, disciplina, contas, importação de trades e análise de performance em uma interface visual.
+[Versão pública informada pelo projeto](https://trade-diary-dashboard.vercel.app/) · [Repositório](https://github.com/MuriloPortoPereira/trade-diary-dashboard) · [Licença MIT](LICENSE)
 
-<br>
+> Os dados ficam no `localStorage` do navegador e da origem usada para abrir a aplicação. Não há sincronização entre dispositivos ou contas de usuário. Exporte backups antes de limpar os dados do navegador ou mudar de origem.
 
-[![Projeto Online](https://img.shields.io/badge/Projeto%20Online-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://trade-diary-dashboard.vercel.app/)
-[![GitHub](https://img.shields.io/badge/Repositório-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/MuriloPortoPereira/trade-diary-dashboard)
-[![Status](https://img.shields.io/badge/status-em%20evolução-22c55e?style=for-the-badge)](#roadmap)
-[![License](https://img.shields.io/badge/licença-MIT-blue?style=for-the-badge)](./LICENSE)
+## O que a aplicação oferece
 
-</div>
-
----
-
-## Demonstração
-
-| Acesso | Link |
+| Área | Recursos existentes |
 |---|---|
-| Projeto online | [https://trade-diary-dashboard.vercel.app/](https://trade-diary-dashboard.vercel.app/) |
-| Repositório | [https://github.com/MuriloPortoPereira/trade-diary-dashboard](https://github.com/MuriloPortoPereira/trade-diary-dashboard) |
+| Diário e dashboard | Registro de trades, filtros, tabelas, métricas, gráficos e calendário |
+| Contas e risco | Múltiplas contas, visão geral de saldos, limites e acompanhamento de risco |
+| Análises | Estratégias, resultados, disciplina, psicologia e simulação |
+| Rotina e StudyHub | Checklist pré-mercado e ferramentas de estudo integradas |
+| Dados | Importação de relatórios/planilhas, exportação CSV e backup JSON |
+| Workspace | Documentos, notificações, parceiros, perfil e preferências de idioma |
 
----
+A interface contém 15 páginas internas alternadas por `showPage(id)`. O perfil é um resumo local da conta ativa; não implementa autenticação. Este software é uma ferramenta de registro e estudo, não aconselhamento financeiro.
 
-## Preview da interface
+## Executar localmente
 
-![Preview do Trade Diary Dashboard](https://drive.google.com/uc?export=view&id=1nVj7awfGgIHCebEtdbLw6vkEcPVdM-5p)
-
-Caso a imagem não carregue no GitHub, acesse pelo link abaixo:
-
-[Visualizar screenshot no Google Drive](https://drive.google.com/file/d/1nVj7awfGgIHCebEtdbLw6vkEcPVdM-5p/view?usp=sharing)
-
----
-
-## Visão geral
-
-O **Trade Diary Dashboard** é uma aplicação web criada para ajudar traders a registrarem, organizarem e analisarem suas operações em um painel centralizado.
-
-A proposta do projeto é transformar dados operacionais em uma visão mais clara sobre performance, risco, disciplina e evolução da banca.
-
-A versão publicada foi mantida com uma estrutura mínima e funcional, priorizando:
-
-- carregamento simples;
-- publicação rápida na Vercel;
-- código acessível para análise;
-- apresentação objetiva para portfólio;
-- uso direto pelo navegador.
-
----
-
-## Problema que o projeto resolve
-
-Muitos traders registram operações em planilhas, prints, anotações soltas ou arquivos separados.
-
-Esse fluxo dificulta a análise de pontos importantes, como:
-
-| Dificuldade | Impacto |
-|---|---|
-| Dados espalhados | Dificulta revisar performance |
-| Falta de padronização | Prejudica comparação entre operações |
-| Pouca visibilidade de risco | Aumenta chance de decisões impulsivas |
-| Ausência de histórico centralizado | Dificulta identificar padrões |
-| Falta de métricas comportamentais | Reduz clareza sobre disciplina operacional |
-
-O **Trade Diary Dashboard** busca centralizar essas informações em uma interface visual, ajudando o usuário a revisar suas operações de forma mais organizada.
-
----
-
-## Funcionalidades
-
-| Área | Funcionalidades |
-|---|---|
-| Dashboard | Visão geral das operações e métricas principais |
-| Trades | Registro, análise e acompanhamento de operações |
-| Contas | Filtro e organização por conta operacional |
-| Risco | Métricas relacionadas a exposição e gerenciamento |
-| Disciplina | Apoio à leitura de comportamento operacional |
-| Importação | Importação de operações via planilhas |
-| Performance | Visualização de evolução e resultados |
-| Cotação | Consumo externo de cotação USD/BRL |
-| Interface | Layout web responsivo e publicado como site estático |
-
----
-
-## Tecnologias utilizadas
-
-<div align="center">
-
-![HTML5](https://img.shields.io/badge/HTML5-111827?style=for-the-badge&logo=html5)
-![CSS3](https://img.shields.io/badge/CSS3-111827?style=for-the-badge&logo=css3&logoColor=1572B6)
-![JavaScript](https://img.shields.io/badge/JavaScript-111827?style=for-the-badge&logo=javascript)
-![Chart.js](https://img.shields.io/badge/Chart.js-111827?style=for-the-badge&logo=chartdotjs)
-![Vercel](https://img.shields.io/badge/Vercel-111827?style=for-the-badge&logo=vercel)
-
-</div>
-
-| Tecnologia | Uso no projeto |
-|---|---|
-| HTML5 | Estrutura principal da aplicação |
-| CSS3 | Estilização, layout e responsividade |
-| JavaScript | Lógica de interação, cálculos e manipulação de dados |
-| LocalStorage | Persistência local de informações no navegador |
-| Chart.js | Apoio visual com gráficos via CDN |
-| XLSX | Importação de planilhas via CDN |
-| API USD/BRL | Consulta externa de cotação |
-| Vercel | Deploy da versão web |
-
----
-
-## Estrutura do projeto
-
-A versão pública foi organizada de forma mínima para facilitar análise e deploy.
-
-```txt
-trade-diary-dashboard/
-├── index.html
-├── app.js
-├── src/styles/
-├── src/modules/
-├── README.md
-└── LICENSE
-```
-
-| Arquivo | Função |
-|---|---|
-| `index.html` | Estrutura principal da aplicação |
-| `app.js` | Regras de interação, cálculos e comportamento do dashboard |
-| `src/styles/` e `src/modules/*/presentation/*.css` | Estilos visuais carregados na ordem de `index.html` |
-| `README.md` | Documentação do projeto |
-| `LICENSE` | Licença de uso |
-
----
-
-## Como rodar localmente
-
-Clone o repositório:
+Não é necessário `npm install`. Use um servidor HTTP na raiz do repositório para carregar os scripts e CSS locais:
 
 ```bash
 git clone https://github.com/MuriloPortoPereira/trade-diary-dashboard.git
-```
-
-Acesse a pasta:
-
-```bash
 cd trade-diary-dashboard
+git switch --track origin/refactor/clean-architecture-progress
+python3 -m http.server 8000
 ```
 
-Rode um servidor local:
+Abra [http://localhost:8000](http://localhost:8000). A versão publicada usa arquivos estáticos; não há compilação. A conexão com a internet é necessária para carregar Chart.js pelo CDN, fontes externas e para consultar a cotação USD/BRL. A biblioteca XLSX é carregada pelo CDN apenas quando uma importação de planilha exige isso.
+
+A branch `refactor/clean-architecture-progress` contém o trabalho incremental de refatoração. A aplicação continua usando scripts clássicos síncronos; a ordem dos `<script>` e `<link>` em `index.html` faz parte do contrato de compatibilidade.
+
+## Estrutura do repositório
+
+```text
+index.html                  HTML, páginas, modais e ordem dos assets
+app.js                      Estado, bootstrap e fluxos ainda legados
+src/styles/                 CSS comum e responsividade
+src/modules/                Código e CSS organizados por feature
+  accounts/presentation/    Visão de contas
+  partners/presentation/    Página e estilos de parceiros
+  profile/presentation/     Página de perfil
+  preferences/presentation/ Idiomas, catálogos e widgets
+  simulation/domain/        Cálculo puro de sizing
+  data-transfer/infrastructure/ Serialização CSV
+  ...                       Demais módulos extraídos gradualmente
+tests/                      Testes Node de caracterização
+scripts/                    Smoke e comparação visual no navegador
+docs/architecture/          Mapas, arquitetura, roadmap e progresso
+AGENTS.md                   Instruções operacionais dos agentes
+```
+
+`src/modules/` também contém módulos de apresentação para analytics, calendar, documents, routine, StudyHub e trades. O [mapa do projeto](docs/architecture/project-map.md) é a fonte rápida para localizar código real. O [mapa de extração JavaScript](docs/architecture/javascript-extraction-map.md) distingue destinos propostos dos arquivos já criados.
+
+## Arquitetura e compatibilidade
+
+A refatoração segue Clean Architecture de forma proporcional a uma aplicação estática:
+
+- **Presentation:** DOM, renderização, handlers e CSS da feature.
+- **Application:** coordenação de casos de uso, quando houver um boundary real.
+- **Domain:** cálculos e regras puras, sem DOM, Chart.js ou storage.
+- **Infrastructure:** formatos, `localStorage`, arquivos e integrações externas.
+- **Composição legada:** `app.js` ainda liga os módulos e preserva funções globais usadas pelo HTML.
+
+As extrações são feitas por responsabilidade, com testes antes da mudança. Funções globais, handlers inline, dados salvos, ordem dos scripts e comportamento existente devem continuar compatíveis. Não há migração para ES modules nem dependência de runtime nova. Consulte [arquitetura alvo](docs/architecture/target-architecture.md), [regras de dependência](docs/architecture/dependency-rules.md) e [ADRs](docs/architecture/README.md).
+
+## Testes e verificação
+
+Requer Node.js para os testes. O smoke também requer Chrome ou Chromium instalado; configure `CHROME_BIN` se o executável não for `google-chrome`.
 
 ```bash
-python -m http.server 8000
+node --test tests/*.test.cjs
+node scripts/browser-smoke.cjs
+node --check app.js
+git diff --check
 ```
 
-Depois acesse no navegador:
+Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` em cada um. O smoke usa um perfil isolado do navegador, verifica navegação e assets locais e não usa os dados do seu navegador habitual. A comparação visual por estados, geometria e imagens é descrita em [ferramentas e verificações](docs/architecture/tooling.md). A cobertura caracteriza fluxos específicos; ela não equivale a uma prova de todos os cálculos ou estados possíveis.
 
-```txt
-http://localhost:8000
-```
+## Estado da refatoração
 
----
-
-## Deploy
-
-O projeto está publicado na Vercel:
-
-```txt
-https://trade-diary-dashboard.vercel.app/
-```
-
-Configuração recomendada para deploy:
-
-| Campo | Configuração |
+| Frente | Situação |
 |---|---|
-| Framework Preset | Other |
-| Build Command | vazio |
-| Output Directory | vazio ou `.` |
-| Root Directory | raiz do projeto |
+| Preparação, auditoria e mapas | Concluídos |
+| Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
+| G1–G2: CSS | Concluídos; 40 arquivos CSS carregados na ordem original |
+| G3: JavaScript por feature | Em andamento; renderers de perfil, parceiros e contas extraídos |
+| G4: regras de domínio | Pendente por lotes de métricas, timing, risco e simulação |
+| G5: persistência/importação | Pendente por formato, coordenação e IO |
+| G6: StudyHub | Pendente; runtime legado exige isolamento gradual |
+| G7: HTML e compatibilidade | Pendente, após migrar consumidores relevantes |
 
----
+O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
 
-## Decisões técnicas
+## Deploy e dados
 
-A publicação foi feita em uma versão reduzida, contendo apenas os arquivos essenciais para execução do projeto.
+A aplicação pode ser servida como site estático a partir da raiz do repositório, mantendo os caminhos e a ordem dos assets de `index.html`. O endereço Vercel acima é o link divulgado pelo projeto; esta branch de refatoração não é publicada automaticamente por este README.
 
-Arquivos internos de desenvolvimento, testes, versões antigas, ferramentas auxiliares, documentos de referência e snapshots foram removidos da versão pública para manter o repositório mais objetivo.
+Trades, contas, configuração e dados do StudyHub usam armazenamento local do navegador. Importação, exportação e restauração têm contratos próprios: consulte [mapa de módulos](docs/architecture/module-map.md) e [mapa do projeto](docs/architecture/project-map.md) antes de alterá-los. Não mude chaves de storage ou formato de backup como parte de uma extração visual ou de arquivos.
 
-Essa decisão deixa o projeto mais fácil de acessar, revisar e publicar.
+## Documentação e contribuição
 
----
+Comece pelo [índice de arquitetura](docs/architecture/README.md). Para contribuir em um lote, leia [AGENTS.md](AGENTS.md), localize a feature no mapa, registre o comportamento atual, faça uma extração coesa, rode as verificações e revise o diff. Ferramentas de agente como Serena, Context7, Caveman e Superpowers auxiliam o desenvolvimento; a aplicação não depende delas em runtime.
 
-## Aprendizados
-
-Durante o desenvolvimento e organização deste projeto, foram praticados conceitos como:
-
-- estruturação de aplicações front-end sem framework;
-- organização de dashboards com HTML, CSS e JavaScript;
-- manipulação de dados no navegador;
-- uso de bibliotecas externas via CDN;
-- importação de planilhas;
-- visualização de métricas operacionais;
-- publicação de site estático na Vercel;
-- preparação de projeto para portfólio técnico.
-
----
-
-## Roadmap
-
-Melhorias planejadas para próximas versões:
-
-| Versão | Melhorias |
-|---|---|
-| V1.1 | Adicionar screenshots reais diretamente no repositório |
-| V1.2 | Melhorar documentação das métricas |
-| V1.3 | Criar filtros avançados por período |
-| V1.4 | Adicionar exportação de relatórios |
-| V1.5 | Melhorar responsividade em telas menores |
-| V1.6 | Separar módulos internos por responsabilidade |
-| V1.7 | Adicionar persistência mais robusta |
-| V1.8 | Reintroduzir testes automatizados em versão completa |
-
----
-
-## Aviso educacional e financeiro
-
-Este projeto possui finalidade educacional, analítica e organizacional.
-
-Ele não representa recomendação de investimento, promessa de rentabilidade ou aconselhamento financeiro.
-
-Os dados, cálculos e visualizações devem ser utilizados apenas como apoio para estudo, organização pessoal e análise operacional.
-
----
-
-## Autor
-
-Desenvolvido por **Murilo Porto Pereira**.
-
-| Canal | Link |
-|---|---|
-| GitHub | [MuriloPortoPereira](https://github.com/MuriloPortoPereira) |
-| Projeto online | [Trade Diary Dashboard](https://trade-diary-dashboard.vercel.app/) |
-| Repositório | [trade-diary-dashboard](https://github.com/MuriloPortoPereira/trade-diary-dashboard) |
-
----
-
-## Licença
-
-Este projeto está distribuído sob a licença MIT.
-
-Consulte o arquivo [LICENSE](./LICENSE) para mais detalhes.
-
-
-## Desenvolvimento e arquitetura
-
-Mapa, hotspots, plano incremental e verificações: [docs/architecture](docs/architecture/README.md).
-Instruções para agentes: [AGENTS.md](AGENTS.md).
+Desenvolvido por **Murilo Porto Pereira**. Licenciado sob [MIT](LICENSE).
