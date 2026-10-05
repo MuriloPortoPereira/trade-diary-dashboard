@@ -300,6 +300,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Depois do corte: 70 testes Node, 39 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
 - Próximo lote G3d: selecionar outro renderer coeso após caracterizar estado, consumidores e efeitos.
 
+## G3d: renderer de documentos
+
+- `renderDocumentsPage` movida intacta de `app.js` para `src/modules/documents/presentation/documents-page.js` (137 linhas).
+- `index.html` carrega a declaração global antes dos renderers de contas/parceiros/perfil e de `app.js`; seleção, ações, `showPage` e `refreshAll` continuam iguais.
+- Antes do corte: cinco testes de caracterização e 75 testes Node passaram; baseline visual v29 de 922 estados do commit `3b95e19`.
+- Depois do corte: 75 testes Node, 43 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
+- Próximo lote G3e: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

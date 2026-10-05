@@ -715,6 +715,16 @@ exercita `refreshAll` (39 checks). Referência visual v29 de `bc3ef23` em
 59 imagens/291 pixels de rasterização dentro da tolerância existente; zero erros de
 console/runtime. Corpo da função movido byte a byte; 70 testes Node e sintaxe aprovados.
 
+## Renderer de documentos (G3d)
+
+`tests/documents-page.test.cjs` caracterizou antes do corte pastas, lista, editor,
+vazio, contexto de trade e nó ausente. O smoke abre documentos, verifica pastas,
+lista/editor e exercita `refreshAll` (43 checks). Referência visual v29 de
+`3b95e19` em `.agents/state/artifacts/refactoring-g3c/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3d/after-v29`. O corpo da função foi movido
+byte a byte; 922 estados idênticos, 52 imagens/188 pixels de rasterização dentro da
+tolerância existente, zero erros de console/runtime; 75 testes Node, sintaxe e diff aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

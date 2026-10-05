@@ -97,6 +97,15 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      const documentsNav = document.querySelector('.nav-item[onclick="showPage(\'documents\')"]');
+      documentsNav.click();
+      check('documents navigation and global renderer', document.querySelector('#page-documents.active') && typeof renderDocumentsPage === 'function');
+      check('documents folders rendered', document.querySelectorAll('#docFolders .doc-folder').length > 0);
+      check('documents list and editor rendered', document.getElementById('docEntries').innerHTML.length > 0 &&
+        document.getElementById('docEditorHeading').textContent.trim().length > 0);
+      refreshAll();
+      check('documents refresh renders again', document.querySelector('#page-documents.active') &&
+        document.querySelectorAll('#docFolders .doc-folder').length > 0);
       showPage('studyHub');
       for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
         document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
@@ -164,7 +173,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 39, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 43, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

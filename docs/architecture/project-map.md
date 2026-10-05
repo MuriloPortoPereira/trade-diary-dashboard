@@ -16,7 +16,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
 | StudyHub | `renderStudyHub`, `syncStudyHubLegacyInputs`, `shInitLegacyModule` |
 | Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
-| Documentos | `getDocumentEntries`, `saveCurrentDocument`, `renderDocumentsPage` |
+| Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
@@ -260,8 +260,15 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/modules/documents/presentation/doc-browser-and-layout.css`: shell, cards, pastas, entradas e metadados agrupados; 192 linhas.
 - `src/modules/documents/presentation/doc-editor-and-media.css`: contexto do trade, toolbar, textarea, mídia e estados vazios; 173 linhas.
 - Links adjacentes após resumos compartilhados; `.doc-empty` mantém o override tardio e media queries 1420/1240/1080px permanecem nos CSS responsivos.
-- Renderers/seleção em `app.js`: `renderDocumentsPage`, `renderDocumentMedia`, `selectDocumentFolder`, `selectDocumentEntry`; persistência não alterada.
+- Renderer principal em `src/modules/documents/presentation/documents-page.js`; `renderDocumentMedia`, `selectDocumentFolder`, `selectDocumentEntry` e persistência permanecem em `app.js`.
 - `scripts/lib/document-style-scenarios.cjs`: 41 casos de notas gerais/diárias/trades/vazio, foco, hover e overflow; dados temporários restaurados, sem salvar/remover/upload.
+
+## Documentos: renderer de página (G3d)
+
+- `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage` global, 137 linhas movidas intactas de `app.js`; script clássico síncrono antes dos renderers de contas/parceiros/perfil e de `app.js`.
+- Estado de pasta/seleção, helpers, mídia, ações e persistência continuam no legado; `showPage`, `refreshAll` e callbacks de documentos preservam os consumidores.
+- `tests/documents-page.test.cjs` caracteriza lista, editor, vazio, contexto de trade, alvos ausentes e ordem de carga; smoke abre documentos e exercita refresh.
+- Matriz visual v29 comparou 922 estados com G3c; todos idênticos, com 52 imagens/188 pixels dentro da tolerância existente.
 
 ## Contas: visão geral (G2z)
 

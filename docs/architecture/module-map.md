@@ -101,6 +101,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/partners-page.test.cjs` | Caracterização de vazio, afiliados/QR, alvos ausentes e ordem de carga |
 | `src/modules/accounts/presentation/accounts-page.js` | Renderer global de contas, 46 linhas movidas intactas de `app.js` |
 | `tests/accounts-page.test.cjs` | Caracterização de contas, vazio, alvos opcionais e ordem de carga |
+| `src/modules/documents/presentation/documents-page.js` | Renderer global de documentos, 137 linhas movidas intactas de `app.js` |
+| `tests/documents-page.test.cjs` | Caracterização de pasta/lista/editor, vazio, trade, alvo ausente e ordem de carga |
 | `scripts/lib/partner-style-scenarios.cjs` | Vazio/afiliados/QR em oito larguras, sem mutação persistente |
 | `src/styles/tag-cloud.css` | Espaçamento/títulos dos três grupos de tags do perfil; 13 linhas |
 | `src/styles/page-motion.css` | `@keyframes fade-up` usado pela página ativa; 12 linhas |
@@ -110,6 +112,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3c; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3d; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
