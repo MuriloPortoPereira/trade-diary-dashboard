@@ -18,6 +18,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `getDocumentEntries`, `saveCurrentDocument`, `renderDocumentsPage` |
 | Parceiros | `ensurePartnerHubConfig`, `renderPartnersPage` |
+| Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
 | Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
@@ -281,6 +282,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/tag-cloud.css`: 13 linhas de espaçamento dos três grupos e títulos da nuvem de tags; carregado após parceiros e antes dos CSS responsivos.
 - Consumidor: `renderProfilePage` preenche `#profileTags`; `.tag-list`/`.tag` anteriores continuam em `src/styles/tag-editor.css`.
 - `scripts/lib/tag-editor-style-scenarios.cjs` inclui nove estados de nuvem padrão/vazia/texto longo em 390/720/1440px; dados e storage restaurados.
+
+## Perfil: renderer de página (G3a)
+
+- `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` global, movida sem reescrita de `app.js`; carrega como script clássico síncrono imediatamente antes de `app.js`.
+- Continua lendo conta/trades/config e delegando métricas, risco e alertas às funções legadas no momento da chamada; `showPage` e `refreshAll` mantêm os consumidores.
+- `tests/profile-page.test.cjs` caracteriza hero, risco, tags, alertas e nós opcionais; smoke navega ao perfil e exercita refresh.
+- Matriz visual v29 comparou 922 estados com a referência anterior ao corte; todos idênticos, com 56 imagens/372 pixels dentro da tolerância existente.
 
 ## Shell: animação de entrada (G2ac)
 

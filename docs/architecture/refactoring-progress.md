@@ -2,8 +2,8 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1 e os cortes G2 registrados abaixo.
-- G2 em andamento; faltam estilos residuais. G3–G6 continuam como frentes de JavaScript, domínio, IO e StudyHub.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a registrados abaixo.
+- G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G2ae extraído: `src/styles/responsive-mobile.css`, 316 linhas/4.966 bytes e duas media queries completas de 720/440px; `styles.css` removido.
-- G2 concluído: 40 blocos CSS carregados em 40 links, preservando os 162.576 bytes originais concatenados.
-- Caracterização pré-corte: 59 testes Node e matriz v29 de 922 casos, incluindo 439/440/441 e 719/720/721px; referência imutável de `63ed009`.
-- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 62 imagens/369 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+- G3a extraído: `renderProfilePage` de `app.js` para `src/modules/profile/presentation/profile-page.js`, 48 linhas movidas intactas.
+- API global e consumidores `showPage`/`refreshAll` preservados; script clássico síncrono carregado imediatamente antes de `app.js`.
+- Caracterização pré-corte: três testes do renderer e 62 testes Node no total; baseline visual v29 de 922 estados do commit `47371b4`.
+- Após o corte: 62 testes Node, 31 checks no navegador, sintaxe e diff aprovados; 922 estados visuais idênticos, com 56 imagens/372 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Next
-- G3: JavaScript de páginas/componentes por feature; escolher uma responsabilidade pequena, caracterizar e preservar globals/handlers antes de extrair.
+- G3b: escolher outro renderer coeso de apresentação, caracterizar consumidores e preservar globals/ordem dos scripts antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -260,3 +260,4 @@
 - G2ac: keyframes comuns em `src/styles`; consumidor `.page.active` e timing permanecem anteriores, media queries tardias intactas.
 - G2ad: media queries gerais de desktop/tablet em `src/styles`; bytes, ordem da cascata e overrides mobile posteriores preservados.
 - G2ae: media queries mobile em `src/styles`; link substitui `styles.css` na mesma posição e mantém as regras StudyHub posteriores.
+- G3a: renderer de perfil em `presentation`; mantém leituras de estado e chamadas de métricas/risco/alertas no momento da renderização, sem nova camada.

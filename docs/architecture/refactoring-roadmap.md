@@ -276,6 +276,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - G2 concluído. Próxima frente G3: JavaScript de páginas/componentes por feature, uma responsabilidade por lote.
 
+## G3a: renderer do perfil
+
+- `renderProfilePage` movida intacta de `app.js` para `src/modules/profile/presentation/profile-page.js` (48 linhas).
+- `index.html` carrega a declaração global como script clássico síncrono imediatamente antes de `app.js`; `showPage` e `refreshAll` permanecem iguais.
+- Antes do corte: três testes de caracterização e 62 testes Node passaram; baseline visual v29 de 922 estados do commit `47371b4`.
+- Depois do corte: 62 testes Node, 31 checks no navegador e 922 estados visuais idênticos; revisão independente sem bloqueios.
+- Próximo lote G3b: outro renderer pequeno de apresentação, após caracterizar seus efeitos e consumidores.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

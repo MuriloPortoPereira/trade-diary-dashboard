@@ -683,6 +683,17 @@ de rasterização dentro da tolerância existente, zero erros de console/runtime
 59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
 Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
 
+## Renderer do perfil (G3a)
+
+`tests/profile-page.test.cjs` caracterizou antes do corte hero, risco, tags, alertas e
+alvos opcionais da função global. O smoke passou a abrir o perfil pelo menu, verificar
+os quatro blocos e exercitar `refreshAll` (31 checks). A matriz visual v29 usa como
+referência a captura de `47371b4` em
+`.agents/state/artifacts/refactoring-g2ae/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3a/after-v29`. Resultado: 922 estados idênticos,
+56 imagens/372 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 62 testes Node e sintaxe aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

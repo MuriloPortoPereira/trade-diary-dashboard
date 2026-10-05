@@ -70,6 +70,16 @@ function browserProbe() {
       nav.click();
       check('navigation closes sidebar', document.querySelector('#page-stats.active') && nav.classList.contains('active') &&
         !document.getElementById('sidebar').classList.contains('open') && !document.getElementById('sidebar-overlay').classList.contains('show'));
+      const profileNav = document.querySelector('.nav-item[onclick="showPage(\'profile\')"]');
+      profileNav.click();
+      check('profile navigation and global renderer', document.querySelector('#page-profile.active') && typeof renderProfilePage === 'function');
+      check('profile hero and risk rendered', document.getElementById('profileHero').textContent.includes('P/L total') &&
+        document.getElementById('profileRiskPanel').textContent.includes('Mandatos de risco'));
+      check('profile tags and focus rendered', document.querySelectorAll('#profileTags .tag-cloud-block').length === 3 &&
+        document.getElementById('profileFocus').textContent.trim().length > 0);
+      refreshAll();
+      check('profile refresh renders again', document.querySelector('#page-profile.active') &&
+        document.getElementById('profileHero').textContent.includes('P/L total'));
       showPage('studyHub');
       for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
         document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
@@ -137,7 +147,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 27, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 31, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

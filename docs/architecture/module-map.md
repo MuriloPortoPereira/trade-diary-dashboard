@@ -102,8 +102,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/styles/page-motion.css` | `@keyframes fade-up` usado pela página ativa; 12 linhas |
 | `src/styles/responsive-desktop-tablet.css` | Media queries gerais de 1420, 1240 e 1080px; 260 linhas |
 | `src/styles/responsive-mobile.css` | Media queries gerais de 720 e 440px; 316 linhas; substitui o residual `styles.css` |
+| `src/modules/profile/presentation/profile-page.js` | Renderer global da página de perfil; 48 linhas movidas intactas de `app.js` |
+| `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1 e G2a–G2ae; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
