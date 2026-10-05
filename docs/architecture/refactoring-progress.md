@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G2ac extraído: `src/styles/page-motion.css`, 12 linhas/144 bytes e um `@keyframes` completo.
-- `styles.css`: 588 para 576 linhas; 39 links preservam os 162.576 bytes originais concatenados.
-- Caracterização pré-corte: CSSOM dos quadros 0%/100% e animação em três páginas; matriz v29 mantém 922 casos, com referência imutável de `080c0d7`.
-- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 62 imagens/303 pixels dentro da tolerância existente; revisão independente sem bloqueios.
+- G2ad extraído: `src/styles/responsive-desktop-tablet.css`, 260 linhas/3.988 bytes e três media queries completas.
+- `styles.css`: 576 para 316 linhas; 40 links preservam os 162.576 bytes originais concatenados.
+- Caracterização pré-corte: 59 testes Node e matriz v29 de 922 casos, incluindo 1080/1240/1420±1; referência imutável de `e612fed`.
+- 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 46 imagens/263 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Next
-- G2ad: responsividade desktop/tablet (baseline 4304–4563), 260 linhas; caracterizar pontos de quebra antes de extrair.
+- G2ae: responsividade mobile (baseline 4564–4879), 316 linhas; caracterizar pontos de quebra antes de extrair.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -184,7 +184,7 @@
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.
 - Fixture visual fixa relógio/RNG/cotação. G1 pode usar fallback; G2a exige fontes carregadas e rede. Igualdade observada vale para esse ambiente.
-- G2a–G2ac cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
+- G2a–G2ad cobrem estados iniciais das 15 páginas em três larguras, shell/ações em 17 larguras, quatro modais sem submissão e abas compartilhadas; não cobrem toda a aplicação.
 - G2d acrescenta dashboard/risco em 1420±1 e tooltips por eventos DOM; não comprova hit testing físico nem todas as variantes financeiras.
 - G2e verificou scroll horizontal e dimensões/overflow; G2i acrescenta fixture com 20 operações e scroll vertical para exercer o cabeçalho sticky.
 - G2f caracteriza apresentação com renderers reais e entradas sintéticas; não audita cálculos financeiros nem testa submissão/exclusão de caixa.
@@ -258,3 +258,4 @@
 - G2aa: estilos de parceiros em `presentation`; configuração, handlers e overrides responsivos continuam na posição original.
 - G2ab: complemento da nuvem de tags em `src/styles`, após parceiros; renderer/estado não mudam.
 - G2ac: keyframes comuns em `src/styles`; consumidor `.page.active` e timing permanecem anteriores, media queries tardias intactas.
+- G2ad: media queries gerais de desktop/tablet em `src/styles`; bytes, ordem da cascata e overrides mobile posteriores preservados.

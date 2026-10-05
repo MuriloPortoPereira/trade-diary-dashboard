@@ -1,8 +1,8 @@
 # Mapa de extração do CSS
 
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2ac executados: quatro `legacy-*.css` e trinta e quatro destinos do prefixo 1–4303 existem.
-Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4304–4879.
+G1 e G2a–G2ad executados: quatro `legacy-*.css` e trinta e cinco destinos do prefixo 1–4563 existem.
+Demais destinos continuam propostos; `styles.css` residual contém as linhas históricas 4564–4879.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou
@@ -454,6 +454,17 @@ Referência integral da cópia imutável de `080c0d7` com runner v29 idêntico, 
 isolado paralelo ao código extraído. Resultado: 922 estados idênticos; 62 imagens/303
 pixels dentro da tolerância existente, zero erros de console/runtime ou assets ausentes;
 revisão independente sem bloqueios. Detalhes em [tooling](tooling.md).
+
+## Trigésimo primeiro corte executado (G2ad)
+
+Bloco histórico 4304–4563 em `src/styles/responsive-desktop-tablet.css`: 260 linhas/3.988 bytes,
+três media queries completas de 1420, 1240 e 1080px. O residual contém 316 linhas
+(4564–4879), com as media queries de 720 e 440px. Link entre `page-motion.css` e
+`styles.css`; 39 blocos extraídos e um residual, 40 links CSS globais.
+
+Antes do corte, matriz v29 de 922 estados e 59 testes Node passaram. A mesma matriz
+após o corte manteve 922 estados idênticos; 46 imagens/263 pixels dentro da tolerância
+existente. Fingerprint integral dos 162.576 bytes e ordem das media queries preservados.
 
 ## Validação exigida
 

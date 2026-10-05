@@ -57,7 +57,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Apresentação: `src/modules/study-hub/presentation/legacy-controls.css`,
   `legacy-trade-sequence.css`, `legacy-recovery-panels.css`, `legacy-integration-overrides.css`.
 - Carregados nessa ordem depois de `styles.css`; todos ativos nas quatro abas. Sem alterações de regras.
-- Após G2ac, `styles.css` mantém o trecho original 4304–4879 (576 linhas), com as media queries gerais de desktop/tablet e mobile.
+- Após G2ad, `src/styles/responsive-desktop-tablet.css` contém as media queries gerais de 1420/1240/1080px (histórico 4304–4563); `styles.css` mantém 720/440px (histórico 4564–4879, 316 linhas).
 - Contrato de bytes/cascata: `tests/study-hub-styles.test.cjs`.
 - Smoke: `scripts/browser-smoke.cjs`; comparação visual: `scripts/study-hub-style-check.cjs`.
 - Fronteiras e próximos cortes: [mapa CSS](css-extraction-map.md); uso e limites: [tooling](tooling.md).
@@ -287,3 +287,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/page-motion.css`: `@keyframes fade-up` de 12 linhas, carregado após a nuvem de tags e antes das media queries residuais.
 - Consumidor: `.page.active` em `src/styles/page-surfaces-and-headers.css`; nome, duração, easing e quadros originais preservados.
 - `scripts/shell-style-check.cjs`: CSSOM caracteriza os quadros 0% e 100% antes de desativar animações para as capturas estáveis.
+
+## Shell: responsividade desktop/tablet (G2ad)
+
+- `src/styles/responsive-desktop-tablet.css`: três media queries completas de 1420/1240/1080px, 260 linhas; link após `page-motion.css` e antes do residual mobile.
+- Regras afetam shell, sidebar, dashboards, documentos, grids e StudyHub. A ordem preserva o override de `#sidebar` (`100dvh` em 1240px; `100vh` em 1080px).
+- Matriz v29 caracteriza 922 estados, incluindo 1080/1240/1420±1; 922 estados idênticos após o corte, com 46 imagens/263 pixels dentro da tolerância existente.

@@ -260,6 +260,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
 - Próximo candidato G2ad: responsividade desktop/tablet (baseline 4304–4563), 260 linhas; caracterizar pontos de quebra antes do corte.
 
+## G2ad: responsividade desktop/tablet
+
+- Histórico 4304–4563 extraído para `src/styles/responsive-desktop-tablet.css`, 260 linhas; residual mobile com 316 linhas.
+- Antes do corte: 59 testes Node e matriz v29 de 922 estados, incluindo 1080/1240/1420±1; referência imutável de `e612fed`.
+- Ordem de 1420, 1240 e 1080px e override de altura da sidebar preservados; 40 links mantêm fingerprint integral do CSS.
+- Validação final: 922 estados idênticos, 59 testes e smoke 27; revisão independente sem bloqueios.
+- Próximo candidato G2ae: responsividade mobile (baseline 4564–4879), 316 linhas; caracterizar antes de extrair.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

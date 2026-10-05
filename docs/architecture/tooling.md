@@ -662,6 +662,17 @@ perfis. 59 testes Node, 27 checks no navegador, sintaxe, parsing de 39 CSS, diff
 revisão independente aprovados. Fingerprint integral conferido no índice Git;
 configurações/artefatos locais fora do commit.
 
+## Responsividade desktop/tablet (G2ad)
+
+Snapshot versão 29: 922 casos, com dashboard em 1080/1240/1420±1, documentos nos
+mesmos breakpoints, StudyHub em 1080±1, métricas em 1420±1 e sidebar aberta em
+1240±1. Referência pré-corte de `e612fed` em
+`.agents/state/artifacts/refactoring-g2ad/reference-v29`; captura pós-corte no mesmo
+runner em `after-v29`. Resultado: 922 estados idênticos; 46 imagens/263 pixels de
+rasterização dentro da tolerância existente, zero erros de console/runtime.
+59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
+Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

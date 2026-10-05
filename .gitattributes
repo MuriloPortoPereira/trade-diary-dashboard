@@ -36,3 +36,4 @@ src/modules/accounts/presentation/account-overview.css -text whitespace=-blank-a
 src/modules/partners/presentation/partners.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/tag-cloud.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/page-motion.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/responsive-desktop-tablet.css -text whitespace=-blank-at-eof,cr-at-eol
