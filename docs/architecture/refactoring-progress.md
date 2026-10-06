@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3m registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3n registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3m extraído: `renderDashboard` para `src/modules/analytics/presentation/dashboard-page.js`, 69 linhas movidas byte a byte.
-- Cards, sete gráficos, curva, componentes, recentes, tooltips e API global preservados; script clássico síncrono antes de `app.js`.
-- Caracterização pré-corte: seis testes novos e 118 testes Node. Pós-corte: 119 testes Node, 78 checks no navegador, sintaxe e diff aprovados.
-- Smoke exercita dashboard, gráficos, alternância da curva e refresh. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3n extraído: `renderRiskBoard` para `src/modules/accounts/presentation/risk-board.js`, 136 linhas movidas byte a byte.
+- Barras, sinais, excessos, metas, formatação, guards e API global preservados; script clássico síncrono antes do dashboard.
+- Caracterização pré-corte: seis testes novos e 125 testes Node. Pós-corte: 126 testes Node, 81 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita risco ideal, quatro barras/sinais e refresh. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3n: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3o: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -273,3 +273,4 @@
 - G3k: calendário compacto do dashboard em apresentação de calendário; data âncora e helpers continuam no legado.
 - G3l: linhas de estratégias em apresentação de analytics, compartilhadas pelos consumidores existentes; snapshots, ranking e formatação permanecem no legado.
 - G3m: renderer principal do dashboard em apresentação de analytics; métricas, filtros, estado e handlers permanecem no legado.
+- G3n: painel de risco em apresentação de contas; cálculo financeiro e estado permanecem no legado. Impacto restrito à localização da declaração e ordem de carga, sem alteração de dados/contratos.

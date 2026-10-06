@@ -393,3 +393,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Métricas, filtros, estado, datasets, risco, formatação e helpers continuam no legado; composição usa os componentes globais já extraídos.
 - `tests/dashboard-page.test.cjs`: cards, sete gráficos, ordem/percentuais da curva, defaults, zero, recentes/limite 20, tooltips idempotentes e carga clássica.
 - 119 testes Node e 78 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Painel de risco do dashboard (G3n)
+
+- `src/modules/accounts/presentation/risk-board.js`: `renderRiskBoard` global, 136 linhas movidas byte a byte; script clássico síncrono antes do dashboard.
+- Consumidor `src/modules/analytics/presentation/dashboard-page.js` intacto; `calcAccountRiskState`, formatação, tons e tooltips continuam no legado.
+- `tests/risk-board.test.cjs`: quatro barras/sinais, excessos, metas, thresholds, raw usage, defaults zero, larguras sem teto e alvos ausentes.
+- 126 testes Node e 81 checks no navegador. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
