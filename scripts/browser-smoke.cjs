@@ -97,6 +97,20 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      showPage('calendar');
+      check('calendar navigation and global renderer', document.querySelector('#page-calendar.active') && typeof renderCalendar === 'function');
+      calGoToMonth('2024-02');
+      setCalView('month');
+      check('calendar leap month rendered', document.querySelectorAll('#calGridWrap .cal-day[onclick]').length === 29 && document.getElementById('calTitle').textContent.includes('2024'));
+      setCalView('week');
+      check('calendar weekly rows rendered', document.querySelectorAll('#calGridWrap .cal-week-label').length === 5);
+      setCalView('biweek');
+      check('calendar fortnight blocks rendered', document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
+      refreshAll();
+      check('calendar refresh preserves fortnight mode', document.querySelector('#page-calendar.active') && document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
+      calGoToMonth('2026-12');
+      calNav(1);
+      check('calendar navigation crosses year', calYear === 2027 && calMonth === 0);
       showPage('notifications');
       check('notifications navigation and global renderer', document.querySelector('#page-notifications.active') && typeof renderNotificationsPage === 'function');
       check('notifications feed rendered', document.getElementById('notificationFeed').textContent.trim().length > 0);
@@ -207,7 +221,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 58, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 64, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

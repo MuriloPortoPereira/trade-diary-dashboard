@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/calendar/presentation/calendar-page.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderCalendar\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function harness(mode = 'month', rows = []) {
   const nodes = Object.fromEntries(['calStats', 'calTitle', 'calGridWrap'].map(id => [id, {innerHTML: '', textContent: ''}]));
@@ -93,4 +94,12 @@ test('unknown view keeps the legacy fortnight fallback and translations are read
   context.t = (key, fallback) => key === 'month.feb' ? 'February' : fallback;
   vm.runInContext('calViewMode="month"; renderCalendar()', context);
   assert.equal(nodes.calTitle.textContent, 'February 2024');
+});
+
+test('calendar loads once as a synchronous classic script before notifications', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/notifications/presentation/notifications-page.js'));
 });
