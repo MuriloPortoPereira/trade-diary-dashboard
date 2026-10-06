@@ -775,6 +775,16 @@ visões, atualiza e cruza ano: 64 checks, zero erros/assets locais ausentes.
 97 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
 neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Apresentação de stops e taxas (G3j)
+
+`tests/stop-fee-analysis.test.cjs` caracterizou quatro cards, tons, percentuais,
+limite inclusivo em 25%, tooltips, formatação e alvo ausente antes do corte.
+Pós-corte protege também carga clássica. Corpo movido byte a byte contra
+`ef7a517`, restante de `app.js` idêntico. Smoke verifica cards na página de
+análises e após refresh: 67 checks, zero erros/assets locais ausentes.
+102 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
+neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

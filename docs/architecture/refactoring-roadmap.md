@@ -349,6 +349,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3j: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3j: apresentação de stops e taxas
+
+- `renderStopFeeAnalysis` movida byte a byte para `src/modules/analytics/presentation/stop-fee-analysis.js` (51 linhas).
+- Script clássico síncrono antes de calendário e de `app.js`; consumidor `renderStats` intacto, cálculos permanecem no legado.
+- Caracterização pré-corte: quatro testes novos e 101 testes Node. Pós-corte: 102 testes Node, 67 checks no navegador, sintaxe e diff aprovados.
+- Protegidos tons, limite inclusivo em 25%, escolha edge/drag, formatação, tooltips e alvo ausente; smoke exercita cards e refresh reais.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3k: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

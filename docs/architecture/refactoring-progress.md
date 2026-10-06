@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3i registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3j registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3i extraído: `renderCalendar` para `src/modules/calendar/presentation/calendar-page.js`, 97 linhas movidas byte a byte.
-- Três visões, conta ativa, datas, métricas, traduções, handlers e retorno `true` preservados; script clássico síncrono antes de notificações e de `app.js`.
-- Caracterização pré-corte: cinco testes novos e 96 testes Node. Pós-corte: 97 testes Node, 64 checks no navegador, sintaxe e diff aprovados.
-- Smoke exercita navegação, seletor de mês, três visões, refresh e virada de ano. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3j extraído: `renderStopFeeAnalysis` para `src/modules/analytics/presentation/stop-fee-analysis.js`, 51 linhas movidas byte a byte.
+- Quatro cards, tons, limites, percentuais, formatação, tooltips e alvo ausente preservados; script clássico síncrono antes de calendário e de `app.js`.
+- Caracterização pré-corte: quatro testes novos e 101 testes Node. Pós-corte: 102 testes Node, 67 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita cards no fluxo de análises e refresh. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3j: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3k: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -269,3 +269,4 @@
 - G3g: renderer de psicologia em `presentation`; seleção de trades, estatísticas subjetivas, filtros e criação de gráficos continuam no legado.
 - G3h: renderer de notificações em `presentation`; geração dos alertas e renderer compartilhado permanecem no legado.
 - G3i: renderer do calendário em `presentation`; estado, handlers e métricas permanecem no legado. O filtro do período exclui o último dia pelo limite à meia-noite, enquanto a grade inclui seus trades; comportamento existente preservado.
+- G3j: apresentação de stops/taxas em `presentation`; cálculo financeiro, filtros e formatação compartilhada permanecem no legado.

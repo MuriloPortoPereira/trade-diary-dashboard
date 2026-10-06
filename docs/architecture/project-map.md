@@ -364,3 +364,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Estado `calYear/calMonth/calViewMode`, métricas, datas e handlers continuam no legado. Consumidores: `calNav`, `calGoToMonth`, `setCalView`, `showPage` e `refreshAll`.
 - `tests/calendar-page.test.cjs`: mensal/semanal/quinzenal, bissexto, totais, vazio, tradução e limite existente do último dia nas métricas do período.
 - 97 testes Node e 64 checks no navegador; sem matriz visual completa nova neste corte de corpo intacto e CSS inalterado.
+
+## Stops e taxas: apresentação (G3j)
+
+- `src/modules/analytics/presentation/stop-fee-analysis.js`: `renderStopFeeAnalysis` global, 51 linhas movidas byte a byte; script clássico síncrono antes de calendário e de `app.js`.
+- Consumidor `renderStats` intacto; `buildStopFeeAnalysis`, `fR` e `mkTip` continuam no legado. Nenhum cálculo financeiro extraído neste lote.
+- `tests/stop-fee-analysis.test.cjs`: quatro cards, tons, limite inclusivo de 25%, escolha edge/drag, tooltips, formatação e alvo ausente.
+- 102 testes Node e 67 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
