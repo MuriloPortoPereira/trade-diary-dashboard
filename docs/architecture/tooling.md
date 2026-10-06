@@ -785,6 +785,16 @@ análises e após refresh: 67 checks, zero erros/assets locais ausentes.
 102 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
 neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Calendário compacto do dashboard (G3k)
+
+`tests/dashboard-calendar.test.cjs` caracterizou mês âncora, bissexto, resultados
+diários/semanais, tradução, vazio, não-array e alvos ausentes antes do corte.
+Pós-corte protege carga clássica. Corpo movido byte a byte contra `c96b3c6`,
+restante de `app.js` idêntico. Smoke verifica grade, totais, refresh e clique
+na célula: 71 checks, zero erros/assets locais ausentes. 107 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte
+sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

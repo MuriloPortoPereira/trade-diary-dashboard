@@ -371,3 +371,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidor `renderStats` intacto; `buildStopFeeAnalysis`, `fR` e `mkTip` continuam no legado. Nenhum cálculo financeiro extraído neste lote.
 - `tests/stop-fee-analysis.test.cjs`: quatro cards, tons, limite inclusivo de 25%, escolha edge/drag, tooltips, formatação e alvo ausente.
 - 102 testes Node e 67 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Calendário compacto do dashboard (G3k)
+
+- `src/modules/calendar/presentation/dashboard-calendar.js`: `renderDashboardCalendar` global, 56 linhas movidas byte a byte; script clássico síncrono antes de stops/taxas e de `app.js`.
+- Consumidor `renderDashboard` intacto; `getAnchorTradeDate`, `t`, `fR` e seleção de trades permanecem no legado.
+- `tests/dashboard-calendar.test.cjs`: mês âncora, bissexto, estados ganho/perda/hoje, totais diários/semanais, vazio, não-array e alvos ausentes.
+- 107 testes Node e 71 checks no navegador, incluindo refresh e navegação pela célula; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
