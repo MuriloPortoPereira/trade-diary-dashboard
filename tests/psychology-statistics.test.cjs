@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/psychology/presentation/psychology-statistics.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStatsPsych\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function harness(rows = [], {hesitationNode = true, buckets} = {}) {
   const ids = ['statPsychCards', 'statEmoBody'];
@@ -100,4 +101,12 @@ test('error chart preserves top-ten cap and long-label truncation', () => {
   const {charts} = harness(many);
   assert.equal(charts.get('statErrorsChart').data.labels.length, 10);
   assert.match(charts.get('statErrorsChart').data.labels[0], /…$/);
+});
+
+test('psychology statistics loads once as a synchronous classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
