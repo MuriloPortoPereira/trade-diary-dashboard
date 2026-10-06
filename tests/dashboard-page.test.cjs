@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/analytics/presentation/dashboard-page.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderDashboard\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 const rows = [
   {id: 'later', date: '2024-02-12', pnl: -10, r: -1, status: 'LOSS', strategy: 'Long strategy name for truncation', emotion: 'Calmo'},
@@ -108,4 +109,12 @@ test('recent trade rendering retains its twenty-row cap', () => {
   const {nodes} = harness({data});
   assert.equal((nodes.recentTrades.innerHTML.match(/<tr>/g) ?? []).length, 20);
   assert.match(nodes.recentTrades.innerHTML, /^<tr>trade24<\/tr>/);
+});
+
+test('dashboard loads once as a synchronous classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

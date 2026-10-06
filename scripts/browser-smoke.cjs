@@ -48,6 +48,14 @@ function browserProbe() {
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
       showPage('dashboard');
       check('dashboard return', document.querySelector('#page-dashboard.active'));
+      check('dashboard global renderer and four cards', typeof renderDashboard === 'function' && document.querySelectorAll('#dashMetrics .metric-card').length === 4);
+      check('dashboard seven charts and recent rows', ['equityChart','wlChart','rBarChart','wdayChart','monthEvChart','stratDashChart','emoDashChart'].every(id => Chart.getChart(id)) && document.querySelectorAll('#recentTrades tr').length > 0);
+      const previousEqMode = eqMode;
+      toggleEqMode();
+      check('dashboard equity mode toggles', eqMode !== previousEqMode && Chart.getChart('equityChart').data.datasets[0].data[0] === 0);
+      toggleEqMode();
+      check('dashboard equity mode restores', eqMode === previousEqMode && document.querySelectorAll('#dashMetrics .metric-card').length === 4);
+
       check('strategy rows global and dashboard board', typeof renderStrategyRows === 'function' && document.querySelectorAll('#dashStrategyBoard .strategy-row').length > 0 && document.querySelectorAll('#dashStrategyBoard .strategy-row').length <= 5);
       const strategyBoard = document.getElementById('dashStrategyBoard').innerHTML;
       refreshAll();
@@ -241,7 +249,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 74, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 78, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
