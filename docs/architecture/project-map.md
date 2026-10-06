@@ -10,7 +10,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
-| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats` e `renderStatsPsych` permanecem em `app.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
+| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats` permanece em `app.js`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
@@ -407,3 +407,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Script clássico síncrono antes do renderer; consumidores HTML, `calendar-page.js` e bootstrap preservados. Estado global e helpers continuam em `app.js`.
 - `tests/calendar-controls.test.cjs`: virada de ano, parsing, ordem de sync/render, modos, controles opcionais e tabela de trades/dia vazio.
 - 133 testes Node e 84 checks no navegador. Sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
+## Psicologia: estatísticas em análises (G3p)
+
+- `src/modules/psychology/presentation/psychology-statistics.js`: `renderStatsPsych` global, 59 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- Consumidor `switchStatTab('psych')` intacto; seleção de período e helpers de hesitação/disciplina e resumo permanecem no legado; cálculos locais do renderer foram movidos intactos.
+- `tests/psychology-statistics.test.cjs`: quatro cards, cinco gráficos, resumos, limites de hesitações/erros, tabela, vazio e alvo opcional.
+- 139 testes Node e 88 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

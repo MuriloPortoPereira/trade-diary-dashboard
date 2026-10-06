@@ -835,6 +835,16 @@ restante de `app.js` idêntico. Smoke verifica controles e dias com trades/vazio
 aprovados. Matriz visual completa não repetida neste corte sem mudança dos
 corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Estatísticas de psicologia em análises (G3p)
+
+`tests/psychology-statistics.test.cjs` caracterizou cards, cinco gráficos,
+resumos, limites de hesitações/erros, tabela, vazio e alvo opcional antes do
+corte. Pós-corte protege carga clássica. Corpo movido byte a byte contra
+`bd209ad`, restante de `app.js` idêntico. Smoke verifica aba, gráficos,
+resumos e tabela: 88 checks, zero erros/assets locais ausentes.
+139 testes Node, sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -403,6 +403,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3p: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3p: estatísticas de psicologia em análises
+
+- `renderStatsPsych` movida byte a byte para `src/modules/psychology/presentation/psychology-statistics.js` (59 linhas).
+- Script clássico síncrono antes de `app.js`; consumidor `switchStatTab('psych')` intacto, helpers de seleção/estatística permanecem no legado; cálculos locais do renderer foram movidos intactos.
+- Caracterização pré-corte: cinco testes novos e 138 testes Node. Pós-corte: 139 testes Node, 88 checks no navegador, sintaxe e diff aprovados.
+- Protegidos cards, cinco gráficos, resumos, limites de hesitações/erros, tabela, vazio e alvo opcional; smoke exercita aba real.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3q: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
