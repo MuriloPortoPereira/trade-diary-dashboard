@@ -34,6 +34,7 @@ function browserProbe() {
       check('psychology statistics four cards', document.querySelectorAll('#statPsychCards .metric-card').length === 4);
       check('psychology statistics five charts', ['statEmoWRChart','statEmoPnlChart','statDiscWRChart','statErrorsChart','statPlanChart'].every(id => Chart.getChart(id)));
       check('psychology statistics summaries and table', document.getElementById('statDiscSummary').innerHTML.length > 0 && document.getElementById('statPlanSummary').innerHTML.length > 0 && document.getElementById('statEmoBody').innerHTML.length > 0);
+      check('psychology summaries use shared renderer', typeof renderAnalysisSummary === 'function' && document.querySelectorAll('#statDiscSummary .analysis-summary-chip').length > 0 && document.querySelectorAll('#statPlanSummary .analysis-summary-chip').length > 0);
 
       document.querySelector('[onclick="switchStatTab(\'simulation\',this)"]').click();
       check('simulation tab visible', document.getElementById('statTab-simulation').style.display === 'block');
@@ -272,7 +273,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 91, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 92, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
