@@ -8,9 +8,9 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/psychology/presentation/psychology-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyDeclaration = appSource.match(/^function renderPsych\([^]*?^\}/m)?.[0];
-const extracted = fs.existsSync(path.join(root, modulePath));
-const source = extracted ? fs.readFileSync(path.join(root, modulePath), 'utf8') : legacyDeclaration;
-assert.ok(source, 'renderPsych must remain available');
+assert.ok(fs.existsSync(path.join(root, modulePath)), 'extracted psychology renderer must exist');
+assert.ok(!legacyDeclaration, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function createHarness({trades = [], visible} = {}) {
   const ids = visible ?? ['bestEmotion', 'bestEmotionWR', 'worstEmotion', 'worstEmotionWR',
@@ -32,7 +32,7 @@ function createHarness({trades = [], visible} = {}) {
     mkChart(id, config) { calls.push(['chart', id, config]); },
     CHART_OPTS: {scales: {x: {grid: false}, y: {grid: true}}, plugins: {tooltip: {enabled: true}}},
   });
-  vm.runInContext(source, context, {filename: extracted ? modulePath : 'app.js (psychology declaration)'});
+  vm.runInContext(source, context, {filename: modulePath});
   return {calls, context, nodes};
 }
 
@@ -88,8 +88,6 @@ test('optional summary nodes do not prevent charts and table rendering', () => {
 });
 
 test('extracted psychology renderer stays a synchronous classic script before app.js', () => {
-  if (!extracted) return;
-  assert.ok(!legacyDeclaration, 'legacy declaration must be moved');
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)]
     .map(match => ({attributes: match[1], src: match[1].match(/\bsrc="([^"]+)"/)?.[1]}))

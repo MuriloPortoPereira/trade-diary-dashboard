@@ -97,6 +97,15 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      showPage('psych');
+      check('psychology navigation and global renderer', document.querySelector('#page-psych.active') && typeof renderPsych === 'function');
+      check('psychology summaries rendered', document.getElementById('bestEmotion').textContent.trim().length > 0 &&
+        document.getElementById('followedPlanRate').textContent.trim().length > 0);
+      check('psychology charts and table rendered', document.getElementById('emotionChart') &&
+        document.getElementById('discChart') && document.getElementById('psychTbody').innerHTML.length > 0);
+      refreshAll();
+      check('psychology refresh renders again', document.querySelector('#page-psych.active') &&
+        document.getElementById('psychTbody').innerHTML.length > 0);
       const strategyNav = document.querySelector('.nav-item[onclick="showPage(\'strategyHub\')"]');
       strategyNav.click();
       check('strategy hub navigation and global renderer', document.querySelector('#page-strategyHub.active') && typeof renderStrategyHub === 'function');
@@ -191,7 +200,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 51, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 55, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
