@@ -9,7 +9,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Inicialização/navegação | `app.js`: `showPage`, `refreshAll`, callback `window.load`; `index.html` |
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
-| Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
+| Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
 | Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats` e `renderStatsPsych` permanecem em `app.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
@@ -142,7 +142,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/calendar/presentation/calendar-grids.css`: 241 linhas do mini calendário, resumo semanal e layouts do calendário.
 - Carrega após `strategy-comparison.css`, antes dos CSS responsivos; overrides 1080/720/440 mantêm sua posição original.
-- Renderers em `app.js`: `renderDashboardCalendar`, `renderCalendar`; navegação e seleção preservadas.
+- Renderers: `renderDashboardCalendar` em `src/modules/calendar/presentation/dashboard-calendar.js` e `renderCalendar` em `calendar-page.js`; navegação e seleção permanecem em `app.js`.
 - UI: `week` aparece como Mensal, `biweek` como Quinzenal; `month` permanece acessível pela API global.
 - Cenários: `scripts/lib/calendar-style-scenarios.cjs`; modos, hover, rolagem, detalhes do dia, mudança de ano e mês bissexto.
 - Resets de estado visual entre capturas, sem mudar contas/trades/storage; limites em [tooling](tooling.md).
@@ -385,3 +385,11 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidores: `renderDashStrategyBoard` no legado e `renderStrategyHub` no módulo de apresentação; `escapeHtml`, `fR`, `formatStrategyRatio` e snapshots continuam no legado.
 - `tests/strategy-rows.test.cjs`: ordem, escaping, sinais, métricas, normalização das barras, limite/default/slice, vazio e alvo ausente.
 - 112 testes Node e 74 checks no navegador; dashboard/refresh e quantidade de linhas no hub exercitados. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Dashboard: renderer principal (G3m)
+
+- `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard` global, 69 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- Consumidores preservados: bootstrap, `setMode`, `toggleEqMode`, `refreshAll`, `showPage` e handler de período no HTML.
+- Métricas, filtros, estado, datasets, risco, formatação e helpers continuam no legado; composição usa os componentes globais já extraídos.
+- `tests/dashboard-page.test.cjs`: cards, sete gráficos, ordem/percentuais da curva, defaults, zero, recentes/limite 20, tooltips idempotentes e carga clássica.
+- 119 testes Node e 78 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

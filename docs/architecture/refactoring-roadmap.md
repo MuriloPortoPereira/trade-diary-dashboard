@@ -376,6 +376,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3m: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3m: renderer principal do dashboard
+
+- `renderDashboard` movida byte a byte para `src/modules/analytics/presentation/dashboard-page.js` (69 linhas).
+- Script clássico síncrono antes de `app.js`; bootstrap, handlers e consumidores intactos, cálculos/estado permanecem no legado.
+- Caracterização pré-corte: seis testes novos e 118 testes Node. Pós-corte: 119 testes Node, 78 checks no navegador, sintaxe e diff aprovados.
+- Protegidos cards, sete gráficos, curva de saldo/percentual, recentes, defaults, componentes e tooltips; smoke exercita fluxo real e alternância da curva.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3n: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
