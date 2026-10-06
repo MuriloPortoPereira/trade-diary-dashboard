@@ -745,6 +745,16 @@ exercita `refreshAll` (51 checks). Referência visual v29 de `2c70ab9` em
 922 estados idênticos, 55 imagens/288 pixels de rasterização dentro da tolerância
 existente, zero erros de console/runtime; 83 testes Node, sintaxe e diff aprovados.
 
+## Renderer da página de psicologia (G3g)
+
+`tests/psychology-page.test.cjs` caracterizou antes do corte resumos, gráficos,
+tabela, vazio e alvos opcionais. O smoke abre psicologia, verifica resumos, gráficos
+e tabela e exercita `refreshAll` (55 checks). Referência visual v29 do lote G3f em
+`.agents/state/artifacts/refactoring-g3f/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3g/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 49 imagens/293 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 87 testes Node, sintaxe e diff aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -10,7 +10,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
-| Análises/calendário | `renderStats`, `renderStatsPsych`, `renderCalendar` |
+| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats`, `renderStatsPsych`, `renderCalendar` permanecem em `app.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
@@ -38,6 +38,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `getStrategySnapshots`, `renderStrategyRows`, `renderStatusList` e formatação continuam no legado; `showPage` e `refreshAll` preservam os consumidores.
 - `tests/strategy-hub-page.test.cjs` caracteriza preenchido/vazio, métricas, tabela, foco, alvos opcionais e ordem de carga; smoke abre estratégias e exercita refresh.
 - Matriz visual v29 comparou 922 estados com G3e; todos idênticos, com 55 imagens/288 pixels dentro da tolerância existente.
+
+## Psicologia: renderer da página (G3g)
+
+- `src/modules/psychology/presentation/psychology-page.js`: `renderPsych` global, 25 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.
+- Conta ativa, seleção de trades, Chart.js, filtros subjetivos e formatação continuam no legado; `showPage` e `refreshAll` preservam os consumidores.
+- `tests/psychology-page.test.cjs` caracteriza resumos, gráficos, tabela, vazio, alvos opcionais e ordem de carga; smoke abre psicologia e exercita refresh.
+- Matriz visual v29 comparou 922 estados com G3f; todos idênticos, com 49 imagens/293 pixels dentro da tolerância existente.
 
 ## Transferência de dados: serialização CSV
 

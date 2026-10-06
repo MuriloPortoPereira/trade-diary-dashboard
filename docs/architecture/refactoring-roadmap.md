@@ -324,6 +324,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Depois do corte: 83 testes Node, 51 checks no navegador e 922 estados visuais idênticos; revisão independente sem achados.
 - Próximo lote G3g: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3g: renderer da página de psicologia
+
+- `renderPsych` movida intacta de `app.js` para `src/modules/psychology/presentation/psychology-page.js` (25 linhas).
+- `index.html` carrega a declaração global antes dos outros renderers e de `app.js`; `showPage` e `refreshAll` continuam iguais.
+- Antes do corte: quatro testes de caracterização e 87 testes Node passaram; baseline visual v29 de 922 estados do lote G3f.
+- Depois do corte: 87 testes Node, 55 checks no navegador e 922 estados visuais idênticos; revisão independente sem achados.
+- Próximo lote G3h: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
