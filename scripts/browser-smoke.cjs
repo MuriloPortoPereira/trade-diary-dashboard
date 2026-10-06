@@ -140,6 +140,14 @@ function browserProbe() {
       check('calendar fortnight blocks rendered', document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
       refreshAll();
       check('calendar refresh preserves fortnight mode', document.querySelector('#page-calendar.active') && document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
+      const dayTrade = getAccountTrades(activeAccountId).find(trade => trade.date);
+      check('calendar controls globals and fixture', ['calNav','calGoToMonth','syncCalPicker','setCalView','showCalDay'].every(name => typeof window[name] === 'function') && dayTrade);
+      calGoToMonth(dayTrade.date.slice(0, 7));
+      document.querySelector('#calGridWrap [onclick="showCalDay(' + Number(dayTrade.date.slice(8, 10)) + ')"]').click();
+      check('calendar day click renders account trades', document.getElementById('calDayDetail').style.display === 'block' && document.querySelectorAll('#calDayTbody tr').length === getAccountTrades(activeAccountId).filter(trade => trade.date === dayTrade.date).length);
+      calGoToMonth('2099-02');
+      showCalDay(1);
+      check('calendar empty day hides detail', document.getElementById('calDayDetail').style.display === 'none');
       calGoToMonth('2026-12');
       calNav(1);
       check('calendar navigation crosses year', calYear === 2027 && calMonth === 0);
@@ -255,7 +263,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 81, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 84, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

@@ -8,7 +8,8 @@ const modulePath = 'src/modules/calendar/presentation/calendar-controls.js';
 const names = ['calNav', 'calGoToMonth', 'syncCalPicker', 'setCalView', 'showCalDay'];
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const declarations = names.map(name => app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
-const source = declarations.every(Boolean) ? declarations.join('\n') : fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.ok(declarations.every(declaration => declaration === undefined), 'legacy declarations must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function harness(rows = [], missing = []) {
   const calls = [], toggles = [];
@@ -96,4 +97,12 @@ test('empty day hides detail while preserving prior title and table', () => {
   assert.equal(nodes.calDayDetail.style.display, 'none');
   assert.equal(nodes.calDayTitle.textContent, 'before');
   assert.equal(nodes.calDayTbody.innerHTML, 'before');
+});
+
+test('calendar controls loads once as a synchronous classic script before calendar renderer', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/calendar/presentation/calendar-page.js'));
 });
