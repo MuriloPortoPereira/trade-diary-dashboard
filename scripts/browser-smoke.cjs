@@ -48,6 +48,11 @@ function browserProbe() {
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
       showPage('dashboard');
       check('dashboard return', document.querySelector('#page-dashboard.active'));
+      check('strategy rows global and dashboard board', typeof renderStrategyRows === 'function' && document.querySelectorAll('#dashStrategyBoard .strategy-row').length > 0 && document.querySelectorAll('#dashStrategyBoard .strategy-row').length <= 5);
+      const strategyBoard = document.getElementById('dashStrategyBoard').innerHTML;
+      refreshAll();
+      check('strategy dashboard refresh preserves rows', document.getElementById('dashStrategyBoard').innerHTML === strategyBoard);
+
       check('dashboard calendar global and cells', typeof renderDashboardCalendar === 'function' && document.querySelectorAll('#dashCalendarMini .dash-cal-cell[onclick]').length >= 28);
       check('dashboard calendar title and week totals', document.getElementById('dashCalendarMonth').textContent.trim().length > 0 && document.querySelectorAll('#dashWeekBreakdown .week-row').length >= 4);
       const miniCalendar = document.getElementById('dashCalendarMini').innerHTML;
@@ -144,6 +149,8 @@ function browserProbe() {
       strategyNav.click();
       check('strategy hub navigation and global renderer', document.querySelector('#page-strategyHub.active') && typeof renderStrategyHub === 'function');
       check('strategy hub metrics rendered', document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
+      check('strategy hub rows and table agree', document.querySelectorAll('#strategyHubBoard .strategy-row').length === document.querySelectorAll('#strategyHubTable tr').length);
+
       check('strategy hub board and focus rendered', document.getElementById('strategyHubBoard').innerHTML.length > 0 &&
         document.getElementById('strategyHubFocus').innerHTML.length > 0);
       refreshAll();
@@ -234,7 +241,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 71, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 74, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

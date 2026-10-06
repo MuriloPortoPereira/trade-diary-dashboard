@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/analytics/presentation/strategy-rows.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStrategyRows\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(rows, limit, visible = true) {
   const node = {innerHTML: 'before'}, calls = [];
@@ -66,4 +67,13 @@ test('missing target returns without reading rows or formatting', () => {
   const {html, calls} = render(null, undefined, false);
   assert.equal(html, 'before');
   assert.deepEqual(calls, []);
+});
+
+test('strategy rows loads once as a synchronous classic script before its consumers', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/strategy-hub-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
