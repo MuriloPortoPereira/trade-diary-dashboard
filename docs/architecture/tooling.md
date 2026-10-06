@@ -735,6 +735,16 @@ em `.agents/state/artifacts/refactoring-g3e/after-v29`. Corpo movido byte a byte
 922 estados idênticos, 52 imagens/191 pixels de rasterização dentro da tolerância
 existente, zero erros de console/runtime; 79 testes Node, sintaxe e diff aprovados.
 
+## Renderer do hub de estratégias (G3f)
+
+`tests/strategy-hub-page.test.cjs` caracterizou antes do corte métricas, tabela,
+foco, vazio e alvos opcionais. O smoke abre o hub, verifica métricas/board/foco e
+exercita `refreshAll` (51 checks). Referência visual v29 de `2c70ab9` em
+`.agents/state/artifacts/refactoring-g3e/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3f/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 55 imagens/288 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 83 testes Node, sintaxe e diff aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

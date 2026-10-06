@@ -9,7 +9,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Inicialização/navegação | `app.js`: `showPage`, `refreshAll`, callback `window.load`; `index.html` |
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
-| Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots` |
+| Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
 | Análises/calendário | `renderStats`, `renderStatsPsych`, `renderCalendar` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
@@ -31,6 +31,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `TradeDiarySimulationSizing`: parsing numérico, arredondamento e dimensionamento puro.
 - Smoke: `scripts/browser-smoke.cjs`; demais regras de simulação permanecem em `app.js`.
 - Resultados e limites de cobertura: [progresso](refactoring-progress.md).
+
+## Estratégias: renderer do hub (G3f)
+
+- `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` global, 41 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.
+- `getStrategySnapshots`, `renderStrategyRows`, `renderStatusList` e formatação continuam no legado; `showPage` e `refreshAll` preservam os consumidores.
+- `tests/strategy-hub-page.test.cjs` caracteriza preenchido/vazio, métricas, tabela, foco, alvos opcionais e ordem de carga; smoke abre estratégias e exercita refresh.
+- Matriz visual v29 comparou 922 estados com G3e; todos idênticos, com 55 imagens/288 pixels dentro da tolerância existente.
 
 ## Transferência de dados: serialização CSV
 

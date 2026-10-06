@@ -97,6 +97,15 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      const strategyNav = document.querySelector('.nav-item[onclick="showPage(\'strategyHub\')"]');
+      strategyNav.click();
+      check('strategy hub navigation and global renderer', document.querySelector('#page-strategyHub.active') && typeof renderStrategyHub === 'function');
+      check('strategy hub metrics rendered', document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
+      check('strategy hub board and focus rendered', document.getElementById('strategyHubBoard').innerHTML.length > 0 &&
+        document.getElementById('strategyHubFocus').innerHTML.length > 0);
+      refreshAll();
+      check('strategy hub refresh renders again', document.querySelector('#page-strategyHub.active') &&
+        document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
       const premarketNav = document.querySelector('.nav-item[onclick="showPage(\'premarket\')"]');
       premarketNav.click();
       check('premarket navigation and global renderer', document.querySelector('#page-premarket.active') && typeof renderPremarket === 'function');
@@ -182,7 +191,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 47, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 51, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
