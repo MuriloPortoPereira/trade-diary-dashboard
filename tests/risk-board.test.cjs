@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/accounts/presentation/risk-board.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderRiskBoard\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(overrides = {}, {missing, period = 'month', account = {risk: 1, ddDaily: 2, ddWeekly: 5, ddTotal: 10, goalPct: 10}} = {}) {
   const state = {
@@ -97,4 +98,12 @@ test('any missing required target returns before risk calculation or mutation', 
     assert.deepEqual(calls, []);
     for (const [id, node] of Object.entries(nodes)) if (id !== 'dashPeriod') assert.deepEqual(node, {textContent: 'before', innerHTML: 'before'});
   }
+});
+
+test('risk board loads once as a synchronous classic script before dashboard', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/dashboard-page.js'));
 });
