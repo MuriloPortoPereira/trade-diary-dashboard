@@ -1,6 +1,6 @@
 # Análise da modularização do projeto inteiro
 
-Data: 2026-09-11. Referência: `5c9859f`, branch `develop/clean-architecture`.
+Data: 2026-09-11. Referência histórica: `5c9859f`, agora contida na branch `refactor`.
 Pedido: reorganizar o projeto existente por responsabilidade, mantendo código e comportamento.
 Esta entrega é análise e desenho dos cortes; não é uma reescrita nem uma migração já executada.
 

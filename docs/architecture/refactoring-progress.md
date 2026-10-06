@@ -9,7 +9,7 @@
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
 
 ## Completed
-- Baseline `ab0cb63`, branch `develop/clean-architecture`, sem mudanças locais preexistentes.
+- Baseline `ab0cb63`, preservado em `main` e na tag `v1.0.0`, sem mudanças locais preexistentes.
 - Caveman local; Superpowers 6.3.0 via marketplace; MCPs locais Serena e Context7.
 - Serena: raiz ativada, overview, símbolo/referências de sizing e navegação no novo domínio.
 - Context7: resolução Node.js e consulta real da documentação do test runner v24.

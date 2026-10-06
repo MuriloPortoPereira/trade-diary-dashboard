@@ -4,6 +4,8 @@ Aplicação web estática para registrar operações de trading, acompanhar cont
 
 [Versão pública informada pelo projeto](https://trade-diary-dashboard.vercel.app/) · [Repositório](https://github.com/MuriloPortoPereira/trade-diary-dashboard) · [Licença MIT](LICENSE)
 
+> **Branch `refactor`:** versão em reorganização arquitetural. A versão estável original permanece em `main` e está marcada por `v1.0.0`. Esta branch ainda não representa uma nova versão publicada.
+
 > Os dados ficam no `localStorage` do navegador e da origem usada para abrir a aplicação. Não há sincronização entre dispositivos ou contas de usuário. Exporte backups antes de limpar os dados do navegador ou mudar de origem.
 
 ## O que a aplicação oferece
@@ -26,13 +28,32 @@ Não é necessário `npm install`. Use um servidor HTTP na raiz do repositório 
 ```bash
 git clone https://github.com/MuriloPortoPereira/trade-diary-dashboard.git
 cd trade-diary-dashboard
-git switch --track origin/refactor/clean-architecture-progress
+git switch --track origin/refactor
 python3 -m http.server 8000
 ```
 
 Abra [http://localhost:8000](http://localhost:8000). A versão publicada usa arquivos estáticos; não há compilação. Chart.js pelo CDN, fontes externas e a consulta da cotação USD/BRL exigem conexão com a internet; os arquivos locais continuam disponíveis sem ela. A biblioteca XLSX é carregada pelo CDN apenas quando uma importação de planilha exige isso.
 
-A branch `refactor/clean-architecture-progress` contém o trabalho incremental de refatoração. A aplicação continua usando scripts clássicos síncronos; a ordem dos `<script>` e `<link>` em `index.html` faz parte do contrato de compatibilidade.
+A branch `refactor` contém o trabalho incremental de refatoração. A aplicação continua usando scripts clássicos síncronos; a ordem dos `<script>` e `<link>` em `index.html` faz parte do contrato de compatibilidade.
+
+## Branches, GitFlow e versões
+
+| Branch | Responsabilidade |
+|---|---|
+| `main` | Versão estável. Atualmente representa a versão inicial `v1.0.0` e permanece sem alterações durante a refatoração. |
+| `develop` | Integração de funcionalidades. Por enquanto é uma cópia da `main`; receberá a refatoração somente após a conclusão e validação desta branch. |
+| `refactor` | Trabalho arquitetural em andamento, com histórico completo dos lotes seguros e verificáveis. |
+| `feature/*` | Funcionalidades futuras criadas a partir da `develop` e integradas novamente nela após revisão. |
+| `hotfix/*` | Correções urgentes criadas a partir da `main`, devolvidas à `main` e à `develop`. |
+
+Fluxo planejado para esta reorganização:
+
+```text
+main (v1.0.0) ────────────────┐
+  └─ refactor ── lotes G1–G7 ─┴─> develop ── validação final ──> main (v2.0.0)
+```
+
+Depois da versão 2, o fluxo normal será `develop` → `feature/*` → `develop` → `main`. A `main` recebe apenas versões validadas; tags seguem versionamento semântico (`v1.0.0`, `v2.0.0` e versões posteriores). Commits permanecem pequenos e conceituais, e cada integração deve registrar testes e revisão correspondentes.
 
 ## Estrutura do repositório
 
@@ -95,6 +116,8 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 | G7: HTML e compatibilidade | Pendente, após migrar consumidores relevantes |
 
 O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
+
+O estágio atual é G3f. A última validação passou com 83 testes Node, 51 verificações no navegador e 922 estados visuais equivalentes dentro da tolerância documentada. O próximo lote planejado é G3g.
 
 ## Deploy e dados
 
