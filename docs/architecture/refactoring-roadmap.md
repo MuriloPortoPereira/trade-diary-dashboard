@@ -421,6 +421,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3r: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3r: resumos analíticos compartilhados
+
+- `renderAnalysisSummary` movida byte a byte para `src/shared/presentation/analysis-summary.js` (10 linhas); reuso confirmado em estratégias e psicologia.
+- Script clássico síncrono antes dos consumidores; API, ordem, tons, escaping, defaults, vazio e guards intactos.
+- Caracterização pré-corte: quatro testes novos e 149 testes Node. Pós-corte: 150 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita os resumos reais de psicologia; comparação de estratégias mantém a mesma função global.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3s: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

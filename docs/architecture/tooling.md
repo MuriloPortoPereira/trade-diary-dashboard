@@ -855,6 +855,16 @@ checks, zero erros/assets locais ausentes. 145 testes Node, sintaxe e diff
 aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Resumos analíticos compartilhados (G3r)
+
+`tests/analysis-summary.test.cjs` caracterizou ordem, tons, escaping, defaults,
+itens falsy, vazio/não-array e alvo ausente antes do corte. Pós-corte protege
+carga clássica. Corpo movido byte a byte contra `c197586`, restante de `app.js`
+idêntico. Smoke verifica resumos reais de psicologia: 92 checks, zero
+erros/assets locais ausentes. 150 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -125,6 +125,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/notifications-page.test.cjs` | Caracterização de conta ativa, cópia dos alertas, vazio, falha e ordem de carga |
 | `src/shared/presentation/status-list.js` | Lista de status reutilizada por notificações, perfil, estratégias e StudyHub; 17 linhas intactas |
 | `tests/status-list.test.cjs` | Caracterização de vazio, escaping, ações, valores, alvos e carga |
+| `src/shared/presentation/analysis-summary.js` | Resumos analíticos reutilizados por estratégias e psicologia; 10 linhas intactas |
+| `tests/analysis-summary.test.cjs` | Caracterização de ordem, escaping, defaults, itens falsy, vazio, alvos e carga |
 | `src/modules/psychology/presentation/psychology-statistics.js` | Renderer da aba de psicologia em análises, 59 linhas intactas |
 | `tests/psychology-statistics.test.cjs` | Caracterização de cards, gráficos, resumos, hesitações, erros, tabela, vazio e carga |
 | `src/modules/psychology/presentation/psychology-page.js` | Renderer global da página de psicologia, 25 linhas movidas intactas de `app.js` |
@@ -138,6 +140,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3q; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3r; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

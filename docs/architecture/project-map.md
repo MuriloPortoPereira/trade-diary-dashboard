@@ -421,3 +421,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Reuso real por notificações, perfil, hub de estratégias e StudyHub; nenhuma nova camada de dados ou IO.
 - `tests/status-list.test.cjs`: vazio, ordem, escaping, ações, valores falsy/truthy, alvo ausente e carga. Interpolações legadas de mensagens/handlers mantidas.
 - 145 testes Node e 91 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Resumos analíticos compartilhados (G3r)
+
+- `src/shared/presentation/analysis-summary.js`: `renderAnalysisSummary(containerId, items=[])` global, 10 linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- Reuso real pela comparação de estratégias em `app.js` e pelas estatísticas de psicologia extraídas; dados e cálculos permanecem nos respectivos produtores.
+- `tests/analysis-summary.test.cjs`: ordem, tons, escaping, defaults, itens falsy, vazio/não-array, alvo ausente e carga.
+- 150 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

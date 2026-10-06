@@ -9,6 +9,10 @@ as funções privadas dos IIFEs. O arquivo contém 9.770 linhas, sendo 2.696 no 
 reuso real entre notificações, perfil, estratégias e StudyHub. Interpolações
 legadas e contrato global foram preservados.
 
+`renderAnalysisSummary` (G3r) foi movida intacta para
+`src/shared/presentation/analysis-summary.js`: reuso real entre comparação de
+estratégias e psicologia. Produtores e cálculos permanecem nas features.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.

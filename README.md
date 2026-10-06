@@ -109,7 +109,7 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 | Preparação, auditoria e mapas | Concluídos |
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
 | G1–G2: CSS | Concluídos; 40 arquivos CSS carregados na ordem original |
-| G3: JavaScript por feature | Em andamento; renderers de perfil, parceiros, contas, documentos, premarket, estratégias, psicologia, notificações e calendário extraídos; apresentação de stops/taxas e calendário compacto do dashboard separados; linhas de estratégias compartilhadas e renderer principal do dashboard extraídos; painel de risco e controles do calendário e estatísticas de psicologia separados; lista de status compartilhada extraída |
+| G3: JavaScript por feature | Em andamento; renderers por feature extraídos incrementalmente; listas de status e resumos analíticos compartilhados separados |
 | G4: regras de domínio | Pendente por lotes de métricas, timing, risco e simulação |
 | G5: persistência/importação | Pendente por formato, coordenação e IO |
 | G6: StudyHub | Pendente; runtime legado exige isolamento gradual |
@@ -117,7 +117,7 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 
 O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
 
-O estágio atual é G3q. A última validação passou com 145 testes Node e 91 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3r.
+O estágio atual é G3r. A última validação passou com 150 testes Node e 92 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3s.
 
 ## Deploy e dados
 
