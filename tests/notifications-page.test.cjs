@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/notifications/presentation/notifications-page.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8')
   .match(/^function renderNotificationsPage\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function harness(alerts) {
   const account = {id: 'a'};
@@ -58,4 +59,13 @@ test('notifications propagates alert failures without rendering a partial feed',
   const {context, calls} = harness(null);
   assert.throws(() => vm.runInContext('renderNotificationsPage()', context), /map/);
   assert.equal(calls.length, 3);
+});
+
+test('notifications loads once as a synchronous classic script before the other renderers', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)];
+  const tag = tags.filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tag.length, 1);
+  assert.doesNotMatch(tag[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/psychology/presentation/psychology-page.js'));
 });

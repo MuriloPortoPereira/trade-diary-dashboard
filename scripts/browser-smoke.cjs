@@ -97,6 +97,13 @@ function browserProbe() {
       refreshAll();
       check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
         document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      showPage('notifications');
+      check('notifications navigation and global renderer', document.querySelector('#page-notifications.active') && typeof renderNotificationsPage === 'function');
+      check('notifications feed rendered', document.getElementById('notificationFeed').textContent.trim().length > 0);
+      const notificationFeed = document.getElementById('notificationFeed').innerHTML;
+      refreshAll();
+      check('notifications refresh preserves feed', document.querySelector('#page-notifications.active') &&
+        document.getElementById('notificationFeed').innerHTML === notificationFeed);
       showPage('psych');
       check('psychology navigation and global renderer', document.querySelector('#page-psych.active') && typeof renderPsych === 'function');
       check('psychology summaries rendered', document.getElementById('bestEmotion').textContent.trim().length > 0 &&
@@ -200,7 +207,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 55, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 58, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
