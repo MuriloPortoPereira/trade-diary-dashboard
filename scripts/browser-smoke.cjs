@@ -70,6 +70,10 @@ function browserProbe() {
       nav.click();
       check('navigation closes sidebar', document.querySelector('#page-stats.active') && nav.classList.contains('active') &&
         !document.getElementById('sidebar').classList.contains('open') && !document.getElementById('sidebar-overlay').classList.contains('show'));
+      check('stop fee global renderer and four cards', typeof renderStopFeeAnalysis === 'function' && document.querySelectorAll('#statsRiskLeakageRows .risk-insight-item').length === 4);
+      check('stop fee labels rendered', document.getElementById('statsRiskLeakageRows').textContent.includes('Taxas pagas') && document.getElementById('statsRiskLeakageRows').textContent.includes('Edge removido'));
+      refreshAll();
+      check('stop fee refresh renders four cards', document.querySelectorAll('#statsRiskLeakageRows .risk-insight-item').length === 4);
       const profileNav = document.querySelector('.nav-item[onclick="showPage(\'profile\')"]');
       profileNav.click();
       check('profile navigation and global renderer', document.querySelector('#page-profile.active') && typeof renderProfilePage === 'function');
@@ -221,7 +225,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 64, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 67, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
