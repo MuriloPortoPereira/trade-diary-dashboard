@@ -117,6 +117,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/stop-fee-analysis.test.cjs` | Caracterização de tons, percentuais, formatação, tooltips, alvo ausente e carga |
 | `src/modules/calendar/presentation/dashboard-calendar.js` | Calendário compacto e totais semanais do dashboard, 56 linhas movidas intactas |
 | `tests/dashboard-calendar.test.cjs` | Caracterização de mês âncora, bissexto, resultados diários/semanais, vazio, alvos e carga |
+| `src/modules/calendar/presentation/calendar-controls.js` | Navegação, seletor, modos e detalhe do dia; cinco declarações/41 linhas intactas |
+| `tests/calendar-controls.test.cjs` | Caracterização de estado, parsing, controles opcionais, detalhe/vazio e carga |
 | `src/modules/calendar/presentation/calendar-page.js` | Renderer global de calendário, 97 linhas movidas intactas de `app.js` |
 | `tests/calendar-page.test.cjs` | Caracterização de três visões, bissexto, totais, datas, vazio, traduções e ordem de carga |
 | `src/modules/notifications/presentation/notifications-page.js` | Renderer global de notificações, 8 linhas movidas intactas de `app.js` |
@@ -132,6 +134,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3n; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3o; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

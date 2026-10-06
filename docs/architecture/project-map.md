@@ -142,7 +142,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/calendar/presentation/calendar-grids.css`: 241 linhas do mini calendário, resumo semanal e layouts do calendário.
 - Carrega após `strategy-comparison.css`, antes dos CSS responsivos; overrides 1080/720/440 mantêm sua posição original.
-- Renderers: `renderDashboardCalendar` em `src/modules/calendar/presentation/dashboard-calendar.js` e `renderCalendar` em `calendar-page.js`; navegação e seleção permanecem em `app.js`.
+- Renderers: `renderDashboardCalendar` em `src/modules/calendar/presentation/dashboard-calendar.js` e `renderCalendar` em `calendar-page.js`; navegação e seleção em `src/modules/calendar/presentation/calendar-controls.js`; estado permanece em `app.js`.
 - UI: `week` aparece como Mensal, `biweek` como Quinzenal; `month` permanece acessível pela API global.
 - Cenários: `scripts/lib/calendar-style-scenarios.cjs`; modos, hover, rolagem, detalhes do dia, mudança de ano e mês bissexto.
 - Resets de estado visual entre capturas, sem mudar contas/trades/storage; limites em [tooling](tooling.md).
@@ -361,7 +361,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 ## Calendário: renderer da página (G3i)
 
 - `src/modules/calendar/presentation/calendar-page.js`: `renderCalendar` global, 97 linhas movidas byte a byte; script clássico síncrono antes de notificações e de `app.js`.
-- Estado `calYear/calMonth/calViewMode`, métricas, datas e handlers continuam no legado. Consumidores: `calNav`, `calGoToMonth`, `setCalView`, `showPage` e `refreshAll`.
+- Estado `calYear/calMonth/calViewMode`, métricas e helpers de datas continuam no legado; handlers em `calendar-controls.js` após G3o. Consumidores: `calNav`, `calGoToMonth`, `setCalView`, `showPage` e `refreshAll`.
 - `tests/calendar-page.test.cjs`: mensal/semanal/quinzenal, bissexto, totais, vazio, tradução e limite existente do último dia nas métricas do período.
 - 97 testes Node e 64 checks no navegador; sem matriz visual completa nova neste corte de corpo intacto e CSS inalterado.
 
@@ -400,3 +400,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidor `src/modules/analytics/presentation/dashboard-page.js` intacto; `calcAccountRiskState`, formatação, tons e tooltips continuam no legado.
 - `tests/risk-board.test.cjs`: quatro barras/sinais, excessos, metas, thresholds, raw usage, defaults zero, larguras sem teto e alvos ausentes.
 - 126 testes Node e 81 checks no navegador. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Controles do calendário (G3o)
+
+- `src/modules/calendar/presentation/calendar-controls.js`: globals `calNav`, `calGoToMonth`, `syncCalPicker`, `setCalView`, `showCalDay`; cinco declarações/41 linhas movidas byte a byte.
+- Script clássico síncrono antes do renderer; consumidores HTML, `calendar-page.js` e bootstrap preservados. Estado global e helpers continuam em `app.js`.
+- `tests/calendar-controls.test.cjs`: virada de ano, parsing, ordem de sync/render, modos, controles opcionais e tabela de trades/dia vazio.
+- 133 testes Node e 84 checks no navegador. Sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.

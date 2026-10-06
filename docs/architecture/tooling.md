@@ -825,6 +825,16 @@ zero erros/assets locais ausentes. 126 testes Node, sintaxe e diff aprovados.
 Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
 gerado ou CSS; última matriz: G3g.
 
+## Controles do calendário (G3o)
+
+`tests/calendar-controls.test.cjs` caracterizou navegação, parsing, sync/render,
+modos, controles opcionais e detalhe do dia antes do corte. Pós-corte protege
+carga clássica. Cinco declarações/41 linhas movidas byte a byte contra `c8e8538`,
+restante de `app.js` idêntico. Smoke verifica controles e dias com trades/vazios:
+84 checks, zero erros/assets locais ausentes. 133 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança dos
+corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
