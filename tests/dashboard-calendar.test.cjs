@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/calendar/presentation/dashboard-calendar.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderDashboardCalendar\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(rows = [], {visible = ['dashCalendarMonth', 'dashCalendarMini', 'dashWeekBreakdown'], anchor = '2024-02-10'} = {}) {
   const nodes = Object.fromEntries(visible.map(id => [id, {innerHTML: 'before', textContent: 'before'}]));
@@ -77,4 +78,12 @@ test('every required target is guarded before reading anchor or changing other t
     assert.deepEqual(calls, []);
     for (const node of Object.values(nodes)) assert.deepEqual(node, {innerHTML: 'before', textContent: 'before'});
   }
+});
+
+test('dashboard calendar loads once as a synchronous classic script before stop fee presentation', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/stop-fee-analysis.js'));
 });
