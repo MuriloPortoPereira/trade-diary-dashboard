@@ -36,7 +36,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Estratégias: renderer do hub (G3f)
 
 - `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` global, 41 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.
-- `getStrategySnapshots`, `renderStrategyRows`, `renderStatusList` e formatação continuam no legado; `showPage` e `refreshAll` preservam os consumidores.
+- `getStrategySnapshots`, `renderStatusList` e formatação continuam no legado; `renderStrategyRows` foi extraído no G3l; `showPage` e `refreshAll` preservam os consumidores.
 - `tests/strategy-hub-page.test.cjs` caracteriza preenchido/vazio, métricas, tabela, foco, alvos opcionais e ordem de carga; smoke abre estratégias e exercita refresh.
 - Matriz visual v29 comparou 922 estados com G3e; todos idênticos, com 55 imagens/288 pixels dentro da tolerância existente.
 
@@ -134,7 +134,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/analytics/presentation/strategy-comparison.css`: 201 linhas de ranking, seletores e painel comparativo.
 - Carrega após `account-risk-and-cashflow.css`, antes dos CSS responsivos; uso no dashboard, central de estratégias e aba de análise.
-- Renderers: `renderStrategyRows`, `renderDashStrategyBoard`, `renderStrategyCompareCards`; eventos dos seletores continuam em `app.js`.
+- Renderer compartilhado: `renderStrategyRows` em `src/modules/analytics/presentation/strategy-rows.js`; `renderDashStrategyBoard`, `renderStrategyCompareCards` e eventos dos seletores continuam em `app.js`.
 - Cenários isolados: `scripts/lib/strategy-style-scenarios.cjs`; ranking positivo/negativo/vazio, comparação completa e alternância de seleções.
 - Overrides tardios e responsivos permanecem nos CSS responsivos. Contrato de bytes e limites em [tooling](tooling.md).
 
@@ -378,3 +378,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidor `renderDashboard` intacto; `getAnchorTradeDate`, `t`, `fR` e seleção de trades permanecem no legado.
 - `tests/dashboard-calendar.test.cjs`: mês âncora, bissexto, estados ganho/perda/hoje, totais diários/semanais, vazio, não-array e alvos ausentes.
 - 107 testes Node e 71 checks no navegador, incluindo refresh e navegação pela célula; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Linhas de estratégias compartilhadas (G3l)
+
+- `src/modules/analytics/presentation/strategy-rows.js`: `renderStrategyRows(targetId, rows, limit=5)` global, 23 linhas movidas byte a byte; script clássico síncrono antes do hub e de `app.js`.
+- Consumidores: `renderDashStrategyBoard` no legado e `renderStrategyHub` no módulo de apresentação; `escapeHtml`, `fR`, `formatStrategyRatio` e snapshots continuam no legado.
+- `tests/strategy-rows.test.cjs`: ordem, escaping, sinais, métricas, normalização das barras, limite/default/slice, vazio e alvo ausente.
+- 112 testes Node e 74 checks no navegador; dashboard/refresh e quantidade de linhas no hub exercitados. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

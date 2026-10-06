@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3k registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3l registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3k extraído: `renderDashboardCalendar` para `src/modules/calendar/presentation/dashboard-calendar.js`, 56 linhas movidas byte a byte.
-- Mês âncora, grade, totais diários/semanais, traduções e guards preservados; script clássico síncrono antes de stops/taxas e de `app.js`.
-- Caracterização pré-corte: quatro testes novos e 106 testes Node. Pós-corte: 107 testes Node, 71 checks no navegador, sintaxe e diff aprovados.
-- Smoke exercita calendário compacto, refresh e navegação pela célula. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3l extraído: `renderStrategyRows` para `src/modules/analytics/presentation/strategy-rows.js`, 23 linhas movidas byte a byte.
+- API global/default cinco, ordem, escaping, sinais, métricas, barras e guards preservados; script clássico síncrono antes dos consumidores.
+- Caracterização pré-corte: quatro testes novos e 111 testes Node. Pós-corte: 112 testes Node, 74 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita dashboard/refresh e linhas do hub. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3l: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3m: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -271,3 +271,4 @@
 - G3i: renderer do calendário em `presentation`; estado, handlers e métricas permanecem no legado. O filtro do período exclui o último dia pelo limite à meia-noite, enquanto a grade inclui seus trades; comportamento existente preservado.
 - G3j: apresentação de stops/taxas em `presentation`; cálculo financeiro, filtros e formatação compartilhada permanecem no legado.
 - G3k: calendário compacto do dashboard em apresentação de calendário; data âncora e helpers continuam no legado.
+- G3l: linhas de estratégias em apresentação de analytics, compartilhadas pelos consumidores existentes; snapshots, ranking e formatação permanecem no legado.
