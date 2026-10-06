@@ -765,6 +765,16 @@ ou assets locais ausentes. 91 testes Node, sintaxe e diff aprovados.
 Matriz visual completa não repetida neste corte sem alteração de HTML gerado/CSS;
 a última matriz completa permanece a do G3g, sem atribuir seu resultado ao G3h.
 
+## Renderer da página de calendário (G3i)
+
+`tests/calendar-page.test.cjs` caracterizou três visões, ano bissexto, totais,
+vazio, tradução e limite preexistente do último dia antes do corte. Pós-corte
+protege também carga clássica. Corpo movido byte a byte contra `6955e9d`, com
+restante de `app.js` idêntico. Smoke abre calendário, escolhe mês, alterna três
+visões, atualiza e cruza ano: 64 checks, zero erros/assets locais ausentes.
+97 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
+neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

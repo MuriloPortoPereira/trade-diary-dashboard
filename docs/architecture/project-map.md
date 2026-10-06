@@ -10,7 +10,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `calcMetrics`, `renderDashboard`, `getStrategySnapshots`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
-| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats`, `renderStatsPsych`, `renderCalendar` permanecem em `app.js` |
+| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats` e `renderStatsPsych` permanecem em `app.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
@@ -357,3 +357,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `getActiveAccount`, `getAccountTrades`, `buildOperationalAlerts`, `renderStatusList` e estado permanecem no legado; consumidores `showPage` e `refreshAll` intactos.
 - `tests/notifications-page.test.cjs`: conta ativa em cada chamada, cópia sem mutação, mensagem vazia, propagação de falhas e ordem de carga.
 - 91 testes Node e 58 checks no navegador; matriz visual completa não repetida: não houve alteração de HTML gerado/CSS, e o fluxo real foi exercitado no smoke.
+
+## Calendário: renderer da página (G3i)
+
+- `src/modules/calendar/presentation/calendar-page.js`: `renderCalendar` global, 97 linhas movidas byte a byte; script clássico síncrono antes de notificações e de `app.js`.
+- Estado `calYear/calMonth/calViewMode`, métricas, datas e handlers continuam no legado. Consumidores: `calNav`, `calGoToMonth`, `setCalView`, `showPage` e `refreshAll`.
+- `tests/calendar-page.test.cjs`: mensal/semanal/quinzenal, bissexto, totais, vazio, tradução e limite existente do último dia nas métricas do período.
+- 97 testes Node e 64 checks no navegador; sem matriz visual completa nova neste corte de corpo intacto e CSS inalterado.

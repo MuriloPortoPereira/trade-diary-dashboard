@@ -340,6 +340,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida: corpo e HTML gerado intactos, sem mudança CSS; smoke verifica navegação/feed/refresh reais.
 - Próximo lote G3i: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3i: renderer da página de calendário
+
+- `renderCalendar` movida byte a byte para `src/modules/calendar/presentation/calendar-page.js` (97 linhas).
+- Script clássico síncrono antes de notificações e de `app.js`; cinco consumidores intactos.
+- Caracterização pré-corte: cinco testes novos e 96 testes Node. Pós-corte: 97 testes Node, 64 checks no navegador, sintaxe e diff aprovados.
+- Protegidos mensal/semanal/quinzenal, bissexto, totais, vazio, tradução e limite de data preexistente; smoke exercita modos, mês, refresh e virada de ano.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3j: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
