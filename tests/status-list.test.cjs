@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const modulePath = 'src/shared/presentation/status-list.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStatusList\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(items, {visible = true, emptyMessage} = {}) {
   const node = {innerHTML: 'before'}, context = vm.createContext({
@@ -66,4 +67,13 @@ test('legacy empty message and action handlers retain their existing interpolati
   assert.match(html, /status-item custom/);
   assert.match(html, /onclick="run\("x"\)"/);
   assert.match(html, /&lt;Open&gt;/);
+});
+
+test('status list loads once as a synchronous classic script before its consumers', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/psychology/presentation/psychology-statistics.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

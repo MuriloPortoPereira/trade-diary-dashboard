@@ -111,6 +111,7 @@ function browserProbe() {
       const profileNav = document.querySelector('.nav-item[onclick="showPage(\'profile\')"]');
       profileNav.click();
       check('profile navigation and global renderer', document.querySelector('#page-profile.active') && typeof renderProfilePage === 'function');
+      check('profile status list uses shared renderer', typeof renderStatusList === 'function' && document.querySelectorAll('#profileFocus .status-item').length > 0);
       check('profile hero and risk rendered', document.getElementById('profileHero').textContent.includes('P/L total') &&
         document.getElementById('profileRiskPanel').textContent.includes('Mandatos de risco'));
       check('profile tags and focus rendered', document.querySelectorAll('#profileTags .tag-cloud-block').length === 3 &&
@@ -159,6 +160,7 @@ function browserProbe() {
       check('calendar navigation crosses year', calYear === 2027 && calMonth === 0);
       showPage('notifications');
       check('notifications navigation and global renderer', document.querySelector('#page-notifications.active') && typeof renderNotificationsPage === 'function');
+      check('notification feed uses shared status list', document.querySelectorAll('#notificationFeed .status-item').length > 0);
       check('notifications feed rendered', document.getElementById('notificationFeed').textContent.trim().length > 0);
       const notificationFeed = document.getElementById('notificationFeed').innerHTML;
       refreshAll();
@@ -176,6 +178,7 @@ function browserProbe() {
       const strategyNav = document.querySelector('.nav-item[onclick="showPage(\'strategyHub\')"]');
       strategyNav.click();
       check('strategy hub navigation and global renderer', document.querySelector('#page-strategyHub.active') && typeof renderStrategyHub === 'function');
+      check('strategy hub focus uses shared status list', document.querySelectorAll('#strategyHubFocus .status-item').length > 0);
       check('strategy hub metrics rendered', document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
       check('strategy hub rows and table agree', document.querySelectorAll('#strategyHubBoard .strategy-row').length === document.querySelectorAll('#strategyHubTable tr').length);
 
@@ -269,7 +272,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 88, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 91, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
