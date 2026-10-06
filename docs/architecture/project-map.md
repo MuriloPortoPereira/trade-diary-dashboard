@@ -36,7 +36,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Estratégias: renderer do hub (G3f)
 
 - `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` global, 41 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.
-- `getStrategySnapshots`, `renderStatusList` e formatação continuam no legado; `renderStrategyRows` foi extraído no G3l; `showPage` e `refreshAll` preservam os consumidores.
+- `getStrategySnapshots` e formatação continuam no legado; `renderStatusList` em `src/shared/presentation/status-list.js`; `renderStrategyRows` foi extraído no G3l; `showPage` e `refreshAll` preservam os consumidores.
 - `tests/strategy-hub-page.test.cjs` caracteriza preenchido/vazio, métricas, tabela, foco, alvos opcionais e ordem de carga; smoke abre estratégias e exercita refresh.
 - Matriz visual v29 comparou 922 estados com G3e; todos idênticos, com 55 imagens/288 pixels dentro da tolerância existente.
 
@@ -354,7 +354,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 ## Notificações: renderer da página (G3h)
 
 - `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage` global, oito linhas movidas byte a byte; script clássico síncrono antes de psicologia e de `app.js`.
-- `getActiveAccount`, `getAccountTrades`, `buildOperationalAlerts`, `renderStatusList` e estado permanecem no legado; consumidores `showPage` e `refreshAll` intactos.
+- `getActiveAccount`, `getAccountTrades`, `buildOperationalAlerts` e estado permanecem no legado; `renderStatusList` em `src/shared/presentation/status-list.js`; consumidores `showPage` e `refreshAll` intactos.
 - `tests/notifications-page.test.cjs`: conta ativa em cada chamada, cópia sem mutação, mensagem vazia, propagação de falhas e ordem de carga.
 - 91 testes Node e 58 checks no navegador; matriz visual completa não repetida: não houve alteração de HTML gerado/CSS, e o fluxo real foi exercitado no smoke.
 
@@ -414,3 +414,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidor `switchStatTab('psych')` intacto; seleção de período e helpers de hesitação/disciplina e resumo permanecem no legado; cálculos locais do renderer foram movidos intactos.
 - `tests/psychology-statistics.test.cjs`: quatro cards, cinco gráficos, resumos, limites de hesitações/erros, tabela, vazio e alvo opcional.
 - 139 testes Node e 88 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Lista de status compartilhada (G3q)
+
+- `src/shared/presentation/status-list.js`: `renderStatusList(targetId, items, emptyMessage=...)` global, 17 linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- Reuso real por notificações, perfil, hub de estratégias e StudyHub; nenhuma nova camada de dados ou IO.
+- `tests/status-list.test.cjs`: vazio, ordem, escaping, ações, valores falsy/truthy, alvo ausente e carga. Interpolações legadas de mensagens/handlers mantidas.
+- 145 testes Node e 91 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

@@ -5,6 +5,10 @@ Serena fornece linhas base zero; localizar pelo símbolo após qualquer moviment
 O overview do nível superior lista 383 funções, 32 variáveis e 20 constantes; não inclui todas
 as funções privadas dos IIFEs. O arquivo contém 9.770 linhas, sendo 2.696 no bloco StudyHub final.
 
+`renderStatusList` (G3q) foi movida intacta para `src/shared/presentation/status-list.js`:
+reuso real entre notificações, perfil, estratégias e StudyHub. Interpolações
+legadas e contrato global foram preservados.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.

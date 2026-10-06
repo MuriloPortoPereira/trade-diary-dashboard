@@ -845,6 +845,16 @@ resumos e tabela: 88 checks, zero erros/assets locais ausentes.
 139 testes Node, sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Lista de status compartilhada (G3q)
+
+`tests/status-list.test.cjs` caracterizou vazio, escaping, ações, valores,
+alvo ausente e interpolações legadas antes do corte. Pós-corte protege carga
+clássica. Corpo movido byte a byte contra `a936863`, restante de `app.js`
+idêntico. Smoke verifica listas em notificações, perfil e estratégias: 91
+checks, zero erros/assets locais ausentes. 145 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

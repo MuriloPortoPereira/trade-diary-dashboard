@@ -412,6 +412,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3q: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3q: lista de status compartilhada
+
+- `renderStatusList` movida byte a byte para `src/shared/presentation/status-list.js` (17 linhas); reuso confirmado em quatro features.
+- Script clássico síncrono antes dos consumidores; API, mensagens vazias, escaping, ações e interpolações legadas intactos.
+- Caracterização pré-corte: cinco testes novos e 144 testes Node. Pós-corte: 145 testes Node, 91 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita notificações, perfil e hub de estratégias; StudyHub mantém a mesma função global.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3r: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

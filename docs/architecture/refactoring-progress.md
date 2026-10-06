@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3p registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3q registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3p extraído: `renderStatsPsych` para `src/modules/psychology/presentation/psychology-statistics.js`, 59 linhas movidas byte a byte.
-- Cards, gráficos, resumos, hesitações, tabela e API global preservados; script clássico síncrono antes de `app.js`.
-- Caracterização pré-corte: cinco testes novos e 138 testes Node. Pós-corte: 139 testes Node, 88 checks no navegador, sintaxe e diff aprovados.
-- Smoke exercita aba, cards, cinco gráficos, resumos e tabela. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3q extraído: `renderStatusList` para `src/shared/presentation/status-list.js`, 17 linhas movidas byte a byte; reuso real por notificações, perfil, estratégias e StudyHub.
+- API global, vazio, escaping, ações e interpolações legadas preservados; script clássico síncrono antes dos consumidores.
+- Caracterização pré-corte: cinco testes novos e 144 testes Node. Pós-corte: 145 testes Node, 91 checks no navegador, sintaxe e diff aprovados.
+- Smoke exercita listas de notificações, perfil e hub. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3q: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3r: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -276,3 +276,4 @@
 - G3n: painel de risco em apresentação de contas; cálculo financeiro e estado permanecem no legado. Impacto restrito à localização da declaração e ordem de carga, sem alteração de dados/contratos.
 - G3o: controles do calendário em apresentação da feature; estado, consulta de trades e formatação permanecem no legado. API global e handlers inline preservados.
 - G3p: estatísticas de psicologia em apresentação da feature; helpers de seleção/estatística permanecem no legado; cálculos locais do renderer foram movidos intactos.
+- G3q: lista de status em `src/shared/presentation` por reutilização confirmada; preservadas interpolações legadas e handlers globais, sem saneamento comportamental neste lote.
