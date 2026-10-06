@@ -332,6 +332,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Depois do corte: 87 testes Node, 55 checks no navegador e 922 estados visuais idênticos; revisão independente sem achados.
 - Próximo lote G3h: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3h: renderer da página de notificações
+
+- `renderNotificationsPage` movida byte a byte para `src/modules/notifications/presentation/notifications-page.js` (8 linhas).
+- Script clássico síncrono antes de psicologia e de `app.js`; `showPage` e `refreshAll` intactos.
+- Caracterização pré-corte: três testes novos e 90 testes Node. Pós-corte: 91 testes Node, 58 checks no navegador, sintaxe e diff aprovados.
+- Matriz visual completa não repetida: corpo e HTML gerado intactos, sem mudança CSS; smoke verifica navegação/feed/refresh reais.
+- Próximo lote G3i: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

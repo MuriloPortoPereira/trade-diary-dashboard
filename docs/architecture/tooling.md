@@ -755,6 +755,16 @@ e tabela e exercita `refreshAll` (55 checks). Referência visual v29 do lote G3f
 922 estados idênticos, 49 imagens/293 pixels de rasterização dentro da tolerância
 existente, zero erros de console/runtime; 87 testes Node, sintaxe e diff aprovados.
 
+## Renderer da página de notificações (G3h)
+
+`tests/notifications-page.test.cjs` caracterizou conta ativa, cópia dos alertas,
+mensagem vazia e propagação de falhas antes do corte; pós-corte protege também
+ordem de carga. Corpo movido byte a byte, restante de `app.js` idêntico à base
+`77eb592`. Smoke abre notificações e exercita `refreshAll`: 58 checks, zero erros
+ou assets locais ausentes. 91 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem alteração de HTML gerado/CSS;
+a última matriz completa permanece a do G3g, sem atribuir seu resultado ao G3h.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

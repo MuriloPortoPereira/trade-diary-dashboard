@@ -18,6 +18,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
+| Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `save`, `load`, `saveConfig` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
@@ -349,3 +350,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/styles/responsive-mobile.css`: duas media queries completas de 720/440px, 316 linhas; ocupa a posição anterior de `styles.css`, antes dos quatro CSS legados StudyHub.
 - `styles.css` foi removido após esgotar o residual; nenhum script, dado persistido ou seletor mudou.
 - Matriz v29 inclui 390, 439/440/441 e 719/720/721px; demais larguras e páginas continuam na comparação integral.
+
+## Notificações: renderer da página (G3h)
+
+- `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage` global, oito linhas movidas byte a byte; script clássico síncrono antes de psicologia e de `app.js`.
+- `getActiveAccount`, `getAccountTrades`, `buildOperationalAlerts`, `renderStatusList` e estado permanecem no legado; consumidores `showPage` e `refreshAll` intactos.
+- `tests/notifications-page.test.cjs`: conta ativa em cada chamada, cópia sem mutação, mensagem vazia, propagação de falhas e ordem de carga.
+- 91 testes Node e 58 checks no navegador; matriz visual completa não repetida: não houve alteração de HTML gerado/CSS, e o fluxo real foi exercitado no smoke.
