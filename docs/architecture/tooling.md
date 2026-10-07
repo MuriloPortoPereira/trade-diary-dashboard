@@ -887,6 +887,17 @@ zero erros/assets locais ausentes. 159 testes Node, sintaxe e diff aprovados.
 Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
 gerado ou CSS; última matriz: G3g.
 
+## Caixa na configuração (G3u)
+
+`tests/setup-cashflow-list.test.cjs` caracterizou guards, conta ativa, vazio,
+cálculo, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers
+e não mutação antes do corte. Pós-corte protege a carga clássica. Corpo movido
+byte a byte contra `7564c76`; o restante de `app.js` difere apenas por dois
+separadores de linha removidos. Smoke abre contas e confirma os renderers
+globais: 92 checks, zero erros/assets locais ausentes. 165 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

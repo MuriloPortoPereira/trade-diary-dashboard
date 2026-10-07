@@ -442,3 +442,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/account-cashflow-form.test.cjs`: guard de DOM, vazio, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers, não mutação e carga.
 - Cálculo, estado temporário, inclusão, remoção e persistência continuam no legado; consumidores de cadastro/edição preservados.
 - 159 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Caixa na configuração (G3u)
+
+- `src/modules/accounts/presentation/setup-cashflow-list.js`: `renderSetupCashflowList()` global, 24 linhas movidas byte a byte; script clássico síncrono antes de `accounts-page.js` e `app.js`.
+- `tests/setup-cashflow-list.test.cjs`: guards de DOM/conta, vazio, cálculo, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers, não mutação e carga.
+- Consulta da conta, cálculo, inclusão, exclusão e persistência continuam no legado; consumidores de setup preservados.
+- 165 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
