@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/accounts/presentation/account-list.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderAccountList\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(accounts, visible = true) {
   const node = {innerHTML: 'before'};
@@ -78,4 +79,14 @@ test('multiple accounts preserve order and add one delete action per row', () =>
   assert.match(html, /Aportes líquidos: R\$-50 · Meta: 20%/);
   assert.deepEqual(calls.filter(call => call[0] === 'trades').map(call => call[1]), ['a', 'b']);
   assert.equal(calls.filter(call => call[0] === 'risk').length, 2);
+});
+
+test('account list loads once as a synchronous classic script before accounts page', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/accounts/presentation/accounts-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

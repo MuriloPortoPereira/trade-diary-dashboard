@@ -3833,12 +3833,6 @@ function switchImportTab(id){
   if(id==='export'){renderBackupSummary(createBackupPayload());renderExportAccountFilter();}
 }
 
-function renderAccountList(){
-  const el=document.getElementById('accountList');if(!el)return;
-  if(!accounts.length){el.innerHTML='<p style="color:var(--muted);font-size:12px">Nenhuma conta cadastrada.</p>';return;}
-  el.innerHTML=accounts.map(a=>{const acctTrades=getAccountTrades(a.id);const risk=calcAccountRiskState(a,acctTrades);return`<div style="background:var(--bg2);border:1px solid var(--border2);border-left:3px solid ${a.color};border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px"><div style="flex:1"><div style="font-weight:600;font-size:13px">${a.name}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${acctTypeLabel(a.type)} · ${acctTrades.length} trades · Saldo: ${fR(risk.currentBalance)}</div><div style="font-size:10px;color:var(--muted)">Inicial: ${fR(risk.initialBalance)} · Aportes líquidos: ${fR(risk.cashflowNet)} · Meta: ${a.goalPct}%</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="selectAccount('${a.id}')">✓ Usar</button><button class="btn btn-ghost btn-sm btn-icon" onclick="editAccount('${a.id}')">✏</button>${accounts.length>1?`<button class="btn btn-danger btn-sm btn-icon" onclick="deleteAccount('${a.id}')">✕</button>`:''}</div></div>`;}).join('');
-}
-
 function acctTypeLabel(t){
   return{cfd_pct:'CFD %',futures_usd:'CFD %',prop_pct:'Prop Firm %',crypto:'Crypto'}[t]||t;
 }
