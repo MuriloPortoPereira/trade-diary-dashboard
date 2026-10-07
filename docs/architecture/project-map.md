@@ -449,3 +449,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/setup-cashflow-list.test.cjs`: guards de DOM/conta, vazio, cálculo, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers, não mutação e carga.
 - Consulta da conta, cálculo, inclusão, exclusão e persistência continuam no legado; consumidores de setup preservados.
 - 165 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Resumo de risco na configuração (G3v)
+
+- `src/modules/accounts/presentation/setup-risk-summary.js`: `renderSetupRiskSummary()` global, 14 linhas movidas byte a byte; script clássico síncrono antes dos demais renderers de setup e de `app.js`.
+- `tests/setup-risk-summary.test.cjs`: guard de conta, dependências, oito campos, sinais, defaults percentuais, alvos opcionais, não mutação e carga.
+- Conta, trades e `calcAccountRiskState` continuam no legado; consumidores de setup preservados.
+- 170 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

@@ -457,6 +457,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3v: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3v: resumo de risco na configuração
+
+- `renderSetupRiskSummary` movida byte a byte para `src/modules/accounts/presentation/setup-risk-summary.js` (14 linhas).
+- Script clássico síncrono antes dos demais renderers de setup; API, dependências, oito campos, sinais, defaults e alvos opcionais intactos.
+- Caracterização pré-corte: quatro testes novos e 169 testes Node. Pós-corte: 170 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
+- Smoke abre contas e confirma os renderers globais; conta, trades e cálculo financeiro permanecem no legado.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3w: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
