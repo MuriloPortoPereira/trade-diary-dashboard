@@ -865,6 +865,17 @@ erros/assets locais ausentes. 150 testes Node, sintaxe e diff aprovados.
 Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
 gerado ou CSS; última matriz: G3g.
 
+## Mídia de documentos (G3s)
+
+`tests/document-media.test.cjs` caracterizou mensagens vazias, ordem, URLs,
+escaping, fallback, ações, ausência de mutação e falhas antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `a524bae`;
+o restante de `app.js` difere apenas por dois separadores de linha removidos.
+Smoke abre documentos e confirma os renderers globais: 92 checks, zero
+erros/assets locais ausentes. 154 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

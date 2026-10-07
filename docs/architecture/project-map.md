@@ -288,7 +288,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 ## Documentos: renderer de página (G3d)
 
 - `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage` global, 137 linhas movidas intactas de `app.js`; script clássico síncrono antes dos renderers de contas/parceiros/perfil e de `app.js`.
-- Estado de pasta/seleção, helpers, mídia, ações e persistência continuam no legado; `showPage`, `refreshAll` e callbacks de documentos preservam os consumidores.
+- Estado de pasta/seleção, helpers, ações e persistência continuam no legado; `showPage`, `refreshAll` e callbacks de documentos preservam os consumidores. A mídia foi separada no G3s.
 - `tests/documents-page.test.cjs` caracteriza lista, editor, vazio, contexto de trade, alvos ausentes e ordem de carga; smoke abre documentos e exercita refresh.
 - Matriz visual v29 comparou 922 estados com G3c; todos idênticos, com 52 imagens/188 pixels dentro da tolerância existente.
 
@@ -428,3 +428,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Reuso real pela comparação de estratégias em `app.js` e pelas estatísticas de psicologia extraídas; dados e cálculos permanecem nos respectivos produtores.
 - `tests/analysis-summary.test.cjs`: ordem, tons, escaping, defaults, itens falsy, vazio/não-array, alvo ausente e carga.
 - 150 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Mídia de documentos (G3s)
+
+- `src/modules/documents/presentation/document-media.js`: `renderDocumentMedia(entry)` global, 11 linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
+- `tests/document-media.test.cjs`: mensagens vazias por origem, ordem, URLs, escaping, fallback, índices de remoção, ausência de mutação, falhas e carga.
+- `documents-page.js` mantém o consumidor; helpers de imagem, remoção e persistência continuam no legado.
+- 154 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
