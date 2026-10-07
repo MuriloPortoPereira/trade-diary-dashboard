@@ -435,3 +435,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/document-media.test.cjs`: mensagens vazias por origem, ordem, URLs, escaping, fallback, índices de remoção, ausência de mutação, falhas e carga.
 - `documents-page.js` mantém o consumidor; helpers de imagem, remoção e persistência continuam no legado.
 - 154 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Caixa no formulário de conta (G3t)
+
+- `src/modules/accounts/presentation/account-cashflow-form.js`: `renderAccountCashflowList()` global, 22 linhas movidas byte a byte; script clássico síncrono antes de `accounts-page.js` e `app.js`.
+- `tests/account-cashflow-form.test.cjs`: guard de DOM, vazio, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers, não mutação e carga.
+- Cálculo, estado temporário, inclusão, remoção e persistência continuam no legado; consumidores de cadastro/edição preservados.
+- 159 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
