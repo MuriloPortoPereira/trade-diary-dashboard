@@ -199,7 +199,7 @@ function browserProbe() {
         document.querySelectorAll('#pmHabitGrid .pm-grid-day').length >= 28);
       const documentsNav = document.querySelector('.nav-item[onclick="showPage(\'documents\')"]');
       documentsNav.click();
-      check('documents navigation and global renderer', document.querySelector('#page-documents.active') && typeof renderDocumentsPage === 'function');
+      check('documents navigation and global renderer', document.querySelector('#page-documents.active') && typeof renderDocumentMedia === 'function' && typeof renderDocumentsPage === 'function');
       check('documents folders rendered', document.querySelectorAll('#docFolders .doc-folder').length > 0);
       check('documents list and editor rendered', document.getElementById('docEntries').innerHTML.length > 0 &&
         document.getElementById('docEditorHeading').textContent.trim().length > 0);
