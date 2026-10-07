@@ -919,6 +919,17 @@ contas e confirma os renderers globais: 92 checks, zero erros/assets locais
 ausentes. 175 testes Node, sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Página de configuração de risco (G3x)
+
+`tests/risk-setup-page.test.cjs` caracterizou precedência conta/configuração,
+zeros, defaults `??`/`||`, data, campos opcionais e ordem das chamadas antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`7a9a357`; o restante de `app.js` difere apenas por dois separadores de linha
+removidos. Smoke abre contas e confirma os renderers globais: 92 checks, zero
+erros/assets locais ausentes. 179 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
