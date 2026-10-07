@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/accounts/presentation/account-cashflow-form.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderAccountCashflowList\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render(flows, summary = {deposits: 0, withdrawals: 0, net: 0}, visible = true) {
   const node = {innerHTML: 'before'};
@@ -79,4 +80,14 @@ test('negative net retains the red tone without a positive sign', () => {
   );
   assert.match(html, /class="text-red">R\$-10<\/b>/);
   assert.match(html, /class="text-green">Aporte<\/span>/);
+});
+
+test('cashflow form renderer loads once as a synchronous classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/accounts/presentation/accounts-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

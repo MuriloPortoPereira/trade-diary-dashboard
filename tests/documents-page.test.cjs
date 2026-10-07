@@ -106,6 +106,6 @@ test('extracted documents renderer stays a synchronous classic script before app
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === modulePath).length, 1);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.equal(scripts[index + 1].src, 'src/modules/accounts/presentation/accounts-page.js');
+  assert.equal(scripts[index + 1].src, 'src/modules/accounts/presentation/account-cashflow-form.js');
   assert.doesNotMatch(scripts[index].attributes, /\b(?:async|defer|type="module")\b/i);
 });
