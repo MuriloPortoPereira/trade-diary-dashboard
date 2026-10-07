@@ -139,6 +139,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/account-list.test.cjs` | Caracterização de guard, vazio, contas, cálculos, ordem, ações e carga |
 | `src/modules/accounts/presentation/risk-setup-page.js` | Composição dos campos, resumos e tags da configuração de risco; 17 linhas intactas |
 | `tests/risk-setup-page.test.cjs` | Caracterização de precedência, defaults, zeros, data, campos opcionais e carga |
+| `src/app/presentation/account-summary.js` | Projeção da conta ativa no topbar; 10 linhas intactas |
+| `tests/account-summary.test.cjs` | Caracterização de guard, cor, nome, tipo, alvos opcionais e carga |
 | `src/modules/psychology/presentation/psychology-statistics.js` | Renderer da aba de psicologia em análises, 59 linhas intactas |
 | `tests/psychology-statistics.test.cjs` | Caracterização de cards, gráficos, resumos, hesitações, erros, tabela, vazio e carga |
 | `src/modules/psychology/presentation/psychology-page.js` | Renderer global da página de psicologia, 25 linhas movidas intactas de `app.js` |
@@ -152,6 +154,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3x; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3y; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

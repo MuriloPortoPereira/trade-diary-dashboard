@@ -470,3 +470,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/risk-setup-page.test.cjs`: precedência conta/configuração, preservação de zeros, defaults `??`/`||`, data, campos opcionais, chamadas dependentes e carga.
 - Estado, formulário, salvamento, tags e cálculo financeiro continuam no legado ou nos renderers já separados; dois consumidores preservados.
 - 179 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Resumo da conta no shell (G3y)
+
+- `src/app/presentation/account-summary.js`: `renderTopbarAccount()` global, dez linhas movidas byte a byte; script clássico síncrono antes de `accounts-page.js` e `app.js`.
+- `tests/account-summary.test.cjs`: guard de conta, cor, nome, label de tipo, targets independentes, não mutação e carga.
+- Conta ativa, normalização, seleção, tipo e métricas do topbar continuam no legado; cinco consumidores preservados.
+- 183 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

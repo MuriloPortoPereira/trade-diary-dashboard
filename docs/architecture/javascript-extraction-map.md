@@ -37,6 +37,10 @@ trades, risco e formatação permanecem como dependências globais.
 `src/modules/accounts/presentation/risk-setup-page.js`: estado, formulário,
 salvamento, tags e cálculo financeiro permanecem nas dependências existentes.
 
+`renderTopbarAccount` (G3y) foi movida intacta para
+`src/app/presentation/account-summary.js`: conta ativa, normalização, seleção,
+tipo e métricas do topbar permanecem nas dependências globais existentes.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.
@@ -45,7 +49,7 @@ somente depois da caracterização suas regras entram em `domain`.
 
 | Área / localização | Arquivos coesos propostos | Dependências e preservação |
 |---|---|---|
-| Estado, shell e bootstrap; início do arquivo, `showPage`, `refreshAll`, load 6954–7017 | `app/bootstrap.js`, `app/presentation/navigation.js`, `app/presentation/account-summary.js`, `app/presentation/app-dialog.js` | Estado único de trades/contas/config; ordem load, seed, renderização, listeners, traduções e câmbio |
+| Estado, shell e bootstrap; início do arquivo, `showPage`, `refreshAll`, load 6954–7017; G3y executado | `app/presentation/account-summary.js`; destinos ainda propostos: `app/bootstrap.js`, `app/presentation/{navigation,app-dialog}.js` | Resumo global movido intacto; estado único de trades/contas/config, ordem load, seed, listeners, traduções e câmbio seguem no legado |
 | Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,setup-cashflow-list,account-list}.js`; destino ainda proposto: `account-form.js` | Renderers globais movidos intactos; conta ativa, normalização, formulário, persistência e atualização das demais páginas seguem no legado |
 | Risco: `calcAccountRiskState` 1485–1670; board 1878–2024; setup 6704–6877; renderers G3n/G3v/G3x executados | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; depois `domain/{calculate-cashflow-totals,calculate-account-risk}.js` | Renderers globais movidos intactos; relógio, ciclos, depósitos/retiradas, config e cálculo permanecem no legado; não extrair como domínio em bloco |
 | Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191 | `modules/trades/presentation/{trade-form,incomplete-trade-flow,trade-images}.js`; depois `application/save-trade.js` | editingId, erros/imagens, conta/risco, globals t-*, save e refreshAll; `saveTrade` 1124–1239 |

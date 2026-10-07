@@ -484,6 +484,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3y: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3y: resumo da conta no shell
+
+- `renderTopbarAccount` movida byte a byte para `src/app/presentation/account-summary.js` (10 linhas).
+- Script clássico síncrono antes dos consumidores; API, guard de conta, cor, nome, tipo e targets opcionais intactos.
+- Caracterização pré-corte: três testes novos e 182 testes Node. Pós-corte: 183 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
+- Smoke abre contas e confirma os renderers globais; normalização, seleção, tipo e métricas do topbar permanecem globais.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3z: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
