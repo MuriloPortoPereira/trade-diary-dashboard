@@ -456,3 +456,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/setup-risk-summary.test.cjs`: guard de conta, dependências, oito campos, sinais, defaults percentuais, alvos opcionais, não mutação e carga.
 - Conta, trades e `calcAccountRiskState` continuam no legado; consumidores de setup preservados.
 - 170 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Lista de contas (G3w)
+
+- `src/modules/accounts/presentation/account-list.js`: `renderAccountList()` global, cinco linhas movidas byte a byte; script clássico síncrono antes de `accounts-page.js` e `app.js`.
+- `tests/account-list.test.cjs`: guard de DOM, vazio, uma/múltiplas contas, dependências, ordem, campos, ações, não mutação e carga.
+- Seleção, edição, exclusão, consulta de trades, cálculo de risco e formatação continuam como dependências globais; interpolações legadas permanecem intactas.
+- 175 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

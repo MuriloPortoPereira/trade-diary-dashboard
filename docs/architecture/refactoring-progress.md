@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3v registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3w registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3v extraído: `renderSetupRiskSummary` para `src/modules/accounts/presentation/setup-risk-summary.js`, 14 linhas movidas byte a byte.
-- API global, dependências, oito campos, sinais, defaults e alvos opcionais preservados; script clássico síncrono antes dos consumidores.
-- Caracterização pré-corte: quatro testes novos e 169 testes Node. Pós-corte: 170 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
+- G3w extraído: `renderAccountList` para `src/modules/accounts/presentation/account-list.js`, cinco linhas movidas byte a byte.
+- API global, guard, vazio, ordem, campos, cálculos, ações e interpolações legadas preservados; script clássico síncrono antes do consumidor.
+- Caracterização pré-corte: quatro testes novos e 174 testes Node. Pós-corte: 175 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
 - Smoke abre contas e confirma os renderers globais. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3w: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3x: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -282,3 +282,4 @@
 - G3t: caixa temporário do formulário em apresentação de contas; cálculo, estado, edição e persistência permanecem no legado.
 - G3u: lista de caixa do setup em apresentação de contas; consulta, cálculo, edição e persistência permanecem no legado.
 - G3v: resumo de risco do setup em apresentação de contas; conta, trades e cálculo financeiro permanecem no legado.
+- G3w: lista do seletor em apresentação de contas; ações, risco, trades e interpolações legadas permanecem globais.
