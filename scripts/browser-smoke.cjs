@@ -131,7 +131,7 @@ function browserProbe() {
         document.getElementById('partnerAffiliatesEditor').textContent.trim().length > 0);
       const accountsNav = document.querySelector('.nav-item[onclick="showPage(\'accounts\')"]');
       accountsNav.click();
-      check('accounts navigation and global renderer', document.querySelector('#page-accounts.active') && typeof renderAccountCashflowList === 'function' && typeof renderSetupRiskSummary === 'function' && typeof renderSetupCashflowList === 'function' && typeof renderSetup === 'function' && typeof renderAccountList === 'function' && typeof renderAccountsPage === 'function');
+      check('accounts navigation and global renderer', document.querySelector('#page-accounts.active') && typeof renderAccountCashflowList === 'function' && typeof renderSetupRiskSummary === 'function' && typeof renderSetupCashflowList === 'function' && typeof renderSetup === 'function' && typeof renderAccountList === 'function' && typeof renderTopbarAccount === 'function' && typeof renderAccountsPage === 'function');
       check('accounts metrics rendered', document.querySelectorAll('#accountsMetrics .metric-card').length === 4);
       check('accounts overview rendered', document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
       refreshAll();
