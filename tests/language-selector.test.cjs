@@ -42,6 +42,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/trades/presentation/trade-log-selection.js',
     'src/modules/psychology/presentation/psychology-statistics.js',
     'src/modules/calendar/presentation/calendar-controls.js',
+    'src/modules/accounts/presentation/account-balance-chrome.js',
     'src/modules/accounts/presentation/risk-board.js',
     'src/modules/analytics/presentation/dashboard-page.js',
     'src/modules/analytics/presentation/strategy-rows.js',

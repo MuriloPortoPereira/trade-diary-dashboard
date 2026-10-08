@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/accounts/presentation/account-balance-chrome.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function syncAccountBalanceChrome\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({account = {id: 'acct-1'}, trades = [{id: 'trade-1'}], risk, elements = {}, useDefaults = false} = {}) {
   const calls = [];
@@ -22,7 +23,7 @@ function render({account = {id: 'acct-1'}, trades = [{id: 'trade-1'}], risk, ele
     formatAccountBalanceChange(value) { calls.push(['change', value]); return 'formatted change'; },
     document: {getElementById(id) { calls.push(['target', id]); return elements[id] ?? null; }},
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#syncAccountBalanceChrome' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   const result = vm.runInContext(useDefaults
     ? 'syncAccountBalanceChrome()'
     : 'syncAccountBalanceChrome(account,trades)', context);
@@ -33,6 +34,14 @@ test('missing default account still resolves its trades and returns before risk 
   const {calls, result} = render({account: null, useDefaults: true});
   assert.equal(result, null);
   assert.deepEqual(calls, [['active'], ['trades', undefined]]);
+});
+
+test('account balance chrome classic script loads once before dashboard and app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('src/modules/analytics/presentation/dashboard-page.js'));
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('default account updates balance, positive change and trade count and returns risk', () => {
