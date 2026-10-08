@@ -58,3 +58,12 @@ test('export account filter retains an existing selection and clears a missing o
   assert.equal(render({accounts, select: createSelect('second')}).select.value, 'second');
   assert.equal(render({accounts, select: createSelect('removed')}).select.value, '');
 });
+
+test('export account filter loads once as a synchronous classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
+});
