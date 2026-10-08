@@ -46,6 +46,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/analytics/presentation/strategy-hub-page.js',
     'src/modules/routine/presentation/premarket-page.js',
     'src/modules/documents/presentation/document-media.js',
+    'src/modules/documents/presentation/document-folder-icon.js',
     'src/modules/documents/presentation/documents-page.js',
     'src/modules/accounts/presentation/account-cashflow-form.js',
     'src/modules/accounts/presentation/setup-risk-summary.js',
