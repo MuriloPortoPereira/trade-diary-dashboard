@@ -527,6 +527,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `calcMetrics`, `fR`, filtros e estado do diário permanecem nas dependências existentes; consumidor de `renderLog` preservado.
 - 216 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Barra de seleção do diário (G3ah)
+
+- `src/modules/trades/presentation/trade-log-selection.js`: `updateBulkBar()` global, 26 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/trade-log-selection.test.cjs`: guard do DOM, seleção vazia/simples/múltipla, incompletos, textos, classes, ações, checkbox geral e carga.
+- `selectedTrades`, busca de incompletos e comandos de seleção permanecem no legado; quatro consumidores preservados.
+- 221 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.

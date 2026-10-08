@@ -155,6 +155,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-error-chips.test.cjs` | Caracterização de guard, normalização, deduplicação, seleção, escaping e carga |
 | `src/modules/trades/presentation/trade-log-metrics.js` | Cards de métricas do filtro atual do diário; 19 linhas intactas |
 | `tests/trade-log-metrics.test.cjs` | Caracterização de guard, cards, sinais, risco médio, incompletos, não mutação e carga |
+| `src/modules/trades/presentation/trade-log-selection.js` | Barra de ações e checkbox geral da seleção do diário; 26 linhas intactas |
+| `tests/trade-log-selection.test.cjs` | Caracterização de guard, contagens, textos, classes, ações, checkbox geral e carga |
 | `src/modules/documents/presentation/document-folder-icon.js` | Ícones SVG das pastas e fallback de arquivo; 9 linhas intactas |
 | `tests/document-folder-icon.test.cjs` | Caracterização de wrapper, SVGs, tipos, fallback e carga |
 | `src/modules/psychology/presentation/psychology-statistics.js` | Renderer da aba de psicologia em análises, 59 linhas intactas |
@@ -170,6 +172,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3ag; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3ah; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

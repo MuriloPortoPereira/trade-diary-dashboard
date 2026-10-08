@@ -1021,6 +1021,16 @@ Smoke: 95 checks, zero erros/assets locais ausentes. 216 testes Node, sintaxe e
 diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Barra de seleção do diário (G3ah)
+
+`tests/trade-log-selection.test.cjs` caracterizou guard do DOM, seleção
+vazia/simples/múltipla, incompletos, textos, classes, ações e checkbox geral
+antes do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte
+contra `e68b77d`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 221 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -565,6 +565,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3ah: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3ah: barra de seleção do diário
+
+- `updateBulkBar` movida byte a byte para `src/modules/trades/presentation/trade-log-selection.js` (26 linhas).
+- Script clássico síncrono antes de `app.js`; API, guard, contagens, textos, classes, ações e checkbox geral intactos.
+- Caracterização pré-corte: quatro testes novos e 220 testes Node. Pós-corte: 221 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- `selectedTrades`, busca de incompletos e comandos de seleção permanecem no legado; quatro consumidores preservados.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3ai: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

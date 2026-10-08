@@ -73,6 +73,10 @@ toggle, disciplina e persistência permanecem nas dependências existentes.
 `src/modules/trades/presentation/trade-log-metrics.js`: cálculo agregado,
 formatação monetária, filtros e estado do diário permanecem nas dependências existentes.
 
+`updateBulkBar` (G3ah) foi movida intacta para
+`src/modules/trades/presentation/trade-log-selection.js`: conjunto selecionado,
+busca de incompletos e comandos de seleção permanecem nas dependências existentes.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.
@@ -85,7 +89,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,setup-cashflow-list,account-list}.js`; destino ainda proposto: `account-form.js` | Renderers globais movidos intactos; conta ativa, normalização, formulário, persistência e atualização das demais páginas seguem no legado |
 | Risco: `calcAccountRiskState` 1485–1670; board 1878–2024; setup 6704–6877; renderers G3n/G3v/G3x executados | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; depois `domain/{calculate-cashflow-totals,calculate-account-risk}.js` | Renderers globais movidos intactos; relógio, ciclos, depósitos/retiradas, config e cálculo permanecem no legado; não extrair como domínio em bloco |
 | Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af executados | `modules/trades/presentation/{trade-images,trade-error-chips}.js`; destinos ainda propostos: `{trade-form,incomplete-trade-flow}.js`; depois `application/save-trade.js` | Preview e chips globais movidos intactos; editingId, upload/remoção, seleção de erros, conta/risco, save e refreshAll seguem no legado |
-| Diário: 2617–2953; G3ae/G3ag executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics}.js`; destinos ainda propostos: `{trade-log,trade-log-selection}.js`; `domain/log-date-range.js` | Aviso e cards de métricas globais movidos intactos; cálculo, filtros, ordenação, seleção, conta, duplicação e confirmações de exclusão seguem no legado |
+| Diário: 2617–2953; G3ae/G3ag/G3ah executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics,trade-log-selection}.js`; destino ainda proposto: `trade-log.js`; depois `domain/log-date-range.js` | Aviso, cards e barra de seleção globais movidos intactos; cálculo, filtros, ordenação, conjunto selecionado, conta, duplicação e confirmações de exclusão seguem no legado |
 | Timing: 272–373 | `modules/trades/domain/trade-timing.js`, após entradas explícitas | Normalizadores de data/horário compartilhados com importação; preservar virada de dia e inválidos |
 | Métricas: `calcMetrics` 1344–1394; `filterByPeriod` 1396–1403 | `modules/analytics/domain/calculate-trade-metrics.js`; wrapper `calcMetrics`; filtro só após receber data explícita | Resolver conta/capital no legado; núcleo recebe dados e saldo inicial; não mudar ordem da série; filtro atual consulta relógio |
 | Estratégias: 2026–2468, hub 4800–4894; renderers G3f/G3l executados | `modules/analytics/presentation/{strategy-hub-page,strategy-rows}.js`; demais destinos propostos: `strategy-comparison.js`, depois `domain/{strategy-snapshots,strategy-outcomes,strategy-comparison-scores}.js` | Renderers globais movidos intactos; métricas, ranking, empates, filtros, cores e helpers seguem no legado |
