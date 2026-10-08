@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/trades/presentation/trade-log-metrics.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderLogMetrics\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({rows = [], incompleteCount = 0, metrics, target = {innerHTML: 'before'}} = {}) {
   const calls = [];
@@ -19,7 +20,7 @@ function render({rows = [], incompleteCount = 0, metrics, target = {innerHTML: '
     calcMetrics(value) { calls.push(['metrics', value]); return metrics; },
     fR(value) { calls.push(['money', value]); return `F:${value}`; },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#renderLogMetrics' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('renderLogMetrics(rows,incompleteCount)', context);
   return {target, calls};
 }
@@ -28,6 +29,13 @@ test('missing log metrics target returns before reading or calculating rows', ()
   const rows = new Proxy([], {get() { throw new Error('rows accessed'); }});
   const {calls} = render({rows, target: null});
   assert.deepEqual(calls, [['target', 'logMetrics']]);
+});
+
+test('trade log metrics classic script loads once before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('log metrics preserve cards, signed result, win rate and average risk', () => {
