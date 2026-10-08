@@ -499,6 +499,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Cache, densidade, formatação e atualização das métricas permanecem nas dependências existentes; dois consumidores preservados.
 - 199 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Saldo da conta no shell (G3ai)
+
+- `src/modules/accounts/presentation/account-balance-chrome.js`: `syncAccountBalanceChrome(acct,acctTrades)` global, 15 linhas movidas byte a byte; script clássico síncrono antes do dashboard e de `app.js`.
+- `tests/account-balance-chrome.test.cjs`: argumentos padrão, conta ausente, retorno, saldo, variação positiva/negativa, contagem, alvos opcionais e carga.
+- Conta ativa, trades, cálculo de risco e formatação permanecem nas dependências existentes; quatro consumidores preservados.
+- 226 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Prévia das imagens da operação (G3ad)
 
 - `src/modules/trades/presentation/trade-images.js`: `renderImagePreviews()` global, quatro linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
