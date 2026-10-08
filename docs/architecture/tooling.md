@@ -971,6 +971,16 @@ removidos. Smoke: 95 checks, zero erros/assets locais ausentes. 195 testes
 Node, sintaxe e diff aprovados. Matriz visual completa não repetida neste
 corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Valor responsivo do topbar (G3ac)
+
+`tests/topbar-value.test.cjs` caracterizou cache/target ausentes, densidade
+completa/compacta, título e argumentos de classe antes do corte. Pós-corte
+protege a carga clássica. Corpo movido byte a byte contra `3193ab9`; o restante
+de `app.js` difere apenas por dois separadores de linha removidos. Smoke: 95
+checks, zero erros/assets locais ausentes. 199 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -492,6 +492,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Conta ativa, normalização, seleção, tipo e métricas do topbar continuam no legado; cinco consumidores preservados.
 - 183 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Valor responsivo do topbar (G3ac)
+
+- `src/app/presentation/topbar-value.js`: `renderTopbarValue(id)` global, nove linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- `tests/topbar-value.test.cjs`: cache ausente, target ausente, densidade completa/compacta, título, argumentos de classe e carga.
+- Cache, densidade, formatação e atualização das métricas permanecem nas dependências existentes; dois consumidores preservados.
+- 199 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
