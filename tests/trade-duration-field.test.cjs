@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/trades/presentation/trade-duration-field.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function updateTradeDurationField\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({values = {}, duration = null, formatted = 'formatted'} = {}) {
   const calls = [];
@@ -21,7 +22,7 @@ function render({values = {}, duration = null, formatted = 'formatted'} = {}) {
     },
     formatDurationMinutes(minutes) { calls.push(['format', minutes]); return formatted; },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#updateTradeDurationField' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('updateTradeDurationField()', context);
   return {calls, elements};
 }
@@ -29,6 +30,13 @@ function render({values = {}, duration = null, formatted = 'formatted'} = {}) {
 test('missing duration target returns before reading form fields or calculating', () => {
   const {calls} = render();
   assert.deepEqual(calls, [['target', 't-duration']]);
+});
+
+test('trade duration field classic script loads once before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('duration field preserves dates, times, dependency calls and formatted value', () => {
