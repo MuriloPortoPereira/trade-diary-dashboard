@@ -940,6 +940,16 @@ confirma os renderers globais: 92 checks, zero erros/assets locais ausentes.
 183 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
 neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Ícones das pastas de documentos (G3z)
+
+`tests/document-folder-icon.test.cjs` caracterizou wrapper, contrato SVG,
+quatro tipos, paths distintos e fallback antes do corte. Pós-corte protege a
+carga clássica. Corpo movido byte a byte contra `73cd31d`; o restante de
+`app.js` difere apenas por dois separadores de linha removidos. Smoke abre
+documentos e confirma os renderers globais: 92 checks, zero erros/assets locais
+ausentes. 187 testes Node, sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

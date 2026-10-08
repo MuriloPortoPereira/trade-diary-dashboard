@@ -477,3 +477,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/account-summary.test.cjs`: guard de conta, cor, nome, label de tipo, targets independentes, não mutação e carga.
 - Conta ativa, normalização, seleção, tipo e métricas do topbar continuam no legado; cinco consumidores preservados.
 - 183 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Ícones das pastas de documentos (G3z)
+
+- `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
+- `tests/document-folder-icon.test.cjs`: wrapper, contrato SVG acessível, quatro tipos, paths distintos, fallback e carga.
+- Navegação, pastas, estado e persistência continuam no legado ou em `documents-page.js`; dois consumidores preservados.
+- 187 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

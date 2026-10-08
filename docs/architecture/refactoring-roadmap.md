@@ -493,6 +493,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3z: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3z: ícones das pastas de documentos
+
+- `renderDocFolderIcon` movida byte a byte para `src/modules/documents/presentation/document-folder-icon.js` (9 linhas).
+- Script clássico síncrono antes de `documents-page.js`; API, wrapper, contrato SVG, quatro tipos e fallback intactos.
+- Caracterização pré-corte: três testes novos e 186 testes Node. Pós-corte: 187 testes Node, 92 checks no navegador, sintaxe e diff aprovados.
+- Smoke abre documentos e confirma os renderers globais; navegação, estado e persistência permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3aa: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
