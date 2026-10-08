@@ -39,6 +39,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/trades/presentation/trade-images.js',
     'src/modules/trades/presentation/trade-log-read-only-notice.js',
     'src/modules/trades/presentation/trade-log-metrics.js',
+    'src/modules/trades/presentation/trade-log-selection.js',
     'src/modules/psychology/presentation/psychology-statistics.js',
     'src/modules/calendar/presentation/calendar-controls.js',
     'src/modules/accounts/presentation/risk-board.js',

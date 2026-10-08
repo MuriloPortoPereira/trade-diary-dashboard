@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/trades/presentation/trade-log-selection.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function updateBulkBar\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function createElement(extra = {}) {
   const classes = new Set();
@@ -34,7 +35,7 @@ function render({selected = [], incomplete = [], elements = {}, checkboxes = []}
       querySelectorAll(selector) { calls.push(['query', selector]); return checkboxes; },
     },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#updateBulkBar' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('updateBulkBar()', context);
   return {calls};
 }
@@ -48,6 +49,13 @@ test('missing bulk bar returns after resolving optional controls without reading
     ['target', 'bulkEditBtn'],
     ['target', 'bulkCompleteBtn'],
   ]);
+});
+
+test('trade log selection classic script loads once before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('selected incomplete trades show the bar, counts, actions and checked select-all state', () => {
