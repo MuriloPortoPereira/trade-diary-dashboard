@@ -506,6 +506,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Upload, `FileReader`, normalização, remoção e persistência permanecem no legado; quatro consumidores preservados.
 - 203 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Aviso de consulta do diário (G3ae)
+
+- `src/modules/trades/presentation/trade-log-read-only-notice.js`: `renderLogReadOnlyNotice(accountFilter)` global, 16 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/trade-log-read-only-notice.test.cjs`: guard do DOM, estado desbloqueado, todas as contas, conta específica, mensagens, escaping, não mutação e carga.
+- Filtro, conta ativa, nomes e decisão de bloqueio permanecem no legado; consumidor de `renderLog` preservado.
+- 208 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.

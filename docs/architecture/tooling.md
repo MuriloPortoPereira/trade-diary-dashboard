@@ -991,6 +991,16 @@ erros/assets locais ausentes. 203 testes Node, sintaxe e diff aprovados. Matriz
 visual completa não repetida neste corte sem mudança do corpo/HTML gerado ou
 CSS; última matriz: G3g.
 
+## Aviso de consulta do diário (G3ae)
+
+`tests/trade-log-read-only-notice.test.cjs` caracterizou guard do DOM,
+desbloqueio, todas/uma conta, mensagens, escaping e não mutação antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `1811212`;
+o restante de `app.js` difere apenas pela declaração e separadores removidos.
+Smoke: 95 checks, zero erros/assets locais ausentes. 208 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

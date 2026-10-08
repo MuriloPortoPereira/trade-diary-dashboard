@@ -538,6 +538,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3ae: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3ae: aviso de consulta do diário
+
+- `renderLogReadOnlyNotice` movida byte a byte para `src/modules/trades/presentation/trade-log-read-only-notice.js` (16 linhas).
+- Script clássico síncrono antes de `app.js`; API, guard, desbloqueio, mensagens, escaping e tratamento de todas/uma conta intactos.
+- Caracterização pré-corte: quatro testes novos e 207 testes Node. Pós-corte: 208 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Filtro, conta ativa, nomes e decisão de bloqueio permanecem no legado; consumidor de `renderLog` preservado.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3af: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
