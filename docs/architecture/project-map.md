@@ -60,8 +60,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
 - `tests/export-account-filter.test.cjs`: guard do select, ordem, IDs, nomes escapados, preservação/limpeza da seleção e carga.
-- Contas, `escapeHtml`, leitura dos filtros e exportação permanecem nas dependências existentes; consumidor de `showPage('export')` preservado.
+- Contas, `escapeHtml`, leitura dos filtros e exportação permanecem nas dependências existentes; consumidor de `switchImportTab('export')` preservado.
 - 191 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Resumo do backup (G3ab)
+
+- `src/modules/data-transfer/presentation/backup-summary.js`: `renderBackupSummary(data=createBackupPayload())` global, cinco linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- `tests/backup-summary.test.cjs`: guard do DOM, prefixo traduzido, formatação, preservação do dado, argumento padrão e carga.
+- Criação/formatação do payload, importação, restauração e exportação permanecem nas dependências existentes; cinco consumidores preservados.
+- 195 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Preferências: idiomas
 

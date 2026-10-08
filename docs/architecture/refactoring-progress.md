@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3aa registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3ab registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3aa extraído: `renderExportAccountFilter` para `src/modules/data-transfer/presentation/export-account-filter.js`, sete linhas movidas byte a byte.
-- API global, guard, ordem, IDs, escaping de nomes e preservação/limpeza da seleção mantidos; script clássico síncrono antes do consumidor.
-- Caracterização pré-corte: três testes novos e 190 testes Node. Pós-corte: 191 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
-- Smoke cobre a tela de exportação existente. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3ab extraído: `renderBackupSummary` para `src/modules/data-transfer/presentation/backup-summary.js`, cinco linhas movidas byte a byte.
+- API global, guard, tradução, formatação e avaliação do argumento padrão mantidos; script clássico síncrono antes dos consumidores.
+- Caracterização pré-corte: três testes novos e 194 testes Node. Pós-corte: 195 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Smoke percorre a aba de exportação e executa o renderer. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3ab: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3ac: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -287,3 +287,4 @@
 - G3y: resumo da conta ativa em apresentação do shell; normalização, seleção, tipo e métricas permanecem globais.
 - G3z: ícones de pastas em apresentação de documentos; navegação, estado e persistência permanecem nas dependências existentes.
 - G3aa: filtro de contas em apresentação de transferência; contas, escaping, leitura dos filtros e exportação permanecem nas dependências existentes.
+- G3ab: resumo do backup em apresentação de transferência; criação/formatação do payload, importação, restauração e exportação permanecem nas dependências existentes.
