@@ -513,6 +513,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Upload, `FileReader`, normalização, remoção e persistência permanecem no legado; quatro consumidores preservados.
 - 203 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Duração da operação no formulário (G3aj)
+
+- `src/modules/trades/presentation/trade-duration-field.js`: `updateTradeDurationField()` global, 12 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/trade-duration-field.test.cjs`: guard do DOM, datas, horários, fallback da data de saída, dependências, duração nula/zero e carga.
+- Cálculo e formatação temporal permanecem nas dependências existentes; três chamadas JavaScript e quatro handlers HTML preservados.
+- 231 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Aviso de consulta do diário (G3ae)
 
 - `src/modules/trades/presentation/trade-log-read-only-notice.js`: `renderLogReadOnlyNotice(accountFilter)` global, 16 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

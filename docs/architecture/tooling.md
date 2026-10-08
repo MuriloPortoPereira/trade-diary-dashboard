@@ -1041,6 +1041,16 @@ Smoke: 95 checks, zero erros/assets locais ausentes. 226 testes Node, sintaxe e
 diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Duração da operação no formulário (G3aj)
+
+`tests/trade-duration-field.test.cjs` caracterizou guard do DOM, datas,
+horários, fallback da data de saída, dependências e duração nula/zero antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`d075c07`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 231 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

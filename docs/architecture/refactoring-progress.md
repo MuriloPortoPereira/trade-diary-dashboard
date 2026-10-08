@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3ai registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3aj registrados abaixo.
 - G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3ai extraído: `syncAccountBalanceChrome` para `src/modules/accounts/presentation/account-balance-chrome.js`, 15 linhas movidas byte a byte.
-- API global, argumentos padrão, retorno, saldo, variação, sinal, contagem e alvos opcionais mantidos; script clássico síncrono antes do dashboard e de `app.js`.
-- Caracterização pré-corte: quatro testes novos e 225 testes Node. Pós-corte: 226 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- G3aj extraído: `updateTradeDurationField` para `src/modules/trades/presentation/trade-duration-field.js`, 12 linhas movidas byte a byte.
+- API global, guard, datas, horários, fallback da saída, dependências e duração nula/zero mantidos; script clássico síncrono antes de `app.js`.
+- Caracterização pré-corte: quatro testes novos e 230 testes Node. Pós-corte: 231 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
 - Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3aj: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3ak: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -295,3 +295,4 @@
 - G3ag: métricas do diário em apresentação de trades; cálculo agregado, formatação monetária, filtros e estado permanecem nas dependências existentes.
 - G3ah: barra de seleção do diário em apresentação de trades; conjunto selecionado, busca de incompletos e comandos permanecem nas dependências existentes.
 - G3ai: saldo da conta no shell em apresentação de contas; conta ativa, trades, cálculo de risco e formatação permanecem nas dependências existentes.
+- G3aj: duração no formulário da operação em apresentação de trades; cálculo e formatação temporal permanecem nas dependências existentes.
