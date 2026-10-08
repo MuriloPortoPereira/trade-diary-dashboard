@@ -43,6 +43,8 @@ test('log metrics preserve cards, signed result, win rate and average risk', () 
   const metrics = {closed: [{}, {}, {}], totalPnl: 25.5, wr: 2 / 3, wins: [{}, {}], losses: [{}]};
   const before = JSON.stringify(rows);
   const {target, calls} = render({rows, metrics});
+  const labels = [...target.innerHTML.matchAll(/<div class="m-label">([^<]+)<\/div>/g)].map(match => match[1]);
+  assert.deepEqual(labels, ['Registros filtrados', 'P/L filtrado', 'Win rate', 'Controle']);
   assert.match(target.innerHTML, /metric-card c-blue[^]*Registros filtrados[^]*>5<[^]*3 trades fechados/);
   assert.match(target.innerHTML, /metric-card c-green[^]*P\/L filtrado[^]*>\+F:25\.5<[^]*resultado do filtro atual/);
   assert.match(target.innerHTML, /metric-card c-yellow[^]*Win rate[^]*>66\.7%<[^]*2 wins · 1 losses/);
