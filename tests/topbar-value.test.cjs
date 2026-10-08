@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/app/presentation/topbar-value.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderTopbarValue\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({id = 'topbarMetric', item, density = 'full', target = {textContent: 'before', title: 'before'}} = {}) {
   const calls = [];
@@ -51,4 +52,14 @@ test('topbar value preserves density selection, full title and class arguments',
   assert.equal(compact.target.textContent, 'US$ 1k');
   assert.equal(compact.target.title, 'US$ 1.000');
   assert.deepEqual(compact.calls[1], ['class', compact.target, 'tb-value', 'positive']);
+});
+
+test('topbar value loads once as a synchronous classic script before app consumers', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/app/presentation/account-summary.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
