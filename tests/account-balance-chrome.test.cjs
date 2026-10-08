@@ -71,13 +71,20 @@ test('default account updates balance, positive change and trade count and retur
   ]);
 });
 
-test('zero result with negative cashflow keeps the negative change color', () => {
-  const change = {textContent: '', style: {color: ''}};
+test('negative result or zero result with negative cashflow keeps the negative change color', () => {
+  const pnlChange = {textContent: '', style: {color: ''}};
+  render({
+    risk: {currentBalance: 100, totalPnl: -1, cashflowNet: 10},
+    elements: {sideBalanceChange: pnlChange},
+  });
+  assert.equal(pnlChange.style.color, 'var(--red)');
+
+  const cashflowChange = {textContent: '', style: {color: ''}};
   render({
     risk: {currentBalance: 100, totalPnl: 0, cashflowNet: -1},
-    elements: {sideBalanceChange: change},
+    elements: {sideBalanceChange: cashflowChange},
   });
-  assert.equal(change.style.color, 'var(--red)');
+  assert.equal(cashflowChange.style.color, 'var(--red)');
 });
 
 test('optional targets skip their formatters without changing the calculated return', () => {
