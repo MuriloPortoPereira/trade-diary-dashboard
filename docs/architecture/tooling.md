@@ -1011,6 +1011,16 @@ separadores removidos. Smoke: 95 checks, zero erros/assets locais ausentes. 212
 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida neste
 corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Métricas do diário (G3ag)
+
+`tests/trade-log-metrics.test.cjs` caracterizou guard do DOM, quatro cards,
+sinais, win rate, risco médio, incompletos e não mutação antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `1ceda37`;
+o restante de `app.js` difere apenas pela declaração e separadores removidos.
+Smoke: 95 checks, zero erros/assets locais ausentes. 216 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

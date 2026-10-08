@@ -520,6 +520,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Catálogo, seleção, toggle, disciplina, formulário e persistência permanecem no legado; quatro consumidores preservados.
 - 212 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Métricas do diário (G3ag)
+
+- `src/modules/trades/presentation/trade-log-metrics.js`: `renderLogMetrics(arr,incompleteCount)` global, 19 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/trade-log-metrics.test.cjs`: guard do DOM, quatro cards, sinais, win rate, risco médio, incompletos, não mutação e carga.
+- `calcMetrics`, `fR`, filtros e estado do diário permanecem nas dependências existentes; consumidor de `renderLog` preservado.
+- 216 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
