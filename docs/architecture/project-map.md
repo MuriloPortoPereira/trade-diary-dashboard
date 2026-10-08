@@ -499,6 +499,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Cache, densidade, formatação e atualização das métricas permanecem nas dependências existentes; dois consumidores preservados.
 - 199 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Prévia das imagens da operação (G3ad)
+
+- `src/modules/trades/presentation/trade-images.js`: `renderImagePreviews()` global, quatro linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/trade-images.test.cjs`: guard do DOM, vazio, ordem, URLs, títulos, estilos, índices de remoção, não mutação e carga.
+- Upload, `FileReader`, normalização, remoção e persistência permanecem no legado; quatro consumidores preservados.
+- 203 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.

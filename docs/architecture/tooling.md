@@ -981,6 +981,16 @@ checks, zero erros/assets locais ausentes. 199 testes Node, sintaxe e diff
 aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Prévia das imagens da operação (G3ad)
+
+`tests/trade-images.test.cjs` caracterizou guard do DOM, vazio, ordem, URLs,
+títulos, estilos, índices de remoção e não mutação antes do corte. Pós-corte
+protege a carga clássica. Corpo movido byte a byte contra `7f60ebb`; o restante
+de `app.js` difere apenas pela declaração removida. Smoke: 95 checks, zero
+erros/assets locais ausentes. 203 testes Node, sintaxe e diff aprovados. Matriz
+visual completa não repetida neste corte sem mudança do corpo/HTML gerado ou
+CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
