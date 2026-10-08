@@ -3631,12 +3631,6 @@ function formatBackupSummary(data){
   ].join(' · ');
 }
 
-function renderBackupSummary(data=createBackupPayload()){
-  const el=document.getElementById('backupSummary');
-  if(!el)return;
-  el.textContent=t('backup.current','Backup atual')+': '+formatBackupSummary(data);
-}
-
 function validateBackupData(data){
   if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Arquivo de backup inválido.');
   const keys=['trades','config','preMarketData','accounts','activeAccountId','studyHubState'];
