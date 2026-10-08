@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/data-transfer/presentation/export-account-filter.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderExportAccountFilter\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function createSelect(value = '') {
   let html = '';
