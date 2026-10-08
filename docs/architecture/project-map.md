@@ -513,6 +513,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Filtro, conta ativa, nomes e decisão de bloqueio permanecem no legado; consumidor de `renderLog` preservado.
 - 208 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Chips de erros da operação (G3af)
+
+- `src/modules/trades/presentation/trade-error-chips.js`: `renderErrorChips()` global, 12 linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- `tests/trade-error-chips.test.cjs`: guard do DOM, vazio, normalização, deduplicação, ordem, seleção, encoding, escaping, não mutação e carga.
+- Catálogo, seleção, toggle, disciplina, formulário e persistência permanecem no legado; quatro consumidores preservados.
+- 212 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Ícones das pastas de documentos (G3z)
 
 - `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
