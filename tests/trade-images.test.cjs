@@ -40,6 +40,9 @@ test('trade image previews preserve order, raw fields, styles and removal indice
   ];
   const before = JSON.stringify(images);
   const {preview} = render(images);
+  assert.equal(preview.innerHTML,
+    '<div style="position:relative;display:inline-block"><img src="data:image/png;base64,AAA" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border2)" title="Antes <setup>"><button onclick="removeTradeImage(0)" style="position:absolute;top:-4px;right:-4px;background:var(--red);border:none;border-radius:50%;width:16px;height:16px;color:white;font-size:10px">✕</button></div>' +
+    '<div style="position:relative;display:inline-block"><img src="blob:trade-image" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border2)" title="Depois & saída"><button onclick="removeTradeImage(1)" style="position:absolute;top:-4px;right:-4px;background:var(--red);border:none;border-radius:50%;width:16px;height:16px;color:white;font-size:10px">✕</button></div>');
   assert.match(preview.innerHTML, /^<div style="position:relative;display:inline-block">/);
   assert.ok(preview.innerHTML.indexOf('data:image/png;base64,AAA') < preview.innerHTML.indexOf('blob:trade-image'));
   assert.match(preview.innerHTML, /title="Antes <setup>"/);
