@@ -45,6 +45,10 @@ tipo e métricas do topbar permanecem nas dependências globais existentes.
 `src/modules/documents/presentation/document-folder-icon.js`: navegação,
 pastas, estado e persistência permanecem nas dependências existentes.
 
+`renderExportAccountFilter` (G3aa) foi movida intacta para
+`src/modules/data-transfer/presentation/export-account-filter.js`: contas,
+escaping, leitura dos filtros e exportação permanecem nas dependências existentes.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.
@@ -68,7 +72,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Rotina: 3703–3885; renderer G3e executado | `modules/routine/presentation/premarket-page.js`; demais destinos propostos: `{habit-manager,routine-charts}.js` | Renderer global movido intacto; preMarketData, índices dos hábitos, médias, autosave e conta ativa seguem no legado |
 | Simulação: 3416–3682 | `modules/simulation/presentation/{simulation-form,simulation-panel,simulation-plan-summary}.js`; depois `domain/project-balance-scenarios.js` | Sizing já extraído; snapshot depende de conta/risco/métricas; projeção depende de aleatoriedade |
 | Importação: 375–425, 740–922, 3887–4124 e 4379–4439 | `modules/data-transfer/infrastructure/{parse-mt-report,parse-generic-trade-rows,split-delimited-rows,load-spreadsheet-reader}.js`; `application/import-trades.js`; `presentation/import-confirmation.js` | Parsing também gera IDs/datas e consulta trades; isolar dependências antes de chamar parser puro |
-| Backup/exportação: 4193–4377; demos 6458–6702 | `modules/data-transfer/application/{restore-backup,sample-data}.js`; `infrastructure/download-text-file.js`; `presentation/import-export-page.js` | Backup v2, restauração parcial, formatos, FileReader/Blob e seed; CSV já extraído |
+| Backup/exportação: 4193–4377; demos 6458–6702; G3aa executado | `modules/data-transfer/presentation/export-account-filter.js`; destinos ainda propostos: `application/{restore-backup,sample-data}.js`, `infrastructure/download-text-file.js`, `presentation/import-export-page.js` | Filtro de contas global movido intacto; backup v2, restauração parcial, formatos, FileReader/Blob e seed seguem no legado; CSV já extraído |
 | Documentos: 5653–6170; renderers G3d/G3s/G3z executados | `modules/documents/presentation/{documents-page,document-media,document-folder-icon}.js`; demais destinos propostos: `{document-editor,document-browser}.js`, `application/{get-document-entries,save-document,delete-document}.js` | Renderers globais movidos intactos; helpers, seleção, fachada sobre trades/rotina/config.generalDocs e persistência seguem no legado |
 | Imagens: `normalizeDocImages` 5653–5658 | `modules/documents/domain/normalize-document-images.js` | Reuso real por documentos/trades/importação; preservar formatos aceitos e descarte atual de campos extras |
 | Parceiros: normalização 94–122, UI 6228–6340; renderer G3b executado | `modules/partners/presentation/partners-page.js`; demais destinos propostos: `{partner-media,partner-clipboard}.js` | Renderer global movido intacto; config.partnerHub, IDs, FileReader, clipboard e save permanecem no legado |

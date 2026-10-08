@@ -56,6 +56,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Carga: sizing antes do serializer CSV; ambos antes de `app.js`, como scripts clássicos síncronos.
 - Testes: `tests/trades-csv.test.cjs`; smoke CSV em `scripts/browser-smoke.cjs`.
 
+## Filtro de contas da exportação (G3aa)
+
+- `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/export-account-filter.test.cjs`: guard do select, ordem, IDs, nomes escapados, preservação/limpeza da seleção e carga.
+- Contas, `escapeHtml`, leitura dos filtros e exportação permanecem nas dependências existentes; consumidor de `showPage('export')` preservado.
+- 191 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Preferências: idiomas
 
 - Registro: `src/modules/preferences/presentation/translation-catalog.js` (`LANGUAGES`, `TRANSLATIONS`).

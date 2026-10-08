@@ -502,6 +502,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3aa: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3aa: filtro de contas da exportação
+
+- `renderExportAccountFilter` movida byte a byte para `src/modules/data-transfer/presentation/export-account-filter.js` (7 linhas).
+- Script clássico síncrono antes de `app.js`; API, guard, ordem, IDs, escaping e preservação/limpeza da seleção intactos.
+- Caracterização pré-corte: três testes novos e 190 testes Node. Pós-corte: 191 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Contas, leitura de filtros, download e serialização permanecem nas dependências existentes; consumidor de `showPage('export')` preservado.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3ab: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
