@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/simulation/presentation/simulation-sizing-fields.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function syncSimulationMoneyFromPercent\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({activeAccountId = 'active-1', values = {}, snapshot, sizing} = {}) {
   const calls = [];
@@ -28,7 +29,7 @@ function render({activeAccountId = 'active-1', values = {}, snapshot, sizing} = 
     },
     setSimulationInputValue(id, value, digits) { calls.push(['set', id, value, digits]); },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#syncSimulationMoneyFromPercent' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   const result = vm.runInContext('syncSimulationMoneyFromPercent()', context);
   return {calls, result};
 }
@@ -56,6 +57,15 @@ test('missing controls use active-account fallbacks and project all calculated m
     ['set', 'simGoalDay', 50, 2],
     ['set', 'simStopDay', 30, 2],
   ]);
+});
+
+test('simulation sizing fields classic script loads once after domain and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  const domainPath = 'src/modules/simulation/domain/calculate-simulation-sizing.js';
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(domainPath) < scripts.indexOf(modulePath));
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('selected account and explicit fields preserve conversion and projection order including zero', () => {

@@ -30,6 +30,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
   const localScripts = scripts.filter(script => script.src && !script.src.startsWith('https://'));
   assert.deepEqual(localScripts.map(script => script.src), [
     'src/modules/simulation/domain/calculate-simulation-sizing.js',
+    'src/modules/simulation/presentation/simulation-sizing-fields.js',
     'src/modules/data-transfer/infrastructure/serialize-trades-csv.js',
     'src/modules/data-transfer/presentation/backup-summary.js',
     'src/modules/data-transfer/presentation/export-account-filter.js', ...languagePaths,
