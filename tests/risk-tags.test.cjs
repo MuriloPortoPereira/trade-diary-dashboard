@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/accounts/presentation/risk-tags.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderTags\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 function render({type = 'emotion', config = {}, target = {innerHTML: 'before'}, ensuredConfig = config, counts = {}} = {}) {
   const calls = [];
@@ -24,7 +25,7 @@ function render({type = 'emotion', config = {}, target = {innerHTML: 'before'}, 
     strategyUsageCount(value) { calls.push(['usage', value]); return counts[value] || 0; },
     escapeHtml(value) { calls.push(['escape', value]); return `[${value}]`; },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#renderTags' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('renderTags(type)', context);
   return {calls, target, config: vm.runInContext('config', context)};
 }
@@ -32,6 +33,14 @@ function render({type = 'emotion', config = {}, target = {innerHTML: 'before'}, 
 test('missing tag target returns before reading or normalizing configuration', () => {
   const {calls} = render({type: 'market', target: null});
   assert.deepEqual(calls, [['target', 'marketTags']]);
+});
+
+test('risk tags classic script loads once before setup page and app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(scripts.filter(src => src === modulePath).length, 1);
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('src/modules/accounts/presentation/risk-setup-page.js'));
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 
 test('common tags preserve order, escaping, indices and removal handlers', () => {
