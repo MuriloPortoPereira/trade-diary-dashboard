@@ -610,6 +610,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3am: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3am: campos monetários da simulação
+
+- `syncSimulationMoneyFromPercent` movida byte a byte para `src/modules/simulation/presentation/simulation-sizing-fields.js` (14 linhas).
+- Script clássico síncrono depois do domínio de sizing e antes de `app.js`; API, conta ativa/selecionada, fallbacks, conversão, cálculo, projeções, ordem e retorno intactos.
+- Caracterização pré-corte: dois testes novos e 244 testes Node. Pós-corte: 245 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Snapshot, conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes; dois consumidores JavaScript e quatro handlers HTML preservados.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3an: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

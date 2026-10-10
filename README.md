@@ -66,7 +66,7 @@ src/modules/                Código e CSS organizados por feature
   partners/presentation/    Página e estilos de parceiros
   profile/presentation/     Página de perfil
   preferences/presentation/ Idiomas, catálogos e widgets
-  simulation/domain/        Cálculo puro de sizing
+  simulation/{domain,presentation}/ Cálculo e projeção do sizing
   data-transfer/infrastructure/ Serialização CSV
   data-transfer/presentation/ Resumo de backup e filtro de exportação
   trades/presentation/        Operação e apresentação do diário
@@ -119,7 +119,7 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 
 O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
 
-O estágio atual é G3al. A última validação passou com 242 testes Node e 95 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3am.
+O estágio atual é G3am. A última validação passou com 245 testes Node e 95 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3an.
 
 ## Deploy e dados
 

@@ -33,6 +33,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Smoke: `scripts/browser-smoke.cjs`; demais regras de simulação permanecem em `app.js`.
 - Resultados e limites de cobertura: [progresso](refactoring-progress.md).
 
+## Campos monetários da simulação (G3am)
+
+- `src/modules/simulation/presentation/simulation-sizing-fields.js`: `syncSimulationMoneyFromPercent()` global, 14 linhas movidas byte a byte; script clássico síncrono depois do domínio de sizing e antes de `app.js`.
+- `tests/simulation-sizing-fields.test.cjs`: conta selecionada/ativa, fallbacks, entradas explícitas, zero, conversão, ordem das três projeções, retorno e carga.
+- Snapshot, conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes; dois consumidores JavaScript e quatro handlers HTML preservados.
+- 245 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Estratégias: renderer do hub (G3f)
 
 - `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` global, 41 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.

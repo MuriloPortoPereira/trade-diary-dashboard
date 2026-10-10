@@ -1071,6 +1071,16 @@ Smoke: 95 checks, zero erros/assets locais ausentes. 242 testes Node, sintaxe e
 diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Campos monetários da simulação (G3am)
+
+`tests/simulation-sizing-fields.test.cjs` caracterizou conta ativa/selecionada,
+fallbacks, entradas explícitas, zero, conversão, projeções, ordem e retorno antes
+do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`9a23aec`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 245 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
