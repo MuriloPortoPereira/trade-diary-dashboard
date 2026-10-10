@@ -520,6 +520,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Cálculo e formatação temporal permanecem nas dependências existentes; três chamadas JavaScript e quatro handlers HTML preservados.
 - 231 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Fluxo visual de trades incompletos (G3ak)
+
+- `src/modules/trades/presentation/incomplete-trade-flow.js`: `updateTradeModalFlowUI()` global, 31 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/incomplete-trade-flow.test.cjs`: alvos ausentes/parciais, cadastro, edição, fluxo único/múltiplo, símbolo, progresso, navegação e carga.
+- Fila, índice, trade em edição, navegação e mutações permanecem no legado; dois consumidores preservados.
+- 237 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Aviso de consulta do diário (G3ae)
 
 - `src/modules/trades/presentation/trade-log-read-only-notice.js`: `renderLogReadOnlyNotice(accountFilter)` global, 16 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

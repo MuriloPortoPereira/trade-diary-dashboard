@@ -592,6 +592,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3ak: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3ak: fluxo visual de trades incompletos
+
+- `updateTradeModalFlowUI` movida byte a byte para `src/modules/trades/presentation/incomplete-trade-flow.js` (31 linhas).
+- Script clássico síncrono antes de `app.js`; API, cadastro, edição, fluxo único/múltiplo, título, progresso, símbolo, botões e navegação intactos.
+- Caracterização pré-corte: cinco testes novos e 236 testes Node. Pós-corte: 237 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Fila, índice, trade em edição, navegação e mutações permanecem no legado; dois consumidores preservados.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3al: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

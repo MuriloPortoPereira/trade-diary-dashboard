@@ -153,6 +153,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-images.test.cjs` | Caracterização de guard, vazio, ordem, campos, remoção e carga |
 | `src/modules/trades/presentation/trade-duration-field.js` | Projeção da duração calculada no formulário da operação; 12 linhas intactas |
 | `tests/trade-duration-field.test.cjs` | Caracterização de guard, datas, horários, fallback, duração nula/zero e carga |
+| `src/modules/trades/presentation/incomplete-trade-flow.js` | Projeção do fluxo de conclusão sequencial de trades incompletos; 31 linhas intactas |
+| `tests/incomplete-trade-flow.test.cjs` | Caracterização de cadastro, edição, fluxo único/múltiplo, navegação, alvos opcionais e carga |
 | `src/modules/trades/presentation/trade-log-read-only-notice.js` | Aviso de consulta do diário quando a conta filtrada não é ativa; 16 linhas intactas |
 | `tests/trade-log-read-only-notice.test.cjs` | Caracterização de guard, bloqueio, mensagens, escaping e carga |
 | `src/modules/trades/presentation/trade-error-chips.js` | Composição dos chips de erros da operação; 12 linhas intactas |
@@ -176,6 +178,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3aj; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3ak; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

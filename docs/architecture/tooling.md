@@ -1051,6 +1051,16 @@ Smoke: 95 checks, zero erros/assets locais ausentes. 231 testes Node, sintaxe e
 diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Fluxo visual de trades incompletos (G3ak)
+
+`tests/incomplete-trade-flow.test.cjs` caracterizou alvos ausentes/parciais,
+cadastro, edição, fluxo único/múltiplo, título, progresso, símbolo, botões e
+navegação antes do corte. Pós-corte protege a carga clássica. Corpo movido byte
+a byte contra `4a9dd63`; o restante de `app.js` difere apenas pela declaração
+removida. Smoke: 95 checks, zero erros/assets locais ausentes. 237 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
