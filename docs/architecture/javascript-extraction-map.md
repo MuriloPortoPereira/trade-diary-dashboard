@@ -89,6 +89,10 @@ da duração permanecem nas dependências existentes.
 `src/modules/trades/presentation/incomplete-trade-flow.js`: fila, navegação,
 trade em edição e mutações permanecem nas dependências existentes.
 
+`renderTags` (G3al) foi movida intacta para
+`src/modules/accounts/presentation/risk-tags.js`: normalização, contagem de uso,
+edição, exclusão e persistência permanecem nas dependências existentes.
+
 ## Fronteiras por responsabilidade
 
 Destinos abaixo são propostas relativas a `src/`. Os arquivos não devem ser criados vazios.
@@ -98,7 +102,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Área / localização | Arquivos coesos propostos | Dependências e preservação |
 |---|---|---|
 | Estado, shell e bootstrap; início do arquivo, `showPage`, `refreshAll`, load 6954–7017; G3y/G3ac executados | `app/presentation/{account-summary,topbar-value}.js`; destinos ainda propostos: `app/bootstrap.js`, `app/presentation/{navigation,app-dialog}.js` | Resumo da conta e projeção de valores globais movidos intactos; estado único, cache, densidade, ordem load, listeners, traduções e câmbio seguem no legado |
-| Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w/G3ai executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,setup-cashflow-list,account-list,account-balance-chrome}.js`; destino ainda proposto: `account-form.js` | Renderers globais movidos intactos; conta ativa, normalização, cálculo de risco, formulário, persistência e atualização das demais páginas seguem no legado |
+| Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w/G3ai/G3al executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,setup-cashflow-list,account-list,account-balance-chrome,risk-tags}.js`; destino ainda proposto: `account-form.js` | Renderers globais movidos intactos; conta ativa, normalização, cálculo de risco, edição de tags, formulário, persistência e atualização das demais páginas seguem no legado |
 | Risco: `calcAccountRiskState` 1485–1670; board 1878–2024; setup 6704–6877; renderers G3n/G3v/G3x executados | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; depois `domain/{calculate-cashflow-totals,calculate-account-risk}.js` | Renderers globais movidos intactos; relógio, ciclos, depósitos/retiradas, config e cálculo permanecem no legado; não extrair como domínio em bloco |
 | Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af/G3aj/G3ak executados | `modules/trades/presentation/{trade-images,trade-error-chips,trade-duration-field,incomplete-trade-flow}.js`; destino ainda proposto: `trade-form.js`; depois `application/save-trade.js` | Preview, chips, duração e projeção do fluxo incompleto globais movidos intactos; editingId, fila, navegação, upload/remoção, conta/risco, cálculo temporal, save e refreshAll seguem no legado |
 | Diário: 2617–2953; G3ae/G3ag/G3ah executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics,trade-log-selection}.js`; destino ainda proposto: `trade-log.js`; depois `domain/log-date-range.js` | Aviso, cards e barra de seleção globais movidos intactos; cálculo, filtros, ordenação, conjunto selecionado, conta, duplicação e confirmações de exclusão seguem no legado |

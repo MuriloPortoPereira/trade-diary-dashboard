@@ -145,6 +145,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/risk-setup-page.test.cjs` | Caracterização de precedência, defaults, zeros, data, campos opcionais e carga |
 | `src/modules/accounts/presentation/account-balance-chrome.js` | Projeção do saldo, variação e contagem da conta no shell; 15 linhas intactas |
 | `tests/account-balance-chrome.test.cjs` | Caracterização de defaults, retorno, sinais, campos opcionais, formatação e carga |
+| `src/modules/accounts/presentation/risk-tags.js` | Listas editáveis de estratégias, emoções e mercados da configuração; 16 linhas intactas |
+| `tests/risk-tags.test.cjs` | Caracterização de guard, inicialização, ordem, escaping, contagem, controles e carga |
 | `src/app/presentation/account-summary.js` | Projeção da conta ativa no topbar; 10 linhas intactas |
 | `tests/account-summary.test.cjs` | Caracterização de guard, cor, nome, tipo, alvos opcionais e carga |
 | `src/app/presentation/topbar-value.js` | Projeção de um valor completo/compacto no topbar; 9 linhas intactas |
@@ -178,6 +180,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3ak; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3al; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

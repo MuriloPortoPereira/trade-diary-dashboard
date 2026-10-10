@@ -506,6 +506,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Conta ativa, trades, cálculo de risco e formatação permanecem nas dependências existentes; quatro consumidores preservados.
 - 226 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Tags da configuração de risco (G3al)
+
+- `src/modules/accounts/presentation/risk-tags.js`: `renderTags(type)` global, 16 linhas movidas byte a byte; script clássico síncrono antes de `risk-setup-page.js` e `app.js`.
+- `tests/risk-tags.test.cjs`: guard do DOM, tags comuns, lista inválida, estratégias, ordem, escaping, contagem de uso, controles e carga.
+- Normalização, contagem de uso, edição, exclusão e persistência permanecem nas dependências existentes; cinco chamadas preservadas.
+- 242 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Prévia das imagens da operação (G3ad)
 
 - `src/modules/trades/presentation/trade-images.js`: `renderImagePreviews()` global, quatro linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
