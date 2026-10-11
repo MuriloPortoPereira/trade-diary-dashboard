@@ -8,7 +8,16 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/trades/presentation/incomplete-trade-banner.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^let _incompleteBannerDismissed=false;[^]*?^function dismissIncompleteBanner\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('banner loads as a classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const bannerIndex = html.indexOf(`<script src="${modulePath}"></script>`);
+  const appIndex = html.indexOf('<script src="app.js"></script>');
+  assert.ok(bannerIndex >= 0);
+  assert.ok(bannerIndex < appIndex);
+});
 
 function render({trades = [], alert = {style: {display: 'before'}}, count = {textContent: 'before'}, dismiss = false} = {}) {
   const calls = [];
@@ -23,7 +32,7 @@ function render({trades = [], alert = {style: {display: 'before'}}, count = {tex
       },
     },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#incompleteTradeBanner' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext(dismiss ? 'dismissIncompleteBanner()' : 'updateIncompleteBanner()', context);
   return {alert, count, calls, before, after: JSON.stringify(trades), context};
 }
