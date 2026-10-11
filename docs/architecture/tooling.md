@@ -1103,6 +1103,18 @@ de controles do calendário; com a versão commitada desse único teste, 255 tes
 Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
 corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Abas de estatísticas (G3ap)
+
+`tests/statistics-tabs.test.cjs` caracterizou cinco painéis, classes, elemento
+opcional, ID desconhecido, fallback geral, psicologia e ordem da simulação antes
+do corte. Pós-corte protege também a carga clássica após o renderer psicológico.
+Corpo movido byte a byte contra `634356a`. Smoke: 95 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse
+único teste, 260 testes Node passaram. Sintaxe e diff aprovados. Matriz visual
+completa não repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última
+matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

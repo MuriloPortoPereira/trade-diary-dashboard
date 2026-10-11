@@ -450,6 +450,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/psychology-statistics.test.cjs`: quatro cards, cinco gráficos, resumos, limites de hesitações/erros, tabela, vazio e alvo opcional.
 - 139 testes Node e 88 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Abas de estatísticas (G3ap)
+
+- `src/modules/analytics/presentation/statistics-tabs.js`: `switchStatTab(id,el)` global, 11 linhas movidas byte a byte; script clássico síncrono depois de `psychology-statistics.js` e antes de `app.js`.
+- `tests/statistics-tabs.test.cjs`: cinco painéis, classes, elemento opcional, ID desconhecido, fallback geral, psicologia, ordem da simulação e carga.
+- Cinco handlers HTML e dois cenários do smoke permanecem intactos; renderers, filtros, estado e cálculos continuam nas dependências existentes.
+- 260 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Lista de status compartilhada (G3q)
 
 - `src/shared/presentation/status-list.js`: `renderStatusList(targetId, items, emptyMessage=...)` global, 17 linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
