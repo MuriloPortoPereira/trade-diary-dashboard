@@ -3640,17 +3640,6 @@ function parseMT4(){
   showImportPreview(result);openModal('csvConfirmModal');
 }
 
-function switchImportTab(id){
-  ['csv','export'].forEach(tab=>{
-    const el=document.getElementById('importTab-'+tab);
-    if(el)el.style.display=tab===id?'':'none';
-  });
-  document.querySelectorAll('#page-import .tab-btn').forEach(btn=>{
-    btn.classList.toggle('active',btn.getAttribute('onclick')?.includes(`'${id}'`));
-  });
-  if(id==='export'){renderBackupSummary(createBackupPayload());renderExportAccountFilter();}
-}
-
 function acctTypeLabel(t){
   return{cfd_pct:'CFD %',futures_usd:'CFD %',prop_pct:'Prop Firm %',crypto:'Crypto'}[t]||t;
 }
