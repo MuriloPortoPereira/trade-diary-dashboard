@@ -646,6 +646,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3aq: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3aq: filtros de estatísticas
+
+- `toggleCustomPeriod` e `onStatsAccountChange` movidas byte a byte para `src/modules/analytics/presentation/statistics-filters.js` (11 linhas).
+- Script clássico síncrono depois de `statistics-tabs.js` e antes de `app.js`; APIs, período, fallback, barra opcional e ordem de fixação/render intactos.
+- Caracterização pré-corte: quatro testes novos e 264 testes Node. Pós-corte: 265 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Dois handlers HTML preservados; `statsAccountPinned`, seleção, datas, filtragem e renderer permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3ar: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

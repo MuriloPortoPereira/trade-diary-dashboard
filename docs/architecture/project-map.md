@@ -457,6 +457,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Cinco handlers HTML e dois cenários do smoke permanecem intactos; renderers, filtros, estado e cálculos continuam nas dependências existentes.
 - 260 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Filtros de estatísticas (G3aq)
+
+- `src/modules/analytics/presentation/statistics-filters.js`: `toggleCustomPeriod()` e `onStatsAccountChange()` globais, 11 linhas movidas byte a byte; script clássico síncrono depois de `statistics-tabs.js` e antes de `app.js`.
+- `tests/statistics-filters.test.cjs`: período personalizado/predefinido, fallback, barra opcional, fixação da conta antes do renderer e carga.
+- Dois handlers HTML preservados; `statsAccountPinned`, seleção, datas, filtragem e `renderStats` permanecem nas dependências existentes.
+- 265 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Lista de status compartilhada (G3q)
 
 - `src/shared/presentation/status-list.js`: `renderStatusList(targetId, items, emptyMessage=...)` global, 17 linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.

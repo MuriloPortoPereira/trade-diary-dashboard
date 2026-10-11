@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3ap extraído: `switchStatTab` para `src/modules/analytics/presentation/statistics-tabs.js`, 11 linhas movidas byte a byte.
-- API global, cinco painéis, classes, handlers HTML, fallback e despacho de psicologia/simulação mantidos; script clássico síncrono depois de `psychology-statistics.js` e antes de `app.js`.
-- Caracterização pré-corte: quatro testes novos e 259 testes Node. Pós-corte: 260 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- G3aq extraído: `toggleCustomPeriod` e `onStatsAccountChange` para `src/modules/analytics/presentation/statistics-filters.js`, 11 linhas movidas byte a byte.
+- APIs globais, dois handlers HTML, fallback, barra opcional e fixação da conta antes do renderer mantidos; script clássico síncrono depois de `statistics-tabs.js` e antes de `app.js`.
+- Caracterização pré-corte: quatro testes novos e 264 testes Node. Pós-corte: 265 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
 - Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3aq: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3ar: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
