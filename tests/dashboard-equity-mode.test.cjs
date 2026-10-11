@@ -8,7 +8,18 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/analytics/presentation/dashboard-equity-mode.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function toggleEqMode\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('equity mode loads once as a classic script after dashboard and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf('src/modules/analytics/presentation/dashboard-page.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
+});
 
 function toggle(initialMode, {withButton = true} = {}) {
   const calls = [];
@@ -28,7 +39,7 @@ function toggle(initialMode, {withButton = true} = {}) {
     configurable: true,
   });
   const context = vm.createContext(sandbox);
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#toggleEqMode' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('toggleEqMode()', context);
   return {mode, button, calls};
 }

@@ -1327,13 +1327,6 @@ function filterByPeriod(arr, period){
   return arr;
 }
 
-function toggleEqMode(){
-  eqMode=eqMode==='value'?'pct':'value';
-  const btn=document.getElementById('eqModeBtn');
-  if(btn)btn.textContent=eqMode==='value'?'% retorno':'$ valor';
-  renderDashboard();
-}
-
 function getOrderedTrades(arr){
   return [...arr].filter(t=>t?.date).sort((a,b)=>{
     if(a.date===b.date){
