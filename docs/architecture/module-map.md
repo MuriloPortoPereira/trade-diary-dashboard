@@ -117,6 +117,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/risk-board.test.cjs` | Caracterização de barras, sinais, excessos, metas, thresholds, defaults, guards e carga |
 | `src/modules/analytics/presentation/dashboard-page.js` | Renderer principal do dashboard, 69 linhas movidas intactas |
 | `tests/dashboard-page.test.cjs` | Caracterização de cards, sete gráficos, curva, componentes, recentes, tooltips e carga |
+| `src/modules/analytics/presentation/dashboard-equity-mode.js` | Alternância global entre valor e percentual da curva de equity; 6 linhas intactas |
+| `tests/dashboard-equity-mode.test.cjs` | Caracterização de modos, labels, fallback, botão opcional, ordem e carga |
 | `src/modules/analytics/presentation/strategy-rows.js` | Linhas de estratégias compartilhadas por dashboard/hub, 23 linhas movidas intactas |
 | `tests/strategy-rows.test.cjs` | Caracterização de limite, ordem, escaping, progresso, sinais, vazio, alvos e carga |
 | `src/modules/analytics/presentation/strategy-hub-page.js` | Renderer global do hub de estratégias, 41 linhas movidas intactas de `app.js` |
@@ -189,6 +191,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3aq; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3ar; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

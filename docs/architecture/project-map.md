@@ -429,6 +429,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/dashboard-page.test.cjs`: cards, sete gráficos, ordem/percentuais da curva, defaults, zero, recentes/limite 20, tooltips idempotentes e carga clássica.
 - 119 testes Node e 78 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Modo da curva de equity (G3ar)
+
+- `src/modules/analytics/presentation/dashboard-equity-mode.js`: `toggleEqMode()` global, seis linhas movidas byte a byte; script clássico síncrono depois de `dashboard-page.js` e antes de `app.js`.
+- `tests/dashboard-equity-mode.test.cjs`: alternância valor/percentual, labels, fallback desconhecido, botão opcional, ordem dos efeitos e carga.
+- Handler HTML e dois checks do smoke preservados; `eqMode`, curva, Chart.js e `renderDashboard` permanecem nas dependências existentes.
+- 270 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Painel de risco do dashboard (G3n)
 
 - `src/modules/accounts/presentation/risk-board.js`: `renderRiskBoard` global, 136 linhas movidas byte a byte; script clássico síncrono antes do dashboard.

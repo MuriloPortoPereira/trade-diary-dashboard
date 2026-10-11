@@ -655,6 +655,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3ar: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3ar: modo da curva de equity
+
+- `toggleEqMode` movida byte a byte para `src/modules/analytics/presentation/dashboard-equity-mode.js` (6 linhas).
+- Script clássico síncrono depois de `dashboard-page.js` e antes de `app.js`; API, alternância, labels, fallback, botão opcional e ordem de render intactos.
+- Caracterização pré-corte: quatro testes novos e 269 testes Node. Pós-corte: 270 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Handler HTML e dois checks do smoke preservados; `eqMode`, curva, Chart.js e renderer permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3as: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
