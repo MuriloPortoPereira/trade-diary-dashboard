@@ -628,6 +628,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3ao: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3ao: abas de importação e exportação
+
+- `switchImportTab` movida byte a byte para `src/modules/data-transfer/presentation/import-tabs.js` (10 linhas).
+- Script clássico síncrono depois de `backup-summary.js` e `export-account-filter.js` e antes de `app.js`; API, visibilidade, classes, painéis opcionais e ordem dos efeitos intactos.
+- Caracterização pré-corte: quatro testes novos e 254 testes Node. Pós-corte: 255 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- Dois handlers HTML e consumidores de smoke preservados; payload, parsing, importação, exportação, download e persistência permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3ap: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

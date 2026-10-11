@@ -77,6 +77,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Contas, `escapeHtml`, leitura dos filtros e exportação permanecem nas dependências existentes; consumidor de `switchImportTab('export')` preservado.
 - 191 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Abas de importação e exportação (G3ao)
+
+- `src/modules/data-transfer/presentation/import-tabs.js`: `switchImportTab(id)` global, dez linhas movidas byte a byte; script clássico síncrono depois de resumo/filtro e antes de `app.js`.
+- `tests/import-tabs.test.cjs`: visibilidade das abas, classes ativas, ID desconhecido, painéis opcionais, ordem de payload/resumo/filtro e carga.
+- Dois handlers HTML e os consumidores de smoke permanecem intactos; parsing, importação, exportação, download e persistência continuam no legado.
+- 255 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Resumo do backup (G3ab)
 
 - `src/modules/data-transfer/presentation/backup-summary.js`: `renderBackupSummary(data=createBackupPayload())` global, cinco linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.

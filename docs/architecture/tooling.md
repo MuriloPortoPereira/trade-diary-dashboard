@@ -1092,6 +1092,17 @@ do calendário; com a versão commitada desse único teste, 250 testes Node pass
 Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
 mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Abas de importação e exportação (G3ao)
+
+`tests/import-tabs.test.cjs` caracterizou abas conhecidas/desconhecidas, painéis
+opcionais, classes e ordem de payload, resumo e filtro antes do corte. Pós-corte
+protege também a carga clássica e a posição após as dependências. Corpo movido
+byte a byte contra `5698df5`. Smoke: 95 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste
+de controles do calendário; com a versão commitada desse único teste, 255 testes
+Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
