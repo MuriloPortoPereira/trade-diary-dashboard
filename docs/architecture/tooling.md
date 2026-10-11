@@ -1081,6 +1081,17 @@ Smoke: 95 checks, zero erros/assets locais ausentes. 245 testes Node, sintaxe e
 diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
 corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Banner de trades incompletos (G3an)
+
+`tests/incomplete-trade-banner.test.cjs` caracterizou contagem truthy, exibição,
+zero, alvos opcionais, não mutação e descarte persistente antes do corte.
+Pós-corte protege também a carga clássica. Estado e funções foram movidos byte a
+byte contra `aa8d1e9`. Smoke: 95 checks, zero erros/assets locais ausentes. A
+execução literal da suíte encontrou uma linha local alheia no teste de controles
+do calendário; com a versão commitada desse único teste, 250 testes Node passaram.
+Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

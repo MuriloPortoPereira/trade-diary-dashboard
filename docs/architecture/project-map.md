@@ -40,6 +40,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Snapshot, conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes; dois consumidores JavaScript e quatro handlers HTML preservados.
 - 245 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Banner de trades incompletos (G3an)
+
+- `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `tests/incomplete-trade-banner.test.cjs`: contagem truthy, exibição, zero, alvos opcionais, não mutação, descarte persistente e ordem de carga.
+- Consulta de trades e conta ativa permanecem nas dependências existentes; três consumidores de atualização e a API global de descarte foram preservados.
+- 250 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Estratégias: renderer do hub (G3f)
 
 - `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` global, 41 linhas movidas intactas de `app.js`; script clássico síncrono antes dos demais renderers e de `app.js`.
