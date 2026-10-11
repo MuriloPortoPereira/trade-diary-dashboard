@@ -2973,13 +2973,6 @@ function getStatsPeriodTrades(){
   return arr;
 }
 
-function toggleCustomPeriod(){
-  const period=document.getElementById('statPeriod')?.value||'custom';
-  const bar=document.getElementById('customPeriodBar');
-  if(bar)bar.style.display=period==='custom'?'flex':'none';
-  renderStats();
-}
-
 function openPMMonth(ym){
   pmCurrentMonth=ym;
   showPage('premarket');
@@ -3771,11 +3764,6 @@ function onAccountChange(){
   const infoEl=document.getElementById('t-acct-info');
   if(infoEl){const acctTrades=getAccountTrades(a.id);const risk=calcAccountRiskState(a,acctTrades);infoEl.innerHTML=`<span style="color:var(--muted)">Saldo: <b style="color:var(--text)">${fR(risk.currentBalance)}</b></span><br><span style="color:var(--muted)">Aportes líquidos: ${fR(risk.cashflowNet)} · Meta: ${a.goalPct}%</span>`;}
   calcRR();
-}
-
-function onStatsAccountChange(){
-  statsAccountPinned=true;
-  renderStats();
 }
 
 function updateMarketFromSymbol(){

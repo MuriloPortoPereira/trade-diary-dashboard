@@ -9,9 +9,19 @@ const modulePath = 'src/modules/analytics/presentation/statistics-filters.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyPeriod = appSource.match(/^function toggleCustomPeriod\([^]*?^\}/m)?.[0];
 const legacyAccount = appSource.match(/^function onStatsAccountChange\([^]*?^\}/m)?.[0];
-const source = legacyPeriod && legacyAccount
-  ? `${legacyPeriod}\n\n${legacyAccount}\n`
-  : fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacyPeriod, undefined, 'legacy period declaration must be moved');
+assert.equal(legacyAccount, undefined, 'legacy account declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('statistics filters load once as a classic script after tabs and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf('src/modules/analytics/presentation/statistics-tabs.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
+});
 
 function togglePeriod({period = {value: 'custom'}, bar = {style: {display: 'before'}}} = {}) {
   const calls = [];
@@ -24,7 +34,7 @@ function togglePeriod({period = {value: 'custom'}, bar = {style: {display: 'befo
     },
     renderStats() { calls.push(['render', 'stats']); },
   });
-  vm.runInContext(source, context, {filename: legacyPeriod ? 'app.js#statisticsFilters' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('toggleCustomPeriod()', context);
   return {bar, calls};
 }
@@ -67,7 +77,7 @@ test('account change pins the current filter before rendering statistics', () =>
     configurable: true,
   });
   const context = vm.createContext(sandbox);
-  vm.runInContext(source, context, {filename: legacyAccount ? 'app.js#statisticsFilters' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('onStatsAccountChange()', context);
   assert.equal(context.statsAccountPinned, true);
   assert.deepEqual(calls, [['pin', true], ['render', true]]);
