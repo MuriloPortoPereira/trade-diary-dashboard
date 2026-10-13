@@ -129,6 +129,10 @@ edição, exclusão e persistência permanecem nas dependências existentes.
 `src/modules/simulation/presentation/simulation-sizing-fields.js`: snapshot,
 conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes.
 
+O painel de simulação (G3aw) foi movido intacto para
+`src/modules/simulation/presentation/simulation-panel.js`: snapshot, sizing, plano,
+Monte Carlo, Chart.js e formatação permanecem nas dependências existentes.
+
 `updateIncompleteBanner`, `dismissIncompleteBanner` e seu estado (G3an) foram
 movidos intactos para `src/modules/trades/presentation/incomplete-trade-banner.js`:
 consulta de trades e conta ativa permanecem nas dependências existentes.
@@ -154,7 +158,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Psicologia: 3305–3413 e 4637–4669; renderers G3g/G3p executados | `modules/psychology/presentation/{psychology-page,psychology-statistics}.js`; destinos ainda propostos: `domain/{hesitation-statistics,discipline-buckets}.js` | Renderers globais movidos intactos; helpers de seleção e estatística seguem no legado; cálculos locais do renderer foram movidos intactos |
 | Calendário: 2956–3097; mini 2470–2525; G3i/G3k/G3o executados | `modules/calendar/presentation/{calendar-page,dashboard-calendar,calendar-controls}.js` | Renderers/handlers globais movidos intactos; calMonth/calYear/calViewMode, conta, métricas, tradução e helpers de datas seguem no legado |
 | Rotina: 3703–3885; renderer G3e executado | `modules/routine/presentation/premarket-page.js`; demais destinos propostos: `{habit-manager,routine-charts}.js` | Renderer global movido intacto; preMarketData, índices dos hábitos, médias, autosave e conta ativa seguem no legado |
-| Simulação: 3416–3682; G3am executado | `modules/simulation/presentation/simulation-sizing-fields.js`; destinos ainda propostos: `{simulation-form,simulation-panel,simulation-plan-summary}.js`; depois `domain/project-balance-scenarios.js` | Sizing e projeção dos três campos monetários extraídos; snapshot depende de conta/risco/métricas; projeção ampla depende de aleatoriedade |
+| Simulação; G3am/G3aw executados | `modules/simulation/presentation/{simulation-sizing-fields,simulation-panel}.js`; depois `domain/project-balance-scenarios.js` | Sizing, projeção monetária, snapshot, seleção de conta, plano e renderer movidos intactos; Monte Carlo e projeção ampla permanecem no legado por dependerem de aleatoriedade |
 | Importação: 375–425, 740–922, 3887–4124 e 4379–4439 | `modules/data-transfer/infrastructure/{parse-mt-report,parse-generic-trade-rows,split-delimited-rows,load-spreadsheet-reader}.js`; `application/import-trades.js`; `presentation/import-confirmation.js` | Parsing também gera IDs/datas e consulta trades; isolar dependências antes de chamar parser puro |
 | Backup/exportação: 4193–4377; demos 6458–6702; G3aa–G3ab/G3ao executados | `modules/data-transfer/presentation/{export-account-filter,backup-summary,import-tabs}.js`; destinos ainda propostos: `application/{restore-backup,sample-data}.js`, `infrastructure/download-text-file.js`, `presentation/import-export-page.js` | Filtro, resumo e controle de abas globais movidos intactos; backup v2, restauração parcial, formatos, FileReader/Blob e seed seguem no legado; CSV já extraído |
 | Documentos: 5653–6170; renderers G3d/G3s/G3z executados | `modules/documents/presentation/{documents-page,document-media,document-folder-icon}.js`; demais destinos propostos: `{document-editor,document-browser}.js`, `application/{get-document-entries,save-document,delete-document}.js` | Renderers globais movidos intactos; helpers, seleção, fachada sobre trades/rotina/config.generalDocs e persistência seguem no legado |

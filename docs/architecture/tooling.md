@@ -1181,6 +1181,18 @@ no teste de controles do calendário; com a versão commitada desse único teste
 293 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Painel de simulação (G3aw)
+
+`tests/simulation-panel.test.cjs` caracterizou snapshot, reset, modos manual/conta,
+ordem dos efeitos e renderer com opções, RRR customizado, cards, resumo, plano e
+gráfico. Pós-corte protege também a carga clássica antes dos dispatchers de
+estatísticas. Quatro corpos movidos byte a byte contra `8b8d7d3`. Smoke: 96 checks,
+zero erros/assets locais ausentes. A execução literal da suíte encontrou a linha
+local alheia já registrada no teste de controles do calendário; com a versão
+commitada desse único teste, 299 testes Node passaram. Sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML gerado
+ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

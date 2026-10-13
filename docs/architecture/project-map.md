@@ -40,6 +40,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Snapshot, conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes; dois consumidores JavaScript e quatro handlers HTML preservados.
 - 245 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Painel de simulação (G3aw)
+
+- `src/modules/simulation/presentation/simulation-panel.js`: `applySimulationAccountSnapshot()`, `resetSimulationEntryDefaults()`, `loadSimFromAccount()` e `renderSimulation()` globais, quatro funções/81 linhas movidas byte a byte.
+- `tests/simulation-panel.test.cjs`: snapshot, reset, conta manual/real, ordem dos efeitos, opções, RRR customizado, cards, resumo, plano, gráfico e carga.
+- Handler HTML, abas, análises e navegação preservados; sizing, snapshot, plano, Monte Carlo, Chart.js e formatação continuam nas dependências existentes.
+- `app.js`: 7.907 para 7.829 linhas. 299 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
