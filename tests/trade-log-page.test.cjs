@@ -10,7 +10,18 @@ const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const start = appSource.indexOf('function renderLog(){');
 const end = appSource.indexOf('\nfunction deleteTrade(', start);
 const legacy = start >= 0 && end > start ? appSource.slice(start, end).trimEnd() : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declarations must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('trade log loads once as a classic script after its components and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src=\"${modulePath}\"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
+  assert.ok(html.indexOf('src/modules/trades/presentation/trade-log-selection.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
+});
 
 function element(extra = {}) {
   return {style: {}, innerHTML: '', textContent: '', value: '', ...extra};
@@ -51,7 +62,7 @@ function setup({
     fR: value => Number(value).toFixed(2),
     getMarket: symbol => `market:${symbol}`,
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#trade-log' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   return {context, elements, calls, selectedTrades};
 }
 
