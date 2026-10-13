@@ -23,6 +23,17 @@ test('trade log loads once as a classic script after its components and before a
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
+test('the remaining StudyHub renderLog stays isolated inside its legacy IIFE', () => {
+  const deleteTradeAt = appSource.indexOf('function deleteTrade(');
+  assert.equal(appSource.slice(0, deleteTradeAt).includes('function renderLog(){'), false);
+  const studyIifeAt = appSource.indexOf('(function(){', appSource.indexOf('/* BEGIN STUDYHUB INTEGRATED BUNDLE */'));
+  const studyIifeEnd = appSource.indexOf('})();', studyIifeAt);
+  const studyRenderLogAt = appSource.indexOf('function renderLog(){', studyIifeAt);
+  assert.ok(studyIifeAt >= 0);
+  assert.ok(studyRenderLogAt > studyIifeAt);
+  assert.ok(studyRenderLogAt < studyIifeEnd);
+});
+
 function element(extra = {}) {
   return {style: {}, innerHTML: '', textContent: '', value: '', ...extra};
 }

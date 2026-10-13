@@ -24,6 +24,7 @@ function browserProbe() {
     try {
       check('Chart.js loaded', typeof Chart === 'function' && Chart.version === '4.4.1');
       check('dashboard active', document.querySelector('#page-dashboard.active'));
+      check('trade log global stays on diary renderer', typeof renderLog === 'function' && renderLog.toString().includes('filterAccount') && !renderLog.toString().includes('LOG.length'));
       const storageBefore = Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]));
       const nav = document.querySelector('.nav-item[onclick*="\'stats\'"]');
       check('stats navigation exists', nav);
@@ -278,7 +279,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 95, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 96, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
