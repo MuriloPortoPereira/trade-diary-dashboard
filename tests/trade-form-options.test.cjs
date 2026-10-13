@@ -82,3 +82,19 @@ test('toggle trims and adds or removes errors before recalculating discipline', 
     ['chips'], ['discipline', true], ['chips'], ['discipline', true],
   ]);
 });
+
+test('trade form options load once after chips and before remaining trade presentation', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const chipsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-error-chips.js');
+  const optionsIndex = scripts.findIndex(script => script.src === modulePath);
+  const imagesIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-images.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(chipsIndex < optionsIndex && optionsIndex < imagesIndex && imagesIndex < appIndex);
+});
