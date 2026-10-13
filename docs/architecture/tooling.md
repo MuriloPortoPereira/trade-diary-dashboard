@@ -1205,6 +1205,17 @@ registrada no teste de controles do calendário; com a versão commitada desse
 completa não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS;
 última matriz: G3g.
 
+## Diálogo comum da aplicação (G3ay)
+
+`tests/app-dialog.test.cjs` caracterizou defaults, projeção no DOM, foco diferido,
+fechamento, confirmação, valor obrigatório, callbacks e fallbacks nativos. Pós-corte
+protege também a carga clássica depois do seletor de idioma e antes dos consumidores.
+Seis corpos movidos byte a byte contra `eee28e7`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 314 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -54,6 +54,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Handlers HTML, estado temporário, defaults e renderização de cashflows preservados; `saveAccount`, `deleteAccount`, normalização, persistência e coordenação permanecem em `app.js`.
 - `app.js`: 7.829 para 7.780 linhas. 306 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
 
+## Diálogo comum da aplicação (G3ay)
+
+- `src/app/presentation/app-dialog.js`: abertura, fechamento, confirmação, notice e prompt em seis APIs globais/60 linhas movidas byte a byte.
+- `tests/app-dialog.test.cjs`: defaults, projeção no DOM, foco, fechamento, valor obrigatório, ordem do callback, opções, fallbacks nativos e carga.
+- Dois handlers HTML e consumidores de todas as features preservados; `appDialogState` permanece em `app.js`.
+- `app.js`: 7.780 para 7.725 linhas. 314 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
@@ -299,7 +306,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/styles/application-dialog.css`: largura, texto multilinha, input e erro do diálogo comum.
 - `scripts/lib/modal-tab-style-scenarios.cjs`: input/foco, confirmação sem input e erro por valor incorreto, em três larguras.
-- `openAppDialog`, `confirmAppDialog` e wrappers confirm/notice/prompt permanecem em `app.js`.
+- `openAppDialog`, `confirmAppDialog` e wrappers confirm/notice/prompt estão em `src/app/presentation/app-dialog.js`; `appDialogState` permanece em `app.js`.
 
 ## Rodapé da navegação: estilos (G2u)
 

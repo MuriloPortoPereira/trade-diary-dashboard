@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3ax extraído: cinco funções do formulário para `src/modules/accounts/presentation/account-form.js`, 53 linhas movidas byte a byte.
-- APIs globais, handlers, estado temporário, defaults, edição, cashflows e alternância CFD/futuros mantidos; script clássico síncrono após o renderer de cashflows e antes dos demais consumidores e de `app.js`.
-- Caracterização pré-corte: seis testes novos e 305 testes Node. Pós-corte: 306 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.829 para 7.780 linhas. `saveAccount` e `deleteAccount` permanecem no legado com persistência e coordenação. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3ay extraído: seis funções do diálogo comum para `src/app/presentation/app-dialog.js`, 60 linhas movidas byte a byte.
+- APIs globais, handlers, defaults, confirmação, prompt, notice, validação e fallbacks nativos mantidos; script clássico síncrono depois do seletor de idioma e antes de todos os consumidores e de `app.js`.
+- Caracterização pré-corte: sete testes novos e 313 testes Node. Pós-corte: 314 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.780 para 7.725 linhas. `appDialogState` permanece na composição legada. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3ay: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3az: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
