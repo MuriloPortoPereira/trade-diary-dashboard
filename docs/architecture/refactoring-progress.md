@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3at extraído: `renderStrategyCompareCards` para `src/modules/analytics/presentation/strategy-comparison.js`, 223 linhas movidas byte a byte.
-- API global, consumidor, estados vazio/duplicado/completo, resumos, vencedores, gráficos e carga mantidos; script clássico síncrono depois de `strategy-rows.js` e antes de `app.js`.
-- Caracterização pré-corte: quatro testes novos e 279 testes Node. Pós-corte: 280 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 8.412 para 8.188 linhas. Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3au extraído: `renderStats` para `src/modules/analytics/presentation/statistics-page.js`, 193 linhas movidas byte a byte.
+- API global, consumidores, contas, escopo de risco, tabelas, gráficos, timing, estratégias e carga mantidos; script clássico síncrono depois de `strategy-comparison.js` e antes de `app.js`.
+- Caracterização pré-corte: quatro testes novos e 284 testes Node. Pós-corte: 285 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 8.188 para 7.995 linhas. Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3au: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3av: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

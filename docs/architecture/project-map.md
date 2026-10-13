@@ -10,7 +10,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
-| Análises/calendário | `src/modules/psychology/presentation/psychology-page.js`: `renderPsych`; `renderStats` permanece em `app.js`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
+| Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
@@ -427,6 +427,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/strategy-comparison.test.cjs`: guard do painel, estado vazio, seleção duplicada, comparação completa, resumos, vencedores, quatro gráficos e carga.
 - Consumidor `renderStats` preservado; métricas, timing, Chart.js, formatação e helpers continuam nas dependências existentes.
 - `app.js`: 8.412 para 8.188 linhas. 280 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Página de análises (G3au)
+
+- `src/modules/analytics/presentation/statistics-page.js`: `renderStats()` global, 193 linhas movidas byte a byte; script clássico síncrono depois de `strategy-comparison.js` e antes de `app.js`.
+- `tests/statistics-page.test.cjs`: seleção de conta, escopo de risco, vazio, gráficos, histograma, símbolos, dias, horários e carga.
+- Handlers HTML, abas e filtros preservados; métricas, risco, timing, estratégias, Chart.js, formatação e simulação continuam nas dependências existentes.
+- `app.js`: 8.188 para 7.995 linhas. 285 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Dashboard: renderer principal (G3m)
 

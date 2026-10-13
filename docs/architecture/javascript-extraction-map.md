@@ -77,6 +77,10 @@ do plano e atualização de disciplina permanecem nas dependências existentes.
 `src/modules/analytics/presentation/strategy-comparison.js`: métricas, timing,
 Chart.js, formatadores e helpers permanecem nas dependências existentes.
 
+`renderStats` (G3au) foi movida intacta para
+`src/modules/analytics/presentation/statistics-page.js`: métricas, filtros, risco,
+timing, estratégias, Chart.js e simulação permanecem nas dependências existentes.
+
 `renderTopbarValue` (G3ac) foi movida intacta para
 `src/app/presentation/topbar-value.js`: cache, densidade, formatação e
 atualização das métricas permanecem nas dependências globais existentes.
@@ -141,7 +145,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Timing: 272–373 | `modules/trades/domain/trade-timing.js`, após entradas explícitas | Normalizadores de data/horário compartilhados com importação; preservar virada de dia e inválidos |
 | Métricas: `calcMetrics` 1344–1394; `filterByPeriod` 1396–1403 | `modules/analytics/domain/calculate-trade-metrics.js`; wrapper `calcMetrics`; filtro só após receber data explícita | Resolver conta/capital no legado; núcleo recebe dados e saldo inicial; não mudar ordem da série; filtro atual consulta relógio |
 | Estratégias: 1725–2136, hub 4580–4670; renderers G3f/G3l/G3at executados | `modules/analytics/presentation/{strategy-hub-page,strategy-rows,strategy-comparison}.js`; depois `domain/{strategy-snapshots,strategy-outcomes,strategy-comparison-scores}.js` | Renderers globais movidos intactos; métricas, ranking, empates, filtros, cores, Chart.js e helpers seguem nas dependências existentes |
-| Dashboard: 2470–2615; análises 3099–3303; G3m/G3ap–G3ar executados | `modules/analytics/presentation/{dashboard-page,dashboard-equity-mode,statistics-tabs,statistics-filters}.js`; destinos ainda propostos: `{stats-page,chart-renderer}.js` | Renderer, modo da curva, abas e filtros globais movidos intactos; Chart.js, CHART_OPTS, datasets, métricas, traduções, datas e seleção preservados; renderer comum apenas onde já compartilhado |
+| Dashboard e análises; G3m/G3ap–G3ar/G3au executados | `modules/analytics/presentation/{dashboard-page,dashboard-equity-mode,statistics-tabs,statistics-filters,statistics-page}.js`; destino ainda proposto: `chart-renderer.js` somente se surgir reuso real | Renderers, modo da curva, abas e filtros globais movidos intactos; Chart.js, CHART_OPTS, datasets, métricas, traduções, datas e seleção permanecem nas dependências existentes |
 | Stops/taxas: helper 1756–1763, `buildStopFeeAnalysis` 1765–1824, renderer 1826–1876; G3j executado | `modules/analytics/presentation/stop-fee-analysis.js`; destino ainda proposto: `domain/stop-fee-analysis.js`, após limites explícitos | Renderer global movido intacto; cálculo depende do risco da conta e permanece no legado |
 | Psicologia: 3305–3413 e 4637–4669; renderers G3g/G3p executados | `modules/psychology/presentation/{psychology-page,psychology-statistics}.js`; destinos ainda propostos: `domain/{hesitation-statistics,discipline-buckets}.js` | Renderers globais movidos intactos; helpers de seleção e estatística seguem no legado; cálculos locais do renderer foram movidos intactos |
 | Calendário: 2956–3097; mini 2470–2525; G3i/G3k/G3o executados | `modules/calendar/presentation/{calendar-page,dashboard-calendar,calendar-controls}.js` | Renderers/handlers globais movidos intactos; calMonth/calYear/calViewMode, conta, métricas, tradução e helpers de datas seguem no legado |

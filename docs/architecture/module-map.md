@@ -183,6 +183,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/statistics-tabs.test.cjs` | Caracterização de painéis, classes, alvos opcionais, fallback, psicologia, simulação e carga |
 | `src/modules/analytics/presentation/statistics-filters.js` | Controles globais de período personalizado e fixação da conta das estatísticas; 11 linhas intactas |
 | `tests/statistics-filters.test.cjs` | Caracterização de período, fallback, alvos opcionais, ordem da fixação da conta e carga |
+| `src/modules/analytics/presentation/statistics-page.js` | Orquestração da página de análises; 193 linhas movidas intactas |
+| `tests/statistics-page.test.cjs` | Caracterização de contas, risco, vazio, gráficos, símbolos, dias, horários e carga |
 | `src/modules/psychology/presentation/psychology-page.js` | Renderer global da página de psicologia, 25 linhas movidas intactas de `app.js` |
 | `tests/psychology-page.test.cjs` | Caracterização de resumos, gráficos, tabela, vazio, alvos opcionais e ordem de carga |
 | `scripts/lib/partner-style-scenarios.cjs` | Vazio/afiliados/QR em oito larguras, sem mutação persistente |
@@ -195,6 +197,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3at; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3au; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
