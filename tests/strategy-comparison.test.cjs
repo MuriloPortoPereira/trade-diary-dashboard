@@ -8,7 +8,18 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/analytics/presentation/strategy-comparison.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderStrategyCompareCards\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('strategy comparison loads once as a classic script after rows and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src=\"${modulePath}\"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
+  assert.ok(html.indexOf('src/modules/analytics/presentation/strategy-rows.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
+});
 
 function element(extra = {}) {
   return {style: {}, innerHTML: '', textContent: '', value: '', ...extra};
@@ -71,7 +82,7 @@ function render({rows = [], selectedA = '', selectedB = '', includeWrap = true} 
     getStrategyCompareScores: () => [100, 50],
     CHART_OPTS: {plugins: {}, scales: {x: {ticks: {}}, y: {ticks: {}}}},
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#renderStrategyCompareCards' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('renderStrategyCompareCards(__rows)', vm.createContext({...context, __rows: rows}));
   return {elements, calls};
 }
