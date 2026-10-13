@@ -8,7 +8,18 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderStats\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('statistics page loads once as a classic script after strategy comparison and before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src=\"${modulePath}\"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
+  assert.ok(html.indexOf('src/modules/analytics/presentation/strategy-comparison.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
+});
 
 function element(extra = {}) {
   return {
@@ -89,7 +100,7 @@ function render({
     clockToMinutes: value => value ? Number(value.split(':')[0]) * 60 + Number(value.split(':')[1]) : null,
     renderSimulation: () => calls.push(['simulation']),
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#renderStats' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('renderStats()', context);
   return {elements, calls, calculated};
 }
