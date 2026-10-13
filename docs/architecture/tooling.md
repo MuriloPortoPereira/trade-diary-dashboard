@@ -1193,6 +1193,18 @@ commitada desse único teste, 299 testes Node passaram. Sintaxe e diff aprovados
 Matriz visual completa não repetida neste corte sem mudança do corpo/HTML gerado
 ou CSS; última matriz: G3g.
 
+## Formulário de contas (G3ax)
+
+`tests/account-form.test.cjs` caracterizou conta nova, conta ausente, edição com
+clone de cashflows, movimento válido/inválido, remoção e alternância CFD/futuros.
+Pós-corte protege também a carga clássica após o renderer de cashflows. Cinco
+corpos movidos byte a byte contra `72d8c3d`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse
+único teste, 306 testes Node passaram. Sintaxe e diff aprovados. Matriz visual
+completa não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS;
+última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

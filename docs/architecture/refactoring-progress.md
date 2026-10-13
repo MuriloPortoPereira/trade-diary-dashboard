@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3aw extraído: quatro funções do painel para `src/modules/simulation/presentation/simulation-panel.js`, 81 linhas movidas byte a byte.
-- APIs globais, handler, snapshot, reset, modos manual/conta, cards, resumo, plano, gráfico e carga mantidos; script clássico síncrono antes dos dispatchers de estatísticas e de `app.js`.
-- Caracterização pré-corte: cinco testes novos e 298 testes Node. Pós-corte: 299 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.907 para 7.829 linhas. Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3ax extraído: cinco funções do formulário para `src/modules/accounts/presentation/account-form.js`, 53 linhas movidas byte a byte.
+- APIs globais, handlers, estado temporário, defaults, edição, cashflows e alternância CFD/futuros mantidos; script clássico síncrono após o renderer de cashflows e antes dos demais consumidores e de `app.js`.
+- Caracterização pré-corte: seis testes novos e 305 testes Node. Pós-corte: 306 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.829 para 7.780 linhas. `saveAccount` e `deleteAccount` permanecem no legado com persistência e coordenação. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3ax: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3ay: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

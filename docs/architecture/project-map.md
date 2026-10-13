@@ -47,6 +47,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Handler HTML, abas, análises e navegação preservados; sizing, snapshot, plano, Monte Carlo, Chart.js e formatação continuam nas dependências existentes.
 - `app.js`: 7.907 para 7.829 linhas. 299 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Formulário de contas (G3ax)
+
+- `src/modules/accounts/presentation/account-form.js`: `newAccount()`, `editAccount()`, `addAccountCashflowFromForm()`, `removeAccountFormCashflow()` e `onAcctTypeChange()` globais, cinco funções/53 linhas movidas byte a byte.
+- `tests/account-form.test.cjs`: conta nova/ausente/edição, clone de cashflows, movimento válido/inválido, remoção, tipo da conta e ordem de carga.
+- Handlers HTML, estado temporário, defaults e renderização de cashflows preservados; `saveAccount`, `deleteAccount`, normalização, persistência e coordenação permanecem em `app.js`.
+- `app.js`: 7.829 para 7.780 linhas. 306 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
