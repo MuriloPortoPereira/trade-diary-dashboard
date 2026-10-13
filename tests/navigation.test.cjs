@@ -130,3 +130,19 @@ test('unknown page clears active state and only closes the sidebar', () => {
   assert.equal(navItems.some(item => item.classList.contains('active')), false);
   assert.deepEqual(calls, []);
 });
+
+test('navigation loads once as the final classic module before app.js', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const profileIndex = scripts.findIndex(script => script.src === 'src/modules/profile/presentation/profile-page.js');
+  const navigationIndex = scripts.findIndex(script => script.src === modulePath);
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(profileIndex < navigationIndex && navigationIndex < appIndex);
+  assert.equal(scripts[navigationIndex + 1].src, 'app.js');
+});

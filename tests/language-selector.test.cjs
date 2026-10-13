@@ -82,7 +82,8 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/app/presentation/account-summary.js',
     'src/modules/accounts/presentation/accounts-page.js',
     'src/modules/partners/presentation/partners-page.js',
-    'src/modules/profile/presentation/profile-page.js', 'app.js',
+    'src/modules/profile/presentation/profile-page.js',
+    'src/app/presentation/navigation.js', 'app.js',
   ]);
   for (const script of localScripts) {
     assert.doesNotMatch(script.attributes, /\b(?:async|defer|nomodule)\b/i);

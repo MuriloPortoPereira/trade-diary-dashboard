@@ -86,6 +86,7 @@ test('extracted profile stays a synchronous classic script before app.js', () =>
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === profilePath).length, 1);
   const profileIndex = scripts.findIndex(script => script.src === profilePath);
-  assert.equal(scripts[profileIndex + 1].src, 'app.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(profileIndex < appIndex);
   assert.doesNotMatch(scripts[profileIndex].attributes, /\b(?:async|defer|type="module")\b/i);
 });
