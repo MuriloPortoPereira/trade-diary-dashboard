@@ -1216,6 +1216,17 @@ registrada no teste de controles do calendário; com a versão commitada desse �
 teste, 314 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
 não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Controles do diário (G3az)
+
+`tests/trade-log-controls.test.cjs` caracterizou ordenação, indicadores, limpeza do
+período, seleção total/individual, classes das linhas e limpeza da seleção. Pós-corte
+protege também a carga clássica depois dos renderers do diário. Cinco corpos movidos
+byte a byte contra `fb256d1`. Smoke: 96 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse único teste, 321 testes Node
+passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte
+sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

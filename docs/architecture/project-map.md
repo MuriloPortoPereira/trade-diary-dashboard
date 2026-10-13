@@ -61,6 +61,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Dois handlers HTML e consumidores de todas as features preservados; `appDialogState` permanece em `app.js`.
 - `app.js`: 7.780 para 7.725 linhas. 314 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
 
+## Controles do diário (G3az)
+
+- `src/modules/trades/presentation/trade-log-controls.js`: ordenação, limpeza do período, seleção total/individual e limpeza da seleção em cinco APIs globais/43 linhas movidas byte a byte.
+- `tests/trade-log-controls.test.cjs`: alternância de ordenação, indicadores, controles opcionais, checkboxes, IDs selecionados, classes das linhas, barra e carga.
+- Handlers HTML e o `onchange` gerado pelas linhas permanecem intactos; estado, filtros, cálculos e mutações continuam em `app.js`.
+- `app.js`: 7.725 para 7.686 linhas. 321 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
