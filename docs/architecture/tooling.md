@@ -1251,6 +1251,17 @@ no teste de controles do calendário; com a versão commitada desse único teste
 334 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Controlador de modais (G3bc)
+
+`tests/modal-controller.test.cjs` caracterizou bloqueio do diário, edição encontrada
+ou ausente, trade novo, data/duração, modal de contas/importação, fechamento e fila.
+Pós-corte protege também a carga clássica depois dos renderers e antes da navegação.
+Dois corpos movidos byte a byte contra `c4cb0d6`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 341 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

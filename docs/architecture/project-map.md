@@ -82,6 +82,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `openModal` e os consumidores dos chips permanecem intactos; configuração, estado, conta, disciplina e salvamento continuam em `app.js`.
 - `app.js`: 7.659 para 7.636 linhas. 334 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
 
+## Controlador de modais (G3bc)
+
+- `src/app/presentation/modal-controller.js`: abertura e fechamento dos modais de trade, conta e importação em duas APIs globais/27 linhas movidas byte a byte.
+- `tests/modal-controller.test.cjs`: bloqueio, edição encontrada/ausente, trade novo, data/duração, modal de contas, modal genérico, fechamento, fila e carga.
+- Handlers HTML e consumidores permanecem intactos; estado, formulários, fila e renderers continuam em `app.js` ou nos módulos existentes.
+- `app.js`: 7.636 para 7.610 linhas. 341 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

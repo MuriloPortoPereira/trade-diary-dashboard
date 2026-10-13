@@ -754,6 +754,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3bc: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3bc: controlador de modais
+
+- `openModal` e `closeModal` movidas byte a byte para `src/app/presentation/modal-controller.js` (27 linhas).
+- Script clássico síncrono depois dos renderers e antes da navegação e de `app.js`; APIs, handlers, bloqueio, trade novo/edição, conta/importação e fechamento intactos.
+- Caracterização pré-corte: seis testes novos e 340 testes Node. Pós-corte: 341 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- Estado, formulários, fila, renderers, listeners e bootstrap permanecem na composição legada ou nos módulos existentes.
+- Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3bd: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
