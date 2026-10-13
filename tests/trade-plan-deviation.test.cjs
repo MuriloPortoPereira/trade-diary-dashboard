@@ -8,7 +8,17 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/trades/presentation/trade-plan-deviation.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function togglePlanDeviation\([^]*?^\}/m)?.[0];
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+assert.equal(legacy, undefined, 'legacy declaration must be moved');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('plan deviation loads once as a classic script before app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src="${modulePath}"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
+});
 
 function toggle({deviation = {disabled: true, style: {opacity: '0.5'}, placeholder: 'before'}, followed = {value: ''}} = {}) {
   const calls = [];
@@ -21,7 +31,7 @@ function toggle({deviation = {disabled: true, style: {opacity: '0.5'}, placehold
     },
     autoDisc() { calls.push(['discipline']); },
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#togglePlanDeviation' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   vm.runInContext('togglePlanDeviation()', context);
   return {deviation, followed, calls};
 }

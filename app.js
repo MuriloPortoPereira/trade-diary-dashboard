@@ -925,18 +925,6 @@ function autoDisc(force=false){
   if(explain)explain.textContent=reasons.length?`Auto: ${reasons.join(' · ')}.`:'Auto: execução limpa.';
 }
 
-function togglePlanDeviation(){
-  const pd=document.getElementById('t-plan-deviation');
-  if(!pd)return;
-  pd.disabled=false;
-  pd.style.opacity='1';
-  const followed=document.getElementById('t-followedplan')?.value||'';
-  pd.placeholder=followed==='sim'
-    ? 'Opcional: algum detalhe mesmo seguindo o plano?'
-    : 'O que mudou na execução, entrada, saída ou gestão?';
-  autoDisc();
-}
-
 function resetForm(){
   ['t-symbol','t-date','t-entry','t-stop','t-tp','t-exit',
    't-riskpct','t-riskusd','t-r','t-pnl',
