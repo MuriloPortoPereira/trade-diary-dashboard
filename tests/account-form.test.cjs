@@ -116,3 +116,16 @@ test('cashflow removal and account type keep existing presentation behavior', ()
   assert.equal(elements['af-risk-unit'].textContent, '%');
   assert.equal(elements['af-mult'].parentElement.style.display, 'none');
 });
+
+test('account form loads as a classic script before its consumers and leaves app.js clean', () => {
+  for (const name of names) {
+    assert.equal(legacyParts[names.indexOf(name)], undefined);
+  }
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const cashflowIndex = html.indexOf('<script src="src/modules/accounts/presentation/account-cashflow-form.js"></script>');
+  const formIndex = html.indexOf(`<script src="${modulePath}"></script>`);
+  const setupIndex = html.indexOf('<script src="src/modules/accounts/presentation/setup-risk-summary.js"></script>');
+  const appIndex = html.indexOf('<script src="app.js"></script>');
+  assert.ok(cashflowIndex >= 0 && cashflowIndex < formIndex);
+  assert.ok(formIndex < setupIndex && setupIndex < appIndex);
+});
