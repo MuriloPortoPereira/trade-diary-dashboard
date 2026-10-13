@@ -132,3 +132,19 @@ test('clear selection resets state, visible rows, select-all and bulk bar', () =
   context.clearSelection();
   assert.deepEqual(calls, ['updateBulkBar', 'updateBulkBar']);
 });
+
+test('trade log controls load once after their renderers and before app.js', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const selectionIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-selection.js');
+  const logIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log.js');
+  const controlsIndex = scripts.findIndex(script => script.src === modulePath);
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(selectionIndex < logIndex && logIndex < controlsIndex && controlsIndex < appIndex);
+});
