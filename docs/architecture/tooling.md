@@ -1148,6 +1148,17 @@ de controles do calendário; com a versão commitada desse único teste, 275 tes
 Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
 corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Comparação de estratégias (G3at)
+
+`tests/strategy-comparison.test.cjs` caracterizou retorno sem painel, estado vazio,
+seleção duplicada e comparação completa com resumos, vencedores e quatro gráficos.
+Pós-corte protege também a carga clássica após as linhas de estratégias. Corpo
+movido byte a byte contra `1a04be6`. Smoke: 95 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+280 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

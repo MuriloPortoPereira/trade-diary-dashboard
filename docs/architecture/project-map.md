@@ -169,7 +169,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/analytics/presentation/strategy-comparison.css`: 201 linhas de ranking, seletores e painel comparativo.
 - Carrega após `account-risk-and-cashflow.css`, antes dos CSS responsivos; uso no dashboard, central de estratégias e aba de análise.
-- Renderer compartilhado: `renderStrategyRows` em `src/modules/analytics/presentation/strategy-rows.js`; `renderDashStrategyBoard`, `renderStrategyCompareCards` e eventos dos seletores continuam em `app.js`.
+- Renderers compartilhados: `renderStrategyRows` em `src/modules/analytics/presentation/strategy-rows.js` e `renderStrategyCompareCards` em `src/modules/analytics/presentation/strategy-comparison.js`; `renderDashStrategyBoard` e eventos dos seletores continuam em `app.js`.
 - Cenários isolados: `scripts/lib/strategy-style-scenarios.cjs`; ranking positivo/negativo/vazio, comparação completa e alternância de seleções.
 - Overrides tardios e responsivos permanecem nos CSS responsivos. Contrato de bytes e limites em [tooling](tooling.md).
 
@@ -420,6 +420,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Consumidores: `renderDashStrategyBoard` no legado e `renderStrategyHub` no módulo de apresentação; `escapeHtml`, `fR`, `formatStrategyRatio` e snapshots continuam no legado.
 - `tests/strategy-rows.test.cjs`: ordem, escaping, sinais, métricas, normalização das barras, limite/default/slice, vazio e alvo ausente.
 - 112 testes Node e 74 checks no navegador; dashboard/refresh e quantidade de linhas no hub exercitados. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Comparação de estratégias (G3at)
+
+- `src/modules/analytics/presentation/strategy-comparison.js`: `renderStrategyCompareCards(rows)` global, 223 linhas movidas byte a byte; script clássico síncrono depois de `strategy-rows.js` e antes de `app.js`.
+- `tests/strategy-comparison.test.cjs`: guard do painel, estado vazio, seleção duplicada, comparação completa, resumos, vencedores, quatro gráficos e carga.
+- Consumidor `renderStats` preservado; métricas, timing, Chart.js, formatação e helpers continuam nas dependências existentes.
+- `app.js`: 8.412 para 8.188 linhas. 280 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Dashboard: renderer principal (G3m)
 

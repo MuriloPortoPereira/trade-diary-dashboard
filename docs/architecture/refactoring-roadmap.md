@@ -673,6 +673,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3at: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3at: comparação de estratégias
+
+- `renderStrategyCompareCards` movida byte a byte para `src/modules/analytics/presentation/strategy-comparison.js` (223 linhas).
+- Script clássico síncrono depois de `strategy-rows.js` e antes de `app.js`; API, consumidor, estados, resumos e gráficos intactos.
+- Caracterização pré-corte: quatro testes novos e 279 testes Node. Pós-corte: 280 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
+- `renderStats` preservado; métricas, timing, Chart.js, formatação e helpers permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3au: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
