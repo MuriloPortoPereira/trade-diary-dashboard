@@ -155,3 +155,19 @@ test('wrappers retain native confirm, alert and prompt fallbacks', () => {
   rejected.context.showAppPrompt('', 'Não', '', () => { called = true; });
   assert.equal(called, false);
 });
+
+test('application dialog loads once as a classic script before every consumer and leaves app.js clean', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const dialogIndex = scripts.findIndex(script => script.src === modulePath);
+  const languageIndex = scripts.findIndex(script => script.src === 'src/modules/preferences/presentation/language-selector.js');
+  const accountFormIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/account-form.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(languageIndex < dialogIndex && dialogIndex < accountFormIndex && accountFormIndex < appIndex);
+});
