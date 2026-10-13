@@ -1137,6 +1137,17 @@ no teste de controles do calendário; com a versão commitada desse único teste
 270 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Desvio do plano no formulário (G3as)
+
+`tests/trade-plan-deviation.test.cjs` caracterizou guard do DOM, opções sim/não,
+fallback do campo ausente e ordem da atualização de disciplina antes do corte.
+Pós-corte protege também a carga clássica após o campo de duração. Corpo movido
+byte a byte contra `d984237`. Smoke: 95 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste
+de controles do calendário; com a versão commitada desse único teste, 275 testes
+Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

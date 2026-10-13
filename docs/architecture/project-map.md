@@ -569,6 +569,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Cálculo e formatação temporal permanecem nas dependências existentes; três chamadas JavaScript e quatro handlers HTML preservados.
 - 231 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
+## Desvio do plano no formulário (G3as)
+
+- `src/modules/trades/presentation/trade-plan-deviation.js`: `togglePlanDeviation()` global, 11 linhas movidas byte a byte; script clássico síncrono depois de `trade-duration-field.js` e antes de `app.js`.
+- `tests/trade-plan-deviation.test.cjs`: guard do DOM, opções sim/não, fallback do campo ausente, ordem da disciplina e carga.
+- Handler HTML preservado; `autoDisc`, dados do formulário e persistência permanecem nas dependências existentes.
+- 275 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
 ## Fluxo visual de trades incompletos (G3ak)
 
 - `src/modules/trades/presentation/incomplete-trade-flow.js`: `updateTradeModalFlowUI()` global, 31 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
