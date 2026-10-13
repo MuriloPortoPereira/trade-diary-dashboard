@@ -691,6 +691,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3av: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3av: página do diário
+
+- `renderLog`, `fmtMissingField` e `tradeRow` movidas byte a byte para `src/modules/trades/presentation/trade-log.js` (três funções/87 linhas).
+- Script clássico síncrono depois dos componentes do diário e antes de `app.js`; APIs, consumidores, filtros, vazio, alertas e linhas intactos.
+- Caracterização pré-corte: seis testes novos e 291 testes Node. Pós-corte: 293 testes Node, 96 checks no navegador, sintaxe e diff aprovados; o `renderLog` homônimo do StudyHub permanece isolado em sua IIFE.
+- Quatro handlers HTML preservados; filtros, contas, seleção, formatação, mutações e persistência permanecem nas dependências existentes.
+- Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3aw: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

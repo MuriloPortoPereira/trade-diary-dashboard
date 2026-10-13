@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3au extraído: `renderStats` para `src/modules/analytics/presentation/statistics-page.js`, 193 linhas movidas byte a byte.
-- API global, consumidores, contas, escopo de risco, tabelas, gráficos, timing, estratégias e carga mantidos; script clássico síncrono depois de `strategy-comparison.js` e antes de `app.js`.
-- Caracterização pré-corte: quatro testes novos e 284 testes Node. Pós-corte: 285 testes Node, 95 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 8.188 para 7.995 linhas. Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3av extraído: `renderLog`, `fmtMissingField` e `tradeRow` para `src/modules/trades/presentation/trade-log.js`, três funções/87 linhas movidas byte a byte.
+- APIs globais, handlers, filtros, vazio, incompletos, labels e linhas mantidos; script clássico síncrono depois dos componentes do diário e antes de `app.js`.
+- Caracterização pré-corte: seis testes novos e 291 testes Node. Pós-corte: 293 testes Node, 96 checks no navegador, sintaxe e diff aprovados; o check adicional confirma que o `renderLog` do StudyHub permanece isolado em sua IIFE.
+- `app.js`: 7.995 para 7.907 linhas. Smoke carrega a aplicação e captura erros de script/assets. Matriz visual completa não repetida neste corte de corpo/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3av: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3aw: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

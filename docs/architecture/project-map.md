@@ -7,7 +7,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Trabalho | Procurar primeiro |
 |---|---|
 | Inicialização/navegação | `app.js`: `showPage`, `refreshAll`, callback `window.load`; `index.html` |
-| Operação/diário | `saveTrade`, `renderLog`, `getLogFilteredTrades`, `duplicateTrade` |
+| Operação/diário | `saveTrade`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js`; `getLogFilteredTrades`, `duplicateTrade` em `app.js` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
@@ -624,6 +624,13 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/trade-log-selection.test.cjs`: guard do DOM, seleção vazia/simples/múltipla, incompletos, textos, classes, ações, checkbox geral e carga.
 - `selectedTrades`, busca de incompletos e comandos de seleção permanecem no legado; quatro consumidores preservados.
 - 221 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Página do diário (G3av)
+
+- `src/modules/trades/presentation/trade-log.js`: `renderLog()`, `fmtMissingField()` e `tradeRow()` globais, três funções/87 linhas movidas byte a byte; script clássico síncrono depois dos componentes do diário e antes de `app.js`.
+- `tests/trade-log-page.test.cjs`: filtros, ordem da orquestração, vazio, alerta de incompletos, labels e linhas compacta/completa.
+- Quatro handlers HTML e consumidores JavaScript preservados; filtros, contas, seleção, formatação, mutações e persistência continuam nas dependências existentes.
+- `app.js`: 7.995 para 7.907 linhas. 293 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Ícones das pastas de documentos (G3z)
 

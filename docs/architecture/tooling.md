@@ -1170,6 +1170,17 @@ no teste de controles do calendário; com a versão commitada desse único teste
 285 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
 repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
 
+## Página do diário (G3av)
+
+`tests/trade-log-page.test.cjs` caracterizou filtros, ordem da orquestração, estado
+vazio, alerta de incompletos, labels e variantes compacta/completa das linhas.
+Pós-corte protege também a carga clássica após os componentes do diário. Bloco
+movido byte a byte contra `98c6b11`. Um teste estrutural e um check no navegador confirmam que o `renderLog` homônimo do StudyHub permanece isolado em sua IIFE. Smoke: 96 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+293 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
