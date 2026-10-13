@@ -10,7 +10,18 @@ const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['applySimulationAccountSnapshot', 'resetSimulationEntryDefaults', 'loadSimFromAccount', 'renderSimulation'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+for (const [index, part] of legacyParts.entries()) assert.equal(part, undefined, `${names[index]} must be moved`);
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+
+test('simulation panel loads once as a classic script before statistics dispatchers and app.js', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
+    .filter(match => match[1].includes(`src=\"${modulePath}\"`));
+  assert.equal(tags.length, 1);
+  assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/statistics-tabs.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
+});
 
 function element(extra = {}) {
   return {style: {}, value: '', innerHTML: '', textContent: '', readOnly: false, ...extra};
@@ -59,7 +70,7 @@ function setup({accountValue = 'manual', optionCount = 2, rrrValue = '1', sizing
     mkChart: (id, config) => calls.push(['chart', id, config]),
     CHART_OPTS: {plugins: {}},
   });
-  vm.runInContext(source, context, {filename: legacy ? 'app.js#simulation-panel' : modulePath});
+  vm.runInContext(source, context, {filename: modulePath});
   return {context, elements, calls};
 }
 
