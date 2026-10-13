@@ -119,7 +119,7 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 
 O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
 
-O estágio atual é G3ba. A última validação passou com 328 testes Node e 96 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3bb.
+O estágio atual é G3bb. A última validação passou com 334 testes Node e 96 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G3bc.
 
 ## Deploy e dados
 

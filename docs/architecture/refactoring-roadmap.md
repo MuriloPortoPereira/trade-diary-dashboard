@@ -745,6 +745,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado.
 - Próximo lote G3bb: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
 
+## G3bb: opções do formulário de trade
+
+- `populateSelects` e `toggleTradeError` movidas byte a byte para `src/modules/trades/presentation/trade-form-options.js` (24 linhas).
+- Script clássico síncrono depois dos chips de erro e antes dos demais módulos de trades e de `app.js`; APIs, opções, ordem, conta ativa, reset e alternância intactos.
+- Caracterização pré-corte: cinco testes novos e 333 testes Node. Pós-corte: 334 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- Configuração, estado, conta, cálculo da disciplina, modal e salvamento permanecem no legado.
+- Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado.
+- Próximo lote G3bc: selecionar outra responsabilidade coesa após caracterizar estado, consumidores e efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

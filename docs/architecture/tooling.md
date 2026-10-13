@@ -1240,6 +1240,17 @@ registrada no teste de controles do calendário; com a versão commitada desse �
 teste, 328 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
 não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Opções do formulário de trade (G3bb)
+
+`tests/trade-form-options.test.cjs` caracterizou ordem e conteúdo dos selects,
+labels crus, campos opcionais, conta ativa, símbolos, reset e alternância dos erros.
+Pós-corte protege também a carga clássica depois dos chips de erro. Dois corpos
+movidos byte a byte contra `77c7720`. Smoke: 96 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+334 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
