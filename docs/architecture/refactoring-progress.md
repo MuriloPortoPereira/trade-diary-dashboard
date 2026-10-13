@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3az extraído: cinco handlers dos controles do diário para `src/modules/trades/presentation/trade-log-controls.js`, 43 linhas movidas byte a byte.
-- APIs globais, handlers HTML, ordenação, indicadores, período, checkboxes, classes das linhas e atualização da barra mantidos; script clássico síncrono depois dos renderers do diário e antes de `app.js`.
-- Caracterização pré-corte: seis testes novos e 320 testes Node. Pós-corte: 321 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.725 para 7.686 linhas. `sortState`, `selectedTrades`, filtros, cálculos e mutações permanecem no legado. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3ba extraído: `refreshAll`, `toggleSidebar` e `showPage` para `src/app/presentation/navigation.js`, 29 linhas movidas byte a byte.
+- APIs globais, handlers HTML, despacho dos renderers, classes ativas, defaults, sidebar e ordem do refresh mantidos; script clássico síncrono como último módulo antes de `app.js`.
+- Caracterização pré-corte: seis testes novos e 327 testes Node. Pós-corte: 328 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.686 para 7.659 linhas. Listeners, estado e bootstrap permanecem no legado. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3ba: selecionar outra responsabilidade coesa de apresentação após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3bb: selecionar outra responsabilidade coesa após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

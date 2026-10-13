@@ -6,7 +6,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 | Trabalho | Procurar primeiro |
 |---|---|
-| Inicialização/navegação | `app.js`: `showPage`, `refreshAll`, callback `window.load`; `index.html` |
+| Inicialização/navegação | `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; callback `window.load` em `app.js`; `index.html` |
 | Operação/diário | `saveTrade`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js`; `getLogFilteredTrades`, `duplicateTrade` em `app.js` |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
@@ -67,6 +67,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/trade-log-controls.test.cjs`: alternância de ordenação, indicadores, controles opcionais, checkboxes, IDs selecionados, classes das linhas, barra e carga.
 - Handlers HTML e o `onchange` gerado pelas linhas permanecem intactos; estado, filtros, cálculos e mutações continuam em `app.js`.
 - `app.js`: 7.725 para 7.686 linhas. 321 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
+
+## Navegação da aplicação (G3ba)
+
+- `src/app/presentation/navigation.js`: refresh da página ativa, atualização compartilhada, sidebar e troca de página em três APIs globais/29 linhas movidas byte a byte.
+- `tests/navigation.test.cjs`: despacho conhecido/desconhecido, ordem do refresh, fallback do dashboard, classes, sidebar, período, reset da simulação e carga.
+- Handlers HTML e consumidores gerados permanecem intactos; listeners, estado e callback `window.load` continuam em `app.js`.
+- `app.js`: 7.686 para 7.659 linhas. 328 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
 
 ## Banner de trades incompletos (G3an)
 

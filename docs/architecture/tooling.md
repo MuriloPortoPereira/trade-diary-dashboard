@@ -1227,6 +1227,19 @@ controles do calendário; com a versão commitada desse único teste, 321 testes
 passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte
 sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Navegação da aplicação (G3ba)
+
+`tests/navigation.test.cjs` caracterizou despacho conhecido/desconhecido, ordem do
+refresh compartilhado, sidebar, classes ativas, período do dashboard e reset da
+simulação. Pós-corte protege também a carga clássica como último módulo antes de
+`app.js`. Três corpos movidos byte a byte contra `7267fc7`. O teste estrutural do
+perfil foi ajustado após diagnóstico: sua intenção é preceder `app.js`, enquanto o
+novo teste protege a navegação intermediária. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 328 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
