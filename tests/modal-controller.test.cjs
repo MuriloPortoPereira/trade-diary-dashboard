@@ -114,3 +114,19 @@ test('closing removes open state and only trade modal clears bulk flow', () => {
   assert.equal(generic.elements.csvConfirmModal.classList.contains('open'), false);
   assert.deepEqual(generic.calls, []);
 });
+
+test('modal controller loads once after feature renderers and before navigation', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const profileIndex = scripts.findIndex(script => script.src === 'src/modules/profile/presentation/profile-page.js');
+  const modalIndex = scripts.findIndex(script => script.src === modulePath);
+  const navigationIndex = scripts.findIndex(script => script.src === 'src/app/presentation/navigation.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(profileIndex < modalIndex && modalIndex < navigationIndex && navigationIndex < appIndex);
+});
