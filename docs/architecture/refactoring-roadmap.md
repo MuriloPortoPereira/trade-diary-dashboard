@@ -781,6 +781,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Matriz visual completa não repetida neste corte de corpo/HTML gerado intacto e CSS inalterado.
 - Próximo lote G4a: domínio puro de timing de trades, com wrappers globais temporários para compatibilidade.
 
+## G4a: domínio de timing de trades
+
+- Nove regras de normalização, formatação, duração e agregação foram movidas para o factory puro `src/modules/trades/domain/trade-timing.js`.
+- `normalizeDate` e `cleanMTCell` entram como dependências explícitas; o módulo não acessa DOM, storage, Chart ou IO. As APIs globais permanecem como wrappers em `app.js`.
+- Caracterização pré-corte: cinco testes novos e 357 testes Node. Pós-corte: 359 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- Preservados formatos legados, intervalos frouxos, arredondamento, virada da meia-noite, datas explícitas, intervalos inválidos, grupos e ordenação. Ausências convertidas em zero nas médias permanecem caracterizadas.
+- Revisão independente aprovada sem bloqueios; matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
+- Próximo lote G4b: núcleo puro de métricas de trades, sem incluir filtro temporal dependente do relógio.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

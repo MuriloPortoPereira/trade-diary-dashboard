@@ -1285,6 +1285,17 @@ do calendário; com a versão commitada desse único teste, 352 testes Node pass
 Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem mudança
 do corpo/HTML gerado ou CSS; última matriz: G3g. Este lote encerra G3.
 
+## Domínio de timing de trades (G4a)
+
+`tests/trade-timing.test.cjs` caracterizou normalização e formatação, intervalos
+frouxos, virada da meia-noite, datas explícitas, inválidos, médias, grupos,
+ordenação e imutabilidade. Pós-corte protege também o factory isolado, wrappers e
+ordem clássica. A execução literal encontrou somente a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse teste,
+359 testes Node passaram. Smoke: 96 checks; sintaxe e diff aprovados. Revisão
+independente sem bloqueios. Matriz visual completa não repetida neste corte sem
+mudança de HTML/CSS ou saída esperada; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

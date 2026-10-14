@@ -112,14 +112,14 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
 | G1–G2: CSS | Concluídos; 40 arquivos CSS carregados na ordem original |
 | G3: JavaScript por feature | Concluído para apresentação; renderers, shell, formulários e controles principais separados |
-| G4: regras de domínio | Próxima frente: timing, métricas, risco e simulação em lotes puros |
+| G4: regras de domínio | Em andamento; timing extraído, métricas e risco seguem em lotes puros |
 | G5: persistência/importação | Pendente por formato, coordenação e IO |
 | G6: StudyHub | Pendente; runtime legado exige isolamento gradual |
 | G7: HTML e compatibilidade | Pendente, após migrar consumidores relevantes |
 
 O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
 
-O estágio atual é G3be, encerramento da fase de apresentação. A última validação passou com 352 testes Node e 96 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G4a, domínio puro de timing de trades.
+O estágio atual é G4a, domínio puro de timing de trades. A última validação passou com 359 testes Node e 96 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G4b, métricas puras de trades.
 
 ## Deploy e dados
 

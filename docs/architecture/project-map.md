@@ -103,6 +103,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Componentes compartilhados da topbar e consumidores permanecem intactos; risco, trades, relógio e formatação continuam nas dependências existentes.
 - `app.js`: 7.592 para 7.568 linhas. 352 testes Node e 96 checks no navegador; G3 encerrado sem nova matriz visual por manter corpo/HTML gerado e CSS intactos.
 
+## Domínio de timing de trades (G4a)
+
+- `src/modules/trades/domain/trade-timing.js`: factory puro para normalização/formatação de horário, duração, médias e agrupamentos; normalizadores compartilhados entram como dependências explícitas.
+- `tests/trade-timing.test.cjs`: formatos legados, intervalos frouxos, arredondamento, virada da meia-noite, datas explícitas, intervalos inválidos, WIN/LOSS/BE, estratégias, imutabilidade, isolamento e carga.
+- Nove APIs globais permanecem em `app.js` como wrappers; formulário, estatísticas, comparação, importação e dados persistidos permanecem compatíveis.
+- `app.js`: 7.568 para 7.476 linhas. 359 testes Node e 96 checks no navegador; revisão independente sem bloqueios.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
