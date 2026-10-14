@@ -85,3 +85,41 @@ test('capital base retains balance fallback and JavaScript addition semantics', 
   assert.equal(api.getAccountCapitalBase({balance: '100', cashflows: [{type: 'deposit', amount: 25}]}), '10025');
   assert.equal(api.getAccountCapitalBase(null), 0);
 });
+
+test('isolated cashflow domain exposes one calculator without account state or IO', () => {
+  const forbidden = ['document', 'localStorage', 'fetch', 'accounts', 'save'];
+  const sandbox = {};
+  for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`cashflow domain accessed ${name}`); }});
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryAccountCashflow']);
+  assert.deepEqual(Object.keys(context.TradeDiaryAccountCashflow), ['calculateCashflowTotals']);
+  assert.deepEqual(plain(context.TradeDiaryAccountCashflow.calculateCashflowTotals([
+    {type: 'deposit', amount: 30},
+    {type: 'withdrawal', amount: 8},
+  ])), {deposits: 30, withdrawals: 8, net: 22});
+});
+
+test('cashflow domain loads once before consumers while legacy helpers remain global', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/accounts/presentation/account-cashflow-form.js',
+    'src/modules/accounts/presentation/setup-cashflow-list.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/accounts/presentation/account-form.js',
+    'app.js',
+  ]) {
+    assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  }
+  assert.match(appSource, /^function getAccountCashflows\(acct\)\{/m);
+  assert.match(appSource, /^function calcAccountCashflow\(acct\)\{/m);
+  assert.match(appSource, /^function getAccountCapitalBase\(acct\)\{/m);
+  assert.match(appSource, /return TradeDiaryAccountCashflow\.calculateCashflowTotals\(getAccountCashflows\(acct\)\);/);
+});

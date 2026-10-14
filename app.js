@@ -1109,13 +1109,7 @@ function getAccountCashflows(acct){
 }
 
 function calcAccountCashflow(acct){
-  return getAccountCashflows(acct).reduce((sum,flow)=>{
-    const amount=Math.abs(parseFloat(flow.amount)||0);
-    if(flow.type==='withdrawal')sum.withdrawals+=amount;
-    else sum.deposits+=amount;
-    sum.net=sum.deposits-sum.withdrawals;
-    return sum;
-  },{deposits:0,withdrawals:0,net:0});
+  return TradeDiaryAccountCashflow.calculateCashflowTotals(getAccountCashflows(acct));
 }
 
 function getAccountCapitalBase(acct){
