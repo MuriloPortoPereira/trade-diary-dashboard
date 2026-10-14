@@ -1296,6 +1296,17 @@ registrada no teste de controles do calendário; com a versão commitada desse t
 independente sem bloqueios. Matriz visual completa não repetida neste corte sem
 mudança de HTML/CSS ou saída esperada; última matriz: G3g.
 
+## Domínio de métricas de trades (G4b)
+
+`tests/trade-metrics.test.cjs` caracterizou resolução do saldo inicial, grupos,
+referências, OPEN/BE, Infinity, ordem invertida, drawdown, streaks e índices
+anualizados. Pós-corte protege também isolamento, wrapper e ordem clássica. A
+execução literal encontrou somente a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse teste, 366 testes Node passaram.
+Smoke: 96 checks; sintaxe e diff aprovados. Revisão independente incluiu comparação
+diferencial de 500 casos variados, sem divergências. Matriz visual completa não
+repetida neste corte sem mudança de HTML/CSS ou saída esperada; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

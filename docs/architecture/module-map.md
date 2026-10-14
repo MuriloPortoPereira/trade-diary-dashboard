@@ -58,6 +58,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-form-account-context.test.cjs` | Caracterização de conta/fallback, campos, resumo, símbolo, mercado e carga |
 | `src/modules/trades/domain/trade-timing.js` | Factory puro de horário, duração e agregações temporais; 115 linhas |
 | `tests/trade-timing.test.cjs` | Caracterização de formatos, virada do dia, inválidos, médias, grupos, wrappers e isolamento |
+| `src/modules/analytics/domain/calculate-trade-metrics.js` | Métricas puras de resultado, drawdown, índices e streaks; 53 linhas |
+| `tests/trade-metrics.test.cjs` | Caracterização de capital, grupos, ordem, Infinity, drawdown, streaks, índices, wrapper e isolamento |
 | `src/app/presentation/topbar-statistics.js` | Períodos, drawdown, meta e badge da topbar; uma função/24 linhas |
 | `tests/topbar-statistics.test.cjs` | Caracterização de datas, percentuais, tons, meta, alvos opcionais, densidade e carga |
 | `src/modules/data-transfer/infrastructure/serialize-trades-csv.js` | Formato CSV: colunas e escaping; recebe dados explícitos, sem executar IO |
@@ -219,6 +221,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be e G4a; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be e G4a–G4b; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

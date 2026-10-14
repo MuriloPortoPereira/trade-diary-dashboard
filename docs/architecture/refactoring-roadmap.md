@@ -790,6 +790,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Revisão independente aprovada sem bloqueios; matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
 - Próximo lote G4b: núcleo puro de métricas de trades, sem incluir filtro temporal dependente do relógio.
 
+## G4b: domínio de métricas de trades
+
+- O corpo numérico de `calcMetrics` foi movido para `src/modules/analytics/domain/calculate-trade-metrics.js`, recebendo somente trades e saldo inicial.
+- O wrapper global continua resolvendo conta, capital base e fallbacks; consumidores e filtro temporal permanecem intactos.
+- Caracterização pré-corte: cinco testes novos e 364 testes Node. Pós-corte: 366 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- Preservados ordem invertida, referências dos trades, OPEN/BE, Infinity, ruído de ponto flutuante, drawdown, streak final não consolidado e índices anualizados.
+- Revisão independente aprovada; comparação diferencial de 500 casos variados não encontrou divergências. Matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
+- Próximo lote G4c: totais puros de cashflow das contas, preparando a separação posterior do risco.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

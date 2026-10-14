@@ -154,6 +154,10 @@ O timing de trades (G4a) foi isolado em
 duração e agregações recebem normalização de data/célula explicitamente; as nove
 APIs globais permanecem como wrappers em `app.js`.
 
+As métricas de trades (G4b) foram isoladas em
+`src/modules/analytics/domain/calculate-trade-metrics.js`: conta e capital continuam
+resolvidos por `calcMetrics`, enquanto o domínio recebe somente trades e saldo inicial.
+
 O controlador de modais (G3bc) foi movido intacto para
 `src/app/presentation/modal-controller.js`: abertura e fechamento permanecem globais;
 estado, formulários, fila, renderers e bootstrap continuam nas dependências existentes.
@@ -188,7 +192,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af/G3aj/G3ak/G3an/G3as/G3bb/G3bd executados | `modules/trades/presentation/{trade-images,trade-error-chips,trade-form-options,trade-form-account-context,trade-duration-field,trade-plan-deviation,incomplete-trade-flow,incomplete-trade-banner}.js`; destino ainda proposto: `trade-form.js`; depois `application/save-trade.js` | Preview, chips, opções, contexto da conta, duração, desvio, fluxo e banner globais movidos intactos; editingId, fila, upload/remoção, cálculo temporal e save seguem no legado |
 | Diário; G3ae/G3ag/G3ah/G3av/G3az executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics,trade-log-selection,trade-log,trade-log-controls}.js`; depois `domain/log-date-range.js` | Aviso, cards, barra de seleção, orquestração, linhas e controles globais movidos intactos; cálculo, filtros, estado selecionado, conta, duplicação e confirmações de exclusão seguem nas dependências existentes |
 | Timing; G4a executado | `modules/trades/domain/trade-timing.js` | Factory puro recebe normalizadores compartilhados; wrappers globais preservam consumidores, virada de dia, inválidos e médias legadas |
-| Métricas: `calcMetrics` 1344–1394; `filterByPeriod` 1396–1403 | `modules/analytics/domain/calculate-trade-metrics.js`; wrapper `calcMetrics`; filtro só após receber data explícita | Resolver conta/capital no legado; núcleo recebe dados e saldo inicial; não mudar ordem da série; filtro atual consulta relógio |
+| Métricas; G4b executado | `modules/analytics/domain/calculate-trade-metrics.js`; wrapper `calcMetrics` | Domínio recebe trades e saldo inicial; conta/capital permanecem no wrapper, ordem invertida e resultados numéricos preservados; filtro temporal continua no legado |
 | Estratégias: 1725–2136, hub 4580–4670; renderers G3f/G3l/G3at executados | `modules/analytics/presentation/{strategy-hub-page,strategy-rows,strategy-comparison}.js`; depois `domain/{strategy-snapshots,strategy-outcomes,strategy-comparison-scores}.js` | Renderers globais movidos intactos; métricas, ranking, empates, filtros, cores, Chart.js e helpers seguem nas dependências existentes |
 | Dashboard e análises; G3m/G3ap–G3ar/G3au executados | `modules/analytics/presentation/{dashboard-page,dashboard-equity-mode,statistics-tabs,statistics-filters,statistics-page}.js`; destino ainda proposto: `chart-renderer.js` somente se surgir reuso real | Renderers, modo da curva, abas e filtros globais movidos intactos; Chart.js, CHART_OPTS, datasets, métricas, traduções, datas e seleção permanecem nas dependências existentes |
 | Stops/taxas: helper 1756–1763, `buildStopFeeAnalysis` 1765–1824, renderer 1826–1876; G3j executado | `modules/analytics/presentation/stop-fee-analysis.js`; destino ainda proposto: `domain/stop-fee-analysis.js`, após limites explícitos | Renderer global movido intacto; cálculo depende do risco da conta e permanece no legado |

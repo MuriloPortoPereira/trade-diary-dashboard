@@ -110,6 +110,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Nove APIs globais permanecem em `app.js` como wrappers; formulário, estatísticas, comparação, importação e dados persistidos permanecem compatíveis.
 - `app.js`: 7.568 para 7.476 linhas. 359 testes Node e 96 checks no navegador; revisão independente sem bloqueios.
 
+## Domínio de métricas de trades (G4b)
+
+- `src/modules/analytics/domain/calculate-trade-metrics.js`: resultados, expectativa, profit factor, drawdown, Sharpe, Sortino, Calmar, recovery e streaks recebem trades e saldo inicial explícitos.
+- `tests/trade-metrics.test.cjs`: fallbacks de capital, grupos, referências, vazio/BE/Infinity, ordem invertida, drawdown, streaks, índices, isolamento e carga.
+- `calcMetrics` permanece global e resolve conta/capital antes de delegar; consumidores e `filterByPeriod` permanecem intactos.
+- `app.js`: 7.476 para 7.431 linhas. 366 testes Node e 96 checks no navegador; comparação diferencial de 500 casos e revisão independente sem divergências.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

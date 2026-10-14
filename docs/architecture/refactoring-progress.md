@@ -2,8 +2,8 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3am registrados abaixo.
-- G3 concluído para os boundaries principais de apresentação; G4 iniciado pelo domínio puro de timing, seguido por métricas e risco.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4b registrados abaixo.
+- G4 iniciado pelos domínios puros de timing e métricas; risco segue em lotes menores.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G4a extraído: nove regras de timing para `src/modules/trades/domain/trade-timing.js`, com normalização de data/célula injetada explicitamente e sem UI, storage ou IO.
-- APIs globais, defaults, formatos frouxos, arredondamento, virada da meia-noite, datas explícitas, agrupamentos WIN/LOSS/BE e ordenação por estratégia mantidos; script clássico síncrono antes dos consumidores.
-- Caracterização pré-corte: cinco testes novos e 357 testes Node. Pós-corte: 359 testes Node, 96 checks no navegador, sintaxe e diff aprovados; revisão independente sem bloqueios.
-- `app.js`: 7.568 para 7.476 linhas. O comportamento legado em que valores temporais ausentes participam da média como zero foi caracterizado, sem correção funcional neste lote.
+- G4b extraído: cálculo de métricas para `src/modules/analytics/domain/calculate-trade-metrics.js`, recebendo trades e saldo inicial explícitos, sem conta, UI, storage ou relógio.
+- `calcMetrics` global preserva resolução da conta/capital e todos os consumidores. Ordem invertida, referências, OPEN/BE, Infinity, ponto flutuante, drawdown, streaks e índices mantidos.
+- Caracterização pré-corte: cinco testes novos e 364 testes Node. Pós-corte: 366 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.476 para 7.431 linhas. Revisão independente e comparação diferencial de 500 casos sem divergências.
 
 ## Next
-- G4b: extrair o núcleo puro de métricas de trades, mantendo resolução de conta/capital e relógio fora do domínio.
+- G4c: caracterizar e extrair os totais puros de cashflow das contas antes de abordar o cálculo maior de risco.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
