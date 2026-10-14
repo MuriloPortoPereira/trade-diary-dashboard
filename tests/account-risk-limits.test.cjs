@@ -94,3 +94,33 @@ test('risk limits retain zero capital, fallback percentages and cycle base', () 
   assert.equal(result.dayExcessPct, 0);
   assert.equal(result.goalProgress, 0);
 });
+
+test('isolated risk limits expose only pure calculations', () => {
+  const forbidden = ['document', 'localStorage', 'fetch', 'accounts', 'config'];
+  const sandbox = {};
+  for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`risk limits accessed ${name}`); }});
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryRiskLimits']);
+  assert.deepEqual(Object.keys(context.TradeDiaryRiskLimits).sort(), ['calculateRiskConsumption', 'calculateRiskThresholds']);
+  const thresholds = context.TradeDiaryRiskLimits.calculateRiskThresholds({ddDaily: 2, ddWeekly: 5, ddTotal: 10, risk: 1}, 1000);
+  assert.deepEqual(JSON.parse(JSON.stringify(thresholds)), {dayLimit: 20, weekLimit: 50, monthLimit: 100, riskPerTradeUsd: 10});
+});
+
+test('risk limits load once before classic consumers and keep global risk API', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/accounts/presentation/risk-board.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/accounts/presentation/risk-setup-page.js',
+    'app.js',
+  ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+});
