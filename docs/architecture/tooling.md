@@ -1307,6 +1307,17 @@ Smoke: 96 checks; sintaxe e diff aprovados. Revisão independente incluiu compar
 diferencial de 500 casos variados, sem divergências. Matriz visual completa não
 repetida neste corte sem mudança de HTML/CSS ou saída esperada; última matriz: G3g.
 
+## Domínio de totais de cashflow (G4c)
+
+`tests/account-cashflow.test.cjs` caracterizou lookup/fallbacks, parsing parcial,
+valores absolutos, tipos desconhecidos, vazio, Infinity/NaN, erros, imutabilidade e
+saldo textual. Pós-corte protege também isolamento, wrappers e ordem clássica. A
+execução literal encontrou somente a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse teste, 373 testes Node passaram.
+Smoke: 96 checks; sintaxe e diff aprovados; revisão independente sem bloqueios.
+Matriz visual completa não repetida neste corte sem mudança de HTML/CSS ou saída
+esperada; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

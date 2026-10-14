@@ -799,6 +799,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Revisão independente aprovada; comparação diferencial de 500 casos variados não encontrou divergências. Matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
 - Próximo lote G4c: totais puros de cashflow das contas, preparando a separação posterior do risco.
 
+## G4c: domínio de totais de cashflow
+
+- O redutor de `calcAccountCashflow` foi movido para `src/modules/accounts/domain/calculate-cashflow-totals.js`, recebendo movimentos explícitos.
+- `getAccountCashflows`, `calcAccountCashflow` e `getAccountCapitalBase` permanecem globais; formulários, risco, edição e persistência continuam intactos.
+- Caracterização pré-corte: cinco testes novos e 371 testes Node. Pós-corte: 373 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- Preservados parsing parcial, valores absolutos, fallback de tipo, vazios, Infinity/NaN, erros, referências, imutabilidade e adição de saldo textual.
+- Revisão independente aprovada sem bloqueios. Matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
+- Próximo lote G4d: primeiro boundary puro de limites/consumo de risco; relógio e seleção temporal permanecem fora.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

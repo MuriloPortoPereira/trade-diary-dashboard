@@ -117,6 +117,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `calcMetrics` permanece global e resolve conta/capital antes de delegar; consumidores e `filterByPeriod` permanecem intactos.
 - `app.js`: 7.476 para 7.431 linhas. 366 testes Node e 96 checks no navegador; comparação diferencial de 500 casos e revisão independente sem divergências.
 
+## Domínio de totais de cashflow (G4c)
+
+- `src/modules/accounts/domain/calculate-cashflow-totals.js`: soma pura de depósitos, retiradas e líquido a partir de movimentos explícitos.
+- `tests/account-cashflow.test.cjs`: referências/fallbacks, parsing parcial, valores absolutos, tipos desconhecidos, vazio, Infinity, erros, imutabilidade, saldo textual, isolamento e carga.
+- `getAccountCashflows`, `calcAccountCashflow` e `getAccountCapitalBase` permanecem globais; lookup, formulários, risco e persistência continuam intactos.
+- `app.js`: 7.431 para 7.425 linhas. 373 testes Node e 96 checks no navegador; revisão independente sem bloqueios.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

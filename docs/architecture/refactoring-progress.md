@@ -2,8 +2,8 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4b registrados abaixo.
-- G4 iniciado pelos domínios puros de timing e métricas; risco segue em lotes menores.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4c registrados abaixo.
+- G4 inclui timing, métricas e cashflow puros; risco segue em lotes menores.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G4b extraído: cálculo de métricas para `src/modules/analytics/domain/calculate-trade-metrics.js`, recebendo trades e saldo inicial explícitos, sem conta, UI, storage ou relógio.
-- `calcMetrics` global preserva resolução da conta/capital e todos os consumidores. Ordem invertida, referências, OPEN/BE, Infinity, ponto flutuante, drawdown, streaks e índices mantidos.
-- Caracterização pré-corte: cinco testes novos e 364 testes Node. Pós-corte: 366 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.476 para 7.431 linhas. Revisão independente e comparação diferencial de 500 casos sem divergências.
+- G4c extraído: redutor de cashflow para `src/modules/accounts/domain/calculate-cashflow-totals.js`, recebendo movimentos explícitos e sem conta, UI, storage ou IO.
+- APIs globais, referência/fallback do array, parsing parcial, valores absolutos, tipos desconhecidos, Infinity, erros, imutabilidade e semântica de adição do saldo mantidos.
+- Caracterização pré-corte: cinco testes novos e 371 testes Node. Pós-corte: 373 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.431 para 7.425 linhas. Revisão independente sem bloqueios.
 
 ## Next
-- G4c: caracterizar e extrair os totais puros de cashflow das contas antes de abordar o cálculo maior de risco.
+- G4d: caracterizar `calcAccountRiskState` e extrair primeiro o boundary puro de limites/consumo, mantendo relógio e escopos temporais no wrapper.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
