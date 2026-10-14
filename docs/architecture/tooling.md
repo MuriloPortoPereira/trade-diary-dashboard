@@ -1262,6 +1262,18 @@ registrada no teste de controles do calendário; com a versão commitada desse �
 teste, 341 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
 não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
 
+## Contexto de conta do formulário de trade (G3bd)
+
+`tests/trade-form-account-context.test.cjs` caracterizou conta selecionada e fallback,
+risco, multiplicador, visibilidade percentual/absoluta, resumo, alvos opcionais,
+símbolo e mercado. Pós-corte protege também a carga clássica depois das opções do
+formulário. Dois corpos movidos byte a byte contra `608b791`. Smoke: 96 checks,
+zero erros/assets locais ausentes. A execução literal da suíte encontrou a linha
+local alheia já registrada no teste de controles do calendário; com a versão
+commitada desse único teste, 347 testes Node passaram. Sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança dos corpos/HTML gerado
+ou CSS; última matriz: G3g.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

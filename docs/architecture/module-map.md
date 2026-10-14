@@ -54,6 +54,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-form-options.test.cjs` | Caracterização de opções, campos opcionais, conta, erros, efeitos e carga |
 | `src/app/presentation/modal-controller.js` | Abertura/fechamento dos modais e coordenação das apresentações; duas funções/27 linhas |
 | `tests/modal-controller.test.cjs` | Caracterização de bloqueio, trade novo/edição, contas, importação, fechamento e carga |
+| `src/modules/trades/presentation/trade-form-account-context.js` | Conta, risco e mercado projetados no formulário; duas funções/19 linhas |
+| `tests/trade-form-account-context.test.cjs` | Caracterização de conta/fallback, campos, resumo, símbolo, mercado e carga |
 | `src/modules/data-transfer/infrastructure/serialize-trades-csv.js` | Formato CSV: colunas e escaping; recebe dados explícitos, sem executar IO |
 | `tests/trades-csv.test.cjs` | Caracterização do CSV, wrappers/default, consumidor de exportação e ordem de scripts |
 | `src/modules/data-transfer/presentation/export-account-filter.js` | Opções de contas do filtro de exportação; 7 linhas intactas |
@@ -213,6 +215,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3bc; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae e G3a–G3bd; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

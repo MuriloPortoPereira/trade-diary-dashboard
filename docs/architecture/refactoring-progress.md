@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3bc extraído: `openModal` e `closeModal` para `src/app/presentation/modal-controller.js`, 27 linhas movidas byte a byte.
-- APIs globais, handlers HTML, bloqueio do diário, trade novo/edição, modal de contas/importação, data, fluxo e fechamento mantidos; script clássico síncrono depois dos renderers e antes da navegação e de `app.js`.
-- Caracterização pré-corte: seis testes novos e 340 testes Node. Pós-corte: 341 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.636 para 7.610 linhas. Estado, formulários, fila, renderers, listeners e bootstrap permanecem no legado ou nos módulos existentes. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3bd extraído: `onAccountChange` e `updateMarketFromSymbol` para `src/modules/trades/presentation/trade-form-account-context.js`, 19 linhas movidas byte a byte.
+- APIs globais, handlers HTML, conta selecionada/fallback, risco, multiplicador, visibilidade, resumo, símbolo e mercado mantidos; script clássico síncrono depois das opções e antes dos demais módulos de trades e de `app.js`.
+- Caracterização pré-corte: cinco testes novos e 346 testes Node. Pós-corte: 347 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.610 para 7.592 linhas. Contas, risco, formatação, cálculo de R e catálogo de mercados permanecem nas dependências existentes. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
 
 ## Next
-- G3bd: selecionar outra responsabilidade coesa após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G3be: selecionar outra responsabilidade coesa após localizar consumidores e caracterizar efeitos; manter um corte por lote.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
