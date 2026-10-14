@@ -97,3 +97,19 @@ test('symbol change preserves market lookup and conditional select update', () =
   missing.context.updateMarketFromSymbol();
   assert.deepEqual(missing.calls, [['market', undefined]]);
 });
+
+test('trade form account context loads once after options and before remaining trade presentation', () => {
+  for (const part of legacyParts) assert.equal(part, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const optionsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-form-options.js');
+  const contextIndex = scripts.findIndex(script => script.src === modulePath);
+  const imagesIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-images.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(optionsIndex < contextIndex && contextIndex < imagesIndex && imagesIndex < appIndex);
+});
