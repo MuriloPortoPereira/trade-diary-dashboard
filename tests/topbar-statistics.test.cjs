@@ -75,6 +75,13 @@ test('losses, zero capital and missing goal retain legacy tones and zero percent
   assert.deepEqual(calls.filter(call => call[0] === 'set').map(call => [call[1], call[3]]), [
     ['tbWeek', 'r'], ['tbMonth', 'r'], ['tbDD', 'g'], ['tbGoal', 'y'], ['topBadge', 'red'],
   ]);
+
+  const reachedRisk = {capitalBase: 1000, currentDdUsd: 0, currentDdPct: 0, goalTarget: 200, totalPnl: 250, currentBalance: 1250};
+  const reached = setup({risk: reachedRisk});
+  reached.context.updateTopbarStats();
+  const goalCall = reached.calls.find(call => call[0] === 'set' && call[1] === 'tbGoal');
+  assert.deepEqual(goalCall, ['set', 'tbGoal', {full: '100%'}, 'g', undefined]);
+  assert.equal(reached.elements.tbGoalSub.textContent, 'money:250/money:200');
 });
 
 test('optional sub targets do not prevent main values or density fitting', () => {
@@ -89,4 +96,21 @@ test('fit false skips only the final density pass', () => {
   context.updateTopbarStats({fit: false});
   assert.equal(calls.some(call => call[0] === 'fit'), false);
   assert.equal(calls.filter(call => call[0] === 'set').length, 5);
+});
+
+test('topbar statistics load once after shared topbar components and before account pages', () => {
+  assert.equal(legacyDeclaration, undefined);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const valueIndex = scripts.findIndex(script => script.src === 'src/app/presentation/topbar-value.js');
+  const summaryIndex = scripts.findIndex(script => script.src === 'src/app/presentation/account-summary.js');
+  const statisticsIndex = scripts.findIndex(script => script.src === modulePath);
+  const accountsIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/accounts-page.js');
+  const appIndex = scripts.findIndex(script => script.src === 'app.js');
+  assert.ok(valueIndex < summaryIndex && summaryIndex < statisticsIndex && statisticsIndex < accountsIndex && accountsIndex < appIndex);
 });
