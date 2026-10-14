@@ -1274,6 +1274,17 @@ commitada desse único teste, 347 testes Node passaram. Sintaxe e diff aprovados
 Matriz visual completa não repetida neste corte sem mudança dos corpos/HTML gerado
 ou CSS; última matriz: G3g.
 
+## Estatísticas da topbar (G3be)
+
+`tests/topbar-statistics.test.cjs` caracterizou limites semanal/mensal, percentuais,
+tons, drawdown, meta, badge, alvos opcionais e densidade. Pós-corte protege também a
+carga clássica depois dos componentes compartilhados da topbar. Corpo movido byte a
+byte contra `c85c560`. Smoke: 96 checks, zero erros/assets locais ausentes. A execução
+literal da suíte encontrou a linha local alheia já registrada no teste de controles
+do calendário; com a versão commitada desse único teste, 352 testes Node passaram.
+Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem mudança
+do corpo/HTML gerado ou CSS; última matriz: G3g. Este lote encerra G3.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

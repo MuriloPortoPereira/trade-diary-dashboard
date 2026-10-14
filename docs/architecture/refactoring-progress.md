@@ -3,7 +3,7 @@
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
 - Implementação parcial: sizing, CSV, idiomas, G1, G2 concluído e G3a–G3am registrados abaixo.
-- G3 em andamento; G4–G6 continuam como frentes de domínio, IO e StudyHub.
+- G3 concluído para os boundaries principais de apresentação; G4 é a próxima frente de domínio puro, seguida por IO e StudyHub.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G3bd extraído: `onAccountChange` e `updateMarketFromSymbol` para `src/modules/trades/presentation/trade-form-account-context.js`, 19 linhas movidas byte a byte.
-- APIs globais, handlers HTML, conta selecionada/fallback, risco, multiplicador, visibilidade, resumo, símbolo e mercado mantidos; script clássico síncrono depois das opções e antes dos demais módulos de trades e de `app.js`.
-- Caracterização pré-corte: cinco testes novos e 346 testes Node. Pós-corte: 347 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.610 para 7.592 linhas. Contas, risco, formatação, cálculo de R e catálogo de mercados permanecem nas dependências existentes. Matriz visual completa não repetida neste corte de corpos/HTML gerado intactos e CSS inalterado; última matriz: G3g, 922 estados.
+- G3be extraído: `updateTopbarStats` para `src/app/presentation/topbar-statistics.js`, 24 linhas movidas byte a byte; este lote encerra G3.
+- API global, períodos semanal/mensal, tons, drawdown, meta, badge, alvos opcionais e densidade mantidos; script clássico síncrono depois dos componentes compartilhados da topbar e antes das páginas de contas e de `app.js`.
+- Caracterização pré-corte: quatro testes novos e 351 testes Node. Pós-corte: 352 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
+- `app.js`: 7.592 para 7.568 linhas. Cálculos de risco e formatação permanecem nas dependências existentes. Os resíduos de apresentação serão tratados junto de boundaries reais em G4–G6, sem criar arquivos mínimos apenas para reduzir linhas.
 
 ## Next
-- G3be: selecionar outra responsabilidade coesa após localizar consumidores e caracterizar efeitos; manter um corte por lote.
+- G4a: extrair o domínio puro de timing de trades após caracterizar normalização, duração, virada de dia e agregações.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

@@ -96,6 +96,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Dois handlers HTML e o consumidor de `populateSelects` permanecem intactos; contas, risco, formatação, cálculo de R e catálogo continuam nas dependências existentes.
 - `app.js`: 7.610 para 7.592 linhas. 347 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
 
+## Estatísticas da topbar (G3be)
+
+- `src/app/presentation/topbar-statistics.js`: período semanal/mensal, drawdown, meta e badge em `updateTopbarStats()`, 24 linhas movidas byte a byte.
+- `tests/topbar-statistics.test.cjs`: limites semana/mês, percentuais, tons, meta, drawdown, badge, alvos opcionais, densidade e carga.
+- Componentes compartilhados da topbar e consumidores permanecem intactos; risco, trades, relógio e formatação continuam nas dependências existentes.
+- `app.js`: 7.592 para 7.568 linhas. 352 testes Node e 96 checks no navegador; G3 encerrado sem nova matriz visual por manter corpo/HTML gerado e CSS intactos.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
