@@ -1318,6 +1318,15 @@ Smoke: 96 checks; sintaxe e diff aprovados; revisão independente sem bloqueios.
 Matriz visual completa não repetida neste corte sem mudança de HTML/CSS ou saída
 esperada; última matriz: G3g.
 
+## Limites e consumo monetário de risco (G4d)
+
+`tests/account-risk-limits.test.cjs` caracterizou defaults, capital com cashflow,
+escopos diário/semanal/mensal/total, excesso, zero, isolamento e carga clássica.
+Na cópia isolada, `node --test --test-isolation=none tests/*.test.cjs` executou 379
+testes reais; o runner padrão do sandbox contou somente 65 arquivos. O smoke local
+precisou permissão para abrir `127.0.0.1` e passou com 96 checks. Sintaxe e diff
+passaram; comparação diferencial de 500 casos e revisão independente não encontraram divergências.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

@@ -2,8 +2,8 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4c registrados abaixo.
-- G4 inclui timing, métricas e cashflow puros; risco segue em lotes menores.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4d registrados abaixo.
+- G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G4c extraído: redutor de cashflow para `src/modules/accounts/domain/calculate-cashflow-totals.js`, recebendo movimentos explícitos e sem conta, UI, storage ou IO.
-- APIs globais, referência/fallback do array, parsing parcial, valores absolutos, tipos desconhecidos, Infinity, erros, imutabilidade e semântica de adição do saldo mantidos.
-- Caracterização pré-corte: cinco testes novos e 371 testes Node. Pós-corte: 373 testes Node, 96 checks no navegador, sintaxe e diff aprovados.
-- `app.js`: 7.431 para 7.425 linhas. Revisão independente sem bloqueios.
+- G4d extraído: limites e excesso monetário para `src/modules/accounts/domain/calculate-risk-limits.js`, com conta, capital, ciclo e P/L explícitos.
+- `calcAccountRiskState` global preserva calendário, escopos, saldo, drawdown, ciclos, rótulos e percentuais finais; cálculos monetários delegados.
+- Caracterização pré-corte: quatro testes novos. Pós-corte: 379 testes Node, 96 checks no navegador, sintaxe e diff aprovados; 500 casos diferenciais equivalentes.
+- `app.js`: 7.425 para 7.409 linhas; revisão independente sem bloqueios.
 
 ## Next
-- G4d: caracterizar `calcAccountRiskState` e extrair primeiro o boundary puro de limites/consumo, mantendo relógio e escopos temporais no wrapper.
+- G4e: caracterizar e separar o próximo cálculo puro de risco (saldo/drawdown ou metas cíclicas) em lote próprio.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

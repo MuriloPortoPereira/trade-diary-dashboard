@@ -124,6 +124,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `getAccountCashflows`, `calcAccountCashflow` e `getAccountCapitalBase` permanecem globais; lookup, formulários, risco e persistência continuam intactos.
 - `app.js`: 7.431 para 7.425 linhas. 373 testes Node e 96 checks no navegador; revisão independente sem bloqueios.
 
+## Limites e consumo de risco (G4d)
+
+- `src/modules/accounts/domain/calculate-risk-limits.js`: limites diário, semanal, mensal e total, perda e excesso em dinheiro, limite e consumo bruto do período; entradas explícitas.
+- `tests/account-risk-limits.test.cjs`: defaults, cashflow, limite diário, escopos, excesso, zero, isolamento e ordem de carga.
+- `calcAccountRiskState` continua global; datas, seleção temporal, saldo, drawdown, ciclos, rótulos e percentuais finais seguem no legado.
+- `app.js`: 7.425 para 7.409 linhas. 379 testes Node, 96 checks no navegador e 500 casos diferenciais equivalentes.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

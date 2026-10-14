@@ -808,6 +808,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Revisão independente aprovada sem bloqueios. Matriz visual completa não repetida por não haver mudança de HTML/CSS ou saída esperada.
 - Próximo lote G4d: primeiro boundary puro de limites/consumo de risco; relógio e seleção temporal permanecem fora.
 
+## G4d: limites e consumo monetário de risco
+
+- Limites e excessos em dinheiro foram movidos para `src/modules/accounts/domain/calculate-risk-limits.js`; inputs de conta, capital, ciclo e P/L são explícitos.
+- `calcAccountRiskState` continua global com calendário, escopos temporais, saldo, drawdown, metas cíclicas, rótulos e percentuais finais.
+- Quatro testes pré-corte; após a extração, 379 testes Node e 96 checks no navegador passaram. Sintaxe, diff e revisão independente aprovados; 500 casos diferenciais produziram o mesmo estado de risco.
+- Próximo lote G4e: escolher e caracterizar um cálculo puro restante de risco, sem mover o bloco inteiro.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
