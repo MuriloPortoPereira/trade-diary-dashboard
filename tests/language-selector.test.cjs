@@ -31,6 +31,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
   assert.deepEqual(localScripts.map(script => script.src), [
     'src/modules/simulation/domain/calculate-simulation-sizing.js',
     'src/modules/trades/domain/trade-timing.js',
+    'src/modules/analytics/domain/calculate-trade-metrics.js',
     'src/modules/simulation/presentation/simulation-sizing-fields.js',
     'src/modules/data-transfer/infrastructure/serialize-trades-csv.js',
     'src/modules/data-transfer/presentation/backup-summary.js',

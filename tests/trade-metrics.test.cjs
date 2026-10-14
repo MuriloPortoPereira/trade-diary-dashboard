@@ -6,6 +6,8 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const modulePath = 'src/modules/analytics/domain/calculate-trade-metrics.js';
+const moduleFile = path.join(root, modulePath);
 const start = appSource.indexOf('function calcMetrics(');
 const end = appSource.indexOf('\nfunction filterByPeriod(', start);
 assert.ok(start >= 0 && end > start, 'calcMetrics source must remain available');
@@ -25,6 +27,9 @@ function loadMetrics({accounts, activeAccountId = 'a1', activeAccount, configBal
       return typeof capitalBase === 'function' ? capitalBase(account) : capitalBase;
     },
   });
+  if (fs.existsSync(moduleFile)) {
+    vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
+  }
   vm.runInContext(source, context, {filename: 'app.js#trade-metrics'});
   return {context, calls};
 }
@@ -119,4 +124,43 @@ test('daily ratios retain sample deviation, downside denominator and annualizati
   assert.ok(Math.abs(result.sortino - 3.3466401061363027) < 1e-12);
   assert.equal(result.calmar, 28.56);
   assert.equal(result.recovery, 1 / 3);
+});
+
+test('isolated metrics domain exposes one calculator without UI, storage or account state', () => {
+  const forbidden = ['document', 'localStorage', 'fetch', 'Chart', 'accounts', 'activeAccountId', 'config'];
+  const sandbox = {};
+  for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`metrics domain accessed ${name}`); }});
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryTradeMetrics']);
+  assert.deepEqual(Object.keys(context.TradeDiaryTradeMetrics), ['calculateTradeMetrics']);
+  const result = context.TradeDiaryTradeMetrics.calculateTradeMetrics([
+    {status: 'WIN', pnl: 25, r: 1, date: '2026-01-01'},
+  ], 500);
+  assert.equal(result.totalPnl, 25);
+  assert.equal(result.startBal, 500);
+});
+
+test('metrics domain loads once before consumers while calcMetrics remains global', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/trades/presentation/trade-log-metrics.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/analytics/presentation/statistics-page.js',
+    'src/modules/calendar/presentation/calendar-page.js',
+    'src/modules/accounts/presentation/accounts-page.js',
+    'src/modules/profile/presentation/profile-page.js',
+    'app.js',
+  ]) {
+    assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  }
+  assert.match(appSource, /^function calcMetrics\(data=\[\], acctId=activeAccountId\)\{/m);
+  assert.match(appSource, /return TradeDiaryTradeMetrics\.calculateTradeMetrics\(data,startBal\);/);
 });
