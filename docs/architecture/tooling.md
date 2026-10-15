@@ -1363,6 +1363,13 @@ com 97 checks. A cópia isolada temporária foi recriada após a sessão limpar
 `/tmp`; código e testes foram revalidados. Sintaxe, diff e revisão independente
 aprovados.
 
+## Formato de backup (G5b)
+
+Cinco testes de caracterização passaram antes da extração. Após o corte,
+`node --test --test-isolation=none tests/*.test.cjs` executou 404 testes reais;
+o runner padrão contou 70 arquivos. Smoke ampliado: 98 checks. Sintaxe, diff e
+revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

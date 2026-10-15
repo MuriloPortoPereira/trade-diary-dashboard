@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a iniciado abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5b registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5a extraído: normalização e divisão de linhas delimitadas para `src/modules/data-transfer/infrastructure/split-delimited-rows.js`.
-- `normalizeCSVRow` e `splitDelimitedRows` globais delegam; `parseCSVText` mantém guarda binária e `parseSpreadsheetRows`.
-- Quatro testes de caracterização passaram antes do corte; após a extração, 398 testes Node e 97 checks no navegador passaram.
-- `app.js`: 7.352 para 7.348 linhas; sintaxe, diff e revisão independente aprovados.
+- G5b extraído: validação e contagens do formato de backup para `src/modules/data-transfer/infrastructure/backup-format.js`.
+- Wrappers globais preservados; criação do payload, tradução e restauração continuam em `app.js`.
+- Cinco testes de caracterização passaram antes do corte; após a extração, 404 testes Node e 98 checks no navegador passaram.
+- `app.js`: 7.348 para 7.340 linhas; sintaxe, diff e revisão independente aprovados.
 
 ## Next
-- G5b: caracterizar payload de backup ou próximo parser de importação antes de extrair um boundary pequeno, preservando chaves e formatos.
+- G5c: caracterizar criação do payload com tempo/estado explícitos antes de extrair; preservar referências, ordem das chaves e consumidores.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

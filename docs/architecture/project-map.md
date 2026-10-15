@@ -189,6 +189,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/split-delimited-rows.test.cjs`: caracterização pré-corte de delimitadores, aspas, vazios, coerção e consumidor; isolamento e carga clássica após o corte.
 - `app.js`: 7.352 para 7.348 linhas. 398 testes Node e 97 checks no navegador.
 
+## Formato de backup (G5b)
+
+- `src/modules/data-transfer/infrastructure/backup-format.js`: valida chaves reconhecidas e resume coleções do backup sem DOM, storage ou estado global.
+- `summarizeBackupData` e `validateBackupData` continuam globais em `app.js` como wrappers; `createBackupPayload`, `formatBackupSummary` e `restoreBackupData` mantêm seus consumidores.
+- `tests/backup-format.test.cjs`: caracterização pré-corte de contagens, formas inválidas, chaves próprias, mensagens e apresentação; isolamento/carga após o corte.
+- `app.js`: 7.348 para 7.340 linhas. 404 testes Node e 98 checks no navegador.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

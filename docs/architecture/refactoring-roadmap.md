@@ -843,6 +843,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Após o corte: 398 testes Node, 97 checks no navegador, sintaxe, diff e revisão independente aprovados.
 - Próximo lote G5b: caracterizar payload de backup ou próximo parser de importação antes de separar formato de efeitos.
 
+## G5b: validação e resumo do backup
+
+- `summarizeBackupData` e `validateBackupData` movidos para `src/modules/data-transfer/infrastructure/backup-format.js`; wrappers globais e consumidores preservados.
+- Cinco testes de caracterização pré-corte: formas, contagens, chaves próprias, erros e texto traduzido; seis testes do arquivo após o corte.
+- 404 testes Node, 98 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Próximo lote G5c: caracterizar `createBackupPayload` com relógio e estado explícitos, sem alterar restauração.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
