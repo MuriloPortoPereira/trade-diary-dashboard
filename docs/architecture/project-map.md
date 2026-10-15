@@ -211,6 +211,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Scripts clássicos antes de `app.js`; estado/adaptadores legados permanecem transitórios. `tests/export-downloads.test.cjs` cobre comportamento e carga.
 - 420 testes Node, 100 checks no navegador incluindo botões JSON/CSV com Blob/URL nativos e clique de download interceptado; `app.js`: 7.247 linhas.
 
+## Coordenação da importação (G5f)
+
+- `src/modules/data-transfer/presentation/import-workflow.js`: `importJSON`, `handleCSVUpload`, `parseMT4`, `showImportPreview`, `confirmImport`; cinco handlers globais em 102 linhas.
+- Script clássico antes de `app.js`; callbacks, diferenças de erros, limite de 80 linhas, duplicados e ordem dos efeitos preservados. Símbolos dos textos existentes codificados com escapes Unicode equivalentes.
+- Parsers, preparação/pending state e persistência continuam no legado. `tests/import-workflow.test.cjs` cobre comportamento, falhas e carga sem IO inicial.
+- Smoke lê CSV real com FileReader nativo, abre preview e protege as seis chaves de save sem confirmar importação. 431 testes Node, 101 checks; `app.js`: 7.145 linhas.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

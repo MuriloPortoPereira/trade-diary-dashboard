@@ -115,7 +115,8 @@ test('normalization errors propagate while retaining earlier mutations', () => {
 test('restoration workflow remains global and loads once before classic consumers', () => {
   assert.ok(fs.existsSync(moduleFile));
   assert.doesNotMatch(app, /^function restoreBackupData\(/m);
-  assert.match(app, /restoreBackupData\(data\);/);
+  const importWorkflow = fs.readFileSync(path.join(root, 'src/modules/data-transfer/presentation/import-workflow.js'), 'utf8');
+  assert.match(importWorkflow, /restoreBackupData\(data\);/);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
     attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],

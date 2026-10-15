@@ -45,6 +45,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/data-transfer/infrastructure/download-text-file.js',
     'src/modules/data-transfer/application/select-export-trades.js',
     'src/modules/data-transfer/presentation/export-downloads.js',
+    'src/modules/data-transfer/presentation/import-workflow.js',
     'src/modules/data-transfer/presentation/backup-summary.js',
     'src/modules/data-transfer/presentation/export-account-filter.js',
     'src/modules/data-transfer/presentation/import-tabs.js', ...languagePaths,

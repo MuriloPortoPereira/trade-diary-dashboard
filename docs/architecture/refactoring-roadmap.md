@@ -872,6 +872,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 7.326 para 7.247 linhas; um commit por lote coeso e área isolada reutilizada. Dependências globais continuam transitórias.
 - Próximo G5f: caracterizar coordenação da importação JSON/CSV antes de extrair; manter parsers fora do corte.
 
+## G5f: upload, preview e confirmação da importação
+
+- Cinco handlers movidos para `presentation/import-workflow.js`; APIs clássicas e fluxo preservados. Única alteração textual dos corpos: símbolos existentes representados por escapes Unicode equivalentes.
+- Dez testes passaram antes do corte; depois, 431 testes Node, 101 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Smoke preserva a checagem síncrona integral do storage e acrescenta FileReader nativo, preview e proteção das seis chaves de save; não confirma importação.
+- `app.js`: 7.247 para 7.145 linhas; um commit coeso. Preparação, pendências, parsers e persistência seguem como dependências transitórias.
+- Próximo G5g: caracterizar preparação e deduplicação dos trades importados antes de separar regras de conta, IDs e campos faltantes.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

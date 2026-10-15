@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5e registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5f registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,19 +166,21 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5e: dez funções globais de exportação movidas intactas para seleção de trades (application), ações JSON/CSV (presentation) e download (infrastructure).
-- Sete testes de caracterização pré-corte; diferenças JSON/CSV de revogação, formato, filtros, referências e datas preservadas.
-- Após o corte: 420 testes Node (73 arquivos no runner padrão), 100 checks no navegador; sintaxe, diff e revisão independente aprovados.
-- `app.js`: 7.326 para 7.247 linhas. Estado/adaptadores globais continuam como dívida transitória.
-- Ritmo ajustado: lote por fluxo coeso, um commit e uma revisão; testes focados durante o corte e suíte completa ao fechar. Área isolada reutilizada.
-- Serena/Context7 não expostos: busca localizada. Primeiro revisor falhou por limite de uso; modelo alternativo concluiu a revisão sem achados.
+- G5f: cinco handlers globais de importação movidos para `presentation/import-workflow.js`: JSON, CSV/XLSX, texto MT4, preview e confirmação.
+- Dez testes pré-corte cobrem leitura/conta no callback, confirmação adiada, erros distintos, limite do preview, duplicados e falhas parciais de save.
+- Após o corte: 431 testes Node (74 arquivos no runner padrão), 101 checks no navegador; sintaxe, diff e revisão independente aprovados.
+- `app.js`: 7.247 para 7.145 linhas. Parsers, preparação e persistência seguem no legado; APIs/estado globais continuam transitórios.
+- FileReader nativo exercitado no smoke, sem confirmação nem gravação das seis chaves de save; pendências/preview repostos em finally.
+- Serena/Context7 não expostos: busca localizada. Aprovação do smoke expirou na primeira tentativa; repetição executou. Revisor sem acesso a porta local; smoke validado pelo agente principal.
 
 ## Next
-- G5f: caracterizar coordenação da importação JSON/CSV (FileReader, confirmação, preview e sequência de efeitos), sem alterar parsers no mesmo lote.
+- G5g: caracterizar preparação e deduplicação dos trades importados antes de separar regras de conta, IDs e campos faltantes; preservar storage e parsers.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
 ## Risks
+- A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
+- A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
 - Sem cobertura ampla de persistência, importação, trades, risco por calendário e StudyHub.
 - Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.

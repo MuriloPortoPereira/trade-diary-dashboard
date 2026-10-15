@@ -15,7 +15,7 @@ function browserProbe() {
     errors.push(event.message || `Resource failed: ${event.target?.src || event.target?.href}`);
   }, true);
   window.addEventListener('unhandledrejection', event => errors.push(String(event.reason)));
-  window.addEventListener('load', () => setTimeout(() => {
+  window.addEventListener('load', () => setTimeout(async () => {
     const passed = [];
     const check = (name, condition) => {
       if (!condition) throw new Error(name);
@@ -244,6 +244,34 @@ function browserProbe() {
           document.getElementById('studyHubLegacyApp').dataset.loaded === '1' &&
           document.getElementById(`mod-${tab}`).classList.contains('active'));
       }
+      const persistedKeys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
+      const persistedBefore = persistedKeys.map(key => localStorage.getItem(key));
+      const previousPending = pendingImport;
+      const previousPendingMeta = pendingImportMeta;
+      const NativeFileReader = window.FileReader;
+      const previewNodes = ['csvConfirmPreview', 'csvPreview', 'importCount'].map(id => document.getElementById(id)).filter(Boolean);
+      const previewHTML = previewNodes.map(node => node.innerHTML);
+      try {
+        const uploadComplete = new Promise((resolve, reject) => {
+          window.FileReader = class extends NativeFileReader {
+            constructor() {
+              super();
+              this.addEventListener('loadend', resolve, {once: true});
+              this.addEventListener('error', () => reject(this.error), {once: true});
+            }
+          };
+        });
+        const file = new File([buildTradesCSV([trades[0]])], 'smoke.csv', {type: 'text/csv'});
+        handleCSVUpload({target: {files: [file]}});
+        await uploadComplete;
+        check('native CSV upload stages one trade and opens preview without saving', pendingImport.length === 1 && pendingImportMeta.source === 'csv' && pendingImportMeta.accountId === activeAccountId && document.getElementById('csvConfirmModal').classList.contains('open') && document.querySelectorAll('#csvConfirmPreview tbody tr').length === 1 && persistedKeys.every((key, index) => localStorage.getItem(key) === persistedBefore[index]));
+      } finally {
+        window.FileReader = NativeFileReader;
+        pendingImport = previousPending;
+        pendingImportMeta = previousPendingMeta;
+        closeModal('csvConfirmModal');
+        previewNodes.forEach((node, index) => { node.innerHTML = previewHTML[index]; });
+      }
     } catch (error) {
       errors.push(error.stack || String(error));
     }
@@ -304,7 +332,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 100, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 101, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
