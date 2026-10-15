@@ -58,3 +58,28 @@ test('formatted backup summary retains translated key order and separator', () =
   assert.equal(result, '2 trades · 1 contas · 2 dias de pré-mercado · 3 documentos');
   assert.deepEqual(calls, ['backup.trades', 'backup.accounts', 'backup.premarketDays', 'backup.documents']);
 });
+
+test('backup format module is isolated and loads before classic consumers', () => {
+  const sandbox = {};
+  for (const name of ['document', 'localStorage', 'fetch', 'trades', 'accounts', 'config']) {
+    Object.defineProperty(sandbox, name, {get() { throw new Error(`backup format accessed ${name}`); }});
+  }
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.keys(context.TradeDiaryBackupFormat).sort(), ['summarizeBackupData', 'validateBackupData']);
+  assert.deepEqual(plain(context.TradeDiaryBackupFormat.summarizeBackupData({trades: [1]})),
+    {trades: 1, accounts: 0, preMarketDays: 0, documents: 0});
+
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const index = scripts.findIndex(script => script.src === modulePath);
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/backup-summary.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
+  assert.match(appSource, /^function summarizeBackupData\(data\)\{/m);
+  assert.match(appSource, /^function validateBackupData\(data\)\{/m);
+});
