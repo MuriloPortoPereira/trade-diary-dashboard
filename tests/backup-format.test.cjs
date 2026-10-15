@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/data-transfer/infrastructure/backup-format.js';
 const start = appSource.indexOf('function summarizeBackupData(');
-const end = appSource.indexOf('\nfunction restoreBackupData(', start);
+const end = appSource.indexOf('\nfunction exposeJsonExport(', start);
 assert.ok(start >= 0 && end > start);
 const plain = value => JSON.parse(JSON.stringify(value));
 

@@ -53,6 +53,13 @@ function browserProbe() {
       check('CSV import row split', JSON.stringify(splitDelimitedRows('Date;Symbol\n2026-10-14;ES')) === JSON.stringify([['Date','Symbol'],['2026-10-14','ES']]) && normalizeCSVRow(' "ES" ') === 'ES');
       const backupPayload = createBackupPayload();
       check('backup format globals', backupPayload.version === 2 && backupPayload.trades === trades && summarizeBackupData(backupPayload).trades === trades.length && validateBackupData(backupPayload) === undefined);
+      try {
+        const restoredTrades = [];
+        const restoredSummary = restoreBackupData({trades: restoredTrades});
+        check('partial backup restoration global', trades === restoredTrades && accounts === backupPayload.accounts && activeAccountId === backupPayload.activeAccountId && restoredSummary.trades === 0 && restoredSummary.accounts === accounts.length);
+      } finally {
+        ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = backupPayload);
+      }
       check('CSV default trades', buildTradesCSV() === buildTradesCSV(trades));
       check('CSV helper compatibility', csvCell(['a', 'b']) === '"a; b"' && TRADE_CSV_HEADERS.join(',') === csvHeader);
       check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
@@ -282,7 +289,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 98, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 99, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

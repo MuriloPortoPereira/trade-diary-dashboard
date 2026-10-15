@@ -11,6 +11,7 @@ const moduleFile = path.join(root, modulePath);
 const start = app.indexOf('function restoreBackupData(');
 const end = app.indexOf('\nfunction exposeJsonExport(', start);
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : app.slice(start, end);
+assert.ok(source.includes('function restoreBackupData('));
 
 function setup(overrides = {}) {
   const calls = [];
@@ -109,4 +110,21 @@ test('normalization errors propagate while retaining earlier mutations', () => {
   assert.strictEqual(accountFailure.context.accounts, accountFailure.before.accounts);
   assert.equal(accountFailure.context.activeAccountId, accountFailure.before.activeAccountId);
   assert.strictEqual(accountFailure.context.studyHubState, accountFailure.before.studyHubState);
+});
+
+test('restoration workflow remains global and loads once before classic consumers', () => {
+  assert.ok(fs.existsSync(moduleFile));
+  assert.doesNotMatch(app, /^function restoreBackupData\(/m);
+  assert.match(app, /restoreBackupData\(data\);/);
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const index = scripts.findIndex(script => script.src === modulePath);
+  assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/backup-format.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/import-tabs.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });
