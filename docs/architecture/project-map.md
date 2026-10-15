@@ -182,6 +182,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Carga: sizing antes do serializer CSV; ambos antes de `app.js`, como scripts clássicos síncronos.
 - Testes: `tests/trades-csv.test.cjs`; smoke CSV em `scripts/browser-smoke.cjs`.
 
+## Importação: linhas delimitadas (G5a)
+
+- `src/modules/data-transfer/infrastructure/split-delimited-rows.js`: normaliza células e divide linhas pelo delimitador da primeira linha; formato legado preservado.
+- `normalizeCSVRow` e `splitDelimitedRows` continuam globais em `app.js` como wrappers; `parseCSVText` mantém guarda binária e delegação para `parseSpreadsheetRows`.
+- `tests/split-delimited-rows.test.cjs`: caracterização pré-corte de delimitadores, aspas, vazios, coerção e consumidor; isolamento e carga clássica após o corte.
+- `app.js`: 7.352 para 7.348 linhas. 398 testes Node e 97 checks no navegador.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

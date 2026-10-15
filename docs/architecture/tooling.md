@@ -1354,6 +1354,15 @@ antes do corte. Após a extração, o runner padrão contou 68 arquivos e
 `--test-isolation=none` executou 393 testes reais. O smoke passou com 96 checks;
 sintaxe, diff e revisão independente aprovados.
 
+## Linhas delimitadas de importação (G5a)
+
+Quatro testes de caracterização passaram antes da extração. Depois, a suíte
+executou 398 testes reais com `--test-isolation=none`; o runner padrão contou
+69 arquivos. O smoke ganhou uma verificação para o parser no navegador e passou
+com 97 checks. A cópia isolada temporária foi recriada após a sessão limpar
+`/tmp`; código e testes foram revalidados. Sintaxe, diff e revisão independente
+aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

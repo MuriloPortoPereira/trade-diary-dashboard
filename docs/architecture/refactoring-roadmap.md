@@ -836,6 +836,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Quatro testes de caracterização pré-corte; 393 testes Node e 96 checks no navegador após o corte. Sintaxe, diff e revisão independente aprovados.
 - Próximo lote G5a: iniciar importação/backup/persistência por um formato ou efeito isolado, com fixtures e chaves preservadas.
 
+## G5a: divisão de linhas delimitadas
+
+- `normalizeCSVRow` e `splitDelimitedRows` foram movidos para `src/modules/data-transfer/infrastructure/split-delimited-rows.js`; wrappers globais e `parseCSVText` preservados.
+- Delimitador escolhido na primeira linha, aspas, vazios, coerção e guarda binária caracterizados antes do corte; quatro testes pré-corte.
+- Após o corte: 398 testes Node, 97 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Próximo lote G5b: caracterizar payload de backup ou próximo parser de importação antes de separar formato de efeitos.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
