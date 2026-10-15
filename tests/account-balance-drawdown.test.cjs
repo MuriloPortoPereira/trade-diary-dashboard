@@ -22,7 +22,7 @@ function balance({initial = 1000, trades = [], cashflow = {deposits: 0, withdraw
     fR: value => String(value),
     f2: value => String(value),
   });
-  for (const name of ['calculate-risk-limits.js', 'calculate-goal-cycle.js', 'calculate-balance-drawdown.js']) {
+  for (const name of ['calculate-risk-limits.js', 'calculate-goal-cycle.js', 'calculate-balance-drawdown.js', 'calculate-risk-period-pnl.js']) {
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }

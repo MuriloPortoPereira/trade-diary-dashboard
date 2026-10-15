@@ -1155,45 +1155,9 @@ function calcAccountRiskState(acct, acctTrades, period){
   weekEnd.setDate(weekStart.getDate()+6);
   weekEnd.setHours(23,59,59,999);
 
-  const sumPnl=list=>list.reduce((sum,t)=>sum+(t.pnl||0),0);
-
-  // Período selecionado no dashboard afeta quais trades entram nas barras
-  // 'today' → só hoje | 'week' → semana dom-sáb | 'month' → mês corrente
-  // 'year'/'all'/undefined → todos (DD total desde o início)
-  let scopeTrades=acctTrades;
-  if(period==='today') scopeTrades=acctTrades.filter(t=>t.date===todayStr);
-  else if(period==='week') scopeTrades=acctTrades.filter(t=>{
-    if(!t.date)return false;
-    const d=new Date(t.date+'T12:00:00');
-    return d>=weekStart&&d<=weekEnd;
+  const {dayPnl,weekPnl,monthPnl,scopePnl,scopeLoss}=TradeDiaryRiskPeriodPnl.calculateRiskPeriodPnl({
+    acctTrades,period,todayStr,todayDate,weekStart,weekEnd,
   });
-  else if(period==='month') scopeTrades=acctTrades.filter(t=>{
-    if(!t.date)return false;
-    const d=new Date(t.date+'T12:00:00');
-    return d.getFullYear()===todayDate.getFullYear()&&d.getMonth()===todayDate.getMonth();
-  });
-
-  // Filtros fixos para referência interna (sinais, topbar, etc.)
-  const dayTrades=acctTrades.filter(t=>t.date===todayStr);
-  const weekTrades=acctTrades.filter(t=>{
-    if(!t.date)return false;
-    const d=new Date(t.date+'T12:00:00');
-    return d>=weekStart && d<=weekEnd;
-  });
-  const monthTrades=acctTrades.filter(t=>{
-    if(!t.date)return false;
-    const d=new Date(t.date+'T12:00:00');
-    return d.getFullYear()===todayDate.getFullYear() && d.getMonth()===todayDate.getMonth();
-  });
-
-  const dayPnl=sumPnl(dayTrades);
-  const weekPnl=sumPnl(weekTrades);
-  const monthPnl=sumPnl(monthTrades);
-
-  // PnL do escopo selecionado — usado nas barras de progresso das barras de risco
-  const scopePnl=sumPnl(scopeTrades);
-  // Perda no escopo selecionado (só valores negativos)
-  const scopeLoss=Math.max(-scopePnl,0);
 
   const cashflow=calcAccountCashflow(acct);
   const initialBalance=acct.balance||0;

@@ -67,3 +67,35 @@ test('text P/L keeps reduction order and scope loss coercion', () => {
   const rows = [{date: '2026-10-14', pnl: '5'}, {date: '2026-10-14', pnl: -2}];
   assert.deepEqual(periodState(rows, 'today').values, ['05-2', '05-2', '05-2', '05-2', NaN, 'today']);
 });
+
+test('risk period domain is isolated and loads once before classic consumers', () => {
+  const modulePath = 'src/modules/accounts/domain/calculate-risk-period-pnl.js';
+  const sandbox = {};
+  for (const name of ['document', 'localStorage', 'fetch', 'accounts', 'trades']) {
+    Object.defineProperty(sandbox, name, {get() { throw new Error(`risk period accessed ${name}`); }});
+  }
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.keys(context.TradeDiaryRiskPeriodPnl), ['calculateRiskPeriodPnl']);
+  const rows = Object.freeze([Object.freeze({date: '2026-10-14', pnl: -5})]);
+  const result = context.TradeDiaryRiskPeriodPnl.calculateRiskPeriodPnl({
+    acctTrades: rows, period: 'today', todayStr: '2026-10-14', todayDate: new Date('2026-10-14T12:00:00'),
+    weekStart: new Date('2026-10-11T00:00:00'), weekEnd: new Date('2026-10-17T23:59:59'),
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), {dayPnl: -5, weekPnl: -5, monthPnl: -5, scopePnl: -5, scopeLoss: 5});
+
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/accounts/presentation/risk-board.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'app.js',
+  ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+});

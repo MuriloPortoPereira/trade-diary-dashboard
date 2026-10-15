@@ -33,6 +33,8 @@ function setup({account, trades = [], period, cashflow} = {}) {
   if (fs.existsSync(goalCyclePath)) vm.runInContext(fs.readFileSync(goalCyclePath, 'utf8'), context, {filename: goalCyclePath});
   const balanceDrawdownPath = path.join(root, 'src/modules/accounts/domain/calculate-balance-drawdown.js');
   if (fs.existsSync(balanceDrawdownPath)) vm.runInContext(fs.readFileSync(balanceDrawdownPath, 'utf8'), context, {filename: balanceDrawdownPath});
+  const periodPnlPath = path.join(root, 'src/modules/accounts/domain/calculate-risk-period-pnl.js');
+  if (fs.existsSync(periodPnlPath)) vm.runInContext(fs.readFileSync(periodPnlPath, 'utf8'), context, {filename: periodPnlPath});
   vm.runInContext(appSource.slice(start, end), context, {filename: 'app.js#account-risk'});
   return {result: context.calcAccountRiskState(acct, trades, period), calls};
 }
