@@ -54,3 +54,27 @@ test('CSV import retains binary guard and csv source label', () => {
   assert.deepEqual(plain(context.parseCSVText('')), []);
   assert.equal(calls.length, 1);
 });
+
+test('delimited row parser is isolated and loads before classic consumers', () => {
+  const sandbox = {};
+  for (const name of ['document', 'localStorage', 'fetch', 'trades', 'FileReader', 'Blob']) {
+    Object.defineProperty(sandbox, name, {get() { throw new Error(`delimited parser accessed ${name}`); }});
+  }
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.keys(context.TradeDiaryDelimitedRows).sort(), ['normalizeCSVRow', 'splitDelimitedRows']);
+  assert.deepEqual(plain(context.TradeDiaryDelimitedRows.splitDelimitedRows('a;b\nc;d')), [['a', 'b'], ['c', 'd']]);
+
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const index = scripts.findIndex(script => script.src === modulePath);
+  assert.ok(scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/serialize-trades-csv.js') < index);
+  assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
+  assert.match(appSource, /^function normalizeCSVRow\(value\)\{/m);
+  assert.match(appSource, /^function splitDelimitedRows\(text\)\{/m);
+});
