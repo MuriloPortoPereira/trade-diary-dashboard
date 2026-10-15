@@ -60,6 +60,21 @@ function browserProbe() {
       } finally {
         ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = backupPayload);
       }
+      const downloads = [];
+      const originalCreateElement = document.createElement;
+      try {
+        document.createElement = function(tag, ...args) {
+          const element = originalCreateElement.call(this, tag, ...args);
+          if (tag === 'a') element.click = () => downloads.push({filename: element.download, url: element.href});
+          return element;
+        };
+        document.querySelector('[onclick="exportJSON()"]').click();
+        document.querySelector('[onclick="exportCSV()"]').click();
+        check('JSON and CSV export handlers use native download URLs', downloads.length === 2 && /^tradelog_backup_\d{4}-\d{2}-\d{2}\.json$/.test(downloads[0].filename) && /^trades_todos_\d{4}-\d{2}-\d{2}\.csv$/.test(downloads[1].filename) && downloads.every(download => download.url.startsWith('blob:')));
+      } finally {
+        document.createElement = originalCreateElement;
+        downloads.forEach(download => URL.revokeObjectURL(download.url));
+      }
       check('CSV default trades', buildTradesCSV() === buildTradesCSV(trades));
       check('CSV helper compatibility', csvCell(['a', 'b']) === '"a; b"' && TRADE_CSV_HEADERS.join(',') === csvHeader);
       check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
@@ -289,7 +304,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 99, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 100, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

@@ -865,6 +865,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - 412 testes Node e 99 checks no navegador; sintaxe, diff e revisão independente aprovados. `app.js`: 7.339 para 7.326 linhas.
 - Próximo lote G5e: caracterizar e separar o IO de `downloadTextFile` sem consolidar os caminhos de exportação neste corte.
 
+## G5e: fluxo de exportação e download
+
+- Lote ampliado por fluxo conforme ajuste de ritmo: dez funções movidas intactas para `application/select-export-trades.js`, `infrastructure/download-text-file.js` e `presentation/export-downloads.js`.
+- Sete testes pré-corte; após extração, 420 testes Node, 100 checks no navegador, sintaxe e diff aprovados. Globals/handlers e diferenças entre os downloads preservados.
+- `app.js`: 7.326 para 7.247 linhas; um commit por lote coeso e área isolada reutilizada. Dependências globais continuam transitórias.
+- Próximo G5f: caracterizar coordenação da importação JSON/CSV antes de extrair; manter parsers fora do corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

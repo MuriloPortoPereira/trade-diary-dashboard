@@ -4,6 +4,7 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 
 const appSource = fs.readFileSync(`${__dirname}/../app.js`, 'utf8');
+const exportActionsSource = fs.readFileSync(`${__dirname}/../src/modules/data-transfer/presentation/export-downloads.js`, 'utf8');
 const serializerPath = 'src/modules/data-transfer/infrastructure/serialize-trades-csv.js';
 const serializerSource = fs.readFileSync(`${__dirname}/../${serializerPath}`, 'utf8');
 const forbiddenGlobals = [
@@ -15,7 +16,7 @@ const header = 'date,symbol,direction,placedTime,openTime,exitDate,exitTime,entr
 const emptyRow = Array(22).fill('""').join(',');
 
 function declaration(name) {
-  const match = appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
+  const match = [appSource, exportActionsSource].map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).find(Boolean);
   assert.ok(match, `Missing legacy function: ${name}`);
   return match[0];
 }

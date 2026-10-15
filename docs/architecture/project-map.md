@@ -203,6 +203,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/restore-backup.test.cjs`: entradas parciais/completas, referências, ordem, permissividade, seleção de conta e estado parcial nas falhas; carga global.
 - Smoke restaura trades em memória e repõe os seis globals em `finally`; storage permanece protegido. 412 testes Node, 99 checks; `app.js`: 7.326 linhas.
 
+## Fluxo de exportação e download (G5e)
+
+- `src/modules/data-transfer/application/select-export-trades.js`: `normalizeExportSymbols` e `getTradesForCustomExport`; seleção mantém referências/ordem, aliases, filtros e conta global atual.
+- `src/modules/data-transfer/infrastructure/download-text-file.js`: `downloadTextFile`; Blob, clique e revogação opcional em 1.000ms, sem efeito na carga.
+- `src/modules/data-transfer/presentation/export-downloads.js`: sete APIs globais JSON/CSV, leitura de filtros e seleção do mês; corpo intacto, sem unificar diferenças dos caminhos de download.
+- Scripts clássicos antes de `app.js`; estado/adaptadores legados permanecem transitórios. `tests/export-downloads.test.cjs` cobre comportamento e carga.
+- 420 testes Node, 100 checks no navegador incluindo botões JSON/CSV com Blob/URL nativos e clique de download interceptado; `app.js`: 7.247 linhas.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
