@@ -1327,6 +1327,16 @@ testes reais; o runner padrão do sandbox contou somente 65 arquivos. O smoke lo
 precisou permissão para abrir `127.0.0.1` e passou com 96 checks. Sintaxe e diff
 passaram; comparação diferencial de 500 casos e revisão independente não encontraram divergências.
 
+## Metas cíclicas de risco (G4e)
+
+`tests/account-goal-cycle.test.cjs` fixou o cálculo anterior, inclusive o limite
+de 1210 preservado por precisão de ponto flutuante. Após o corte, a suíte isolada
+executou 383 testes reais e o smoke passou com 96 checks. O runner padrão do
+sandbox contou 66 arquivos como testes. A tentativa inicial de checar valores
+com um comando `node -e` falhou por erro de sintaxe; um heredoc local substituiu
+esse auxiliar. A primeira leitura do separador de linha de `index.html` também
+falhou; foi ajustada para LF antes da edição.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

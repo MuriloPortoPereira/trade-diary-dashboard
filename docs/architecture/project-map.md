@@ -128,8 +128,15 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 - `src/modules/accounts/domain/calculate-risk-limits.js`: limites diário, semanal, mensal e total, perda e excesso em dinheiro, limite e consumo bruto do período; entradas explícitas.
 - `tests/account-risk-limits.test.cjs`: defaults, cashflow, limite diário, escopos, excesso, zero, isolamento e ordem de carga.
-- `calcAccountRiskState` continua global; datas, seleção temporal, saldo, drawdown, ciclos, rótulos e percentuais finais seguem no legado.
+- `calcAccountRiskState` continua global; datas, seleção temporal, saldo, drawdown, rótulos e percentuais finais seguem no legado.
 - `app.js`: 7.425 para 7.409 linhas. 379 testes Node, 96 checks no navegador e 500 casos diferenciais equivalentes.
+
+## Metas cíclicas de risco (G4e)
+
+- `src/modules/accounts/domain/calculate-goal-cycle.js`: ciclo, patamares, alvo, P/L e progresso a partir de saldo, base e percentual explícitos.
+- `tests/account-goal-cycle.test.cjs`: caracterização pré-corte de limites, precisão, cashflow e fallback; isolamento e carga clássica após o corte.
+- `calcAccountRiskState` global preservado; `ddBase` continua igual a `cicloBase` e os consumidores recebem o mesmo estado.
+- `app.js`: 7.409 para 7.397 linhas. 383 testes Node e 96 checks no navegador.
 
 ## Banner de trades incompletos (G3an)
 

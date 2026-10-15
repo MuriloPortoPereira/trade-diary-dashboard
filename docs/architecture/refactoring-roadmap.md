@@ -815,6 +815,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Quatro testes pré-corte; após a extração, 379 testes Node e 96 checks no navegador passaram. Sintaxe, diff e revisão independente aprovados; 500 casos diferenciais produziram o mesmo estado de risco.
 - Próximo lote G4e: escolher e caracterizar um cálculo puro restante de risco, sem mover o bloco inteiro.
 
+## G4e: metas cíclicas de risco
+
+- Cálculo puro de ciclo, patamares, alvo, P/L e progresso movido para `src/modules/accounts/domain/calculate-goal-cycle.js`; saldo atual, base e percentual entram explicitamente.
+- `calcAccountRiskState` global e `ddBase=cicloBase` preservados; script clássico carrega antes dos consumidores.
+- Três testes de caracterização pré-corte; 383 testes Node e 96 checks no navegador após o corte. Sintaxe, diff e revisão independente aprovados.
+- Próximo lote G4f: caracterizar saldo e drawdown sem mover calendário, escopos e apresentação.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
