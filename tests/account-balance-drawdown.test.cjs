@@ -59,3 +59,32 @@ test('numeric text P/L keeps JavaScript addition and later coercion unchanged', 
   assert.deepEqual(balance({trades: [{pnl: '25'}, {pnl: -5}]}).values,
     [1000, '100025-5', '100025-5', 0, NaN, NaN]);
 });
+
+test('balance drawdown domain is pure and loads once before classic consumers', () => {
+  const modulePath = 'src/modules/accounts/domain/calculate-balance-drawdown.js';
+  const sandbox = {};
+  for (const name of ['document', 'localStorage', 'fetch', 'accounts', 'trades']) {
+    Object.defineProperty(sandbox, name, {get() { throw new Error(`balance drawdown accessed ${name}`); }});
+  }
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.keys(context.TradeDiaryBalanceDrawdown), ['calculateBalanceDrawdown']);
+  const rows = Object.freeze([Object.freeze({pnl: 100}), Object.freeze({pnl: -25})]);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.TradeDiaryBalanceDrawdown.calculateBalanceDrawdown(1000, rows))),
+    {current: 1075, peak: 1100, currentDdPct: 25 / 1100, currentDdUsd: 25});
+
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/accounts/presentation/risk-board.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'app.js',
+  ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+});

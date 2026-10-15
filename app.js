@@ -1199,16 +1199,7 @@ function calcAccountRiskState(acct, acctTrades, period){
   const initialBalance=acct.balance||0;
   const capitalBase=initialBalance+cashflow.net;
   const goalBase=initialBalance+cashflow.deposits;
-  let peak=capitalBase;
-  let current=capitalBase;
-  let currentDdPct=0;
-  let currentDdUsd=0;
-  ordered.forEach(t=>{
-    current+=(t.pnl||0);
-    if(current>peak)peak=current;
-    currentDdPct=peak>0?Math.max(0,(peak-current)/peak):0;
-    currentDdUsd=Math.max(0,peak-current);
-  });
+  const {current,peak,currentDdPct,currentDdUsd}=TradeDiaryBalanceDrawdown.calculateBalanceDrawdown(capitalBase,ordered);
 
   const goalMoney=pct=>parseFloat((goalBase*((pct||0)/100)).toFixed(2));
   const {dayLimit,weekLimit,monthLimit,riskPerTradeUsd}=TradeDiaryRiskLimits.calculateRiskThresholds(acct,capitalBase);
