@@ -1337,6 +1337,15 @@ com um comando `node -e` falhou por erro de sintaxe; um heredoc local substituiu
 esse auxiliar. A primeira leitura do separador de linha de `index.html` também
 falhou; foi ajustada para LF antes da edição.
 
+## Saldo e drawdown de risco (G4f)
+
+Serena/Context7 constam em `.codex/config.toml`, mas não apareceram nas ferramentas
+MCP desta sessão; navegação por `rg` e leitura localizada. Quatro testes de
+caracterização passaram antes do corte. Após a extração, o runner padrão contou
+67 arquivos e `--test-isolation=none` executou 388 testes reais. Smoke: 96 checks.
+Um separador CRLF introduzido em `index.html` fez `git diff --check` falhar;
+foi convertido para LF e a verificação passou. Revisão independente aprovada.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

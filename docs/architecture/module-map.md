@@ -66,6 +66,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/account-risk-limits.test.cjs` | Caracterização de defaults, capital, escopos, excessos, zero, isolamento e carga |
 | `src/modules/accounts/domain/calculate-goal-cycle.js` | Cálculo puro de metas cíclicas e progresso; 17 linhas |
 | `tests/account-goal-cycle.test.cjs` | Caracterização de patamares, precisão, cashflow, fallback, isolamento e carga |
+| `src/modules/accounts/domain/calculate-balance-drawdown.js` | Saldo, pico e drawdown puros sobre trades ordenados; 18 linhas |
+| `tests/account-balance-drawdown.test.cjs` | Caracterização de cashflow, ordem, perdas, coerção, isolamento e carga |
 | `src/app/presentation/topbar-statistics.js` | Períodos, drawdown, meta e badge da topbar; uma função/24 linhas |
 | `tests/topbar-statistics.test.cjs` | Caracterização de datas, percentuais, tons, meta, alvos opcionais, densidade e carga |
 | `src/modules/data-transfer/infrastructure/serialize-trades-csv.js` | Formato CSV: colunas e escaping; recebe dados explícitos, sem executar IO |
@@ -227,6 +229,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be e G4a–G4e; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be e G4a–G4f; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

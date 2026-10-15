@@ -138,6 +138,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `calcAccountRiskState` global preservado; `ddBase` continua igual a `cicloBase` e os consumidores recebem o mesmo estado.
 - `app.js`: 7.409 para 7.397 linhas. 383 testes Node e 96 checks no navegador.
 
+## Saldo e drawdown da conta (G4f)
+
+- `src/modules/accounts/domain/calculate-balance-drawdown.js`: evolução de saldo, pico e drawdown sobre trades já ordenados e capital explícito.
+- `tests/account-balance-drawdown.test.cjs`: caracterização pré-corte de cashflow, ordem, perdas, picos não positivos e coerção textual; isolamento e carga clássica após o corte.
+- `calcAccountRiskState` global preservado; `getOrderedTrades`, calendário e escopos continuam no legado.
+- `app.js`: 7.397 para 7.388 linhas. 388 testes Node, 96 checks no navegador e revisão independente aprovada.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

@@ -822,6 +822,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Três testes de caracterização pré-corte; 383 testes Node e 96 checks no navegador após o corte. Sintaxe, diff e revisão independente aprovados.
 - Próximo lote G4f: caracterizar saldo e drawdown sem mover calendário, escopos e apresentação.
 
+## G4f: saldo e drawdown da conta
+
+- Evolução do saldo, pico e drawdown movida para `src/modules/accounts/domain/calculate-balance-drawdown.js`; a ordem dos trades é resolvida pelo wrapper global.
+- Quatro testes de caracterização pré-corte cobriram cashflow, ordem, picos não positivos e coerção textual; cinco testes do arquivo passam após o corte.
+- 388 testes Node, 96 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Próximo lote G4g: caracterizar agrupamento temporal/PnL de risco sem mover orquestração ou apresentação.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
