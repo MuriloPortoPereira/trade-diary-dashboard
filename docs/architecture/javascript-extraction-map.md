@@ -172,7 +172,11 @@ permaneciam em `calcAccountRiskState`.
 
 Saldo e drawdown (G4f) foram isolados em
 `src/modules/accounts/domain/calculate-balance-drawdown.js`. Ordenação, datas e
-escopos temporais permanecem em `calcAccountRiskState`.
+escopos temporais permaneciam em `calcAccountRiskState`.
+
+P/L por período de risco (G4g) foi isolado em
+`src/modules/accounts/domain/calculate-risk-period-pnl.js`. Relógio, construção
+de datas, rótulos e composição do estado permanecem em `calcAccountRiskState`.
 
 O controlador de modais (G3bc) foi movido intacto para
 `src/app/presentation/modal-controller.js`: abertura e fechamento permanecem globais;
@@ -204,7 +208,7 @@ somente depois da caracterização suas regras entram em `domain`.
 |---|---|---|
 | Estado, shell e bootstrap; início do arquivo e load 6954–7017; G3y/G3ac/G3ay/G3ba/G3bc/G3be executados | `app/presentation/{account-summary,topbar-value,topbar-statistics,app-dialog,modal-controller,navigation}.js`; destino ainda proposto: `app/bootstrap.js` | Resumo da conta, valores/estatísticas da topbar, diálogos, modais e navegação movidos intactos; estado único, cache, densidade, ordem load, listeners, traduções e câmbio seguem no legado |
 | Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w/G3ai/G3al/G3ax executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,account-form,setup-cashflow-list,account-list,account-balance-chrome,risk-tags}.js` | Renderers e formulário globais movidos intactos; conta ativa, normalização, cálculo de risco, edição de tags, persistência e atualização das demais páginas seguem no legado |
-| Risco; G4c–G4f executados parcialmente | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; `domain/{calculate-cashflow-totals,calculate-risk-limits,calculate-goal-cycle,calculate-balance-drawdown}.js`; depois `domain/calculate-account-risk.js` | Cashflow, limites, metas cíclicas, saldo e drawdown puros; ordenação, relógio e escopos permanecem no legado e saem em lotes menores |
+| Risco; G4c–G4g: núcleo extraído | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; `domain/{calculate-cashflow-totals,calculate-risk-limits,calculate-goal-cycle,calculate-balance-drawdown,calculate-risk-period-pnl}.js` | Cashflow, limites, metas cíclicas, saldo, drawdown e P/L temporal puros; `calcAccountRiskState` preserva ordenação, relógio, rótulos e composição do estado |
 | Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af/G3aj/G3ak/G3an/G3as/G3bb/G3bd executados | `modules/trades/presentation/{trade-images,trade-error-chips,trade-form-options,trade-form-account-context,trade-duration-field,trade-plan-deviation,incomplete-trade-flow,incomplete-trade-banner}.js`; destino ainda proposto: `trade-form.js`; depois `application/save-trade.js` | Preview, chips, opções, contexto da conta, duração, desvio, fluxo e banner globais movidos intactos; editingId, fila, upload/remoção, cálculo temporal e save seguem no legado |
 | Diário; G3ae/G3ag/G3ah/G3av/G3az executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics,trade-log-selection,trade-log,trade-log-controls}.js`; depois `domain/log-date-range.js` | Aviso, cards, barra de seleção, orquestração, linhas e controles globais movidos intactos; cálculo, filtros, estado selecionado, conta, duplicação e confirmações de exclusão seguem nas dependências existentes |
 | Timing; G4a executado | `modules/trades/domain/trade-timing.js` | Factory puro recebe normalizadores compartilhados; wrappers globais preservam consumidores, virada de dia, inválidos e médias legadas |

@@ -145,6 +145,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `calcAccountRiskState` global preservado; `getOrderedTrades`, calendário e escopos continuam no legado.
 - `app.js`: 7.397 para 7.388 linhas. 388 testes Node, 96 checks no navegador e revisão independente aprovada.
 
+## P/L por período de risco (G4g)
+
+- `src/modules/accounts/domain/calculate-risk-period-pnl.js`: filtros e somas de P/L para hoje, semana, mês e escopo selecionado, com datas explícitas.
+- `tests/account-risk-period-pnl.test.cjs`: caracterização pré-corte de limites semanais/mensais, períodos sem filtro, datas ausentes e P/L textual; isolamento e carga clássica após o corte.
+- `calcAccountRiskState` global preservado; relógio, construção de datas, rótulos e composição do estado continuam no wrapper.
+- `app.js`: 7.388 para 7.352 linhas. 393 testes Node, 96 checks no navegador e revisão independente aprovada.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

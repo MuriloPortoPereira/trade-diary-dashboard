@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e G4a–G4f registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 concluídos e núcleo G4a–G4g registrado abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G4f extraído: saldo, pico e drawdown para `src/modules/accounts/domain/calculate-balance-drawdown.js`, com capital e trades ordenados explícitos.
-- `calcAccountRiskState` global mantém `getOrderedTrades`, calendário, escopos, rótulos e percentuais finais.
-- Quatro testes de caracterização passaram antes do corte; após a extração, 388 testes Node e 96 checks no navegador passaram.
-- `app.js`: 7.397 para 7.388 linhas; sintaxe, diff e revisão independente aprovados.
+- G4g extraído: filtros temporais e P/L de risco para `src/modules/accounts/domain/calculate-risk-period-pnl.js`, com trades, período e datas explícitos.
+- O núcleo de G4 está separado; `calcAccountRiskState` global mantém relógio, ordenação, rótulos e composição do estado.
+- Quatro testes de caracterização passaram antes do corte; após a extração, 393 testes Node e 96 checks no navegador passaram.
+- `app.js`: 7.388 para 7.352 linhas; sintaxe, diff e revisão independente aprovados.
 
 ## Next
-- G4g: caracterizar o agrupamento temporal/PnL do risco e escolher um boundary pequeno, preservando seleção de período e relógio.
+- G5a: escolher um boundary pequeno de importação, backup ou persistência; caracterizar primeiro formato, chaves e sequência de efeitos.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

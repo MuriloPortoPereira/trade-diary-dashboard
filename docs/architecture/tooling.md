@@ -1346,6 +1346,14 @@ caracterização passaram antes do corte. Após a extração, o runner padrão c
 Um separador CRLF introduzido em `index.html` fez `git diff --check` falhar;
 foi convertido para LF e a verificação passou. Revisão independente aprovada.
 
+## P/L temporal de risco (G4g)
+
+Serena ainda não estava disponível como ferramenta MCP nesta sessão; `rg` e
+leitura localizada serviram de fallback. Quatro testes de caracterização passaram
+antes do corte. Após a extração, o runner padrão contou 68 arquivos e
+`--test-isolation=none` executou 393 testes reais. O smoke passou com 96 checks;
+sintaxe, diff e revisão independente aprovados.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.

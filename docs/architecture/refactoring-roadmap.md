@@ -829,6 +829,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - 388 testes Node, 96 checks no navegador, sintaxe, diff e revisão independente aprovados.
 - Próximo lote G4g: caracterizar agrupamento temporal/PnL de risco sem mover orquestração ou apresentação.
 
+## G4g: P/L temporal de risco
+
+- Filtros e somas de P/L de hoje, semana, mês e escopo selecionado movidos para `src/modules/accounts/domain/calculate-risk-period-pnl.js`, com trades e datas explícitos.
+- `calcAccountRiskState` continua global e monta datas, rótulos e estado; o núcleo G4 está separado em boundaries pequenos.
+- Quatro testes de caracterização pré-corte; 393 testes Node e 96 checks no navegador após o corte. Sintaxe, diff e revisão independente aprovados.
+- Próximo lote G5a: iniciar importação/backup/persistência por um formato ou efeito isolado, com fixtures e chaves preservadas.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
