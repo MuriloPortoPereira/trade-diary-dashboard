@@ -66,7 +66,7 @@ test('backup format module is isolated and loads before classic consumers', () =
   }
   const context = vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
-  assert.deepEqual(Object.keys(context.TradeDiaryBackupFormat).sort(), ['summarizeBackupData', 'validateBackupData']);
+  assert.deepEqual(Object.keys(context.TradeDiaryBackupFormat).sort(), ['createBackupPayload', 'summarizeBackupData', 'validateBackupData']);
   assert.deepEqual(plain(context.TradeDiaryBackupFormat.summarizeBackupData({trades: [1]})),
     {trades: 1, accounts: 0, preMarketDays: 0, documents: 0});
 

@@ -2451,8 +2451,7 @@ function mergeStudyHubState(nextState){
 }
 
 function createBackupPayload(){
-  return {
-    version:2,
+  return TradeDiaryBackupFormat.createBackupPayload({
     exportedAt:new Date().toISOString(),
     trades,
     config,
@@ -2460,7 +2459,7 @@ function createBackupPayload(){
     accounts,
     activeAccountId,
     studyHubState,
-  };
+  });
 }
 
 function summarizeBackupData(data){

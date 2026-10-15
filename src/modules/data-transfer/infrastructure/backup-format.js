@@ -1,5 +1,18 @@
-// Validation and counts for the existing backup data format.
+// Serialization, validation, and counts for the existing backup data format.
 globalThis.TradeDiaryBackupFormat = (() => {
+  function createBackupPayload({exportedAt,trades,config,preMarketData,accounts,activeAccountId,studyHubState}){
+    return {
+      version:2,
+      exportedAt,
+      trades,
+      config,
+      preMarketData,
+      accounts,
+      activeAccountId,
+      studyHubState,
+    };
+  }
+
   function summarizeBackupData(data){
     const src=(data&&typeof data==='object')?data:{};
     return {
@@ -16,5 +29,5 @@ globalThis.TradeDiaryBackupFormat = (() => {
     if(!keys.some(k=>Object.prototype.hasOwnProperty.call(data,k)))throw new Error('Arquivo não parece ser um backup do diário.');
   }
 
-  return {summarizeBackupData,validateBackupData};
+  return {createBackupPayload,summarizeBackupData,validateBackupData};
 })();
