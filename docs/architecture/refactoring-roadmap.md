@@ -850,6 +850,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - 404 testes Node, 98 checks no navegador, sintaxe, diff e revisão independente aprovados.
 - Próximo lote G5c: caracterizar `createBackupPayload` com relógio e estado explícitos, sem alterar restauração.
 
+## G5c: payload de backup
+
+- Montagem do payload movida para `src/modules/data-transfer/infrastructure/backup-format.js`; wrapper global `createBackupPayload()` lê relógio e estado atual sem mudar consumidores.
+- Dois testes pré-corte caracterizaram versão, ordem das chaves, relógio, referências e leitura de globals por chamada.
+- 406 testes Node, 98 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Próximo lote G5d: caracterizar `restoreBackupData` e a restauração parcial, mantendo efeitos de estado fora do formatador.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

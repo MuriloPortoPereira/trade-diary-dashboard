@@ -1370,6 +1370,14 @@ Cinco testes de caracterização passaram antes da extração. Após o corte,
 o runner padrão contou 70 arquivos. Smoke ampliado: 98 checks. Sintaxe, diff e
 revisão independente aprovados.
 
+## Payload de backup (G5c)
+
+Dois testes de caracterização passaram antes da extração. Após o corte,
+`node --test --test-isolation=none tests/*.test.cjs` executou 406 testes reais;
+o runner padrão contou 71 arquivos. Smoke: 98 checks. Sintaxe, diff e revisão
+independente aprovados. A primeira tentativa do smoke no sandbox falhou ao abrir
+`127.0.0.1` (EPERM); a execução com acesso local passou.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
