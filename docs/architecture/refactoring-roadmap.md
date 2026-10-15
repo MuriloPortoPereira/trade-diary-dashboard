@@ -857,6 +857,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - 406 testes Node, 98 checks no navegador, sintaxe, diff e revisão independente aprovados.
 - Próximo lote G5d: caracterizar `restoreBackupData` e a restauração parcial, mantendo efeitos de estado fora do formatador.
 
+## G5d: coordenação da restauração de backup
+
+- `restoreBackupData` movida intacta para `src/modules/data-transfer/application/restore-backup.js`; global e consumidores preservados, script clássico antes de `app.js`.
+- Boundary transitório: coordena validação, normalização e estado legado sem DOM/storage direto. Não constitui inversão completa das dependências globais; não criar accessors/DI para este corte.
+- Cinco testes pré-corte caracterizam entradas parciais/completas, referências, configuração, fallback e alterações já aplicadas quando ocorre falha.
+- 412 testes Node e 99 checks no navegador; sintaxe, diff e revisão independente aprovados. `app.js`: 7.339 para 7.326 linhas.
+- Próximo lote G5e: caracterizar e separar o IO de `downloadTextFile` sem consolidar os caminhos de exportação neste corte.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

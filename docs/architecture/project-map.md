@@ -196,6 +196,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/backup-format.test.cjs` e `tests/backup-payload.test.cjs`: contagens, formas, chaves, erros, apresentação, versão, ordem, relógio, referências, isolamento e carga.
 - `app.js`: 7.348 para 7.339 linhas. 406 testes Node e 98 checks no navegador.
 
+## Restauração de backup (G5d)
+
+- `src/modules/data-transfer/application/restore-backup.js`: `restoreBackupData(data)` global, corpo intacto; valida e coordena normalizadores/estado em sequência.
+- Script clássico depois do formatador e antes dos consumidores; estado e adaptadores globais continuam como dívida transitória. Sem DOM ou persistência direta.
+- `tests/restore-backup.test.cjs`: entradas parciais/completas, referências, ordem, permissividade, seleção de conta e estado parcial nas falhas; carga global.
+- Smoke restaura trades em memória e repõe os seis globals em `finally`; storage permanece protegido. 412 testes Node, 99 checks; `app.js`: 7.326 linhas.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

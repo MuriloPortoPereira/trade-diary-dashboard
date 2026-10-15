@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5c registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5d registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,13 +166,14 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5c extraído: montagem pura do payload de backup para `src/modules/data-transfer/infrastructure/backup-format.js`.
-- `createBackupPayload()` continua global e lê relógio/estado atual; tradução, restauração e consumidores permanecem em `app.js`.
-- Dois testes de caracterização passaram antes do corte; após a extração, 406 testes Node e 98 checks no navegador passaram.
-- `app.js`: 7.340 para 7.339 linhas; sintaxe, diff e revisão independente aprovados.
+- G5d extraído: `restoreBackupData` intacto para `src/modules/data-transfer/application/restore-backup.js`, como função global em script clássico.
+- Fluxo de aplicação transitório: estado/adaptadores seguem globais, sem DOM ou storage direto; inversão dessas dependências continua pendente.
+- Cinco testes pré-corte cobrem restauração parcial/completa, referências, permissividade, fallback de conta e mutações parciais em falhas.
+- Após o corte: 412 testes Node e 99 checks no navegador; sintaxe, diff e revisão independente aprovados.
+- `app.js`: 7.339 para 7.326 linhas. Alterações locais preexistentes preservadas por execução em cópia isolada.
 
 ## Next
-- G5d: caracterizar restauração parcial do backup e seus efeitos de estado antes de mover a responsabilidade apropriada.
+- G5e: caracterizar `downloadTextFile` e separar IO de download, preservando defaults, Blob/URL, clique e revogação.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

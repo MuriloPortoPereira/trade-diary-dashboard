@@ -79,6 +79,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/data-transfer/infrastructure/backup-format.js` | Montagem, validação e contagens puras do formato de backup; 33 linhas |
 | `tests/backup-format.test.cjs` | Caracterização de contagens, chaves, erros, apresentação, isolamento e carga |
 | `tests/backup-payload.test.cjs` | Caracterização de versão, ordem, relógio, referências e globals atuais |
+| `src/modules/data-transfer/application/restore-backup.js` | Coordenação transitória da restauração; global intacto, 13 linhas, estado/adaptadores ainda globais |
+| `tests/restore-backup.test.cjs` | Caracterização de restauração parcial/completa, referências, falhas parciais e carga |
 | `src/modules/data-transfer/presentation/export-account-filter.js` | Opções de contas do filtro de exportação; 7 linhas intactas |
 | `tests/export-account-filter.test.cjs` | Caracterização de guard, ordem, escaping, seleção e carga |
 | `src/modules/data-transfer/presentation/backup-summary.js` | Projeção do resumo de backup no DOM; 5 linhas intactas |
@@ -236,6 +238,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5c; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5d; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

@@ -1378,6 +1378,15 @@ o runner padrão contou 71 arquivos. Smoke: 98 checks. Sintaxe, diff e revisão
 independente aprovados. A primeira tentativa do smoke no sandbox falhou ao abrir
 `127.0.0.1` (EPERM); a execução com acesso local passou.
 
+## Restauração de backup (G5d)
+
+Cinco testes pré-corte passaram. Após a extração, 412 testes individuais com
+`--test-isolation=none` e 72 arquivos no runner padrão; smoke com 99 checks,
+sintaxe, diff e revisão independente aprovados na cópia isolada.
+Serena/Context7 não expostos nesta sessão: usada busca localizada. `python`
+ausente: usado `python3`. CRLF apenas na nova linha de script corrigido após
+`diff --check`; smoke reexecutado após atualizar a contagem esperada de 98 para 99.
+
 ## Fontes consultadas
 
 - [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
