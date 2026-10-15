@@ -1214,22 +1214,10 @@ function calcAccountRiskState(acct, acctTrades, period){
   const {dayLimit,weekLimit,monthLimit,riskPerTradeUsd}=TradeDiaryRiskLimits.calculateRiskThresholds(acct,capitalBase);
   const totalPnl=current-capitalBase;
 
-  // Meta cíclica: avança sobre o saldo atual a cada vez que bate o percentual configurado
-  // Usa goalBase (capital + depósitos) como patamar inicial do ciclo 0
-  const goalPct=(acct.goalPct||10)/100;
-  // Quantos ciclos completos foram batidos: baseado em saldo atual vs goalBase
-  const cicloAtual=goalPct>0&&goalBase>0
-    ? Math.max(0,Math.floor(Math.log(current/goalBase)/Math.log(1+goalPct)))
-    : 0;
-  // Saldo no início do ciclo atual (= goalBase * (1+goalPct)^cicloAtual)
-  const cicloBase=parseFloat((goalBase*Math.pow(1+goalPct,cicloAtual)).toFixed(2));
-  // Alvo do ciclo atual
-  const cicloAlvo=parseFloat((goalBase*Math.pow(1+goalPct,cicloAtual+1)).toFixed(2));
-  // Tamanho do ciclo em $
-  const goalTarget=parseFloat((cicloAlvo-cicloBase).toFixed(2));
-  // P/L dentro do ciclo atual (desde o patamar do ciclo)
-  const pnlNoCiclo=parseFloat((current-cicloBase).toFixed(2));
-  const goalProgress=goalTarget>0?clamp(pnlNoCiclo/goalTarget,0,1):0;
+  // Meta cíclica: usa goalBase (capital + depósitos) como patamar inicial.
+  const {cicloAtual,cicloBase,cicloAlvo,goalTarget,pnlNoCiclo,goalProgress}=TradeDiaryGoalCycle.calculateGoalCycle({
+    configuredGoalPct:acct.goalPct,goalBase,current,
+  });
 
   // DD total: calculado sobre o saldo do início do ciclo atual — protege o lucro já conquistado
   const ddBase=cicloBase;

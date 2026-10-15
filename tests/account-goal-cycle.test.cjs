@@ -49,3 +49,32 @@ test('goal base includes deposits but not withdrawals, and zero goal percent use
     [1200, 1300, 0, 1200, 1320, 120, 100, 100 / 120, 1200]);
   assert.deepEqual(cycle({balance: 0, goalPct: 0}), [0, 0, 0, 0, 0, 0, 0, 0, 0]);
 });
+
+test('goal cycle domain stays pure and loads once before classic consumers', () => {
+  const modulePath = 'src/modules/accounts/domain/calculate-goal-cycle.js';
+  const sandbox = {};
+  for (const name of ['document', 'localStorage', 'fetch', 'accounts', 'trades']) {
+    Object.defineProperty(sandbox, name, {get() { throw new Error(`goal cycle accessed ${name}`); }});
+  }
+  const context = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
+  assert.deepEqual(Object.keys(context.TradeDiaryGoalCycle), ['calculateGoalCycle']);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.TradeDiaryGoalCycle.calculateGoalCycle({
+    configuredGoalPct: 10, goalBase: 1000, current: 1200,
+  }))), {cicloAtual: 1, cicloBase: 1100, cicloAlvo: 1210, goalTarget: 110, pnlNoCiclo: 100, goalProgress: 100 / 110});
+
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
+    attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
+  }));
+  const matches = scripts.filter(script => script.src === modulePath);
+  assert.equal(matches.length, 1);
+  assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
+  const domainIndex = scripts.findIndex(script => script.src === modulePath);
+  for (const consumer of [
+    'src/modules/accounts/presentation/risk-board.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
+    'app.js',
+  ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
+  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+});
