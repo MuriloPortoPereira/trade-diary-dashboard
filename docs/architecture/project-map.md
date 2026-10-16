@@ -12,7 +12,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
-| Importação/exportação | `parseGenericTradeRows`, `parseMT5Rows`, `buildTradesCSV`, `restoreBackupData` |
+| Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
 | StudyHub | `renderStudyHub`, `syncStudyHubLegacyInputs`, `shInitLegacyModule` |
 | Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
@@ -233,6 +233,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - Scripts sem IO inicial, antes de navigation/app; nenhum formato, seed ou migração alterado. [ADR-003](adr/003-main-state-persistence.md).
 - `tests/app-state-storage.test.cjs`: caracterização de serialização, leitura, normalização, round-trip, defaults, erros e ordem; smoke com localStorage nativo e cleanup em finally.
 - 454 testes Node, 103 checks; `app.js`: 7.049 linhas. Seeds/bootstrap e persistências auxiliares continuam fora do corte.
+
+## Parsers tabulares (G5i)
+
+- `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`: quatro APIs globais, 143 linhas intactas; MT5/HTML-posicional/MT4, cabeçalhos genéricos, prioridade MT e entrada de texto MT4.
+- Adaptador de formato transitório: lê trades e usa IDs, relógio e normalizadores do legado ao ser chamado; sem IO/estado na carga. Extração HTML e loader XLSX continuam em app.js.
+- `tests/parse-tabular-trades.test.cjs`: fixtures dos layouts com normalizadores reais e relógio/IDs controlados, limite de cabeçalhos, aliases, duplicados, arredondamento, datas e erros.
+- Script clássico antes dos handlers; smoke com posição MT real e upload CSV nativo. 468 testes Node, 104 checks; `app.js`: 6.906 linhas.
 
 ## Filtro de contas da exportação (G3aa)
 

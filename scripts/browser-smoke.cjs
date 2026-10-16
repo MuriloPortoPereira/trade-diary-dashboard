@@ -51,6 +51,11 @@ function browserProbe() {
       const csvRow = ['"2026-09-10"', ...Array(19).fill('""'), '"pressa; ""erro"""', '"a,b\nlinha 2"'].join(',');
       check('CSV global serialization', buildTradesCSV([{date: '2026-09-10', errors: ['pressa', '"erro"'], remarks: 'a,b\nlinha 2'}]) === csvHeader + '\n' + csvRow);
       check('CSV import row split', JSON.stringify(splitDelimitedRows('Date;Symbol\n2026-10-14;ES')) === JSON.stringify([['Date','Symbol'],['2026-10-14','ES']]) && normalizeCSVRow(' "ES" ') === 'ES');
+      let mtTicket = '00000987654321';
+      while (trades.some(trade => trade.positionId === mtTicket)) mtTicket += '0';
+      const mtRows = parseSpreadsheetRows([['2024.02.01 09:15', mtTicket, 'ES', 'buy', '1', '100', '95', '120',
+        '2024.02.01 10:30', '110', '-1', '-0.5', '25.5']], 'smoke-mt5');
+      check('MT tabular adapter parses a position through spreadsheet dispatch', mtRows.length === 1 && mtRows[0].positionId === mtTicket && mtRows[0].r === 2 && mtRows[0].pnl === 25.5 && mtRows[0].fees === -1.5 && mtRows[0].openTime === '09:15');
       const backupPayload = createBackupPayload();
       check('backup format globals', backupPayload.version === 2 && backupPayload.trades === trades && summarizeBackupData(backupPayload).trades === trades.length && validateBackupData(backupPayload) === undefined);
       try {
@@ -356,7 +361,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 103, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 104, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

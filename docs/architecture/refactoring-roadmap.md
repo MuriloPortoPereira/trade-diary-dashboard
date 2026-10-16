@@ -896,6 +896,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 7.078 para 7.049 linhas. Sem migração, seed ou mudança de comportamento em falhas parciais.
 - Próximo G5i: caracterizar parsers tabulares genérico/MT5 antes de separar parsing de IDs/estado.
 
+## G5i: parsers tabulares genérico/MT
+
+- Quatro funções movidas intactas para `infrastructure/parse-tabular-trades.js`: layouts MT5/HTML-posicional/MT4, cabeçalhos genéricos, dispatcher e texto MT4. API global e prioridade MT preservadas.
+- Treze testes pré-corte usam normalizadores reais com IDs/relógio controlados; preservam aliases, números/datas, limites, arredondamento, duplicados e erros existentes.
+- Após o corte: 468 testes Node, 104 checks no navegador, sintaxe, diff e revisão independente aprovados. Smoke acrescenta posição MT real; CSV via FileReader já coberto.
+- `app.js`: 7.049 para 6.906 linhas. Adaptador com 143 linhas ainda depende de trades/IDs/relógio/helpers globais; sem declaração de domínio puro.
+- Próximo G5j: caracterizar e separar normalização de células/números/datas/cabeçalhos, preservando wrappers e usos fora dos parsers.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
