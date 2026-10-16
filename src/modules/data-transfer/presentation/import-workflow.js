@@ -71,18 +71,8 @@ function showImportPreview(list){
 
 function confirmImport(){
   const targetAccountId=getPendingImportAccountId();
-  const existingPos=new Set(trades.map(t=>getTradeImportPositionKey(t,targetAccountId)).filter(Boolean));
-  const existingIds=new Set(trades.map(t=>t.id));
-  const seenPos=new Set();
-  const seenIds=new Set();
-  const newTrades=pendingImport.filter(t=>{
-    const positionKey=getTradeImportPositionKey(t,targetAccountId);
-    if(positionKey&&(existingPos.has(positionKey)||seenPos.has(positionKey)))return false;
-    if(existingIds.has(t.id)||seenIds.has(t.id))return false;
-    if(positionKey)seenPos.add(positionKey);
-    seenIds.add(t.id);
-    return true;
-  });
+  const isNewTrade=TradeDiaryImportTradeRules.createImportedTradeFilter(trades,t=>getTradeImportPositionKey(t,targetAccountId));
+  const newTrades=pendingImport.filter(isNewTrade);
   trades=[...newTrades,...trades];
   clearPendingImport();
   _incompleteBannerDismissed=false;

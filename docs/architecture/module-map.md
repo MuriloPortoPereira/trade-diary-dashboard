@@ -85,8 +85,11 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/data-transfer/infrastructure/download-text-file.js` | Adaptador de download do navegador; uma função global, 9 linhas |
 | `src/modules/data-transfer/presentation/export-downloads.js` | Ações JSON/CSV e leitura de controles; sete globals, 45 linhas |
 | `tests/export-downloads.test.cjs` | Caracterização de download, JSON, filtros, ações CSV, datas, falhas e carga clássica |
-| `src/modules/data-transfer/presentation/import-workflow.js` | Upload, preview e confirmação; cinco handlers globais, 102 linhas, preparação/parsers/storage ainda legados |
+| `src/modules/data-transfer/presentation/import-workflow.js` | Upload, preview e confirmação; cinco handlers globais, 92 linhas; duplicidade delegada ao domínio |
 | `tests/import-workflow.test.cjs` | Caracterização de JSON/CSV/XLSX/MT4, callbacks, preview, duplicados, falhas e carga |
+| `src/modules/data-transfer/domain/import-trade-rules.js` | Campos faltantes e predicado de duplicidade com resolvedor explícito; 30 linhas, sem IO/estado da aplicação |
+| `src/modules/data-transfer/application/prepare-trade-import.js` | Preparação, estado pendente e chave de posição; cinco globals intactos, 60 linhas |
+| `tests/import-preparation.test.cjs` | Caracterização de defaults, timestamps, arrays, referências, falhas, conta, pendências, domínio e carga |
 | `src/modules/data-transfer/presentation/export-account-filter.js` | Opções de contas do filtro de exportação; 7 linhas intactas |
 | `tests/export-account-filter.test.cjs` | Caracterização de guard, ordem, escaping, seleção e carga |
 | `src/modules/data-transfer/presentation/backup-summary.js` | Projeção do resumo de backup no DOM; 5 linhas intactas |
@@ -244,6 +247,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5f; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5g; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

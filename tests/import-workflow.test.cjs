@@ -54,6 +54,7 @@ function setup() {
     showPage(id) { calls.push(['page', id]); },
     startBulkIncompleteFlow(ids) { calls.push(['bulk', Array.from(ids)]); },
   });
+  vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/data-transfer/domain/import-trade-rules.js'), 'utf8'), context);
   vm.runInContext(declarations, context);
   return {context, calls, readers, tasks, confirmations, nodes, prepared};
 }
@@ -246,6 +247,17 @@ test('confirmation preserves zero-import save behavior and partial mutations on 
   assert.equal(context.pendingImport.length, 0);
   assert.equal(context._incompleteBannerDismissed, false);
   assert.deepEqual(calls.map(call => call[0]), ['clear']);
+});
+
+test('confirmation reads pending records after scanning existing positions and ids', () => {
+  const {context} = setup();
+  const candidate = {id: 'current'};
+  const existing = {get id() { context.pendingImport = [candidate]; return 'existing'; }};
+  context.trades = [existing];
+  context.pendingImport = [{id: 'stale'}];
+  context.confirmImport();
+  assert.strictEqual(context.trades[0], candidate);
+  assert.strictEqual(context.trades[1], existing);
 });
 
 test('import handlers remain classic globals and initialize without reading state or IO', () => {

@@ -16,6 +16,7 @@
 - Não usar `../../../../`; caminhos de scripts partem do shell. Aliases somente com suporte verificado.
 - Criar contratos por parâmetro quando houver IO a inverter; dispensar interfaces sem consumidor real.
 - G5d: `application/restore-backup.js` mantém estado/adaptadores globais como exceção transitória documentada; inversão pendente. Corpo intacto preserva alterações parciais nas falhas, sem DOM/storage direto.
+- G5g: domínio de importação recebe resolvedor de chave por parâmetro; não consulta conta/pendências globais. Preparação em application mantém adaptadores legados transitórios de estado, relógio e normalização, sem DOM/storage direto.
 
 ## Ciclos e duplicação
 Baseline não tem imports/exports: não há grafo de imports com ciclos a resolver.

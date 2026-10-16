@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5f registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5g registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,15 +166,15 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5f: cinco handlers globais de importação movidos para `presentation/import-workflow.js`: JSON, CSV/XLSX, texto MT4, preview e confirmação.
-- Dez testes pré-corte cobrem leitura/conta no callback, confirmação adiada, erros distintos, limite do preview, duplicados e falhas parciais de save.
-- Após o corte: 431 testes Node (74 arquivos no runner padrão), 101 checks no navegador; sintaxe, diff e revisão independente aprovados.
-- `app.js`: 7.247 para 7.145 linhas. Parsers, preparação e persistência seguem no legado; APIs/estado globais continuam transitórios.
-- FileReader nativo exercitado no smoke, sem confirmação nem gravação das seis chaves de save; pendências/preview repostos em finally.
-- Serena/Context7 não expostos: busca localizada. Aprovação do smoke expirou na primeira tentativa; repetição executou. Revisor sem acesso a porta local; smoke validado pelo agente principal.
+- G5g: campos faltantes e duplicidade em `domain/import-trade-rules.js`; preparação, pendências e chave de posição em `application/prepare-trade-import.js`.
+- Sete novos testes de preparação e um de ordem da confirmação passaram antes do corte, junto dos onze testes existentes de handlers.
+- Predicado de duplicidade inicializa posições/IDs existentes antes de ler os candidatos; resolvedor de posição explícito mantém dependências de estado fora do domínio.
+- Após o corte: 442 testes Node (75 arquivos no runner padrão), 102 checks no navegador; sintaxe, diff e revisão independente aprovados.
+- `app.js`: 7.145 para 7.078 linhas. Preparação/pending state mantêm adaptadores globais transitórios; parsers e persistência seguem no legado.
+- Serena/Context7 não expostos: usada busca localizada; nenhuma dependência externa necessária. Área isolada reutilizada, um commit por lote.
 
 ## Next
-- G5g: caracterizar preparação e deduplicação dos trades importados antes de separar regras de conta, IDs e campos faltantes; preservar storage e parsers.
+- G5h: caracterizar persistência principal (save/load), round-trip das seis chaves, defaults, dados antigos e falhas antes de separar IO; preservar formatos e ordem.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

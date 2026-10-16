@@ -77,6 +77,9 @@ function browserProbe() {
       }
       check('CSV default trades', buildTradesCSV() === buildTradesCSV(trades));
       check('CSV helper compatibility', csvCell(['a', 'b']) === '"a; b"' && TRADE_CSV_HEADERS.join(',') === csvHeader);
+      const importCandidates = [{id: 'existing'}, {id: 'new'}, {id: 'new'}];
+      const uniqueImports = importCandidates.filter(TradeDiaryImportTradeRules.createImportedTradeFilter([{id: 'existing'}], () => ''));
+      check('import deduplication domain retains first new record', uniqueImports.length === 1 && uniqueImports[0] === importCandidates[1]);
       check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
       showPage('dashboard');
@@ -332,7 +335,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 101, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 102, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

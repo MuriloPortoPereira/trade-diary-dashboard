@@ -880,6 +880,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 7.247 para 7.145 linhas; um commit coeso. Preparação, pendências, parsers e persistência seguem como dependências transitórias.
 - Próximo G5g: caracterizar preparação e deduplicação dos trades importados antes de separar regras de conta, IDs e campos faltantes.
 
+## G5g: preparação e regras dos trades importados
+
+- Campos faltantes e duplicidade extraídos para `domain/import-trade-rules.js`; cinco funções de preparação/pending state/chave movidas intactas para `application/prepare-trade-import.js`.
+- `calcImportMissingFields` global delega; confirmação prepara predicado antes de ler pendingImport, preservando leitura de posições/IDs e referências. Relógio, IDs e conta continuam como adaptadores legados na preparação.
+- Oito caracterizações novas pré-corte; após extração, 442 testes Node, 102 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- `app.js`: 7.145 para 7.078 linhas; preparação com 60 linhas e domínio com 30. Scripts clássicos e consumidores preservados.
+- Próximo G5h: caracterizar save/load, round-trip das seis chaves, defaults, dados antigos e falhas antes de separar persistência.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
