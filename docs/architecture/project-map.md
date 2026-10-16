@@ -20,7 +20,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
 | Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
-| Persistência/configuração | `save`, `load`, `saveConfig` |
+| Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
 | Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
 
@@ -225,6 +225,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `src/modules/data-transfer/application/prepare-trade-import.js`: cinco APIs globais de preparação/pending state/chave de posição; corpos intactos. Relógio, IDs, conta e normalizadores continuam em adaptadores legados.
 - `calcImportMissingFields` permanece wrapper global em `app.js`; `confirmImport` delega duplicidade ao domínio antes dos efeitos existentes.
 - `tests/import-preparation.test.cjs` e handlers cobrem defaults, referências, arrays esparsos, tempo/erros, conta, pendências e ordem da confirmação. 442 testes Node, 102 checks; `app.js`: 7.078 linhas.
+
+## Persistência principal (G5h)
+
+- `src/app/infrastructure/app-state-storage.js`: save global intacto e readPersistedAppState; seis chaves/valores brutos, ordem e gravações parciais preservadas. save ainda lê estado global.
+- `src/app/application/load-app-state.js`: load global restaura/normaliza pela leitura substituível; lê todas as chaves antes de aplicar valores, mantém permissividade e catch existente.
+- Scripts sem IO inicial, antes de navigation/app; nenhum formato, seed ou migração alterado. [ADR-003](adr/003-main-state-persistence.md).
+- `tests/app-state-storage.test.cjs`: caracterização de serialização, leitura, normalização, round-trip, defaults, erros e ordem; smoke com localStorage nativo e cleanup em finally.
+- 454 testes Node, 103 checks; `app.js`: 7.049 linhas. Seeds/bootstrap e persistências auxiliares continuam fora do corte.
 
 ## Filtro de contas da exportação (G3aa)
 

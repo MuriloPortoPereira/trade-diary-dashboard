@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5g registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5h registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,15 +166,15 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5g: campos faltantes e duplicidade em `domain/import-trade-rules.js`; preparação, pendências e chave de posição em `application/prepare-trade-import.js`.
-- Sete novos testes de preparação e um de ordem da confirmação passaram antes do corte, junto dos onze testes existentes de handlers.
-- Predicado de duplicidade inicializa posições/IDs existentes antes de ler os candidatos; resolvedor de posição explícito mantém dependências de estado fora do domínio.
-- Após o corte: 442 testes Node (75 arquivos no runner padrão), 102 checks no navegador; sintaxe, diff e revisão independente aprovados.
-- `app.js`: 7.145 para 7.078 linhas. Preparação/pending state mantêm adaptadores globais transitórios; parsers e persistência seguem no legado.
-- Serena/Context7 não expostos: usada busca localizada; nenhuma dependência externa necessária. Área isolada reutilizada, um commit por lote.
+- G5h: save/leitura bruta em `src/app/infrastructure/app-state-storage.js`; load/normalização em `src/app/application/load-app-state.js`.
+- Dez testes pré-corte caracterizam seis chaves, round-trip, defaults/formatos antigos, leitura antes de mutações, serialização sequencial e falhas parciais.
+- Após o corte: 454 testes Node (76 arquivos no runner padrão), 103 checks no navegador; sintaxe, diff e revisão independente aprovados.
+- Smoke grava/lê dados reais em perfil temporário e repõe referências de estado e valores originais das seis chaves em finally. Navegação permanece imediatamente antes de app.js.
+- `app.js`: 7.078 para 7.049 linhas. save mantém estado global transitório; load depende do contrato de leitura bruta. Sem migração, formato ou seed alterado; [ADR-003](adr/003-main-state-persistence.md).
+- Serena/Context7 não expostos: busca localizada. Revisor sem acesso à porta local; smoke validado pelo agente principal.
 
 ## Next
-- G5h: caracterizar persistência principal (save/load), round-trip das seis chaves, defaults, dados antigos e falhas antes de separar IO; preservar formatos e ordem.
+- G5i: caracterizar parsers tabulares por formato (genérico/MT5) antes de separar parsing de IDs/estado; preservar heurísticas, datas e números.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 
@@ -182,7 +182,7 @@
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
-- Sem cobertura ampla de persistência, importação, trades, risco por calendário e StudyHub.
+- Persistência principal caracterizada; seeds/bootstrap, parsers de importação, trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
 - Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.
 - Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.

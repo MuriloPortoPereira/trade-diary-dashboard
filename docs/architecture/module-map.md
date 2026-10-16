@@ -37,6 +37,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Arquivo | Responsabilidade |
 |---|---|
 | `src/modules/simulation/domain/calculate-simulation-sizing.js` | Cálculo numérico puro; sem DOM, storage ou framework |
+| `src/app/infrastructure/app-state-storage.js` | save e leitura bruta das seis chaves principais; 17 linhas, estado global transitório |
+| `src/app/application/load-app-state.js` | load/normalização via contrato de leitura bruta; 17 linhas, sem storage direto |
+| `tests/app-state-storage.test.cjs` | Caracterização de ordem, seis formatos, defaults, round-trip, falhas parciais e carga |
 | `tests/simulation-sizing.test.cjs` | Caracterização dos valores/defaults e regressões do cálculo |
 | `src/modules/simulation/presentation/simulation-sizing-fields.js` | Sincronização dos percentuais com os três campos monetários da simulação; 14 linhas intactas |
 | `tests/simulation-sizing-fields.test.cjs` | Caracterização de conta, fallbacks, conversão, projeções, retorno e carga |
@@ -247,6 +250,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5g; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5h; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.

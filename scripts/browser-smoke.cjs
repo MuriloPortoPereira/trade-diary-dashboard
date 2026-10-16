@@ -275,6 +275,27 @@ function browserProbe() {
         closeModal('csvConfirmModal');
         previewNodes.forEach((node, index) => { node.innerHTML = previewHTML[index]; });
       }
+      const stateBeforeRoundtrip = {trades, config, preMarketData, accounts, activeAccountId, studyHubState};
+      const storageBeforeRoundtrip = persistedKeys.map(key => localStorage.getItem(key));
+      try {
+        const expectedWrites = [JSON.stringify(trades), JSON.stringify(config), JSON.stringify(preMarketData),
+          JSON.stringify(accounts), String(activeAccountId), JSON.stringify(studyHubState)];
+        const expectedTradeIds = JSON.stringify(trades.map(trade => trade.id));
+        const expectedAccountIds = JSON.stringify(accounts.map(account => account.id));
+        save();
+        const serialized = persistedKeys.every((key, index) => localStorage.getItem(key) === expectedWrites[index]);
+        trades = [];
+        accounts = [];
+        activeAccountId = '';
+        load();
+        check('native app storage round-trip preserves six formats and restores trades/accounts', serialized && JSON.stringify(trades.map(trade => trade.id)) === expectedTradeIds && JSON.stringify(accounts.map(account => account.id)) === expectedAccountIds && activeAccountId === stateBeforeRoundtrip.activeAccountId);
+      } finally {
+        ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = stateBeforeRoundtrip);
+        persistedKeys.forEach((key, index) => {
+          if (storageBeforeRoundtrip[index] === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, storageBeforeRoundtrip[index]);
+        });
+      }
     } catch (error) {
       errors.push(error.stack || String(error));
     }
@@ -335,7 +356,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 102, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 103, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

@@ -4221,15 +4221,6 @@ function clearAll(){
   );
 }
 
-function save(){
-  localStorage.setItem('tl_trades',JSON.stringify(trades));
-  localStorage.setItem('tl_config',JSON.stringify(config));
-  localStorage.setItem('tl_pm',JSON.stringify(preMarketData));
-  localStorage.setItem('tl_accounts',JSON.stringify(accounts));
-  localStorage.setItem('tl_activeAccount',activeAccountId);
-  localStorage.setItem('tl_studyhub',JSON.stringify(studyHubState));
-}
-
 function recomputeAllIncomplete(){
   trades=trades.map(trade=>{
     const missing=calcImportMissingFields(trade,trade.status);
@@ -4237,26 +4228,6 @@ function recomputeAllIncomplete(){
     if(incomplete===!!trade.incomplete&&JSON.stringify(missing)===JSON.stringify(trade.missing_fields||[]))return trade;
     return {...trade,incomplete,missing_fields:missing};
   });
-}
-
-function load(){
-  try{
-    const t=localStorage.getItem('tl_trades'),c=localStorage.getItem('tl_config');
-    const pm=localStorage.getItem('tl_pm');
-    const ac=localStorage.getItem('tl_accounts'),ai=localStorage.getItem('tl_activeAccount');
-    const sh=localStorage.getItem('tl_studyhub');
-    if(t)trades=JSON.parse(t);
-    if(c)config={...config,...JSON.parse(c)};
-    config=ensureDefaultStrategies(config);
-    config=ensurePartnerHubConfig(config);
-    if(pm)preMarketData=JSON.parse(pm);
-    if(ac)accounts=JSON.parse(ac).map(normalizeAccount);
-    if(ai)activeAccountId=ai;
-    if(sh){
-      studyHubState=mergeStudyHubState(JSON.parse(sh));
-    }
-    recomputeAllIncomplete();
-  }catch(e){}
 }
 
 window.addEventListener('load',()=>{

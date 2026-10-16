@@ -888,6 +888,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 7.145 para 7.078 linhas; preparação com 60 linhas e domínio com 30. Scripts clássicos e consumidores preservados.
 - Próximo G5h: caracterizar save/load, round-trip das seis chaves, defaults, dados antigos e falhas antes de separar persistência.
 
+## G5h: persistência principal
+
+- save intacto/leitura bruta em `app/infrastructure/app-state-storage.js`; load em `app/application/load-app-state.js` consumindo contrato substituível. Globals transitórios e seis chaves preservados; [ADR-003](adr/003-main-state-persistence.md).
+- Dez testes pré-corte; após extração, 454 testes Node, 103 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Smoke faz round-trip com localStorage real em perfil temporário e restaura os dados em finally. Contrato navigation imediatamente antes de app.js preservado.
+- `app.js`: 7.078 para 7.049 linhas. Sem migração, seed ou mudança de comportamento em falhas parciais.
+- Próximo G5i: caracterizar parsers tabulares genérico/MT5 antes de separar parsing de IDs/estado.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

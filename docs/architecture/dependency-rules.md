@@ -17,6 +17,7 @@
 - Criar contratos por parâmetro quando houver IO a inverter; dispensar interfaces sem consumidor real.
 - G5d: `application/restore-backup.js` mantém estado/adaptadores globais como exceção transitória documentada; inversão pendente. Corpo intacto preserva alterações parciais nas falhas, sem DOM/storage direto.
 - G5g: domínio de importação recebe resolvedor de chave por parâmetro; não consulta conta/pendências globais. Preparação em application mantém adaptadores legados transitórios de estado, relógio e normalização, sem DOM/storage direto.
+- G5h: load em application usa readPersistedAppState (contrato de leitura bruta), sem storage direto. IO em app/infrastructure; save preserva acesso sequencial ao estado global como dívida transitória, sem snapshot antecipado.
 
 ## Ciclos e duplicação
 Baseline não tem imports/exports: não há grafo de imports com ciclos a resolver.
