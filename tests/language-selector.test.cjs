@@ -42,6 +42,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/data-transfer/infrastructure/serialize-trades-csv.js',
     'src/modules/data-transfer/infrastructure/split-delimited-rows.js',
     'src/modules/data-transfer/infrastructure/parse-tabular-trades.js',
+    'src/modules/data-transfer/infrastructure/read-trade-report.js',
     'src/modules/data-transfer/infrastructure/backup-format.js',
     'src/modules/data-transfer/domain/import-trade-rules.js',
     'src/modules/data-transfer/application/restore-backup.js',

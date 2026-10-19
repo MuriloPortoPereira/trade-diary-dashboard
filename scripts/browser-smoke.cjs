@@ -274,6 +274,35 @@ function browserProbe() {
         handleCSVUpload({target: {files: [file]}});
         await uploadComplete;
         check('native CSV upload stages one trade and opens preview without saving', pendingImport.length === 1 && pendingImportMeta.source === 'csv' && pendingImportMeta.accountId === activeAccountId && document.getElementById('csvConfirmModal').classList.contains('open') && document.querySelectorAll('#csvConfirmPreview tbody tr').length === 1 && persistedKeys.every((key, index) => localStorage.getItem(key) === persistedBefore[index]));
+        const reportRows = [['date','symbol','direction','entry','exit','stop','qty','pnl','strategy','ticket'],
+          ['2024-02-01','ES','buy','100','110','95','1','25.5','smoke report',mtTicket]];
+        const awaitReportRead = start => new Promise((resolve, reject) => {
+          window.FileReader = class extends NativeFileReader {
+            constructor() {
+              super();
+              this.addEventListener('loadend', resolve, {once: true});
+              this.addEventListener('error', () => reject(this.error), {once: true});
+            }
+          };
+          start();
+        });
+        const reportHTML = '<table>' + reportRows.map(row => '<tr>' + row.map(value => '<td>' + value + '</td>').join('') + '</tr>').join('') + '</table>';
+        const utf16 = new Uint8Array(2 + reportHTML.length * 2);
+        utf16.set([255, 254]);
+        const view = new DataView(utf16.buffer);
+        for(let i = 0; i < reportHTML.length; i++) view.setUint16(2 + i * 2, reportHTML.charCodeAt(i), true);
+        await awaitReportRead(() => handleHistoryUpload({target: {files: [new File([utf16], 'smoke.HTML', {type: 'text/html'})]}}));
+        const validReportPreview = () => pendingImport.length === 1 && pendingImport[0].symbol === 'ES' && pendingImport[0].pnl === 25.5 && pendingImportMeta.source === 'upload' && pendingImportMeta.accountId === activeAccountId && document.getElementById('csvConfirmModal').classList.contains('open') && document.querySelectorAll('#csvConfirmPreview tbody tr').length === 1 && persistedKeys.every((key, index) => localStorage.getItem(key) === persistedBefore[index]);
+        check('native UTF-16 HTML report upload parses DOM rows and stages without saving', validReportPreview());
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('SheetJS load timeout')), 12000);
+          loadSheetJS(() => { clearTimeout(timer); resolve(); });
+        });
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(reportRows), 'History');
+        const spreadsheet = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+        await awaitReportRead(() => handleMT5Upload({target: {files: [new File([spreadsheet], 'smoke.XLSX')]}}));
+        check('native XLSX report upload reads real workbook and stages without saving', validReportPreview());
       } finally {
         window.FileReader = NativeFileReader;
         pendingImport = previousPending;
@@ -362,7 +391,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 105, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 107, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

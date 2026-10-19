@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5j registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5k registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,17 +166,17 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5j: parseMTNumber, normalizeDate, cleanMTCell e normalizeImportHeader movidos intactos para `infrastructure/normalize-tabular-values.js` (48 linhas).
-- Oito testes passaram antes do corte: coerções, formatos locais, datas/Excel, cabeçalhos, erros e consulta dinâmica dos helpers globais. Um teste adicional protege carga e isolamento.
-- Após o corte: 477 testes Node (78 arquivos no runner padrão), 105 checks no navegador; sintaxe, diff e revisão independente aprovados.
-- Script clássico antes dos parsers e de app.js; consumidores de timing e importação continuam usando as mesmas APIs. Sem estado da aplicação ou IO nos normalizadores.
-- `app.js`: 6.906 para 6.860 linhas. Sem dependências externas ou mudança de comportamento.
-- Serena/Context7 não expostos: busca localizada. Clone temporário recriado após limpeza de /tmp. Smoke do revisor bloqueado por EPERM na porta local; execução principal aprovada com 105 checks.
+- G5k: fluxo restante de relatórios HTML/XLSX extraído como bloco: quatro handlers no módulo existente `presentation/import-workflow.js`; loadSheetJS/parseMT5HTML em `infrastructure/read-trade-report.js` (12 linhas).
+- Seis APIs globais preservadas. Corpos equivalentes; símbolos existentes representados por escapes Unicode. CDN/versão SheetJS, callbacks, UTF-16, opções da primeira planilha e conta na conclusão mantidos.
+- Oito testes pré-corte; teste adicional de carga. Após extração: 486 testes Node (79 arquivos), 107 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- Smoke usa HTML UTF-16 e XLSX reais, FileReader/DOM/SheetJS nativos; verifica preview e seis chaves sem gravação antes da confirmação. Perfil temporário e cleanup de pendências/DOM.
+- `app.js`: 6.860 para 6.818 linhas. Nenhuma dependência de runtime adicionada; globais entre camadas continuam transitórios.
+- Serena/Context7 não expostos: busca localizada. Bateria completa e revisão executadas uma vez ao fechar o bloco; workspace temporário reutilizado para preservar alterações locais.
 
 ## Next
-- G5k: caracterizar e extrair IO restante da importação HTML/XLSX: handleMT5Upload, loadSheetJS, parseMT5HTML e handleMT5Result; preservar callbacks, carga da biblioteca, DOM e fluxo de contas/pendências.
-- Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
-- Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
+- G5l: caracterizar e separar geração/carregamento de dados demonstrativos (buildTickmillDemoImport/loadTickmillDemoImport, buildSampleTrades, ensureSampleStrategies, loadSampleData e addSampleTrades); preservar datas/IDs/valores, confirmação e persistência.
+- Depois: inicialização/persistências restantes e fluxos de operações/regras ainda legados; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
+- Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 
 ## Risks
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.

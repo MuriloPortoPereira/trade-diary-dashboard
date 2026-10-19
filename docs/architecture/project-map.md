@@ -237,7 +237,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 ## Parsers tabulares (G5i)
 
 - `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`: quatro APIs globais, 143 linhas intactas; MT5/HTML-posicional/MT4, cabeçalhos genéricos, prioridade MT e entrada de texto MT4.
-- Adaptador de formato transitório: lê trades e usa IDs, relógio e normalizadores do legado ao ser chamado; sem IO/estado na carga. Extração HTML e loader XLSX continuam em app.js.
+- Adaptador de formato transitório: lê trades e usa IDs, relógio e normalizadores do legado ao ser chamado; sem IO/estado na carga. Extração HTML e loader XLSX em `infrastructure/read-trade-report.js` desde G5k.
 - `tests/parse-tabular-trades.test.cjs`: fixtures dos layouts com normalizadores reais e relógio/IDs controlados, limite de cabeçalhos, aliases, duplicados, arredondamento, datas e erros.
 - Script clássico antes dos handlers; smoke com posição MT real e upload CSV nativo. 468 testes Node, 104 checks; `app.js`: 6.906 linhas.
 
@@ -246,7 +246,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `src/modules/data-transfer/infrastructure/normalize-tabular-values.js`: parseMTNumber, normalizeDate, cleanMTCell e normalizeImportHeader; quatro globals intactos, 48 linhas, sem IO/estado da aplicação.
 - Script clássico antes dos parsers e de app.js; consumidores incluem importação e tradeTimingDomain. Chamadas dinâmicas entre helpers preservadas.
 - `tests/normalize-tabular-values.test.cjs`: formatos locais, coerções, datas/Excel, cabeçalhos, erros, substituição de helpers e carga. Oito testes pré-corte.
-- 477 testes Node, 105 checks no navegador; revisão independente aprovada. `app.js`: 6.860 linhas. IO HTML/XLSX permanece no legado.
+- 477 testes Node, 105 checks no navegador; revisão independente aprovada. `app.js`: 6.860 linhas. IO HTML/XLSX extraído em G5k.
+
+## Relatórios HTML/XLSX (G5k)
+
+- `src/modules/data-transfer/infrastructure/read-trade-report.js`: loadSheetJS e parseMT5HTML; CDN existente e extração DOM de linhas com pelo menos dez células.
+- `src/modules/data-transfer/presentation/import-workflow.js`: inclui handleMT5Upload, handleReportUpload, handleHistoryUpload e handleMT5Result; leitura assíncrona e entrega à preparação/prévia existentes.
+- `tests/trade-report-import.test.cjs`: oito caracterizações pré-corte e carga; roteamento, UTF-16, primeira planilha/opções, callbacks, erros e conta na conclusão.
+- Smoke com HTML UTF-16 e XLSX reais sem persistir antes da confirmação. 486 testes Node, 107 checks, revisão aprovada; `app.js`: 6.818 linhas. Seeds/inicialização seguem no legado.
 
 ## Filtro de contas da exportação (G3aa)
 

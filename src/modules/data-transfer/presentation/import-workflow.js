@@ -90,3 +90,33 @@ function confirmImport(){
     showAppNotice('Importação concluída','\u2713 '+newTrades.length+' trades importados!');
   }
 }
+
+function handleMT5Upload(e){
+  const f=e.target.files[0];if(!f)return;
+  const ext=f.name.toLowerCase().split('.').pop();
+  const prev=document.getElementById('csvPreview')||document.getElementById('mt4Preview');
+  if(prev)prev.innerHTML=`<div class="alert alert-info">\u23f3 Processando ${f.name}...</div>`;
+  if(ext==='xlsx'){
+    loadSheetJS(()=>{const r=new FileReader();r.onload=ev=>{try{const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false});handleMT5Result(parseSpreadsheetRows(rows,f.name),prev);}catch(err){if(prev)prev.innerHTML=`<div class="alert alert-warn">\u274c Erro: ${err.message}</div>`;}};r.readAsArrayBuffer(f);});
+  } else if(ext==='html'||ext==='htm'){
+    const r=new FileReader();r.onload=ev=>{handleMT5Result(parseMT5HTML(ev.target.result,f.name),prev);};r.readAsText(f,'utf-16');
+  } else {const r=new FileReader();r.onload=ev=>{handleMT5Result(parseMT4Raw(ev.target.result),prev);};r.readAsText(f);}
+}
+
+function handleReportUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  const ext=f.name.toLowerCase().split('.').pop();
+  if(ext==='html'||ext==='htm')handleMT5Upload(e);
+  else handleCSVUpload(e);
+}
+
+function handleHistoryUpload(e){
+  handleReportUpload(e);
+}
+
+function handleMT5Result(result,prevEl){
+  if(!result.length){if(prevEl)prevEl.innerHTML=`<div class="alert alert-warn">\u274c Nenhum trade detectado. Verifique se é um relatório histórico válido (XLSX, HTML ou CSV).</div>`;return;}
+  setPendingImport(prepareImportedTrades(result,{accountId:activeAccountId,seedLabel:'upload'}),{accountId:activeAccountId,source:'upload'});
+  if(prevEl)prevEl.innerHTML=`<div class="alert alert-info">\u2713 ${result.length} trades detectados.</div>`;
+  showImportPreview(pendingImport);openModal('csvConfirmModal');
+}

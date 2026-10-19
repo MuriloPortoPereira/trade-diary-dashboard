@@ -913,6 +913,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 6.906 para 6.860 linhas. Sem abstrações adicionais ou mudança de comportamento.
 - Próximo G5k: caracterizar IO HTML/XLSX e separar upload, carga da biblioteca, extração HTML e entrega do resultado, preservando callbacks/DOM/contas/pendências.
 
+## G5k: fluxo de relatórios HTML/XLSX
+
+- Seis globals extraídos como bloco: upload/roteamento/resultado no módulo existente de apresentação; loader SheetJS e leitor HTML no adaptador `infrastructure/read-trade-report.js` (12 linhas).
+- Corpos equivalentes, com escapes Unicode nos símbolos existentes. Mantidos CDN/versão, UTF-16, primeira planilha/opções, callbacks, erros e conta na conclusão; sem novas dependências ou mudanças de persistência.
+- Oito testes pré-corte e carga pós-corte. 486 testes Node, 107 checks no navegador, sintaxe, diff e revisão independente aprovados; smoke com HTML UTF-16 e XLSX reais, preview e storage protegido.
+- `app.js`: 6.860 para 6.818 linhas. Próximo G5l: geração e carregamento de dados demonstrativos, preservando IDs/datas/valores/confirmação/persistência.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

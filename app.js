@@ -2022,48 +2022,6 @@ function savePM(){
   // kept for compatibility — habit toggling is now inline via togglePMHabit
 }
 
-function handleMT5Upload(e){
-  const f=e.target.files[0];if(!f)return;
-  const ext=f.name.toLowerCase().split('.').pop();
-  const prev=document.getElementById('csvPreview')||document.getElementById('mt4Preview');
-  if(prev)prev.innerHTML=`<div class="alert alert-info">⏳ Processando ${f.name}...</div>`;
-  if(ext==='xlsx'){
-    loadSheetJS(()=>{const r=new FileReader();r.onload=ev=>{try{const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false});handleMT5Result(parseSpreadsheetRows(rows,f.name),prev);}catch(err){if(prev)prev.innerHTML=`<div class="alert alert-warn">❌ Erro: ${err.message}</div>`;}};r.readAsArrayBuffer(f);});
-  } else if(ext==='html'||ext==='htm'){
-    const r=new FileReader();r.onload=ev=>{handleMT5Result(parseMT5HTML(ev.target.result,f.name),prev);};r.readAsText(f,'utf-16');
-  } else {const r=new FileReader();r.onload=ev=>{handleMT5Result(parseMT4Raw(ev.target.result),prev);};r.readAsText(f);}
-}
-
-function handleReportUpload(e){
-  const f=e.target.files[0];if(!f)return;
-  const ext=f.name.toLowerCase().split('.').pop();
-  if(ext==='html'||ext==='htm')handleMT5Upload(e);
-  else handleCSVUpload(e);
-}
-
-function handleHistoryUpload(e){
-  handleReportUpload(e);
-}
-
-function loadSheetJS(cb){
-  if(window.XLSX){cb();return;}
-  const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=cb;document.head.appendChild(s);
-}
-
-function parseMT5HTML(html,filename){
-  const div=document.createElement('div');div.innerHTML=html;
-  const allRows=[];
-  div.querySelectorAll('tr').forEach(tr=>{const cells=[...tr.querySelectorAll('td,th')].map(c=>c.textContent.trim());if(cells.length>=10)allRows.push(cells);});
-  return parseSpreadsheetRows(allRows,filename);
-}
-
-function handleMT5Result(result,prevEl){
-  if(!result.length){if(prevEl)prevEl.innerHTML=`<div class="alert alert-warn">❌ Nenhum trade detectado. Verifique se é um relatório histórico válido (XLSX, HTML ou CSV).</div>`;return;}
-  setPendingImport(prepareImportedTrades(result,{accountId:activeAccountId,seedLabel:'upload'}),{accountId:activeAccountId,source:'upload'});
-  if(prevEl)prevEl.innerHTML=`<div class="alert alert-info">✓ ${result.length} trades detectados.</div>`;
-  showImportPreview(pendingImport);openModal('csvConfirmModal');
-}
-
 function deleteStrategy(idx){
   const name=config.strategies[idx];if(!name)return;
   const count=strategyUsageCount(name);
