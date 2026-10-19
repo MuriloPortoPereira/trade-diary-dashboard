@@ -38,6 +38,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/accounts/domain/calculate-balance-drawdown.js',
     'src/modules/accounts/domain/calculate-risk-period-pnl.js',
     'src/modules/simulation/presentation/simulation-sizing-fields.js',
+    'src/modules/data-transfer/infrastructure/normalize-tabular-values.js',
     'src/modules/data-transfer/infrastructure/serialize-trades-csv.js',
     'src/modules/data-transfer/infrastructure/split-delimited-rows.js',
     'src/modules/data-transfer/infrastructure/parse-tabular-trades.js',

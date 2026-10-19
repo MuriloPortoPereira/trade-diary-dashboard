@@ -51,6 +51,7 @@ function browserProbe() {
       const csvRow = ['"2026-09-10"', ...Array(19).fill('""'), '"pressa; ""erro"""', '"a,b\nlinha 2"'].join(',');
       check('CSV global serialization', buildTradesCSV([{date: '2026-09-10', errors: ['pressa', '"erro"'], remarks: 'a,b\nlinha 2'}]) === csvHeader + '\n' + csvRow);
       check('CSV import row split', JSON.stringify(splitDelimitedRows('Date;Symbol\n2026-10-14;ES')) === JSON.stringify([['Date','Symbol'],['2026-10-14','ES']]) && normalizeCSVRow(' "ES" ') === 'ES');
+      check('tabular value normalizers preserve locale numbers, Excel dates and headers', parseMTNumber('(1.234,56)') === -1234.56 && normalizeDate('45292,75') === '2024-01-01' && normalizeImportHeader(' Horário de Entrada (%) ') === 'horariodeentrada%' && cleanMTCell(' a\n b ') === 'a b');
       let mtTicket = '00000987654321';
       while (trades.some(trade => trade.positionId === mtTicket)) mtTicket += '0';
       const mtRows = parseSpreadsheetRows([['2024.02.01 09:15', mtTicket, 'ES', 'buy', '1', '100', '95', '120',
@@ -361,7 +362,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 104, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 105, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

@@ -904,6 +904,15 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - `app.js`: 7.049 para 6.906 linhas. Adaptador com 143 linhas ainda depende de trades/IDs/relógio/helpers globais; sem declaração de domínio puro.
 - Próximo G5j: caracterizar e separar normalização de células/números/datas/cabeçalhos, preservando wrappers e usos fora dos parsers.
 
+## G5j: normalização de formatos tabulares
+
+- Quatro helpers movidos intactos para `infrastructure/normalize-tabular-values.js` (48 linhas): parseMTNumber, normalizeDate, cleanMTCell e normalizeImportHeader.
+- APIs globais clássicas e consultas dinâmicas entre helpers preservadas; script antes dos parsers e da composição de tradeTimingDomain em app.js. Sem IO ou estado da aplicação.
+- Oito testes pré-corte protegem coerções, formatos locais, datas/Excel, cabeçalhos e erros; teste adicional verifica isolamento/carga.
+- Após o corte: 477 testes Node, 105 checks no navegador, sintaxe, diff e revisão independente aprovados.
+- `app.js`: 6.906 para 6.860 linhas. Sem abstrações adicionais ou mudança de comportamento.
+- Próximo G5k: caracterizar IO HTML/XLSX e separar upload, carga da biblioteca, extração HTML e entrega do resultado, preservando callbacks/DOM/contas/pendências.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`

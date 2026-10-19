@@ -241,6 +241,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/parse-tabular-trades.test.cjs`: fixtures dos layouts com normalizadores reais e relógio/IDs controlados, limite de cabeçalhos, aliases, duplicados, arredondamento, datas e erros.
 - Script clássico antes dos handlers; smoke com posição MT real e upload CSV nativo. 468 testes Node, 104 checks; `app.js`: 6.906 linhas.
 
+## Normalização de formatos tabulares (G5j)
+
+- `src/modules/data-transfer/infrastructure/normalize-tabular-values.js`: parseMTNumber, normalizeDate, cleanMTCell e normalizeImportHeader; quatro globals intactos, 48 linhas, sem IO/estado da aplicação.
+- Script clássico antes dos parsers e de app.js; consumidores incluem importação e tradeTimingDomain. Chamadas dinâmicas entre helpers preservadas.
+- `tests/normalize-tabular-values.test.cjs`: formatos locais, coerções, datas/Excel, cabeçalhos, erros, substituição de helpers e carga. Oito testes pré-corte.
+- 477 testes Node, 105 checks no navegador; revisão independente aprovada. `app.js`: 6.860 linhas. IO HTML/XLSX permanece no legado.
+
 ## Filtro de contas da exportação (G3aa)
 
 - `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.

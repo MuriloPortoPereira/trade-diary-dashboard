@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/trades/domain/trade-timing.js';
 const moduleFile = path.join(root, modulePath);
+const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/normalize-tabular-values.js');
 
 function between(source, start, end) {
   const from = source.indexOf(start);
@@ -26,8 +27,10 @@ function loadTiming() {
   const timingStart = appSource.includes('const tradeTimingDomain=')
     ? 'const tradeTimingDomain='
     : 'function normalizeClockTime(';
-  const timing = between(appSource, timingStart, '\nfunction parseMTNumber(');
-  const normalizers = between(appSource, 'function parseMTNumber(', '\nfunction mtTradeStatus(');
+  const hasNormalizerModule = fs.existsSync(normalizerFile);
+  const timing = between(appSource, timingStart, hasNormalizerModule ? '\nfunction mtTradeStatus(' : '\nfunction parseMTNumber(');
+  const normalizers = hasNormalizerModule ? fs.readFileSync(normalizerFile, 'utf8')
+    : between(appSource, 'function parseMTNumber(', '\nfunction mtTradeStatus(');
   vm.runInContext(`${padClock}\n${normalizers}\n${timing}`, context, {filename: 'app.js#trade-timing'});
   return context;
 }

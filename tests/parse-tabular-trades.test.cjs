@@ -10,6 +10,8 @@ const modulePath = 'src/modules/data-transfer/infrastructure/parse-tabular-trade
 const moduleFile = path.join(root, modulePath);
 const sources = [app];
 if (fs.existsSync(moduleFile)) sources.push(fs.readFileSync(moduleFile, 'utf8'));
+const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/normalize-tabular-values.js');
+if (fs.existsSync(normalizerFile)) sources.push(fs.readFileSync(normalizerFile, 'utf8'));
 const parserNames = ['parseMT5Rows', 'parseGenericTradeRows', 'parseSpreadsheetRows', 'parseMT4Raw'];
 function declaration(name) {
   const patterns = [new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'),

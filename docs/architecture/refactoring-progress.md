@@ -2,7 +2,7 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5i registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5j registrados abaixo.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
 - G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
@@ -166,15 +166,15 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5i: parseMT5Rows, parseGenericTradeRows, parseSpreadsheetRows e parseMT4Raw movidos intactos para `infrastructure/parse-tabular-trades.js` (143 linhas).
-- Treze testes pré-corte com normalizadores reais, IDs/relógio controlados: layouts, aliases, limite de cabeçalho, números/datas, duplicados, seleção e erros.
-- Após o corte: 468 testes Node (77 arquivos no runner padrão), 104 checks no navegador; sintaxe, diff e revisão independente aprovados.
-- Smoke cobre linha MT real via dispatcher, além de upload CSV com FileReader e round-trip de storage já existentes.
-- `app.js`: 7.049 para 6.906 linhas. APIs clássicas mantidas; IDs, relógio, trades e normalizadores continuam dependências globais transitórias do adaptador.
-- Serena/Context7 não expostos: busca localizada. Nenhuma dependência externa ou comportamento alterado.
+- G5j: parseMTNumber, normalizeDate, cleanMTCell e normalizeImportHeader movidos intactos para `infrastructure/normalize-tabular-values.js` (48 linhas).
+- Oito testes passaram antes do corte: coerções, formatos locais, datas/Excel, cabeçalhos, erros e consulta dinâmica dos helpers globais. Um teste adicional protege carga e isolamento.
+- Após o corte: 477 testes Node (78 arquivos no runner padrão), 105 checks no navegador; sintaxe, diff e revisão independente aprovados.
+- Script clássico antes dos parsers e de app.js; consumidores de timing e importação continuam usando as mesmas APIs. Sem estado da aplicação ou IO nos normalizadores.
+- `app.js`: 6.906 para 6.860 linhas. Sem dependências externas ou mudança de comportamento.
+- Serena/Context7 não expostos: busca localizada. Clone temporário recriado após limpeza de /tmp. Smoke do revisor bloqueado por EPERM na porta local; execução principal aprovada com 105 checks.
 
 ## Next
-- G5j: caracterizar e separar normalização de células/números/datas/cabeçalhos, preservando wrappers e consumidores fora da importação.
+- G5k: caracterizar e extrair IO restante da importação HTML/XLSX: handleMT5Upload, loadSheetJS, parseMT5HTML e handleMT5Result; preservar callbacks, carga da biblioteca, DOM e fluxo de contas/pendências.
 - Seguir as prioridades do [roadmap](refactoring-roadmap.md); uma responsabilidade por lote.
 - Métricas continuam frente de domínio pendente; não misturar extração visual com mudança de cálculo.
 

@@ -79,6 +79,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trades-csv.test.cjs` | Caracterização do CSV, wrappers/default, consumidor de exportação e ordem de scripts |
 | `src/modules/data-transfer/infrastructure/split-delimited-rows.js` | Normalização e divisão de linhas delimitadas para importação; 16 linhas |
 | `tests/split-delimited-rows.test.cjs` | Caracterização de delimitadores, aspas, vazios, consumidor, isolamento e carga |
+| `src/modules/data-transfer/infrastructure/normalize-tabular-values.js` | Normalização de números, datas, células e cabeçalhos; quatro globals intactos, 48 linhas, sem IO/estado da aplicação |
+| `tests/normalize-tabular-values.test.cjs` | Caracterização de formatos, coerções, datas/Excel, cabeçalhos, consulta dinâmica, erros e carga |
 | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js` | Parsers MT/genérico, seleção de formato e texto MT4; quatro globals, 143 linhas, dependências legadas transitórias |
 | `tests/parse-tabular-trades.test.cjs` | Caracterização de layouts, aliases, números/datas, duplicados, limites, delegação, erros e carga |
 | `src/modules/data-transfer/infrastructure/backup-format.js` | Montagem, validação e contagens puras do formato de backup; 33 linhas |
@@ -252,6 +254,6 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/profile-page.test.cjs` | Caracterização de HTML, risco, tags, alertas, alvos opcionais e ordem de carga |
 | `scripts/shell-style-check.cjs` | Comparação isolada de páginas, shell, menus, foco, hover e modais |
 
-Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5i; demais responsabilidades continuam no legado. Entrega e
+Esses arquivos existem após os lotes 1–2, 2b, G1, G2a–G2ae, G3a–G3be, G4a–G4g e G5a–G5j; demais responsabilidades continuam no legado. Entrega e
 validações: [refactoring-progress.md](refactoring-progress.md). Camadas adicionais serão
 criadas apenas quando uma extração real justificar sua existência.
