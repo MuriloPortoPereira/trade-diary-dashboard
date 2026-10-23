@@ -255,26 +255,11 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `tests/trade-report-import.test.cjs`: oito caracterizações pré-corte e carga; roteamento, UTF-16, primeira planilha/opções, callbacks, erros e conta na conclusão.
 - Smoke com HTML UTF-16 e XLSX reais sem persistir antes da confirmação. 486 testes Node, 107 checks, revisão aprovada; `app.js`: 6.818 linhas. Seeds/inicialização seguem no legado.
 
-## Filtro de contas da exportação (G3aa)
+## Controles da transferência de dados (G3aa/G3ab/G3ao; consolidados após G5k)
 
-- `src/modules/data-transfer/presentation/export-account-filter.js`: `renderExportAccountFilter()` global, sete linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
-- `tests/export-account-filter.test.cjs`: guard do select, ordem, IDs, nomes escapados, preservação/limpeza da seleção e carga.
-- Contas, `escapeHtml`, leitura dos filtros e exportação permanecem nas dependências existentes; consumidor de `switchImportTab('export')` preservado.
-- 191 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
-
-## Abas de importação e exportação (G3ao)
-
-- `src/modules/data-transfer/presentation/import-tabs.js`: `switchImportTab(id)` global, dez linhas movidas byte a byte; script clássico síncrono depois de resumo/filtro e antes de `app.js`.
-- `tests/import-tabs.test.cjs`: visibilidade das abas, classes ativas, ID desconhecido, painéis opcionais, ordem de payload/resumo/filtro e carga.
-- Dois handlers HTML e os consumidores de smoke permanecem intactos; parsing, importação, exportação, download e persistência continuam no legado.
-- 255 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
-
-## Resumo do backup (G3ab)
-
-- `src/modules/data-transfer/presentation/backup-summary.js`: `renderBackupSummary(data=createBackupPayload())` global, cinco linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
-- `tests/backup-summary.test.cjs`: guard do DOM, prefixo traduzido, formatação, preservação do dado, argumento padrão e carga.
-- Criação/formatação do payload, importação, restauração e exportação permanecem nas dependências existentes; cinco consumidores preservados.
-- 195 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+- `src/modules/data-transfer/presentation/data-transfer-controls.js`: reúne `renderBackupSummary`, `renderExportAccountFilter` e `switchImportTab`; três APIs globais coesas em um script clássico antes de `app.js`.
+- Testes separados preservam guards, tradução/formatação, opções/seleção, visibilidade, classes, painéis opcionais e ordem dos efeitos.
+- A consolidação reduz três arquivos mínimos para um módulo de apresentação sem alterar consumidores, HTML gerado, persistência ou ordem efetiva de inicialização.
 
 ## Preferências: idiomas
 

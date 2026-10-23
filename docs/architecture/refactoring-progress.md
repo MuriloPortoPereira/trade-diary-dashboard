@@ -166,15 +166,14 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5k: fluxo restante de relatórios HTML/XLSX extraído como bloco: quatro handlers no módulo existente `presentation/import-workflow.js`; loadSheetJS/parseMT5HTML em `infrastructure/read-trade-report.js` (12 linhas).
-- Seis APIs globais preservadas. Corpos equivalentes; símbolos existentes representados por escapes Unicode. CDN/versão SheetJS, callbacks, UTF-16, opções da primeira planilha e conta na conclusão mantidos.
-- Oito testes pré-corte; teste adicional de carga. Após extração: 486 testes Node (79 arquivos), 107 checks no navegador, sintaxe, diff e revisão independente aprovados.
-- Smoke usa HTML UTF-16 e XLSX reais, FileReader/DOM/SheetJS nativos; verifica preview e seis chaves sem gravação antes da confirmação. Perfil temporário e cleanup de pendências/DOM.
-- `app.js`: 6.860 para 6.818 linhas. Nenhuma dependência de runtime adicionada; globais entre camadas continuam transitórios.
-- Serena/Context7 não expostos: busca localizada. Bateria completa e revisão executadas uma vez ao fechar o bloco; workspace temporário reutilizado para preservar alterações locais.
+- Revisão de granularidade iniciada pelo módulo `data-transfer`: `backup-summary.js`, `export-account-filter.js` e `import-tabs.js` foram consolidados em `presentation/data-transfer-controls.js`.
+- Três APIs globais e seus testes permanecem separados por comportamento; uma única carga clássica substitui três cargas consecutivas, na mesma posição relativa antes de `app.js`.
+- Nenhuma mudança de DOM, persistência ou dependência de runtime. G5k continua validado; `app.js` permanece com 6.818 linhas.
+- 79 arquivos de teste Node e 107 checks no navegador passaram; sintaxe e diff aprovados. Revisão independente teve dois achados corrigidos: spies da ordem dos efeitos e referências antigas nos mapas.
 
 ## Next
 - G5l: caracterizar e separar geração/carregamento de dados demonstrativos (buildTickmillDemoImport/loadTickmillDemoImport, buildSampleTrades, ensureSampleStrategies, loadSampleData e addSampleTrades); preservar datas/IDs/valores, confirmação e persistência.
+- Antes de novos cortes pequenos, aplicar o mesmo critério de coesão aos módulos já extraídos; consolidar somente quando reduzir custo real de navegação.
 - Depois: inicialização/persistências restantes e fluxos de operações/regras ainda legados; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 

@@ -99,11 +99,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/data-transfer/domain/import-trade-rules.js` | Campos faltantes e predicado de duplicidade com resolvedor explícito; 30 linhas, sem IO/estado da aplicação |
 | `src/modules/data-transfer/application/prepare-trade-import.js` | Preparação, estado pendente e chave de posição; cinco globals intactos, 60 linhas |
 | `tests/import-preparation.test.cjs` | Caracterização de defaults, timestamps, arrays, referências, falhas, conta, pendências, domínio e carga |
-| `src/modules/data-transfer/presentation/export-account-filter.js` | Opções de contas do filtro de exportação; 7 linhas intactas |
+| `src/modules/data-transfer/presentation/data-transfer-controls.js` | Resumo de backup, filtro de contas e abas de importação/exportação; três globals coesos consolidados |
 | `tests/export-account-filter.test.cjs` | Caracterização de guard, ordem, escaping, seleção e carga |
-| `src/modules/data-transfer/presentation/backup-summary.js` | Projeção do resumo de backup no DOM; 5 linhas intactas |
 | `tests/backup-summary.test.cjs` | Caracterização de guard, tradução, formatação, default e carga |
-| `src/modules/data-transfer/presentation/import-tabs.js` | Alternância global das abas de importação/exportação e projeção inicial da exportação; 10 linhas intactas |
 | `tests/import-tabs.test.cjs` | Caracterização de visibilidade, classes, alvos opcionais, efeitos da exportação e carga |
 | `src/modules/preferences/presentation/translation-catalog.js` | Registro dos idiomas e objetos dos catálogos |
 | `src/modules/preferences/presentation/locales/{pt-BR,en-US}/*.js` | Textos por idioma e contexto: trading, workspace, dialogs-and-labels; 123–253 linhas por arquivo |

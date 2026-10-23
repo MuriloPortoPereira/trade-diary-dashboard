@@ -126,6 +126,6 @@ test('restoration workflow remains global and loads once before classic consumer
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
   assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/backup-format.js'));
-  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/import-tabs.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-controls.js'));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });

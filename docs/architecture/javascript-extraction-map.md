@@ -45,16 +45,16 @@ tipo e métricas do topbar permanecem nas dependências globais existentes.
 `src/modules/documents/presentation/document-folder-icon.js`: navegação,
 pastas, estado e persistência permanecem nas dependências existentes.
 
-`renderExportAccountFilter` (G3aa) foi movida intacta para
-`src/modules/data-transfer/presentation/export-account-filter.js`: contas,
+`renderExportAccountFilter` (G3aa) foi movida intacta e hoje está consolidada em
+`src/modules/data-transfer/presentation/data-transfer-controls.js`: contas,
 escaping, leitura dos filtros e exportação permanecem nas dependências existentes.
 
-`renderBackupSummary` (G3ab) foi movida intacta para
-`src/modules/data-transfer/presentation/backup-summary.js`: criação do payload,
+`renderBackupSummary` (G3ab) foi movida intacta e hoje está consolidada em
+`src/modules/data-transfer/presentation/data-transfer-controls.js`: criação do payload,
 resumo, tradução, restauração e exportação permanecem nas dependências existentes.
 
-`switchImportTab` (G3ao) foi movida intacta para
-`src/modules/data-transfer/presentation/import-tabs.js`: payload, resumo, filtro,
+`switchImportTab` (G3ao) foi movida intacta e hoje está consolidada em
+`src/modules/data-transfer/presentation/data-transfer-controls.js`: payload, resumo, filtro,
 parsing, download e importação permanecem nas dependências existentes.
 
 `switchStatTab` (G3ap) foi movida intacta para
@@ -221,7 +221,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Rotina: 3703–3885; renderer G3e executado | `modules/routine/presentation/premarket-page.js`; demais destinos propostos: `{habit-manager,routine-charts}.js` | Renderer global movido intacto; preMarketData, índices dos hábitos, médias, autosave e conta ativa seguem no legado |
 | Simulação; G3am/G3aw executados | `modules/simulation/presentation/{simulation-sizing-fields,simulation-panel}.js`; depois `domain/project-balance-scenarios.js` | Sizing, projeção monetária, snapshot, seleção de conta, plano e renderer movidos intactos; Monte Carlo e projeção ampla permanecem no legado por dependerem de aleatoriedade |
 | Importação: 375–425, 740–922, 3887–4124 e 4379–4439; G5a/G5f–G5k executados | `modules/data-transfer/infrastructure/{split-delimited-rows,parse-tabular-trades,normalize-tabular-values,read-trade-report}.js`; `presentation/import-workflow.js`; `domain/import-trade-rules.js`; `application/prepare-trade-import.js` | Parsers tabulares, handlers, preparação/pendências e regras de campos/duplicidade extraídos; normalizadores extraídos; IDs/relógio/estado continuam globais; extração HTML e loader XLSX também extraídos; globais transitórios preservados |
-| Backup/exportação: 4193–4377; demos 6458–6702; G3aa–G3ab/G3ao e G5b–G5k executados | `modules/data-transfer/presentation/{export-account-filter,backup-summary,import-tabs,export-downloads,import-workflow}.js`; `infrastructure/{backup-format,download-text-file}.js`; `application/{restore-backup,select-export-trades}.js`; destino ainda proposto: `application/sample-data.js` | Formato, restauração e handlers movidos; estado/adaptadores continuam globais; seed segue no legado; HTML/loader XLSX extraídos em G5k; persistência principal em app/infrastructure e app/application |
+| Backup/exportação: 4193–4377; demos 6458–6702; G3aa–G3ab/G3ao e G5b–G5k executados | `modules/data-transfer/presentation/{data-transfer-controls,export-downloads,import-workflow}.js`; `infrastructure/{backup-format,download-text-file}.js`; `application/{restore-backup,select-export-trades}.js`; destino ainda proposto: `application/sample-data.js` | Formato, restauração e handlers movidos; controles pequenos consolidados por coesão; estado/adaptadores continuam globais; seed segue no legado; HTML/loader XLSX extraídos em G5k; persistência principal em app/infrastructure e app/application |
 | Documentos: 5653–6170; renderers G3d/G3s/G3z executados | `modules/documents/presentation/{documents-page,document-media,document-folder-icon}.js`; demais destinos propostos: `{document-editor,document-browser}.js`, `application/{get-document-entries,save-document,delete-document}.js` | Renderers globais movidos intactos; helpers, seleção, fachada sobre trades/rotina/config.generalDocs e persistência seguem no legado |
 | Imagens: `normalizeDocImages` 5653–5658 | `modules/documents/domain/normalize-document-images.js` | Reuso real por documentos/trades/importação; preservar formatos aceitos e descarte atual de campos extras |
 | Parceiros: normalização 94–122, UI 6228–6340; renderer G3b executado | `modules/partners/presentation/partners-page.js`; demais destinos propostos: `{partner-media,partner-clipboard}.js` | Renderer global movido intacto; config.partnerHub, IDs, FileReader, clipboard e save permanecem no legado |

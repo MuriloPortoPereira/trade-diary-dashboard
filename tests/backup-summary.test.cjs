@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/data-transfer/presentation/backup-summary.js';
+const modulePath = 'src/modules/data-transfer/presentation/data-transfer-controls.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderBackupSummary\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -62,6 +62,5 @@ test('backup summary loads once as a synchronous classic script before its consu
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/data-transfer/presentation/export-account-filter.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

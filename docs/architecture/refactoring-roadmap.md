@@ -920,6 +920,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Oito testes pré-corte e carga pós-corte. 486 testes Node, 107 checks no navegador, sintaxe, diff e revisão independente aprovados; smoke com HTML UTF-16 e XLSX reais, preview e storage protegido.
 - `app.js`: 6.860 para 6.818 linhas. Próximo G5l: geração e carregamento de dados demonstrativos, preservando IDs/datas/valores/confirmação/persistência.
 
+## Ajuste de granularidade após G5k
+
+- Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
+- `renderBackupSummary`, `renderExportAccountFilter` e `switchImportTab` continuam globais; ordem dos efeitos e posição do script clássico antes de `app.js` permanecem equivalentes.
+- Este padrão passa a orientar os próximos lotes: arquivos são separados por responsabilidade e razão de mudança, não por função isolada ou contagem mínima de linhas.
+
 ## Primeiro lote: sizing
 Arquivos: criar `src/modules/simulation/domain/calculate-simulation-sizing.js`,
 `tests/simulation-sizing.test.cjs`; alterar apenas funções correspondentes em `app.js`
