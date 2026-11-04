@@ -102,6 +102,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/app/presentation/modal-controller.js',
     'src/app/infrastructure/app-state-storage.js',
     'src/app/application/load-app-state.js',
+    'src/modules/trades/application/demo-data.js',
     'src/app/presentation/navigation.js', 'app.js',
   ]);
   for (const script of localScripts) {

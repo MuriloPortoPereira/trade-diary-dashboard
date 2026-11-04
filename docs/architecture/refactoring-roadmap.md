@@ -920,6 +920,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Oito testes pré-corte e carga pós-corte. 486 testes Node, 107 checks no navegador, sintaxe, diff e revisão independente aprovados; smoke com HTML UTF-16 e XLSX reais, preview e storage protegido.
 - `app.js`: 6.860 para 6.818 linhas. Próximo G5l: geração e carregamento de dados demonstrativos, preservando IDs/datas/valores/confirmação/persistência.
 
+## G5l: dados demonstrativos
+
+- Seis APIs globais extraídas juntas para `src/modules/trades/application/demo-data.js`, 245 linhas; geração e workflows permanecem coesos para evitar fragmentação por função.
+- Teste pré-corte fixa 300 trades por assinatura SHA-256, 40 trades Tickmill, IDs/datas/valores, estratégias, lock, confirmação e ordem dos efeitos persistentes.
+- Script clássico síncrono antes de `navigation.js` e `app.js`; handlers, bootstrap, formato persistido e dependências permanecem intactos.
+- `app.js`: 6.818 para 6.571 linhas. Próximo G5m: inicialização e persistências restantes em macrobloco coeso.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

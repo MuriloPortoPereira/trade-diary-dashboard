@@ -8,6 +8,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 |---|---|
 | Inicialização/navegação | `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; callback `window.load` em `app.js`; `index.html` |
 | Operação/diário | `saveTrade`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js`; `getLogFilteredTrades`, `duplicateTrade` em `app.js` |
+| Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
@@ -808,3 +809,10 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `tests/document-folder-icon.test.cjs`: wrapper, contrato SVG acessível, quatro tipos, paths distintos, fallback e carga.
 - Navegação, pastas, estado e persistência continuam no legado ou em `documents-page.js`; dois consumidores preservados.
 - 187 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
+
+## Dados demonstrativos (G5l)
+
+- `src/modules/trades/application/demo-data.js`: `buildTickmillDemoImport`, `loadTickmillDemoImport`, `buildSampleTrades`, `ensureSampleStrategies`, `loadSampleData` e `addSampleTrades` em um módulo coeso de aplicação/245 linhas.
+- Mantém 300 trades determinísticos por conta/data, 40 registros Tickmill, IDs, datas, valores, estratégias, confirmação, persistência, notices e APIs globais.
+- Script clássico síncrono antes de `navigation.js` e `app.js`; consumidores HTML e bootstrap permanecem intactos.
+- `tests/demo-data.test.cjs`: assinatura SHA-256 do dataset e ordem de bloqueio, importação, confirmação, `save`, refresh e notice.

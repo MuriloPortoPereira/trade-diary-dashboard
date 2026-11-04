@@ -166,15 +166,15 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- Revisão de granularidade ampliada: topbar, controles de estatísticas e helpers de renderização de documentos foram consolidados por responsabilidade.
-- Sete arquivos pequenos passaram a três componentes coesos; `dashboard-equity-mode.js` foi avaliado e permaneceu separado para preservar sua posição clássica após o dashboard.
-- APIs globais, DOM, persistência e dependências de runtime permanecem inalterados; `app.js` continua com 6.818 linhas.
-- Testes de caracterização dos três grupos passaram antes e depois da consolidação; validação completa e revisão independente registradas no fechamento do lote.
+- G5l: geração e carregamento de dados demonstrativos extraídos para `src/modules/trades/application/demo-data.js` em um único módulo coeso.
+- Seis APIs globais, dataset de 300 trades, importação Tickmill de 40 registros, estratégias, confirmação e efeitos de persistência preservados.
+- `app.js`: 6.818 para 6.571 linhas; nenhuma dependência de runtime ou formato persistido foi alterado.
+- Teste de caracterização criado e executado antes do corte; validação completa e revisão independente registradas no fechamento do lote.
 
 ## Next
-- G5l: caracterizar e separar geração/carregamento de dados demonstrativos (buildTickmillDemoImport/loadTickmillDemoImport, buildSampleTrades, ensureSampleStrategies, loadSampleData e addSampleTrades); preservar datas/IDs/valores, confirmação e persistência.
+- G5m: caracterizar e separar inicialização/persistências restantes como macrobloco, sem fragmentar funções pequenas relacionadas.
+- Depois: fluxos de operações/formulários/regras; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
-- Depois: inicialização/persistências restantes e fluxos de operações/regras ainda legados; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 
 ## Risks
