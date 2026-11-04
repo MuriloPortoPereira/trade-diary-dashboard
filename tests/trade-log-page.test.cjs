@@ -24,9 +24,8 @@ test('trade log loads once as a classic script after its components and before a
 });
 
 test('the remaining StudyHub renderLog stays isolated inside its legacy IIFE', () => {
-  const deleteTradeAt = appSource.indexOf('function deleteTrade(');
-  assert.equal(appSource.slice(0, deleteTradeAt).includes('function renderLog(){'), false);
   const studyIifeAt = appSource.indexOf('(function(){', appSource.indexOf('/* BEGIN STUDYHUB INTEGRATED BUNDLE */'));
+  assert.equal(appSource.slice(0, studyIifeAt).includes('function renderLog(){'), false);
   const studyIifeEnd = appSource.indexOf('})();', studyIifeAt);
   const studyRenderLogAt = appSource.indexOf('function renderLog(){', studyIifeAt);
   assert.ok(studyIifeAt >= 0);

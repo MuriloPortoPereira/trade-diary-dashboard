@@ -7,7 +7,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Trabalho | Procurar primeiro |
 |---|---|
 | Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
-| Operação/diário | `saveTrade`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js`; `getLogFilteredTrades`, `duplicateTrade` em `app.js` |
+| Operação/diário | `src/modules/trades/application/trade-workflows.js`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js` |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
 | Dashboard/estratégia | `src/modules/analytics/presentation/dashboard-page.js`: `renderDashboard`; `calcMetrics`, `getStrategySnapshots` em `app.js`; `src/modules/analytics/presentation/strategy-hub-page.js`: `renderStrategyHub` |
@@ -822,3 +822,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/app/application/bootstrap-app.js`: callback global de carga em 64 linhas; restauração, seeds, normalização, documentos padrão, resize e ordem dos renderers preservados.
 - `src/modules/preferences/infrastructure/exchange-rate.js`: estado, persistência, fetch e intervalo da cotação USD/BRL em 50 linhas; AwesomeAPI e integração StudyHub intactas.
 - Scripts clássicos síncronos antes de `navigation.js` e `app.js`; `tests/app-bootstrap.test.cjs` e `tests/exchange-rate.test.cjs` caracterizam os contratos antes do corte.
+
+## Workflows de operações (G5n)
+
+- `src/modules/trades/application/trade-workflows.js`: 15 APIs globais/255 linhas para salvar, selecionar, completar, duplicar, excluir e consultar operações.
+- Mantém cálculos derivados de risco/R/P&L, payload persistido, edição, fluxo sequencial de incompletos, confirmação dupla e filtros do diário.
+- Um único script clássico antes dos componentes de apresentação de trades; `tests/trade-workflows.test.cjs` caracteriza os fluxos antes do corte.

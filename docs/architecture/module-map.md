@@ -6,7 +6,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Feature | Entradas/símbolos | Dependências atuais |
 |---|---|---|
 | Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
-| Operações | `saveTrade`, `renderLog`, `duplicateTrade`, `getLogFilteredTrades` | Formulário, `trades`, contas, `save`, métricas |
+| Operações | `src/modules/trades/application/trade-workflows.js`; `renderLog` | Formulário, `trades`, contas, persistência, seleção e métricas |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js` | Geração determinística, importação Tickmill, estratégias, confirmação e persistência |
 | Contas/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount`, `renderAccountsPage` | `accounts`, trades, calendário atual, cashflows, formatação |
 | Dashboard | `renderDashboard`, `calcMetrics`, `renderRiskBoard` | Conta ativa, filtros, Chart.js, DOM |

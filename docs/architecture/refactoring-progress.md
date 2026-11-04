@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5m: bootstrap extraído para `src/app/application/bootstrap-app.js`; cotação e sua persistência para `src/modules/preferences/infrastructure/exchange-rate.js`.
-- Restauração, seeds, documentos padrão, resize, ordem de renderização, storage, fetch, intervalo e integração StudyHub preservados.
-- `app.js`: 6.571 para 6.455 linhas; nenhuma dependência de runtime, chave persistida ou API global alterada.
-- Testes de caracterização executados antes do corte; validação completa e revisão independente registradas no fechamento do lote.
+- G5n: workflows de operações extraídos juntos para `src/modules/trades/application/trade-workflows.js`.
+- Quinze APIs globais preservam salvamento, cálculos derivados, edição, incompletos, seleção, duplicação, exclusão dupla e consultas do diário.
+- `app.js`: 6.455 para 6.199 linhas; nenhuma dependência de runtime, chave persistida ou handler alterado.
+- Teste de caracterização executado antes do corte; validação completa e revisão independente registradas no fechamento do lote.
 
 ## Next
-- G5n: fluxos de operações, formulários e regras ainda legados em macroblocos por responsabilidade.
+- G5o: regras e cálculos restantes de formulário/operações, sem misturar apresentação ou StudyHub.
 - Depois: StudyHub G6 e HTML/compatibilidade G7 continuam pendentes; persistências internas do StudyHub pertencem ao G6.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.

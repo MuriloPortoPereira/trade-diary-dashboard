@@ -59,7 +59,7 @@ Preservar nomes e formatos até uma migração explicitamente planejada.
 | P1 | `app.js` | 11.068 linhas, múltiplos domínios e camadas | Alto | Extrações por responsabilidade com API temporária compatível |
 | P1 | `app.js:8378`, `host.innerHTML` | Template legado de 156.671 caracteres numa linha | Alto | Separar recurso preservando montagem e ordem |
 | P1 | `app.js:8373–10761`, StudyHub legado | Quatro módulos, estado, gráficos e IO num bundle | Alto | Isolar bundle e depois subfeatures; preservar `sh_*` |
-| P1 | `app.js:1124`, `saveTrade` | 116 linhas: validação, cálculo, persistência e UI | Alto | Caracterizar payload e fluxo antes de extrair caso de uso |
+| P1 | `src/modules/trades/application/trade-workflows.js`, `saveTrade` | Validação, cálculo, persistência e UI ainda acoplados | Médio | Boundary explícito no G5n; separar cálculo somente quando houver ganho real |
 | P1 | `app.js:1485`, `calcAccountRiskState` | 186 linhas: calendário, risco e texto formatado | Alto | Fixar tempo nos testes; separar cálculo e apresentação |
 | P1 | `app.js:6932–7033`, persistência/bootstrap | Storage global, normalizações, seed e erros silenciados | Alto | Caracterizar restauração e storage antes de adapter |
 | P2 | `app.js:2218`, `renderStrategyCompareCards` | Aproximadamente 223 linhas com métricas e HTML | Médio | Separar modelo de apresentação e render |

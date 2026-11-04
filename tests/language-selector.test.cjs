@@ -55,6 +55,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/app/presentation/app-dialog.js',
     'src/shared/presentation/analysis-summary.js',
     'src/shared/presentation/status-list.js',
+    'src/modules/trades/application/trade-workflows.js',
     'src/modules/trades/presentation/trade-duration-field.js',
     'src/modules/trades/presentation/trade-plan-deviation.js',
     'src/modules/trades/presentation/incomplete-trade-flow.js',

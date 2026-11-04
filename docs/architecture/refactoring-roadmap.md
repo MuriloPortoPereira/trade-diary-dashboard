@@ -934,6 +934,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Dois testes de caracterização passaram antes do corte e protegem estado vazio/existente, defaults, filtro de documentos, armazenamento, sucesso/falha de rede e carga clássica.
 - `app.js`: 6.571 para 6.455 linhas. Próximo G5n: operações, formulários e regras por responsabilidade.
 
+## G5n: workflows de operações
+
+- Salvamento, seleção, conclusão de incompletos, duplicação, exclusão e consultas reunidos em `src/modules/trades/application/trade-workflows.js`, 255 linhas/15 APIs globais.
+- Teste pré-corte protege validação, payload, risco/R/P&L, criação/edição, cópia profunda, lock, confirmação dupla, ordem persistente, seleção e filtros.
+- Script clássico síncrono antes da apresentação de trades; handlers inline, storage e consumidores permanecem intactos.
+- `app.js`: 6.455 para 6.199 linhas. Próximo G5o: regras e cálculos restantes do formulário/operações.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
