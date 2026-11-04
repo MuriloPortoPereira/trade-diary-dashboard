@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/app/presentation/topbar-statistics.js';
+const modulePath = 'src/app/presentation/topbar.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyDeclaration = appSource.match(/^function updateTopbarStats\([^]*?^\}/m)?.[0];
 const source = legacyDeclaration ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
@@ -98,7 +98,7 @@ test('fit false skips only the final density pass', () => {
   assert.equal(calls.filter(call => call[0] === 'set').length, 5);
 });
 
-test('topbar statistics load once after shared topbar components and before account pages', () => {
+test('topbar functions load once in their cohesive classic script before account pages', () => {
   assert.equal(legacyDeclaration, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -107,10 +107,8 @@ test('topbar statistics load once after shared topbar components and before acco
   const matches = scripts.filter(script => script.src === modulePath);
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
-  const valueIndex = scripts.findIndex(script => script.src === 'src/app/presentation/topbar-value.js');
-  const summaryIndex = scripts.findIndex(script => script.src === 'src/app/presentation/account-summary.js');
   const statisticsIndex = scripts.findIndex(script => script.src === modulePath);
   const accountsIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/accounts-page.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(valueIndex < summaryIndex && summaryIndex < statisticsIndex && statisticsIndex < accountsIndex && accountsIndex < appIndex);
+  assert.ok(statisticsIndex < accountsIndex && accountsIndex < appIndex);
 });

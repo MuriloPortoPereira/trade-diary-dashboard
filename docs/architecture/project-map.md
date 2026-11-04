@@ -98,7 +98,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 ## Estatísticas da topbar (G3be)
 
-- `src/app/presentation/topbar-statistics.js`: período semanal/mensal, drawdown, meta e badge em `updateTopbarStats()`, 24 linhas movidas byte a byte.
+- `src/app/presentation/topbar.js`: valor responsivo, conta ativa, período semanal/mensal, drawdown, meta e badge; três APIs globais preservadas em um único componente coeso.
 - `tests/topbar-statistics.test.cjs`: limites semana/mês, percentuais, tons, meta, drawdown, badge, alvos opcionais, densidade e carga.
 - Componentes compartilhados da topbar e consumidores permanecem intactos; risco, trades, relógio e formatação continuam nas dependências existentes.
 - `app.js`: 7.592 para 7.568 linhas. 352 testes Node e 96 checks no navegador; G3 encerrado sem nova matriz visual por manter corpo/HTML gerado e CSS intactos.
@@ -643,14 +643,14 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Abas de estatísticas (G3ap)
 
-- `src/modules/analytics/presentation/statistics-tabs.js`: `switchStatTab(id,el)` global, 11 linhas movidas byte a byte; script clássico síncrono depois de `psychology-statistics.js` e antes de `app.js`.
+- `src/modules/analytics/presentation/statistics-controls.js`: `switchStatTab(id,el)`, `toggleCustomPeriod()` e `onStatsAccountChange()` globais; script clássico síncrono depois de `psychology-statistics.js` e antes de `app.js`.
 - `tests/statistics-tabs.test.cjs`: cinco painéis, classes, elemento opcional, ID desconhecido, fallback geral, psicologia, ordem da simulação e carga.
 - Cinco handlers HTML e dois cenários do smoke permanecem intactos; renderers, filtros, estado e cálculos continuam nas dependências existentes.
 - 260 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Filtros de estatísticas (G3aq)
 
-- `src/modules/analytics/presentation/statistics-filters.js`: `toggleCustomPeriod()` e `onStatsAccountChange()` globais, 11 linhas movidas byte a byte; script clássico síncrono depois de `statistics-tabs.js` e antes de `app.js`.
+- Os controles de filtro compartilham `statistics-controls.js` com as abas por pertencerem à mesma navegação da página de estatísticas.
 - `tests/statistics-filters.test.cjs`: período personalizado/predefinido, fallback, barra opcional, fixação da conta antes do renderer e carga.
 - Dois handlers HTML preservados; `statsAccountPinned`, seleção, datas, filtragem e `renderStats` permanecem nas dependências existentes.
 - 265 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
@@ -671,7 +671,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Mídia de documentos (G3s)
 
-- `src/modules/documents/presentation/document-media.js`: `renderDocumentMedia(entry)` global, 11 linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
+- `src/modules/documents/presentation/document-rendering-helpers.js`: `renderDocumentMedia(entry)` e `renderDocFolderIcon(type)` globais; helpers puros de markup carregados antes de `documents-page.js` e `app.js`.
 - `tests/document-media.test.cjs`: mensagens vazias por origem, ordem, URLs, escaping, fallback, índices de remoção, ausência de mutação, falhas e carga.
 - `documents-page.js` mantém o consumidor; helpers de imagem, remoção e persistência continuam no legado.
 - 154 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
@@ -713,14 +713,14 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Resumo da conta no shell (G3y)
 
-- `src/app/presentation/account-summary.js`: `renderTopbarAccount()` global, dez linhas movidas byte a byte; script clássico síncrono antes de `accounts-page.js` e `app.js`.
+- `src/app/presentation/topbar.js`: `renderTopbarAccount()` permanece global no componente coeso da topbar, antes de `accounts-page.js` e `app.js`.
 - `tests/account-summary.test.cjs`: guard de conta, cor, nome, label de tipo, targets independentes, não mutação e carga.
 - Conta ativa, normalização, seleção, tipo e métricas do topbar continuam no legado; cinco consumidores preservados.
 - 183 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Valor responsivo do topbar (G3ac)
 
-- `src/app/presentation/topbar-value.js`: `renderTopbarValue(id)` global, nove linhas movidas byte a byte; script clássico síncrono antes dos consumidores e de `app.js`.
+- `src/app/presentation/topbar.js`: `renderTopbarValue(id)` permanece global no componente coeso da topbar, antes dos consumidores e de `app.js`.
 - `tests/topbar-value.test.cjs`: cache ausente, target ausente, densidade completa/compacta, título, argumentos de classe e carga.
 - Cache, densidade, formatação e atualização das métricas permanecem nas dependências existentes; dois consumidores preservados.
 - 199 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
@@ -804,7 +804,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Ícones das pastas de documentos (G3z)
 
-- `src/modules/documents/presentation/document-folder-icon.js`: `renderDocFolderIcon(type)` global, nove linhas movidas byte a byte; script clássico síncrono antes de `documents-page.js` e `app.js`.
+- `src/modules/documents/presentation/document-rendering-helpers.js`: `renderDocFolderIcon(type)` permanece global ao lado do renderer de mídia, antes de `documents-page.js` e `app.js`.
 - `tests/document-folder-icon.test.cjs`: wrapper, contrato SVG acessível, quatro tipos, paths distintos, fallback e carga.
 - Navegação, pastas, estado e persistência continuam no legado ou em `documents-page.js`; dois consumidores preservados.
 - 187 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.

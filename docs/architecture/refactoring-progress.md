@@ -166,14 +166,14 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- Revisão de granularidade iniciada pelo módulo `data-transfer`: `backup-summary.js`, `export-account-filter.js` e `import-tabs.js` foram consolidados em `presentation/data-transfer-controls.js`.
-- Três APIs globais e seus testes permanecem separados por comportamento; uma única carga clássica substitui três cargas consecutivas, na mesma posição relativa antes de `app.js`.
-- Nenhuma mudança de DOM, persistência ou dependência de runtime. G5k continua validado; `app.js` permanece com 6.818 linhas.
-- 79 arquivos de teste Node e 107 checks no navegador passaram; sintaxe e diff aprovados. Revisão independente teve dois achados corrigidos: spies da ordem dos efeitos e referências antigas nos mapas.
+- Revisão de granularidade ampliada: topbar, controles de estatísticas e helpers de renderização de documentos foram consolidados por responsabilidade.
+- Sete arquivos pequenos passaram a três componentes coesos; `dashboard-equity-mode.js` foi avaliado e permaneceu separado para preservar sua posição clássica após o dashboard.
+- APIs globais, DOM, persistência e dependências de runtime permanecem inalterados; `app.js` continua com 6.818 linhas.
+- Testes de caracterização dos três grupos passaram antes e depois da consolidação; validação completa e revisão independente registradas no fechamento do lote.
 
 ## Next
 - G5l: caracterizar e separar geração/carregamento de dados demonstrativos (buildTickmillDemoImport/loadTickmillDemoImport, buildSampleTrades, ensureSampleStrategies, loadSampleData e addSampleTrades); preservar datas/IDs/valores, confirmação e persistência.
-- Antes de novos cortes pequenos, aplicar o mesmo critério de coesão aos módulos já extraídos; consolidar somente quando reduzir custo real de navegação.
+- Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Depois: inicialização/persistências restantes e fluxos de operações/regras ainda legados; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 

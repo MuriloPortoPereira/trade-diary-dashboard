@@ -14,7 +14,7 @@ legadas e contrato global foram preservados.
 estratégias e psicologia. Produtores e cálculos permanecem nas features.
 
 `renderDocumentMedia` (G3s) foi movida intacta para
-`src/modules/documents/presentation/document-media.js`: o renderer continua
+`src/modules/documents/presentation/document-rendering-helpers.js`: o renderer continua
 global para `documents-page.js`; leitura, remoção e persistência seguem no legado.
 
 `renderAccountCashflowList` (G3t) foi movida intacta para
@@ -38,11 +38,11 @@ trades, risco e formatação permanecem como dependências globais.
 salvamento, tags e cálculo financeiro permanecem nas dependências existentes.
 
 `renderTopbarAccount` (G3y) foi movida intacta para
-`src/app/presentation/account-summary.js`: conta ativa, normalização, seleção,
+`src/app/presentation/topbar.js`: conta ativa, normalização, seleção,
 tipo e métricas do topbar permanecem nas dependências globais existentes.
 
 `renderDocFolderIcon` (G3z) foi movida intacta para
-`src/modules/documents/presentation/document-folder-icon.js`: navegação,
+`src/modules/documents/presentation/document-rendering-helpers.js`: navegação,
 pastas, estado e persistência permanecem nas dependências existentes.
 
 `renderExportAccountFilter` (G3aa) foi movida intacta e hoje está consolidada em
@@ -58,11 +58,11 @@ resumo, tradução, restauração e exportação permanecem nas dependências ex
 parsing, download e importação permanecem nas dependências existentes.
 
 `switchStatTab` (G3ap) foi movida intacta para
-`src/modules/analytics/presentation/statistics-tabs.js`: renderers, filtros,
+`src/modules/analytics/presentation/statistics-controls.js`: renderers, filtros,
 estado e cálculos das cinco abas permanecem nas dependências existentes.
 
 `toggleCustomPeriod` e `onStatsAccountChange` (G3aq) foram movidas intactas para
-`src/modules/analytics/presentation/statistics-filters.js`: estado fixado,
+`src/modules/analytics/presentation/statistics-controls.js`: estado fixado,
 seleção, datas, filtragem e renderer permanecem nas dependências existentes.
 
 `toggleEqMode` (G3ar) foi movida intacta para
@@ -82,7 +82,7 @@ Chart.js, formatadores e helpers permanecem nas dependências existentes.
 timing, estratégias, Chart.js e simulação permanecem nas dependências existentes.
 
 `renderTopbarValue` (G3ac) foi movida intacta para
-`src/app/presentation/topbar-value.js`: cache, densidade, formatação e
+`src/app/presentation/topbar.js`: cache, densidade, formatação e
 atualização das métricas permanecem nas dependências globais existentes.
 
 `renderImagePreviews` (G3ad) foi movida intacta para
@@ -146,7 +146,7 @@ refresh, troca de página e sidebar permanecem globais; listeners, estado e boot
 continuam na composição legada.
 
 As estatísticas da topbar (G3be) foram movidas intactas para
-`src/app/presentation/topbar-statistics.js`: períodos e projeções permanecem globais;
+`src/app/presentation/topbar.js`: períodos e projeções permanecem globais;
 risco, trades, relógio e formatação continuam nas dependências existentes.
 
 O timing de trades (G4a) foi isolado em

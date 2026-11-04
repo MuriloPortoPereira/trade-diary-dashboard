@@ -1,3 +1,24 @@
+function renderTopbarValue(id){
+  const item=topbarValueCache[id];
+  const el=document.getElementById(id);
+  if(!item||!el)return;
+  const value=topbarDensity==='compact'?item.compact:item.full;
+  el.textContent=value;
+  el.title=item.full;
+  setTopbarClass(el,item.baseClass,item.cls);
+}
+
+function renderTopbarAccount(){
+  const a=getActiveAccount();
+  if(!a)return;
+  const dot=document.getElementById('acctDot');
+  const name=document.getElementById('acctPillName');
+  const type=document.getElementById('acctPillType');
+  if(dot)dot.style.background=a.color;
+  if(name)name.textContent=a.name;
+  if(type)type.textContent=acctTypeLabel(a.type);
+}
+
 function updateTopbarStats(options={}){
   const shouldFit=options.fit!==false;
   const a=getActiveAccount();

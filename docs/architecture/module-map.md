@@ -73,7 +73,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/account-balance-drawdown.test.cjs` | Caracterização de cashflow, ordem, perdas, coerção, isolamento e carga |
 | `src/modules/accounts/domain/calculate-risk-period-pnl.js` | Filtros temporais e P/L de risco com datas explícitas; 42 linhas |
 | `tests/account-risk-period-pnl.test.cjs` | Caracterização de limites de data, períodos, P/L textual, isolamento e carga |
-| `src/app/presentation/topbar-statistics.js` | Períodos, drawdown, meta e badge da topbar; uma função/24 linhas |
+| `src/app/presentation/topbar.js` | Valor responsivo, conta ativa e estatísticas da topbar; três funções coesas/45 linhas |
 | `tests/topbar-statistics.test.cjs` | Caracterização de datas, percentuais, tons, meta, alvos opcionais, densidade e carga |
 | `src/modules/data-transfer/infrastructure/serialize-trades-csv.js` | Formato CSV: colunas e escaping; recebe dados explícitos, sem executar IO |
 | `tests/trades-csv.test.cjs` | Caracterização do CSV, wrappers/default, consumidor de exportação e ordem de scripts |
@@ -194,7 +194,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/status-list.test.cjs` | Caracterização de vazio, escaping, ações, valores, alvos e carga |
 | `src/shared/presentation/analysis-summary.js` | Resumos analíticos reutilizados por estratégias e psicologia; 10 linhas intactas |
 | `tests/analysis-summary.test.cjs` | Caracterização de ordem, escaping, defaults, itens falsy, vazio, alvos e carga |
-| `src/modules/documents/presentation/document-media.js` | Renderer de imagens e estado vazio dos documentos; 11 linhas intactas |
+| `src/modules/documents/presentation/document-rendering-helpers.js` | Mídia, estado vazio e ícones de pastas dos documentos; dois helpers coesos/21 linhas |
 | `tests/document-media.test.cjs` | Caracterização de vazio, ordem, URLs, escaping, ações, falhas e carga |
 | `src/modules/accounts/presentation/account-cashflow-form.js` | Renderer do resumo e movimentos temporários no formulário de conta; 22 linhas intactas |
 | `tests/account-cashflow-form.test.cjs` | Caracterização de guard, vazio, resumo, sinais, linhas, escaping, ações e carga |
@@ -210,9 +210,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/account-balance-chrome.test.cjs` | Caracterização de defaults, retorno, sinais, campos opcionais, formatação e carga |
 | `src/modules/accounts/presentation/risk-tags.js` | Listas editáveis de estratégias, emoções e mercados da configuração; 16 linhas intactas |
 | `tests/risk-tags.test.cjs` | Caracterização de guard, inicialização, ordem, escaping, contagem, controles e carga |
-| `src/app/presentation/account-summary.js` | Projeção da conta ativa no topbar; 10 linhas intactas |
 | `tests/account-summary.test.cjs` | Caracterização de guard, cor, nome, tipo, alvos opcionais e carga |
-| `src/app/presentation/topbar-value.js` | Projeção de um valor completo/compacto no topbar; 9 linhas intactas |
 | `tests/topbar-value.test.cjs` | Caracterização de guards, densidade, título, classe e carga |
 | `src/modules/trades/presentation/trade-images.js` | Prévia das imagens temporárias da operação; 4 linhas intactas |
 | `tests/trade-images.test.cjs` | Caracterização de guard, vazio, ordem, campos, remoção e carga |
@@ -232,13 +230,11 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-log-selection.test.cjs` | Caracterização de guard, contagens, textos, classes, ações, checkbox geral e carga |
 | `src/modules/trades/presentation/trade-log.js` | Orquestração e linhas da tabela do diário; três funções/87 linhas intactas |
 | `tests/trade-log-page.test.cjs` | Caracterização de filtros, vazio, incompletos, labels, linhas compacta/completa, isolamento StudyHub e carga |
-| `src/modules/documents/presentation/document-folder-icon.js` | Ícones SVG das pastas e fallback de arquivo; 9 linhas intactas |
 | `tests/document-folder-icon.test.cjs` | Caracterização de wrapper, SVGs, tipos, fallback e carga |
 | `src/modules/psychology/presentation/psychology-statistics.js` | Renderer da aba de psicologia em análises, 59 linhas intactas |
 | `tests/psychology-statistics.test.cjs` | Caracterização de cards, gráficos, resumos, hesitações, erros, tabela, vazio e carga |
-| `src/modules/analytics/presentation/statistics-tabs.js` | Alternância global das cinco abas de análises e despacho para seus renderers; 11 linhas intactas |
+| `src/modules/analytics/presentation/statistics-controls.js` | Abas, período personalizado e conta fixada das estatísticas; três funções coesas/23 linhas |
 | `tests/statistics-tabs.test.cjs` | Caracterização de painéis, classes, alvos opcionais, fallback, psicologia, simulação e carga |
-| `src/modules/analytics/presentation/statistics-filters.js` | Controles globais de período personalizado e fixação da conta das estatísticas; 11 linhas intactas |
 | `tests/statistics-filters.test.cjs` | Caracterização de período, fallback, alvos opcionais, ordem da fixação da conta e carga |
 | `src/modules/analytics/presentation/statistics-page.js` | Orquestração da página de análises; 193 linhas movidas intactas |
 | `tests/statistics-page.test.cjs` | Caracterização de contas, risco, vazio, gráficos, símbolos, dias, horários e carga |

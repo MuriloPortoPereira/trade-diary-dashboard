@@ -37,7 +37,7 @@ A página StudyHub chamada “Simulações” é outro conjunto de ferramentas; 
 
 | Região / linhas | Destino JS proposto | Contrato preservado |
 |---|---|---|
-| Topbar 15–60, overlay 61, sidebar 64–146 | `src/app/presentation/navigation.js`, `account-summary.js` | `showPage`, sidebar, conta ativa, idioma e cotação |
+| Topbar 15–60, overlay 61, sidebar 64–146 | `src/app/presentation/navigation.js`, `topbar.js` | `showPage`, sidebar, conta ativa, idioma e cotação |
 | Main 149–1101 | Manter montagem em `index.html` nesta fase | Todos os IDs disponíveis antes do bootstrap |
 | `tradeModal` 1105–1327 | trades / `trade-form.js` | Campos t-*, defaults, cálculos, imagens, salvar/cancelar, anterior/próximo |
 | `accountModal` 1330–1393 | accounts / `account-form.js` | Campos af-*, tipo, limites e movimentos financeiros |
