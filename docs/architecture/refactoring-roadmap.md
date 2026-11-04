@@ -927,6 +927,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Script clássico síncrono antes de `navigation.js` e `app.js`; handlers, bootstrap, formato persistido e dependências permanecem intactos.
 - `app.js`: 6.818 para 6.571 linhas. Próximo G5m: inicialização e persistências restantes em macrobloco coeso.
 
+## G5m: bootstrap e cotação persistida
+
+- Callback de carga movido intacto para `src/app/application/bootstrap-app.js`, 64 linhas; restauração, seeds, documentos, resize e renderização permanecem na mesma ordem.
+- Cotação USD/BRL movida para `src/modules/preferences/infrastructure/exchange-rate.js`, 50 linhas; `appCotacao`, AwesomeAPI, spinner, intervalo e bridge StudyHub preservados.
+- Dois testes de caracterização passaram antes do corte e protegem estado vazio/existente, defaults, filtro de documentos, armazenamento, sucesso/falha de rede e carga clássica.
+- `app.js`: 6.571 para 6.455 linhas. Próximo G5n: operações, formulários e regras por responsabilidade.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

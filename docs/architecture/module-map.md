@@ -5,7 +5,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 
 | Feature | Entradas/símbolos | Dependências atuais |
 |---|---|---|
-| Shell/navegação | `src/app/presentation/navigation.js`; callback `window.load` em `app.js` | IDs `page-*`, funções globais, contas e estado |
+| Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
 | Operações | `saveTrade`, `renderLog`, `duplicateTrade`, `getLogFilteredTrades` | Formulário, `trades`, contas, `save`, métricas |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js` | Geração determinística, importação Tickmill, estratégias, confirmação e persistência |
 | Contas/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount`, `renderAccountsPage` | `accounts`, trades, calendário atual, cashflows, formatação |
@@ -23,7 +23,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Parceiros | `renderPartnersPage`, `ensurePartnerHubConfig` | `config.partnerHub`, links, imagens, clipboard |
 | Perfil/notificações | `renderProfilePage`, `renderNotificationsPage`, `buildOperationalAlerts` | Conta ativa, risco e histórico; sem autenticação |
 | Configuração/storage | `renderSetup`, `saveConfig`, `save`, `load` | Globals, normalização, localStorage |
-| Idiomas/cotação | `TRANSLATIONS`, `applyLanguage`, `fetchCotacao` | DOM, storage, AwesomeAPI; cotação também duplicada no legado |
+| Idiomas/cotação | `TRANSLATIONS`, `applyLanguage`; `src/modules/preferences/infrastructure/exchange-rate.js` | DOM, storage, AwesomeAPI; cotação também duplicada no legado |
 
 ## Fronteiras de integração que devem permanecer compatíveis
 

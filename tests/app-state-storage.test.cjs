@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const bootstrap = fs.readFileSync(path.join(root, 'src/app/application/bootstrap-app.js'), 'utf8');
 const storagePath = 'src/app/infrastructure/app-state-storage.js';
 const loadPath = 'src/app/application/load-app-state.js';
 const keys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
@@ -207,7 +208,8 @@ test('classic persistence scripts initialize without IO and load runs through a 
   }
   assert.equal(typeof context.save, 'function');
   assert.doesNotMatch(app, /^function (?:save|load)\(/m);
-  assert.match(app, /\bload\(\);/);
+  assert.doesNotMatch(app, /\bload\(\);/);
+  assert.match(bootstrap, /\bload\(\);/);
   context.readPersistedAppState = () => ({trades: '[]'});
   context.load();
   assert.deepEqual(plain(context.trades), []);

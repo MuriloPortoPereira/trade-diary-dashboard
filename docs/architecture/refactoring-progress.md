@@ -166,14 +166,14 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5l: geração e carregamento de dados demonstrativos extraídos para `src/modules/trades/application/demo-data.js` em um único módulo coeso.
-- Seis APIs globais, dataset de 300 trades, importação Tickmill de 40 registros, estratégias, confirmação e efeitos de persistência preservados.
-- `app.js`: 6.818 para 6.571 linhas; nenhuma dependência de runtime ou formato persistido foi alterado.
-- Teste de caracterização criado e executado antes do corte; validação completa e revisão independente registradas no fechamento do lote.
+- G5m: bootstrap extraído para `src/app/application/bootstrap-app.js`; cotação e sua persistência para `src/modules/preferences/infrastructure/exchange-rate.js`.
+- Restauração, seeds, documentos padrão, resize, ordem de renderização, storage, fetch, intervalo e integração StudyHub preservados.
+- `app.js`: 6.571 para 6.455 linhas; nenhuma dependência de runtime, chave persistida ou API global alterada.
+- Testes de caracterização executados antes do corte; validação completa e revisão independente registradas no fechamento do lote.
 
 ## Next
-- G5m: caracterizar e separar inicialização/persistências restantes como macrobloco, sem fragmentar funções pequenas relacionadas.
-- Depois: fluxos de operações/formulários/regras; StudyHub G6 e HTML/compatibilidade G7 continuam pendentes.
+- G5n: fluxos de operações, formulários e regras ainda legados em macroblocos por responsabilidade.
+- Depois: StudyHub G6 e HTML/compatibilidade G7 continuam pendentes; persistências internas do StudyHub pertencem ao G6.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 
@@ -181,7 +181,7 @@
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
-- Persistência principal caracterizada; seeds/bootstrap, parsers de importação, trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
+- Persistência principal, seeds/bootstrap e cotação caracterizados; trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
 - Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.
 - Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.

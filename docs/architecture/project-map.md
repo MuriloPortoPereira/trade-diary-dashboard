@@ -6,7 +6,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 | Trabalho | Procurar primeiro |
 |---|---|
-| Inicialização/navegação | `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; callback `window.load` em `app.js`; `index.html` |
+| Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
 | Operação/diário | `saveTrade`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js`; `getLogFilteredTrades`, `duplicateTrade` em `app.js` |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
 | Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
@@ -22,7 +22,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |
-| Idioma/câmbio | `src/modules/preferences/presentation/`; `fetchCotacao` permanece em `app.js` |
+| Idioma/câmbio | `src/modules/preferences/presentation/`; `src/modules/preferences/infrastructure/exchange-rate.js` |
 | Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
 
 ## Simulação: primeiro domínio extraído
@@ -816,3 +816,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - Mantém 300 trades determinísticos por conta/data, 40 registros Tickmill, IDs, datas, valores, estratégias, confirmação, persistência, notices e APIs globais.
 - Script clássico síncrono antes de `navigation.js` e `app.js`; consumidores HTML e bootstrap permanecem intactos.
 - `tests/demo-data.test.cjs`: assinatura SHA-256 do dataset e ordem de bloqueio, importação, confirmação, `save`, refresh e notice.
+
+## Bootstrap e cotação (G5m)
+
+- `src/app/application/bootstrap-app.js`: callback global de carga em 64 linhas; restauração, seeds, normalização, documentos padrão, resize e ordem dos renderers preservados.
+- `src/modules/preferences/infrastructure/exchange-rate.js`: estado, persistência, fetch e intervalo da cotação USD/BRL em 50 linhas; AwesomeAPI e integração StudyHub intactas.
+- Scripts clássicos síncronos antes de `navigation.js` e `app.js`; `tests/app-bootstrap.test.cjs` e `tests/exchange-rate.test.cjs` caracterizam os contratos antes do corte.
