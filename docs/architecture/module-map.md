@@ -17,8 +17,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Importação | `parseMT5Rows`, `parseGenericTradeRows`, `parseMT5HTML`, `confirmImport` | FileReader, datas, IDs, normalizadores, contas e `save` |
 | Backup/exportação | `createBackupPayload`, `restoreBackupData`, `exportJSON`, `buildTradesCSV` | Estado global, JSON, CSV, Blob, confirmação e storage |
 | StudyHub nativo | `renderStudyHub`, `buildStudySimulation`, `syncStudyHubLegacyInputs` | Estado `studyHubState`, conta, risco, DOM legado e `window.sh_*` |
-| StudyHub legado | `shInitLegacyModule`, `calcSimulador`, `calcCiclos`, `tsRunAll`, `fmSimular` | IIFE própria, template integrado, Chart.js e chaves storage próprias |
-| Intraday adicional | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
+| StudyHub legado | `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`: `shInitLegacyModule`, `calcSimulador`, `calcCiclos`, `tsRunAll`, `fmSimular` | IIFE própria, template integrado, Chart.js e chaves storage próprias |
+| Intraday adicional | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
 | Documentos/imagens | `renderDocumentsPage`, `saveCurrentDocument`, `getDocumentEntries` | Trades, rotina, `config.generalDocs`, FileReader, DOM |
 | Parceiros | `renderPartnersPage`, `ensurePartnerHubConfig` | `config.partnerHub`, links, imagens, clipboard |
 | Perfil/notificações | `renderProfilePage`, `renderNotificationsPage`, `buildOperationalAlerts` | Conta ativa, risco e histórico; sem autenticação |
@@ -37,6 +37,9 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 
 | Arquivo | Responsabilidade |
 |---|---|
+| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template e runtime legado com privados isolados; exceção temporária de 2.389 linhas até decomposição interna G6 |
+| `src/modules/study-hub/presentation/study-hub-intraday.js` | Controles, projeções e wrappers do intraday; 306 linhas |
+| `tests/study-hub-runtime.test.cjs` | Montagem única, pontes, isolamento, navegação, limites/projeções intraday e carga clássica |
 | `src/modules/simulation/domain/calculate-simulation-sizing.js` | Cálculo numérico puro; sem DOM, storage ou framework |
 | `src/app/infrastructure/app-state-storage.js` | save e leitura bruta das seis chaves principais; 17 linhas, estado global transitório |
 | `src/app/application/load-app-state.js` | load/normalização via contrato de leitura bruta; 17 linhas, sem storage direto |

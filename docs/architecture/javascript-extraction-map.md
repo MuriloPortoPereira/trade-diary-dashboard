@@ -257,11 +257,11 @@ não transferir centenas de linhas mistas para um novo monólito por página.
 
 ## StudyHub: fronteira separada de maior risco
 
-| Bloco atual | Destino inicial proposto | Condição |
+| Bloco / baseline | Destino atual ou proposto | Condição |
 |---|---|---|
-| Montagem 7075–7082; template na linha 7080 | `modules/study-hub/legacy/mount-legacy-template.js` | Preservar texto, host.innerHTML e dataset.loaded; a linha gigante continua exceção temporária, não solução final |
-| IIFE legado 7084–9461 | `modules/study-hub/legacy/integrated-runtime.js` | Mover intacto primeiro, preservando closure e registro dos callbacks; exceção >1.000 linhas até submódulos |
-| Intraday 9465–9770 | `modules/study-hub/presentation/intraday-impact.js` | IIFE e wrappers sh_buildIntraday/sh_tsRunAll intactos, carregados depois do runtime legado |
+| Montagem 7075–7082; template na linha 7080; G6a executado | `modules/study-hub/presentation/study-hub-legacy-runtime.js` | Texto, host.innerHTML e dataset.loaded intactos; template permanece junto do consumidor durante a transição |
+| IIFE legado 7084–9461; G6a executado | Mesmo runtime de apresentação, 2.389 linhas | Closure e callbacks intactos; exceção >1.000 linhas até extrair regras/adaptadores internos sem expor privados |
+| Intraday 9465–9770; G6a executado | `modules/study-hub/presentation/study-hub-intraday.js`, 306 linhas | IIFE e wrappers sh_buildIntraday/sh_tsRunAll intactos; sequência síncrona app.js → runtime → intraday |
 | Integração nativa, símbolos buildStudyHub*/renderStudy*/syncStudyHubLegacyInputs, `renderStudyHub` 5616–5651 | `modules/study-hub/presentation/{study-hub-page,legacy-input-sync,propfirm-panel,plan-panel,simulation-panel,mental-panel}.js` | Estado studyHubState, risco/conta, IDs e pontes window.sh_* |
 
 O runtime contém shell/cotação 7084–7163; propfirm 7165–7887; plano 7889–8279;
@@ -272,9 +272,9 @@ Após isolar o bundle, caracterizar e separar cada ferramenta, começando por su
 adaptadores de estado. Não expor seus nomes privados como globais: há nomes comuns com o app principal.
 Manter chaves pfCot, pfState, cot, hubCiclos e diary2026; não unificar com tl_* ou appCotacao incidentalmente.
 
-`shSafe` captura exceções e usa console.error. O smoke atual de window.error/unhandledrejection
-não detecta todas essas falhas. Antes desse lote, observar console e resultados das quatro ferramentas;
-usar RNG/relógio determinísticos e verificar callbacks, resize, charts, wrappers e montagem única.
+`shSafe` captura exceções e usa console.error. Desde G6a, o smoke também intercepta mensagens
+`[StudyHub Legacy]` e verifica sizing determinístico, pfState e projeções intraday, além das quatro abas.
+Não equivale a cobertura de todos os cálculos, erros silenciados por outros catches, Monte Carlo ou estados visuais.
 
 ## Sequência transversal
 

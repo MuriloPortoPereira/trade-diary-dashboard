@@ -11,6 +11,12 @@ const chrome = process.env.CHROME_BIN || 'google-chrome';
 
 function browserProbe() {
   const errors = [];
+  const studyHubErrors = [];
+  const originalConsoleError = console.error;
+  console.error = function(...args) {
+    if (args[0] === '[StudyHub Legacy]') studyHubErrors.push(String(args[1]));
+    return originalConsoleError.apply(this, args);
+  };
   window.addEventListener('error', event => {
     errors.push(event.message || `Resource failed: ${event.target?.src || event.target?.href}`);
   }, true);
@@ -253,6 +259,30 @@ function browserProbe() {
           document.getElementById('studyHubLegacyApp').dataset.loaded === '1' &&
           document.getElementById(`mod-${tab}`).classList.contains('active'));
       }
+      const studyInputs = {s_conta: '10000', s_ddmax: '10', s_dddaily: '2', s_stops: '20', s_rrr: '2', s_fim: '10'};
+      const studyBefore = Object.fromEntries(Object.keys(studyInputs).map(id => [id, document.getElementById(id).value]));
+      const pfStateBefore = localStorage.getItem('pfState');
+      try {
+        for (const [id, value] of Object.entries(studyInputs)) document.getElementById(id).value = value;
+        window.sh_calcSimulador();
+        check('StudyHub legacy calculator bridge produces deterministic sizing',
+          document.getElementById('s_risco_usd').textContent === '$50,00' &&
+          document.getElementById('s_alvo_usd').textContent === '$100,00' &&
+          document.getElementById('s_meta_trades').textContent === '10 trades');
+        const savedStudy = JSON.parse(localStorage.getItem('pfState'));
+        check('StudyHub calculator preserves pfState persistence', savedStudy.s_conta === '10000' &&
+          savedStudy.s_stops === '20' && savedStudy.s_rrr === '2' && savedStudy.v === '1.0');
+      } finally {
+        for (const [id, value] of Object.entries(studyBefore)) document.getElementById(id).value = value;
+        window.sh_calcSimulador();
+        if (pfStateBefore === null) localStorage.removeItem('pfState');
+        else localStorage.setItem('pfState', pfStateBefore);
+      }
+      const studyRows = window.studyHubBuildIntradayRows({capital: 1000, riskPct: 1, accountGainPct: 2,
+        dailyStopPct: 3, dailyTargetPct: 4, stopAt: 3, targetAt: 2});
+      check('StudyHub intraday bridge preserves thresholds and financial projection', studyRows.length === 8 &&
+        studyRows[1].allGainValue === 40 && studyRows[1].hitTarget && !studyRows[1].hitStop && studyRows[2].hitStop);
+      check('StudyHub legacy initialization and calculators report no captured errors', studyHubErrors.length === 0);
       const persistedKeys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
       const persistedBefore = persistedKeys.map(key => localStorage.getItem(key));
       const previousPending = pendingImport;
@@ -391,7 +421,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 107, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 111, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');

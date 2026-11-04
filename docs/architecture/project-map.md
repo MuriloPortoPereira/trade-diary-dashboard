@@ -2,7 +2,7 @@
 
 Índice de navegação. Ler este mapa antes de procurar uma feature; buscar símbolos com Serena.
 Fallback: `rg -n 'function NOME' app.js`; abrir apenas o trecho necessário.
-Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
+Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`; usar símbolos e trechos filtrados por tamanho.
 
 | Trabalho | Procurar primeiro |
 |---|---|
@@ -15,8 +15,8 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
-| StudyHub | `renderStudyHub`, `syncStudyHubLegacyInputs`, `shInitLegacyModule` |
-| Intraday | `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
+| StudyHub | `renderStudyHub` e `syncStudyHubLegacyInputs` em `app.js`; montagem e `shInitLegacyModule` em `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` |
+| Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
 | Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
@@ -24,6 +24,14 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 | Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `src/modules/preferences/infrastructure/exchange-rate.js` |
 | Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
+
+## StudyHub: runtime e intraday (G6a)
+
+- `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`: montagem única/template e closure legada intactos, 2.389 linhas; privados permanecem isolados, pontes `window.sh_*` preservadas.
+- `src/modules/study-hub/presentation/study-hub-intraday.js`: complemento intraday em IIFE própria, 306 linhas; wrappers e montagem dos controles preservados.
+- Carga síncrona: `app.js` → runtime → intraday; callbacks load, Chart.js e ordem de inicialização mantidos.
+- `tests/study-hub-runtime.test.cjs` protege montagem, isolamento, pontes, navegação e projeções/limites intraday. Smoke verifica quatro abas, sizing determinístico, `pfState` e erros capturados por `shSafe`.
+- `app.js`: 5.839 → 3.142 linhas. Próximo G6b: estado/integração nativa e adaptadores de persistência; depois regras das ferramentas dentro da closure.
 
 ## Simulação: primeiro domínio extraído
 

@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5p: workflows financeiros e de risco reunidos em `src/modules/accounts/application/account-risk-workflows.js`.
-- Três APIs globais compõem estado financeiro/risco, chave semanal e análise de stops/taxas sobre os módulos puros já existentes.
-- `app.js`: 6.024 para 5.839 linhas; nenhuma dependência de runtime, chave persistida, handler ou ordem de efeitos alterada.
-- Teste de caracterização executado antes do corte; 85 testes Node e 107 checks no navegador passaram antes da revisão independente.
+- G6a: montagem/template e closure StudyHub isolados em `presentation/study-hub-legacy-runtime.js`; complemento em `presentation/study-hub-intraday.js`.
+- Os dois blocos mantêm corpos e template byte a byte; apenas linhas separadoras vazias dos cortes foram removidas. Carga síncrona após `app.js` preserva ordem das closures, callbacks, pontes e storage.
+- `app.js`: 5.839 para 3.142 linhas; runtime com exceção temporária de 2.389 linhas e intraday com 306 linhas.
+- Caracterização executada antes do corte; 86 arquivos de teste Node, 111 checks no navegador, sintaxe e diff passaram. Revisão independente sem bloqueios; wrappers intraday também possuem teste de encadeamento e montagem única.
 
 ## Next
-- G6: decompor o macrobloco StudyHub por responsabilidades coesas, incluindo suas persistências internas, sem imprimir nem reescrever o template gigante.
+- G6b: estado/integração nativa do StudyHub e adaptadores de persistência; depois regras puras das ferramentas dentro da closure, mantendo módulos coesos.
 - Depois: HTML/compatibilidade G7 e fechamento arquitetural continuam pendentes.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
@@ -183,7 +183,7 @@
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.
 - Persistência principal, seeds/bootstrap e cotação caracterizados; trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
-- Smoke cobre janela inicial e fluxo específico; não captura erros silenciados/console.error ou falhas assíncronas posteriores.
+- Smoke cobre janela inicial e fluxos específicos, incluindo console.error com prefixo StudyHub Legacy desde G6a; demais erros silenciados e falhas assíncronas posteriores permanecem fora da cobertura.
 - Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).
 - G1 compara pixels das quatro abas principais StudyHub, apenas subabas iniciais e viewport de 1.000px de altura.
 - Sem cobertura visual de hover/focus/scroll ou elementos ocultos; demais páginas, migrações e Monte Carlo completo permanecem sem validação ampla.

@@ -955,6 +955,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Teste pré-corte protege composição do estado, limites, drawdown, metas, períodos, breaches, taxas, arredondamentos e ordem clássica.
 - `app.js`: 6.024 para 5.839 linhas. Próximo G6: StudyHub por macroblocos coesos, incluindo persistências internas.
 
+## G6a: isolamento do runtime StudyHub e intraday
+
+- Montagem/template e closure movidos para `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`, 2.389 linhas; intraday para `study-hub-intraday.js`, 306 linhas. Corpos preservados byte a byte; somente separadores vazios dos cortes removidos.
+- Dois scripts clássicos síncronos após `app.js`, preservando sequência, privados, callbacks load, pontes `window.sh_*`, Chart.js e chaves próprias de storage.
+- Caracterização pré-corte cobre montagem única, isolamento, navegação, pontes, projeções e limites intraday; smoke ampliado para sizing determinístico, pfState e erros capturados internamente.
+- `app.js`: 5.839 → 3.142 linhas. Próximo G6b: estado/integração nativa e persistências, seguido das regras internas das ferramentas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1014,4 +1021,5 @@ Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobert
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
+Desde G6a, `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` tem exceção temporária de 2.389 linhas: preserva a closure validada e nomes privados compartilhados. O restante do G6 deve extrair regras puras e adaptadores por ferramenta antes de remover essa exceção; não dividir por contagem de linhas. O template gigante permanece intacto junto da montagem até existir um corte próprio verificado.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.
