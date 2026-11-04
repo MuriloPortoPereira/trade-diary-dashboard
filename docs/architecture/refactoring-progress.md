@@ -166,18 +166,19 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G5o: formulário de operações consolidado em `src/modules/trades/presentation/trade-form.js`.
-- Onze APIs globais reúnem disciplina, reset, preenchimento, R/R, opções, conta, duração, desvio e imagens; cinco arquivos pequenos foram absorvidos.
-- `app.js`: 6.199 para 6.024 linhas; nenhuma dependência de runtime, chave persistida ou handler alterado.
-- Teste de caracterização executado antes do corte; validação completa e revisão independente registradas no fechamento do lote.
+- G5p: workflows financeiros e de risco reunidos em `src/modules/accounts/application/account-risk-workflows.js`.
+- Três APIs globais compõem estado financeiro/risco, chave semanal e análise de stops/taxas sobre os módulos puros já existentes.
+- `app.js`: 6.024 para 5.839 linhas; nenhuma dependência de runtime, chave persistida, handler ou ordem de efeitos alterada.
+- Teste de caracterização executado antes do corte; 85 testes Node e 107 checks no navegador passaram antes da revisão independente.
 
 ## Next
-- G5p: regras financeiras/risco restantes fora do formulário, mantendo domínio separado de apresentação.
-- Depois: StudyHub G6 e HTML/compatibilidade G7 continuam pendentes; persistências internas do StudyHub pertencem ao G6.
+- G6: decompor o macrobloco StudyHub por responsabilidades coesas, incluindo suas persistências internas, sem imprimir nem reescrever o template gigante.
+- Depois: HTML/compatibilidade G7 e fechamento arquitetural continuam pendentes.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 
 ## Risks
+- `getTradeWeekKey` está protegido indiretamente pelo agrupamento semanal; entrada vazia, data inválida e fronteira domingo/sábado ainda não possuem casos diretos.
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
 - Monólitos permanecem grandes, com justificativa temporária no roadmap.

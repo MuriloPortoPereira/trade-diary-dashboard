@@ -6,9 +6,8 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const start = appSource.indexOf('function calcAccountRiskState(');
-const end = appSource.indexOf('\nfunction formatSignedMoney(', start);
-assert.ok(start >= 0 && end > start);
+const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
+const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
 function balance({initial = 1000, trades = [], cashflow = {deposits: 0, withdrawals: 0, net: 0}} = {}) {
   const calls = [];
@@ -26,7 +25,7 @@ function balance({initial = 1000, trades = [], cashflow = {deposits: 0, withdraw
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(appSource.slice(start, end), context, {filename: 'app.js#account-risk'});
+  vm.runInContext(workflowSource, context, {filename: workflowPath});
   const state = context.calcAccountRiskState({balance: initial, goalPct: 10}, trades, 'all');
   return {values: [state.capitalBase, state.currentBalance, state.peakBalance, state.currentDdPct,
     state.currentDdUsd, state.totalPnl], calls};
@@ -86,5 +85,6 @@ test('balance drawdown domain is pure and loads once before classic consumers', 
     'src/modules/analytics/presentation/dashboard-page.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
-  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.match(workflowSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
 });

@@ -948,6 +948,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Script clássico único depois dos chips de erro e antes dos demais consumidores; handlers, globals e persistência permanecem intactos.
 - `app.js`: 6.199 para 6.024 linhas. Próximo G5p: regras financeiras e risco restantes fora da apresentação.
 
+## G5p: workflows financeiros e de risco
+
+- `calcAccountRiskState`, `getTradeWeekKey` e `buildStopFeeAnalysis` reunidos em `src/modules/accounts/application/account-risk-workflows.js`, 183 linhas/3 APIs globais.
+- O workflow coordena cashflow e os quatro domínios puros de risco já existentes; agrupamentos e cálculos de taxas permanecem byte a byte.
+- Teste pré-corte protege composição do estado, limites, drawdown, metas, períodos, breaches, taxas, arredondamentos e ordem clássica.
+- `app.js`: 6.024 para 5.839 linhas. Próximo G6: StudyHub por macroblocos coesos, incluindo persistências internas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

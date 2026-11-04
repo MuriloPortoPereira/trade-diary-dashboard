@@ -73,6 +73,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/account-balance-drawdown.test.cjs` | Caracterização de cashflow, ordem, perdas, coerção, isolamento e carga |
 | `src/modules/accounts/domain/calculate-risk-period-pnl.js` | Filtros temporais e P/L de risco com datas explícitas; 42 linhas |
 | `tests/account-risk-period-pnl.test.cjs` | Caracterização de limites de data, períodos, P/L textual, isolamento e carga |
+| `src/modules/accounts/application/account-risk-workflows.js` | Composição do estado financeiro/risco e análise de stops/taxas; três APIs globais coesas/183 linhas |
+| `tests/account-risk-workflows.test.cjs` | Caracterização integrada de cashflow, limites, drawdown, metas, períodos, taxas, agrupamentos e carga clássica |
 | `src/app/presentation/topbar.js` | Valor responsivo, conta ativa e estatísticas da topbar; três funções coesas/45 linhas |
 | `tests/topbar-statistics.test.cjs` | Caracterização de datas, percentuais, tons, meta, alvos opcionais, densidade e carga |
 | `src/modules/data-transfer/infrastructure/serialize-trades-csv.js` | Formato CSV: colunas e escaping; recebe dados explícitos, sem executar IO |

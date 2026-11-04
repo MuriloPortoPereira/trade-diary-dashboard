@@ -153,6 +153,13 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 - `calcAccountRiskState` global preservado; relógio, construção de datas, rótulos e composição do estado continuam no wrapper.
 - `app.js`: 7.388 para 7.352 linhas. 393 testes Node, 96 checks no navegador e revisão independente aprovada.
 
+## Workflows financeiros e de risco (G5p)
+
+- `src/modules/accounts/application/account-risk-workflows.js`: `calcAccountRiskState`, `getTradeWeekKey` e `buildStopFeeAnalysis` globais em um macrobloco de aplicação com 183 linhas.
+- `tests/account-risk-workflows.test.cjs`: composição de cashflow, limites, drawdown, metas e períodos; agrupamento diário/semanal/mensal, breaches, taxas e arredondamentos.
+- Os quatro módulos puros de risco permanecem em `domain`; o workflow apenas os coordena e mantém dependências globais compatíveis com scripts clássicos.
+- `app.js`: 6.024 para 5.839 linhas. 85 testes Node e 107 checks no navegador no fechamento anterior à revisão independente.
+
 ## Banner de trades incompletos (G3an)
 
 - `src/modules/trades/presentation/incomplete-trade-banner.js`: `updateIncompleteBanner()` e `dismissIncompleteBanner()` globais, com estado de descarte, 14 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
@@ -574,7 +581,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 ## Stops e taxas: apresentação (G3j)
 
 - `src/modules/analytics/presentation/stop-fee-analysis.js`: `renderStopFeeAnalysis` global, 51 linhas movidas byte a byte; script clássico síncrono antes de calendário e de `app.js`.
-- Consumidor `renderStats` intacto; `buildStopFeeAnalysis`, `fR` e `mkTip` continuam no legado. Nenhum cálculo financeiro extraído neste lote.
+- No G3j, o consumidor `renderStats` permaneceu intacto e nenhum cálculo financeiro foi extraído; desde o G5p, `buildStopFeeAnalysis` está em `accounts/application/account-risk-workflows.js`, enquanto `fR` e `mkTip` seguem nas dependências existentes.
 - `tests/stop-fee-analysis.test.cjs`: quatro cards, tons, limite inclusivo de 25%, escolha edge/drag, tooltips, formatação e alvo ausente.
 - 102 testes Node e 67 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
@@ -624,7 +631,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 ## Painel de risco do dashboard (G3n)
 
 - `src/modules/accounts/presentation/risk-board.js`: `renderRiskBoard` global, 136 linhas movidas byte a byte; script clássico síncrono antes do dashboard.
-- Consumidor `src/modules/analytics/presentation/dashboard-page.js` intacto; `calcAccountRiskState`, formatação, tons e tooltips continuam no legado.
+- Consumidor `src/modules/analytics/presentation/dashboard-page.js` intacto; desde o G5p, `calcAccountRiskState` está em `accounts/application/account-risk-workflows.js`; formatação, tons e tooltips seguem nas dependências existentes.
 - `tests/risk-board.test.cjs`: quatro barras/sinais, excessos, metas, thresholds, raw usage, defaults zero, larguras sem teto e alvos ausentes.
 - 126 testes Node e 81 checks no navegador. Sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
@@ -695,7 +702,7 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 - `src/modules/accounts/presentation/setup-risk-summary.js`: `renderSetupRiskSummary()` global, 14 linhas movidas byte a byte; script clássico síncrono antes dos demais renderers de setup e de `app.js`.
 - `tests/setup-risk-summary.test.cjs`: guard de conta, dependências, oito campos, sinais, defaults percentuais, alvos opcionais, não mutação e carga.
-- Conta, trades e `calcAccountRiskState` continuam no legado; consumidores de setup preservados.
+- Conta e trades seguem nas dependências existentes; desde o G5p, `calcAccountRiskState` está em `accounts/application/account-risk-workflows.js`; consumidores de setup preservados.
 - 170 testes Node e 92 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Lista de contas (G3w)

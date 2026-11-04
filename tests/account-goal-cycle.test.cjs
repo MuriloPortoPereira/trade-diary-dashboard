@@ -6,9 +6,8 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const start = appSource.indexOf('function calcAccountRiskState(');
-const end = appSource.indexOf('\nfunction formatSignedMoney(', start);
-assert.ok(start >= 0 && end > start);
+const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
+const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
 function cycle({balance = 1000, goalPct = 10, pnl = 0, cashflow = {deposits: 0, withdrawals: 0, net: 0}} = {}) {
   const context = vm.createContext({
@@ -25,7 +24,7 @@ function cycle({balance = 1000, goalPct = 10, pnl = 0, cashflow = {deposits: 0, 
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(appSource.slice(start, end), context, {filename: 'app.js#account-risk'});
+  vm.runInContext(workflowSource, context, {filename: workflowPath});
   const trades = pnl ? [{status: pnl > 0 ? 'WIN' : 'LOSS', date: '2026-10-14', pnl}] : [];
   const state = context.calcAccountRiskState({balance, goalPct}, trades, 'all');
   return [state.goalBase, state.currentBalance, state.cicloAtual, state.cicloBase,
@@ -76,5 +75,6 @@ test('goal cycle domain stays pure and loads once before classic consumers', () 
     'src/modules/analytics/presentation/dashboard-page.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
-  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.match(workflowSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
 });

@@ -7,9 +7,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/accounts/domain/calculate-risk-limits.js';
-const start = appSource.indexOf('function calcAccountRiskState(');
-const end = appSource.indexOf('\nfunction formatSignedMoney(', start);
-assert.ok(start >= 0 && end > start);
+const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
+const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
 function setup({account, trades = [], period, cashflow} = {}) {
   class FixedDate extends Date {
@@ -35,7 +34,7 @@ function setup({account, trades = [], period, cashflow} = {}) {
   if (fs.existsSync(balanceDrawdownPath)) vm.runInContext(fs.readFileSync(balanceDrawdownPath, 'utf8'), context, {filename: balanceDrawdownPath});
   const periodPnlPath = path.join(root, 'src/modules/accounts/domain/calculate-risk-period-pnl.js');
   if (fs.existsSync(periodPnlPath)) vm.runInContext(fs.readFileSync(periodPnlPath, 'utf8'), context, {filename: periodPnlPath});
-  vm.runInContext(appSource.slice(start, end), context, {filename: 'app.js#account-risk'});
+  vm.runInContext(workflowSource, context, {filename: workflowPath});
   return {result: context.calcAccountRiskState(acct, trades, period), calls};
 }
 
@@ -128,5 +127,6 @@ test('risk limits load once before classic consumers and keep global risk API', 
     'src/modules/accounts/presentation/risk-setup-page.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
-  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.match(workflowSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
 });

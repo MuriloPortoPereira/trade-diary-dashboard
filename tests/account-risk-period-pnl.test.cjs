@@ -6,9 +6,8 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const start = appSource.indexOf('function calcAccountRiskState(');
-const end = appSource.indexOf('\nfunction formatSignedMoney(', start);
-assert.ok(start >= 0 && end > start);
+const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
+const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
 function periodState(trades, period) {
   const calls = [];
@@ -26,7 +25,7 @@ function periodState(trades, period) {
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(appSource.slice(start, end), context, {filename: 'app.js#account-risk'});
+  vm.runInContext(workflowSource, context, {filename: workflowPath});
   const state = context.calcAccountRiskState({balance: 1000, goalPct: 10}, trades, period);
   return {values: [state.dayPnl, state.weekPnl, state.monthPnl, state.scopePnl, state.scopeLoss, state.activePeriod], calls};
 }
@@ -97,5 +96,6 @@ test('risk period domain is isolated and loads once before classic consumers', (
     'src/modules/analytics/presentation/dashboard-page.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
-  assert.match(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
+  assert.match(workflowSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);
 });
