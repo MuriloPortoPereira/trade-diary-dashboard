@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G6a: montagem/template e closure StudyHub isolados em `presentation/study-hub-legacy-runtime.js`; complemento em `presentation/study-hub-intraday.js`.
-- Os dois blocos mantêm corpos e template byte a byte; apenas linhas separadoras vazias dos cortes foram removidas. Carga síncrona após `app.js` preserva ordem das closures, callbacks, pontes e storage.
-- `app.js`: 5.839 para 3.142 linhas; runtime com exceção temporária de 2.389 linhas e intraday com 306 linhas.
-- Caracterização executada antes do corte; 86 arquivos de teste Node, 111 checks no navegador, sintaxe e diff passaram. Revisão independente sem bloqueios; wrappers intraday também possuem teste de encadeamento e montagem única.
+- G6b: estado/defaults em `application/study-hub-state.js`, cálculos puros em `domain/study-hub-calculations.js` e integração nativa em `presentation/study-hub-page.js`.
+- APIs globais, defaults, eventos, UI, ordem de efeitos e persistência `tl_studyhub` preservados; wrappers resolvem estado antes de chamar o domínio.
+- `app.js`: 3.142 para 2.269 linhas; módulos novos com 61, 76 e 759 linhas. Runtime privado segue com 2.389 linhas até sua decomposição interna.
+- Caracterização pré-corte, 243 comparações diferenciais sem divergência, 87 arquivos de teste Node e 113 checks no navegador aprovados. Revisão independente sem bloqueios; sugestão de cobertura dos defaults dinâmicos incorporada à suíte.
 
 ## Next
-- G6b: estado/integração nativa do StudyHub e adaptadores de persistência; depois regras puras das ferramentas dentro da closure, mantendo módulos coesos.
+- G6c: regras e persistências privadas das ferramentas dentro do runtime StudyHub, com entradas explícitas, mantendo os nomes privados isolados e módulos coesos.
 - Depois: HTML/compatibilidade G7 e fechamento arquitetural continuam pendentes.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.

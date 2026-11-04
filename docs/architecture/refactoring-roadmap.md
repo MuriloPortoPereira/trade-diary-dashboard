@@ -962,6 +962,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização pré-corte cobre montagem única, isolamento, navegação, pontes, projeções e limites intraday; smoke ampliado para sizing determinístico, pfState e erros capturados internamente.
 - `app.js`: 5.839 → 3.142 linhas. Próximo G6b: estado/integração nativa e persistências, seguido das regras internas das ferramentas.
 
+## G6b: estado, cálculos e página nativa StudyHub
+
+- Defaults/merge em `application/study-hub-state.js` (61 linhas); cálculos explícitos em `domain/study-hub-calculations.js` (76); página nativa e pontes em `presentation/study-hub-page.js` (759).
+- Preservadas APIs globais, estado/defaults, metadata, markup, parse permissivo, eventos e handlers; cinco wrappers resolvem defaults da aplicação e delegam ao domínio puro. Sem adapters ou interfaces adicionais para a persistência principal já extraída.
+- A página acima de 500 linhas foi investigada: formulários, markup e renderers compõem a mesma UI; os cálculos já possuem boundary próprio. Novas divisões devem responder a responsabilidades reais, não a metas de linhas.
+- Caracterização pré-corte: defaults/backups parciais, formulários, save real `tl_studyhub`, sequência de refresh, pontes, abas, simulação e seed; 243 comparações diferenciais sem divergências. Smoke ampliado para merge nativo e simulação determinística.
+- `app.js`: 3.142 → 2.269 linhas. Próximo G6c: regras e persistências privadas das ferramentas do runtime; depois G7 e fechamento arquitetural.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

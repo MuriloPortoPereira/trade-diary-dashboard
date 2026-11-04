@@ -15,7 +15,7 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
-| StudyHub | `renderStudyHub` e `syncStudyHubLegacyInputs` em `app.js`; montagem e `shInitLegacyModule` em `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` |
+| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página/pontes; `application/study-hub-state.js`: defaults/merge; `domain/study-hub-calculations.js`: cálculos nativos; `presentation/study-hub-legacy-runtime.js`: montagem/runtime privado |
 | Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
@@ -32,6 +32,15 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 - Carga síncrona: `app.js` → runtime → intraday; callbacks load, Chart.js e ordem de inicialização mantidos.
 - `tests/study-hub-runtime.test.cjs` protege montagem, isolamento, pontes, navegação e projeções/limites intraday. Smoke verifica quatro abas, sizing determinístico, `pfState` e erros capturados por `shSafe`.
 - `app.js`: 5.839 → 3.142 linhas. Próximo G6b: estado/integração nativa e adaptadores de persistência; depois regras das ferramentas dentro da closure.
+
+## StudyHub: estado e integração nativa (G6b)
+
+- `src/modules/study-hub/application/study-hub-state.js`: `defaultStudyHubState` e `mergeStudyHubState`, 61 linhas; preserva defaults compartilhados de simulação e merge permissivo de backups parciais.
+- `src/modules/study-hub/domain/study-hub-calculations.js`: namespace `TradeDiaryStudyHubCalculations`, 76 linhas; checklist, RNG com seed, snapshot propfirm/mental e simulação recebem dados explícitos, sem DOM/IO/estado da aplicação.
+- `src/modules/study-hub/presentation/study-hub-page.js`: metadata, formulários, handlers, markup, renderers e pontes nativas coesos em 759 linhas; cinco APIs globais delegam ao domínio mantendo defaults de estado.
+- Carga clássica: domínio → estado → página, antes de `app.js`; runtime/intraday continuam depois. Estado global `studyHubState` e armazenamento `tl_studyhub` mantidos nos pontos existentes.
+- `tests/study-hub-native.test.cjs`: defaults/merge, parsing, gravação real, ordem de refresh, adapters/eventos, abas/pontes, limites, seed, simulação e isolamento do domínio. Caracterização pré-corte e 243 comparações diferenciais sem divergência.
+- `app.js`: 3.142 → 2.269 linhas; 87 arquivos de teste Node e 113 checks no navegador. Próximo: regras/persistências privadas do runtime G6c.
 
 ## Simulação: primeiro domínio extraído
 

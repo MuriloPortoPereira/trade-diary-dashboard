@@ -262,7 +262,7 @@ não transferir centenas de linhas mistas para um novo monólito por página.
 | Montagem 7075–7082; template na linha 7080; G6a executado | `modules/study-hub/presentation/study-hub-legacy-runtime.js` | Texto, host.innerHTML e dataset.loaded intactos; template permanece junto do consumidor durante a transição |
 | IIFE legado 7084–9461; G6a executado | Mesmo runtime de apresentação, 2.389 linhas | Closure e callbacks intactos; exceção >1.000 linhas até extrair regras/adaptadores internos sem expor privados |
 | Intraday 9465–9770; G6a executado | `modules/study-hub/presentation/study-hub-intraday.js`, 306 linhas | IIFE e wrappers sh_buildIntraday/sh_tsRunAll intactos; sequência síncrona app.js → runtime → intraday |
-| Integração nativa, símbolos buildStudyHub*/renderStudy*/syncStudyHubLegacyInputs, `renderStudyHub` 5616–5651 | `modules/study-hub/presentation/{study-hub-page,legacy-input-sync,propfirm-panel,plan-panel,simulation-panel,mental-panel}.js` | Estado studyHubState, risco/conta, IDs e pontes window.sh_* |
+| Integração nativa, símbolos buildStudyHub*/renderStudy*/syncStudyHubLegacyInputs; G6b executado | `modules/study-hub/presentation/study-hub-page.js` (759 linhas); `application/study-hub-state.js` (61); `domain/study-hub-calculations.js` (76) | Estado/defaults e UI preservados; cinco APIs globais delegam ao domínio puro com entradas explícitas; IDs, pontes window.sh_* e save mantidos |
 
 O runtime contém shell/cotação 7084–7163; propfirm 7165–7887; plano 7889–8279;
 sequências tradesim 8282–8905; mental/recuperação 8908–9336; tooltips e exportações até 9461.

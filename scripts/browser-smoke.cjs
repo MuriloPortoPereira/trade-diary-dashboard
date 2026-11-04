@@ -253,6 +253,13 @@ function browserProbe() {
       check('export account options rendered', document.getElementById('exportAccount').options.length === accounts.length + 1);
       check('export account default remains all', document.getElementById('exportAccount').value === '');
       showPage('studyHub');
+      const nativeMerge = mergeStudyHubState({plan: {title: 'Smoke StudyHub'}});
+      check('StudyHub native state merge retains defaults and partial plan', nativeMerge.plan.title === 'Smoke StudyHub' &&
+        nativeMerge.propfirm.accountSize === 100000 && nativeMerge.simulator.rrr === 1.1 && nativeMerge.mental.focus === 4);
+      const nativeProjection = buildStudySimulation({capital: 100, riskPct: 10, winRate: 100,
+        rrr: 2, runs: 20, trades: 5, seed: 1});
+      check('StudyHub native seeded simulation retains compounded result', nativeProjection.labels.length === 6 &&
+        Math.abs(nativeProjection.p50[5] - 248.832) < 1e-10 && nativeProjection.positiveRate === 1);
       for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
         document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
         check(`StudyHub ${tab} tab`, document.querySelector('#page-studyHub.active') &&
@@ -421,7 +428,7 @@ async function main() {
     const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
     assert.deepEqual(missing, [], 'Missing application assets');
     assert.deepEqual(result.errors, [], 'Browser errors');
-    assert.equal(result.passed.length, 111, 'Smoke checks incomplete');
+    assert.equal(result.passed.length, 113, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
