@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-form-options.js';
+const modulePath = 'src/modules/trades/presentation/trade-form.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['populateSelects', 'toggleTradeError'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
@@ -32,6 +32,8 @@ function setup({missing = [], selectedErrors = ['Anterior']} = {}) {
     autoDisc: force => calls.push(['discipline', force]),
   });
   vm.runInContext(source, context, {filename: legacy ? 'app.js#trade-form-options' : modulePath});
+  context.onAccountChange = () => calls.push(['account']);
+  context.autoDisc = force => calls.push(['discipline', force]);
   return {context, elements, calls};
 }
 
@@ -83,7 +85,7 @@ test('toggle trims and adds or removes errors before recalculating discipline', 
   ]);
 });
 
-test('trade form options load once after chips and before remaining trade presentation', () => {
+test('trade form loads once before its dependent presentation components', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -94,7 +96,7 @@ test('trade form options load once after chips and before remaining trade presen
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const chipsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-error-chips.js');
   const optionsIndex = scripts.findIndex(script => script.src === modulePath);
-  const imagesIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-images.js');
+  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-read-only-notice.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(chipsIndex < optionsIndex && optionsIndex < imagesIndex && imagesIndex < appIndex);
+  assert.ok(chipsIndex < optionsIndex && optionsIndex < noticeIndex && noticeIndex < appIndex);
 });

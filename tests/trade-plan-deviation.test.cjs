@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-plan-deviation.js';
+const modulePath = 'src/modules/trades/presentation/trade-form.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function togglePlanDeviation\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -32,6 +32,7 @@ function toggle({deviation = {disabled: true, style: {opacity: '0.5'}, placehold
     autoDisc() { calls.push(['discipline']); },
   });
   vm.runInContext(source, context, {filename: modulePath});
+  context.autoDisc = () => calls.push(['discipline']);
   vm.runInContext('togglePlanDeviation()', context);
   return {deviation, followed, calls};
 }

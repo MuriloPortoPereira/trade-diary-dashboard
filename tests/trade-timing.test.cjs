@@ -132,7 +132,7 @@ test('timing domain loads once before presentation consumers and legacy wrappers
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/trades/presentation/trade-duration-field.js',
+    'src/modules/trades/presentation/trade-form.js',
     'src/modules/analytics/presentation/strategy-comparison.js',
     'src/modules/analytics/presentation/statistics-page.js',
     'app.js',

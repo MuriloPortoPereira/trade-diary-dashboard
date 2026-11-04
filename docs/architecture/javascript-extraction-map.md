@@ -70,7 +70,7 @@ seleção, datas, filtragem e renderer permanecem nas dependências existentes.
 curva, Chart.js e renderer permanecem nas dependências existentes.
 
 `togglePlanDeviation` (G3as) foi movida intacta para
-`src/modules/trades/presentation/trade-plan-deviation.js`: estado do campo, seleção
+`src/modules/trades/presentation/trade-form.js`: estado do campo, seleção
 do plano e atualização de disciplina permanecem nas dependências existentes.
 
 `renderStrategyCompareCards` (G3at) foi movida intacta para
@@ -86,7 +86,7 @@ timing, estratégias, Chart.js e simulação permanecem nas dependências existe
 atualização das métricas permanecem nas dependências globais existentes.
 
 `renderImagePreviews` (G3ad) foi movida intacta para
-`src/modules/trades/presentation/trade-images.js`: upload, remoção,
+`src/modules/trades/presentation/trade-form.js`: upload, remoção,
 normalização, formulário e persistência permanecem nas dependências existentes.
 
 `renderLogReadOnlyNotice` (G3ae) foi movida intacta para
@@ -114,7 +114,7 @@ e componentes do diário permanecem nas dependências existentes.
 conta ativa, trades e formatação permanecem nas dependências existentes.
 
 `updateTradeDurationField` (G3aj) foi movida intacta para
-`src/modules/trades/presentation/trade-duration-field.js`: cálculo e formatação
+`src/modules/trades/presentation/trade-form.js`: cálculo e formatação
 da duração permanecem nas dependências existentes.
 
 `updateTradeModalFlowUI` (G3ak) foi movida intacta para
@@ -183,11 +183,11 @@ O controlador de modais (G3bc) foi movido intacto para
 estado, formulários, fila, renderers e bootstrap continuam nas dependências existentes.
 
 As opções do formulário de trade (G3bb) foram movidas intactas para
-`src/modules/trades/presentation/trade-form-options.js`: selects e alternância dos
+`src/modules/trades/presentation/trade-form.js`: selects e alternância dos
 erros permanecem globais; configuração, estado, disciplina e salvamento seguem no legado.
 
 O contexto de conta do formulário (G3bd) foi movido intacto para
-`src/modules/trades/presentation/trade-form-account-context.js`: conta, risco e
+`src/modules/trades/presentation/trade-form.js`: conta, risco e
 mercado permanecem projetados por APIs globais; cálculos e catálogos seguem externos.
 
 Os controles do diário (G3az) foram movidos intactos para
@@ -209,7 +209,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Estado, shell e bootstrap; início do arquivo e load 6954–7017; G3y/G3ac/G3ay/G3ba/G3bc/G3be executados | `app/presentation/{account-summary,topbar-value,topbar-statistics,app-dialog,modal-controller,navigation}.js`; destino ainda proposto: `app/bootstrap.js` | Resumo da conta, valores/estatísticas da topbar, diálogos, modais e navegação movidos intactos; estado único, cache, densidade, ordem load, listeners, traduções e câmbio seguem no legado |
 | Contas: 37–92, cashflows 1426–1483, gestão 4441–4629, overview 6181–6226; renderers G3c/G3t/G3u/G3w/G3ai/G3al/G3ax executados | `modules/accounts/presentation/{accounts-page,account-cashflow-form,account-form,setup-cashflow-list,account-list,account-balance-chrome,risk-tags}.js` | Renderers e formulário globais movidos intactos; conta ativa, normalização, cálculo de risco, edição de tags, persistência e atualização das demais páginas seguem no legado |
 | Risco; G4c–G4g: núcleo extraído | `modules/accounts/presentation/{risk-board,setup-risk-summary,risk-setup-page}.js`; `domain/{calculate-cashflow-totals,calculate-risk-limits,calculate-goal-cycle,calculate-balance-drawdown,calculate-risk-period-pnl}.js` | Cashflow, limites, metas cíclicas, saldo, drawdown e P/L temporal puros; `calcAccountRiskState` preserva ordenação, relógio, rótulos e composição do estado |
-| Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af/G3aj/G3ak/G3an/G3as/G3bb/G3bd executados | `modules/trades/presentation/{trade-images,trade-error-chips,trade-form-options,trade-form-account-context,trade-duration-field,trade-plan-deviation,incomplete-trade-flow,incomplete-trade-banner}.js`; destino ainda proposto: `trade-form.js`; depois `application/save-trade.js` | Preview, chips, opções, contexto da conta, duração, desvio, fluxo e banner globais movidos intactos; editingId, fila, upload/remoção, cálculo temporal e save seguem no legado |
+| Operação: modal 464–579, conta 642–739, formulário 924–1239, imagens 4176–4191; G3ad/G3af/G3aj/G3ak/G3an/G3as/G3bb/G3bd/G5o executados | `modules/trades/presentation/{trade-form,trade-error-chips,incomplete-trade-flow,incomplete-trade-banner}.js`; depois `application/save-trade.js` | Formulário consolidado preserva preview, opções, contexto da conta, duração, desvio, reset, preenchimento, desconto e R:R como APIs globais; editingId, fila, upload/remoção, cálculo temporal e save seguem no legado |
 | Diário; G3ae/G3ag/G3ah/G3av/G3az executados | `modules/trades/presentation/{trade-log-read-only-notice,trade-log-metrics,trade-log-selection,trade-log,trade-log-controls}.js`; depois `domain/log-date-range.js` | Aviso, cards, barra de seleção, orquestração, linhas e controles globais movidos intactos; cálculo, filtros, estado selecionado, conta, duplicação e confirmações de exclusão seguem nas dependências existentes |
 | Timing; G4a executado | `modules/trades/domain/trade-timing.js` | Factory puro recebe normalizadores compartilhados; wrappers globais preservam consumidores, virada de dia, inválidos e médias legadas |
 | Métricas; G4b executado | `modules/analytics/domain/calculate-trade-metrics.js`; wrapper `calcMetrics` | Domínio recebe trades e saldo inicial; conta/capital permanecem no wrapper, ordem invertida e resultados numéricos preservados; filtro temporal continua no legado |

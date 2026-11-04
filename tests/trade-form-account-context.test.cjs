@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-form-account-context.js';
+const modulePath = 'src/modules/trades/presentation/trade-form.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['onAccountChange', 'updateMarketFromSymbol'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
@@ -43,6 +43,7 @@ function setup({selectedId = 'a2', missing = [], futures = false, market = 'EUA'
     getMarket: symbol => { calls.push(['market', symbol]); return market; },
   });
   vm.runInContext(source, context, {filename: legacy ? 'app.js#trade-form-account-context' : modulePath});
+  context.calcRR = () => calls.push(['rr']);
   return {context, elements, calls, accounts, active, risk};
 }
 
@@ -98,7 +99,7 @@ test('symbol change preserves market lookup and conditional select update', () =
   assert.deepEqual(missing.calls, [['market', undefined]]);
 });
 
-test('trade form account context loads once after options and before remaining trade presentation', () => {
+test('trade form account context shares the cohesive form script before consumers', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -107,9 +108,8 @@ test('trade form account context loads once after options and before remaining t
   const matches = scripts.filter(script => script.src === modulePath);
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
-  const optionsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-form-options.js');
   const contextIndex = scripts.findIndex(script => script.src === modulePath);
-  const imagesIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-images.js');
+  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-read-only-notice.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(optionsIndex < contextIndex && contextIndex < imagesIndex && imagesIndex < appIndex);
+  assert.ok(contextIndex < noticeIndex && noticeIndex < appIndex);
 });

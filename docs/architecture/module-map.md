@@ -54,11 +54,10 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/trade-log-controls.test.cjs` | Caracterização de indicadores, datas, checkboxes, linhas, seleção e carga |
 | `src/app/presentation/navigation.js` | Refresh, sidebar e troca de página; três funções/29 linhas |
 | `tests/navigation.test.cjs` | Caracterização de despacho, efeitos compartilhados, classes, sidebar e carga |
-| `src/modules/trades/presentation/trade-form-options.js` | Selects e alternância dos erros do formulário; duas funções/24 linhas |
+| `src/modules/trades/presentation/trade-form.js` | Formulário coeso: disciplina, reset, projeção, cálculos, opções, conta, duração e imagens; 11 funções/249 linhas |
 | `tests/trade-form-options.test.cjs` | Caracterização de opções, campos opcionais, conta, erros, efeitos e carga |
 | `src/app/presentation/modal-controller.js` | Abertura/fechamento dos modais e coordenação das apresentações; duas funções/27 linhas |
 | `tests/modal-controller.test.cjs` | Caracterização de bloqueio, trade novo/edição, contas, importação, fechamento e carga |
-| `src/modules/trades/presentation/trade-form-account-context.js` | Conta, risco e mercado projetados no formulário; duas funções/19 linhas |
 | `tests/trade-form-account-context.test.cjs` | Caracterização de conta/fallback, campos, resumo, símbolo, mercado e carga |
 | `src/modules/trades/domain/trade-timing.js` | Factory puro de horário, duração e agregações temporais; 115 linhas |
 | `tests/trade-timing.test.cjs` | Caracterização de formatos, virada do dia, inválidos, médias, grupos, wrappers e isolamento |
@@ -213,11 +212,8 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `tests/risk-tags.test.cjs` | Caracterização de guard, inicialização, ordem, escaping, contagem, controles e carga |
 | `tests/account-summary.test.cjs` | Caracterização de guard, cor, nome, tipo, alvos opcionais e carga |
 | `tests/topbar-value.test.cjs` | Caracterização de guards, densidade, título, classe e carga |
-| `src/modules/trades/presentation/trade-images.js` | Prévia das imagens temporárias da operação; 4 linhas intactas |
 | `tests/trade-images.test.cjs` | Caracterização de guard, vazio, ordem, campos, remoção e carga |
-| `src/modules/trades/presentation/trade-duration-field.js` | Projeção da duração calculada no formulário da operação; 12 linhas intactas |
 | `tests/trade-duration-field.test.cjs` | Caracterização de guard, datas, horários, fallback, duração nula/zero e carga |
-| `src/modules/trades/presentation/trade-plan-deviation.js` | Estado e orientação do campo de desvio do plano; 11 linhas intactas |
 | `tests/trade-plan-deviation.test.cjs` | Caracterização de guard, opções, fallback, disciplina e carga |
 | `src/modules/trades/presentation/incomplete-trade-flow.js` | Projeção do fluxo de conclusão sequencial de trades incompletos; 31 linhas intactas |
 | `tests/incomplete-trade-flow.test.cjs` | Caracterização de cadastro, edição, fluxo único/múltiplo, navegação, alvos opcionais e carga |

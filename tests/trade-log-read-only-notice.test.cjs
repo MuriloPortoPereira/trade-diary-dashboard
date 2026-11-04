@@ -73,6 +73,6 @@ test('read-only notice loads once as a synchronous classic script before app.js'
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf('src/modules/trades/presentation/trade-images.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf('src/modules/trades/presentation/trade-form.js') < html.indexOf(modulePath));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

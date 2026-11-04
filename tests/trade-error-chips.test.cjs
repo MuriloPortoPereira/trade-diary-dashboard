@@ -62,6 +62,6 @@ test('error chips load once as a synchronous classic script before trade consume
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/trades/presentation/trade-images.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/trades/presentation/trade-form.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

@@ -78,7 +78,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 ## Opções do formulário de trade (G3bb)
 
-- `src/modules/trades/presentation/trade-form-options.js`: preenchimento dos selects e alternância dos erros em duas APIs globais/24 linhas movidas byte a byte.
+- `src/modules/trades/presentation/trade-form.js`: preenchimento dos selects e alternância dos erros permanecem globais no formulário consolidado.
 - `tests/trade-form-options.test.cjs`: ordem e conteúdo das opções, labels crus, campos opcionais, conta ativa, símbolos, reset, adição/remoção de erros, efeitos e carga.
 - `openModal` e os consumidores dos chips permanecem intactos; configuração, estado, conta, disciplina e salvamento continuam em `app.js`.
 - `app.js`: 7.659 para 7.636 linhas. 334 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
@@ -92,7 +92,7 @@ Evitar `app.js:8378` da baseline: contém o template legado inteiro numa linha.
 
 ## Contexto de conta do formulário de trade (G3bd)
 
-- `src/modules/trades/presentation/trade-form-account-context.js`: projeção da conta selecionada e derivação do mercado em duas APIs globais/19 linhas movidas byte a byte.
+- `src/modules/trades/presentation/trade-form.js`: projeção da conta selecionada e derivação do mercado permanecem globais no formulário consolidado.
 - `tests/trade-form-account-context.test.cjs`: conta/fallback, risco, multiplicador, CFD/futuros, resumo, alvos opcionais, símbolo, mercado e carga.
 - Dois handlers HTML e o consumidor de `populateSelects` permanecem intactos; contas, risco, formatação, cálculo de R e catálogo continuam nas dependências existentes.
 - `app.js`: 7.610 para 7.592 linhas. 347 testes Node e 96 checks no navegador; sem matriz visual completa nova neste corte de corpos/HTML gerado intactos e CSS inalterado.
@@ -742,21 +742,21 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 
 ## Prévia das imagens da operação (G3ad)
 
-- `src/modules/trades/presentation/trade-images.js`: `renderImagePreviews()` global, quatro linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `src/modules/trades/presentation/trade-form.js`: `renderImagePreviews()` permanece global no formulário consolidado, antes dos consumidores e de `app.js`.
 - `tests/trade-images.test.cjs`: guard do DOM, vazio, ordem, URLs, títulos, estilos, índices de remoção, não mutação e carga.
 - Upload, `FileReader`, normalização, remoção e persistência permanecem no legado; quatro consumidores preservados.
 - 203 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Duração da operação no formulário (G3aj)
 
-- `src/modules/trades/presentation/trade-duration-field.js`: `updateTradeDurationField()` global, 12 linhas movidas byte a byte; script clássico síncrono antes de `app.js`.
+- `src/modules/trades/presentation/trade-form.js`: `updateTradeDurationField()` permanece global no formulário consolidado.
 - `tests/trade-duration-field.test.cjs`: guard do DOM, datas, horários, fallback da data de saída, dependências, duração nula/zero e carga.
 - Cálculo e formatação temporal permanecem nas dependências existentes; três chamadas JavaScript e quatro handlers HTML preservados.
 - 231 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
 
 ## Desvio do plano no formulário (G3as)
 
-- `src/modules/trades/presentation/trade-plan-deviation.js`: `togglePlanDeviation()` global, 11 linhas movidas byte a byte; script clássico síncrono depois de `trade-duration-field.js` e antes de `app.js`.
+- `src/modules/trades/presentation/trade-form.js`: `togglePlanDeviation()` permanece global no formulário consolidado.
 - `tests/trade-plan-deviation.test.cjs`: guard do DOM, opções sim/não, fallback do campo ausente, ordem da disciplina e carga.
 - Handler HTML preservado; `autoDisc`, dados do formulário e persistência permanecem nas dependências existentes.
 - 275 testes Node e 95 checks no navegador; sem matriz visual completa nova neste corte de corpo/HTML gerado intactos e CSS inalterado.
@@ -828,3 +828,9 @@ Não reescanear caches, dependências instaladas ou o repositório inteiro para 
 - `src/modules/trades/application/trade-workflows.js`: 15 APIs globais/255 linhas para salvar, selecionar, completar, duplicar, excluir e consultar operações.
 - Mantém cálculos derivados de risco/R/P&L, payload persistido, edição, fluxo sequencial de incompletos, confirmação dupla e filtros do diário.
 - Um único script clássico antes dos componentes de apresentação de trades; `tests/trade-workflows.test.cjs` caracteriza os fluxos antes do corte.
+
+## Formulário de operações (G5o)
+
+- `src/modules/trades/presentation/trade-form.js`: 11 APIs globais/249 linhas para disciplina, reset, preenchimento, R/R, duração, desvio, opções, conta, mercado e imagens.
+- Consolida cinco arquivos pequenos da mesma responsabilidade e extrai quatro corpos de `app.js`; não cria wrappers ou abstrações novas.
+- `tests/trade-form.test.cjs` protege disciplina, defaults, cópias e modos percentual/absoluto; testes anteriores continuam cobrindo cada componente.

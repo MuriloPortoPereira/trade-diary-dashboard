@@ -941,6 +941,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Script clássico síncrono antes da apresentação de trades; handlers inline, storage e consumidores permanecem intactos.
 - `app.js`: 6.455 para 6.199 linhas. Próximo G5o: regras e cálculos restantes do formulário/operações.
 
+## G5o: formulário de operações consolidado
+
+- Quatro corpos legados e cinco scripts pequenos coesos reunidos em `src/modules/trades/presentation/trade-form.js`, 249 linhas/11 APIs globais.
+- Teste pré-corte protege disciplina automática/manual, reset, projeção, cópias e cálculos percentual/absoluto; cinco suítes anteriores continuam válidas.
+- Script clássico único depois dos chips de erro e antes dos demais consumidores; handlers, globals e persistência permanecem intactos.
+- `app.js`: 6.199 para 6.024 linhas. Próximo G5p: regras financeiras e risco restantes fora da apresentação.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
