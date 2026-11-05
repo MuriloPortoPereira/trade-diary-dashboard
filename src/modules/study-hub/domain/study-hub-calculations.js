@@ -72,5 +72,36 @@ globalThis.TradeDiaryStudyHubCalculations = (() => {
     return {labels,p10,p50,p90,positiveRate:positives/runs};
   }
 
-  return {countStudyChecklistItems, seededRand, getStudyPropSnapshot, getStudyMentalSnapshot, buildStudySimulation};
+  function liqBRL(lucroUSD, payout, cot, ir, taxa) {
+    return lucroUSD * (payout/100) * cot * (1 - ir/100) * (1 - taxa/100);
+  }
+
+  function genSteps(step, fim) {
+    const out = [];
+    let s = Math.round(parseFloat(step) * 10000);
+    let f = Math.round(parseFloat(fim)  * 10000);
+    if (!s || s <= 0) s = 2500;
+    if (!f || f <= 0) f = 100000;
+    let count = 0;
+    for (let v = s; v <= f + 1 && count < 200; v += s, count++) {
+      out.push(parseFloat((v / 10000).toFixed(4)));
+    }
+    return out;
+  }
+
+  function gerarCenarios(rrr) {
+    const out = [];
+    for (let n = 1; n <= 10; n++) {
+      for (let w = n; w >= 0; w--) {
+        const l = n - w;
+        const pnl = w * rrr - l;
+        const icon = pnl > 0.001 ? '🏆' : pnl < -0.001 ? '💀' : '🔄';
+        const type = pnl > 0.001 ? 'pos' : pnl < -0.001 ? 'neg' : 'zero';
+        out.push({ n, w, l, pnl, icon, type, label: `${icon} ${w}W ${l}L` });
+      }
+    }
+    return out;
+  }
+
+  return {countStudyChecklistItems, seededRand, getStudyPropSnapshot, getStudyMentalSnapshot, buildStudySimulation, liqBRL, genSteps, gerarCenarios};
 })();

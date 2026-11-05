@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G6b: estado/defaults em `application/study-hub-state.js`, cálculos puros em `domain/study-hub-calculations.js` e integração nativa em `presentation/study-hub-page.js`.
-- APIs globais, defaults, eventos, UI, ordem de efeitos e persistência `tl_studyhub` preservados; wrappers resolvem estado antes de chamar o domínio.
-- `app.js`: 3.142 para 2.269 linhas; módulos novos com 61, 76 e 759 linhas. Runtime privado segue com 2.389 linhas até sua decomposição interna.
-- Caracterização pré-corte, 243 comparações diferenciais sem divergência, 87 arquivos de teste Node e 113 checks no navegador aprovados. Revisão independente sem bloqueios; sugestão de cobertura dos defaults dinâmicos incorporada à suíte.
+- G6c: PropFirm privado isolado em `presentation/study-hub-propfirm.js`; três helpers incorporados ao domínio já existente e IO das cinco chaves privadas em `infrastructure/study-hub-storage.js`.
+- A criação do PropFirm ocorre no ponto original do runtime; 12 funções internas alimentam as pontes `sh_*` existentes. Estado, callbacks, UI, formatos e tratamentos de erro preservados.
+- Runtime: 2.389 → 1.672 linhas; PropFirm com 703, domínio com 107 e storage com 12. `app.js` permanece em 2.269 linhas.
+- Sete caracterizações pré-corte, testes de definição inerte/restauração automática, 89 arquivos Node e 113 checks no navegador aprovados. Revisão independente sem bloqueios; sugestão de cobertura do callback de load incorporada à suíte.
 
 ## Next
-- G6c: regras e persistências privadas das ferramentas dentro do runtime StudyHub, com entradas explícitas, mantendo os nomes privados isolados e módulos coesos.
+- G6d: separar plano, TradeSim e mental do runtime por responsabilidades coesas, mantendo estado privado, wrappers e sequência de inicialização.
 - Depois: HTML/compatibilidade G7 e fechamento arquitetural continuam pendentes.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.

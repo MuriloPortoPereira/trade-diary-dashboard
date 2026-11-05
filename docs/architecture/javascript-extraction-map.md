@@ -260,7 +260,7 @@ não transferir centenas de linhas mistas para um novo monólito por página.
 | Bloco / baseline | Destino atual ou proposto | Condição |
 |---|---|---|
 | Montagem 7075–7082; template na linha 7080; G6a executado | `modules/study-hub/presentation/study-hub-legacy-runtime.js` | Texto, host.innerHTML e dataset.loaded intactos; template permanece junto do consumidor durante a transição |
-| IIFE legado 7084–9461; G6a executado | Mesmo runtime de apresentação, 2.389 linhas | Closure e callbacks intactos; exceção >1.000 linhas até extrair regras/adaptadores internos sem expor privados |
+| IIFE legado 7084–9461; G6a/G6c executados | Runtime central com 1.672 linhas; `presentation/study-hub-propfirm.js` com 703; `infrastructure/study-hub-storage.js`; helpers em `domain/study-hub-calculations.js` | PropFirm instanciado no ponto original, preservando ordem de callbacks e 12 pontes; plano, TradeSim e mental continuam privados no runtime |
 | Intraday 9465–9770; G6a executado | `modules/study-hub/presentation/study-hub-intraday.js`, 306 linhas | IIFE e wrappers sh_buildIntraday/sh_tsRunAll intactos; sequência síncrona app.js → runtime → intraday |
 | Integração nativa, símbolos buildStudyHub*/renderStudy*/syncStudyHubLegacyInputs; G6b executado | `modules/study-hub/presentation/study-hub-page.js` (759 linhas); `application/study-hub-state.js` (61); `domain/study-hub-calculations.js` (76) | Estado/defaults e UI preservados; cinco APIs globais delegam ao domínio puro com entradas explícitas; IDs, pontes window.sh_* e save mantidos |
 
@@ -268,8 +268,8 @@ O runtime contém shell/cotação 7084–7163; propfirm 7165–7887; plano 7889�
 sequências tradesim 8282–8905; mental/recuperação 8908–9336; tooltips e exportações até 9461.
 Esses intervalos são referências de investigação interna, não pontos para quebrar a closure automaticamente.
 
-Após isolar o bundle, caracterizar e separar cada ferramenta, começando por suas regras puras e
-adaptadores de estado. Não expor seus nomes privados como globais: há nomes comuns com o app principal.
+Após G6c, PropFirm, três helpers puros e o IO das cinco chaves privadas estão separados; seguir com
+plano, TradeSim e mental. Não expor nomes privados como globais: há nomes comuns com o app principal.
 Manter chaves pfCot, pfState, cot, hubCiclos e diary2026; não unificar com tl_* ou appCotacao incidentalmente.
 
 `shSafe` captura exceções e usa console.error. Desde G6a, o smoke também intercepta mensagens

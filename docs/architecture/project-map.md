@@ -15,7 +15,7 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
-| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página/pontes; `application/study-hub-state.js`: defaults/merge; `domain/study-hub-calculations.js`: cálculos nativos; `presentation/study-hub-legacy-runtime.js`: montagem/runtime privado |
+| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página/pontes nativas; `presentation/study-hub-propfirm.js`: PropFirm privado; `presentation/study-hub-legacy-runtime.js`: montagem/orquestração; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
 | Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
@@ -41,6 +41,15 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 - Carga clássica: domínio → estado → página, antes de `app.js`; runtime/intraday continuam depois. Estado global `studyHubState` e armazenamento `tl_studyhub` mantidos nos pontos existentes.
 - `tests/study-hub-native.test.cjs`: defaults/merge, parsing, gravação real, ordem de refresh, adapters/eventos, abas/pontes, limites, seed, simulação e isolamento do domínio. Caracterização pré-corte e 243 comparações diferenciais sem divergência.
 - `app.js`: 3.142 → 2.269 linhas; 87 arquivos de teste Node e 113 checks no navegador. Próximo: regras/persistências privadas do runtime G6c.
+
+## StudyHub: PropFirm privado e storage (G6c)
+
+- `src/modules/study-hub/presentation/study-hub-propfirm.js`: factory de 703 linhas; encapsula cotação, charts, formulários, importação/exportação e inicialização PropFirm. Instanciada no ponto original do runtime, recebe somente `shAddLoad`; retorna as 12 funções necessárias às pontes existentes, sem expor helpers privados.
+- `src/modules/study-hub/domain/study-hub-calculations.js`: ampliado de 76 para 107 linhas com payout legado, steps inteiros e cenários. A fórmula legada aplica deduções sequenciais; não foi unificada com a fórmula nativa.
+- `src/modules/study-hub/infrastructure/study-hub-storage.js`: dez operações coesas/12 linhas para `pfCot`, `pfState`, `cot`, `hubCiclos` e `diary2026`; formatos, defaults e políticas de erro dos consumidores preservados.
+- Carga clássica após `app.js`: storage → definição PropFirm → runtime → intraday. A definição do factory não acessa DOM/storage nem registra callbacks; a criação ocorre dentro do runtime na posição anterior do bloco.
+- Runtime: 2.389 → 1.672 linhas; `app.js` permanece em 2.269. Testes: `study-hub-propfirm.test.cjs`, `study-hub-storage.test.cjs` e `study-hub-runtime.test.cjs`; 89 arquivos Node e 113 checks no navegador aprovados.
+- Próximo G6d: plano, TradeSim e mental ainda internos ao runtime; depois G7 e fechamento.
 
 ## Simulação: primeiro domínio extraído
 

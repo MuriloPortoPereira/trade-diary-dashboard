@@ -53,6 +53,10 @@ function setup({host = node(), readyState = 'loading'} = {}) {
     Chart: window.Chart,
   };
   const context = vm.createContext(sandbox);
+  for (const file of ['domain/study-hub-calculations.js', 'infrastructure/study-hub-storage.js',
+    'presentation/study-hub-propfirm.js']) {
+    vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/study-hub', file), 'utf8'), context);
+  }
   return {context, window, elements, listeners, timers, frames, errors, writes, host};
 }
 
@@ -120,9 +124,10 @@ test('StudyHub scripts execute synchronously after app.js with runtime before in
     attrs: match[1], src: match[1].match(/\bsrc=['"]([^'"]+)['"]/)?.[1],
   }));
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.equal(scripts[appIndex + 1].src, runtimePath);
-  assert.equal(scripts[appIndex + 2].src, intradayPath);
-  for (const src of [runtimePath, intradayPath]) {
+  const sequence = ['src/modules/study-hub/infrastructure/study-hub-storage.js',
+    'src/modules/study-hub/presentation/study-hub-propfirm.js', runtimePath, intradayPath];
+  assert.deepEqual(scripts.slice(appIndex + 1).map(script => script.src), sequence);
+  for (const src of sequence) {
     const matching = scripts.filter(script => script.src === src);
     assert.equal(matching.length, 1);
     assert.doesNotMatch(matching[0].attrs, /\b(?:async|defer|type|nomodule)\b/i);

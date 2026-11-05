@@ -970,6 +970,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização pré-corte: defaults/backups parciais, formulários, save real `tl_studyhub`, sequência de refresh, pontes, abas, simulação e seed; 243 comparações diferenciais sem divergências. Smoke ampliado para merge nativo e simulação determinística.
 - `app.js`: 3.142 → 2.269 linhas. Próximo G6c: regras e persistências privadas das ferramentas do runtime; depois G7 e fechamento arquitetural.
 
+## G6c: PropFirm privado, regras e persistência
+
+- Bloco PropFirm extraído como factory `TradeDiaryStudyHubPropFirm(shAddLoad)` em `presentation/study-hub-propfirm.js` (703 linhas). O runtime instancia no ponto anterior do bloco e mantém as 12 pontes existentes; nenhuma função privada foi promovida a global.
+- Payout legado, steps e cenários incorporados ao domínio StudyHub existente (107 linhas), preservando deduções sequenciais e precisão. Nenhum arquivo adicional por helper.
+- `infrastructure/study-hub-storage.js` (12 linhas) reúne IO de `pfCot`, `pfState`, `cot`, `hubCiclos`, `diary2026`; serialização, leitura bruta, defaults e catches dos consumidores mantidos.
+- Caracterizações pré-corte protegem sizing/charts, importação/exportação, restauração, ordem e políticas de erro; suíte com 89 arquivos e smoke com 113 checks.
+- Runtime: 2.389 → 1.672 linhas; `app.js` permanece em 2.269. Próximo G6d: plano, TradeSim e mental; depois G7 e fechamento.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1029,5 +1037,5 @@ Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobert
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
-Desde G6a, `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` tem exceção temporária de 2.389 linhas: preserva a closure validada e nomes privados compartilhados. O restante do G6 deve extrair regras puras e adaptadores por ferramenta antes de remover essa exceção; não dividir por contagem de linhas. O template gigante permanece intacto junto da montagem até existir um corte próprio verificado.
+Desde G6a, `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` tem exceção temporária; G6c reduziu de 2.389 para 1.672 linhas ao separar PropFirm, regras e storage. O restante do G6 deve separar plano, TradeSim e mental antes de remover essa exceção; não dividir por contagem de linhas. O template gigante permanece intacto junto da montagem até existir um corte próprio verificado.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.

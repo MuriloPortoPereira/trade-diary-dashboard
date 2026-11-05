@@ -17,7 +17,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Importação | `parseMT5Rows`, `parseGenericTradeRows`, `parseMT5HTML`, `confirmImport` | FileReader, datas, IDs, normalizadores, contas e `save` |
 | Backup/exportação | `createBackupPayload`, `restoreBackupData`, `exportJSON`, `buildTradesCSV` | Estado global, JSON, CSV, Blob, confirmação e storage |
 | StudyHub nativo | `src/modules/study-hub/presentation/study-hub-page.js`: `renderStudyHub`, wrappers de cálculo, `syncStudyHubLegacyInputs` | Estado `studyHubState`, conta, risco, domínio nativo, DOM legado e `window.sh_*` |
-| StudyHub legado | `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`: `shInitLegacyModule`, `calcSimulador`, `calcCiclos`, `tsRunAll`, `fmSimular` | IIFE própria, template integrado, Chart.js e chaves storage próprias |
+| StudyHub legado | `presentation/study-hub-legacy-runtime.js`: montagem e orquestração; `presentation/study-hub-propfirm.js`: PropFirm isolado | Estado privado, Chart.js, helpers puros no domínio e storage em infrastructure |
 | Intraday adicional | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
 | Documentos/imagens | `renderDocumentsPage`, `saveCurrentDocument`, `getDocumentEntries` | Trades, rotina, `config.generalDocs`, FileReader, DOM |
 | Parceiros | `renderPartnersPage`, `ensurePartnerHubConfig` | `config.partnerHub`, links, imagens, clipboard |
@@ -38,10 +38,14 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Arquivo | Responsabilidade |
 |---|---|
 | `src/modules/study-hub/application/study-hub-state.js` | Defaults/merge permissivo nativo; duas APIs globais/61 linhas; defaults de simulação compartilhados permanecem dependência de aplicação |
-| `src/modules/study-hub/domain/study-hub-calculations.js` | Checklist, RNG, snapshots e simulação puros com entradas explícitas; namespace/76 linhas |
+| `src/modules/study-hub/domain/study-hub-calculations.js` | Checklist, RNG, snapshots, simulação e helpers PropFirm legado puros; namespace/107 linhas |
 | `src/modules/study-hub/presentation/study-hub-page.js` | Página nativa coesa: metadata, formulários, markup, renderers, pontes e wrappers globais; 759 linhas |
 | `tests/study-hub-native.test.cjs` | Estado/backups parciais, parsing, persistência real, refresh, eventos, abas, cálculo, seed e isolamento/carga |
-| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template e runtime legado com privados isolados; exceção temporária de 2.389 linhas até decomposição interna G6 |
+| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template, shell, plano, TradeSim, mental e pontes; exceção temporária de 1.672 linhas até concluir G6 |
+| `src/modules/study-hub/presentation/study-hub-propfirm.js` | Factory PropFirm privado, callbacks e 12 funções para as pontes do runtime; 703 linhas |
+| `src/modules/study-hub/infrastructure/study-hub-storage.js` | IO das cinco chaves privadas, sem unificar com tl_*; dez operações/12 linhas |
+| `tests/study-hub-propfirm.test.cjs` | Criação adiada, sizing/charts, restauração, CSV/JSON, falhas, exportação e regras puras |
+| `tests/study-hub-storage.test.cjs` | Chaves, defaults, JSON/raw reads, round-trip e propagação de erros |
 | `src/modules/study-hub/presentation/study-hub-intraday.js` | Controles, projeções e wrappers do intraday; 306 linhas |
 | `tests/study-hub-runtime.test.cjs` | Montagem única, pontes, isolamento, navegação, limites/projeções intraday e carga clássica |
 | `src/modules/simulation/domain/calculate-simulation-sizing.js` | Cálculo numérico puro; sem DOM, storage ou framework |
