@@ -23,15 +23,14 @@ test('trade log loads once as a classic script after its components and before a
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
-test('the remaining StudyHub renderLog stays isolated inside its legacy IIFE', () => {
-  const runtime = fs.readFileSync(path.join(root, 'src/modules/study-hub/presentation/study-hub-legacy-runtime.js'), 'utf8');
-  const studyIifeAt = runtime.indexOf('(function(){');
+test('StudyHub renderLog remains private inside the mental module', () => {
   assert.equal(appSource.includes('function renderLog(){'), false);
-  const studyIifeEnd = runtime.indexOf('})();', studyIifeAt);
-  const studyRenderLogAt = runtime.indexOf('function renderLog(){', studyIifeAt);
-  assert.ok(studyIifeAt >= 0);
-  assert.ok(studyRenderLogAt > studyIifeAt);
-  assert.ok(studyRenderLogAt < studyIifeEnd);
+  const source = fs.readFileSync(path.join(root, 'src/modules/study-hub/presentation/study-hub-mental.js'), 'utf8');
+  const context = vm.createContext({});
+  vm.runInContext(source, context);
+  assert.equal(typeof context.TradeDiaryStudyHubMental, 'function');
+  assert.equal(context.renderLog, undefined);
+  assert.equal(context.LOG, undefined);
 });
 
 function element(extra = {}) {

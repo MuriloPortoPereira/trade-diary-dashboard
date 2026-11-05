@@ -166,14 +166,14 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G6c: PropFirm privado isolado em `presentation/study-hub-propfirm.js`; três helpers incorporados ao domínio já existente e IO das cinco chaves privadas em `infrastructure/study-hub-storage.js`.
-- A criação do PropFirm ocorre no ponto original do runtime; 12 funções internas alimentam as pontes `sh_*` existentes. Estado, callbacks, UI, formatos e tratamentos de erro preservados.
-- Runtime: 2.389 → 1.672 linhas; PropFirm com 703, domínio com 107 e storage com 12. `app.js` permanece em 2.269 linhas.
-- Sete caracterizações pré-corte, testes de definição inerte/restauração automática, 89 arquivos Node e 113 checks no navegador aprovados. Revisão independente sem bloqueios; sugestão de cobertura do callback de load incorporada à suíte.
+- G6d: plano, TradeSim e mental isolados em três factories coesos, mantendo criação na sequência original e as 36 funções internas exigidas pelas pontes existentes.
+- Cinco helpers puros incorporados ao domínio existente. Estado, callbacks load/input/resize, IO, histórico, UI e exportações preservados.
+- Runtime: 1.672 → 233 linhas; módulos com 394/627/423 linhas; domínio com 127. `app.js` permanece em 2.269 linhas.
+- Cinco caracterizações pré-corte, teste de definição inerte, 90 arquivos Node, 113 checks no navegador, sintaxe e diff aprovados. Revisão independente sem achados ou bloqueios. G6 estrutural encerrado; template gigante permanece preservado para G7.
 
 ## Next
-- G6d: separar plano, TradeSim e mental do runtime por responsabilidades coesas, mantendo estado privado, wrappers e sequência de inicialização.
-- Depois: HTML/compatibilidade G7 e fechamento arquitetural continuam pendentes.
+- G7: avaliar composição HTML/template e compatibilidade dos scripts clássicos, sem introduzir framework ou dependências de runtime.
+- Depois: revisar acoplamentos/resíduos ainda em `app.js`, documentação e critérios de fechamento arquitetural; não confundir redução de linhas com conclusão de toda a refatoração.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
 

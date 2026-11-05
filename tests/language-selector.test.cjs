@@ -109,6 +109,9 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/app/presentation/navigation.js', 'app.js',
     'src/modules/study-hub/infrastructure/study-hub-storage.js',
     'src/modules/study-hub/presentation/study-hub-propfirm.js',
+    'src/modules/study-hub/presentation/study-hub-plan.js',
+    'src/modules/study-hub/presentation/study-hub-tradesim.js',
+    'src/modules/study-hub/presentation/study-hub-mental.js',
     'src/modules/study-hub/presentation/study-hub-legacy-runtime.js',
     'src/modules/study-hub/presentation/study-hub-intraday.js',
   ]);

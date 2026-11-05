@@ -54,7 +54,8 @@ function setup({host = node(), readyState = 'loading'} = {}) {
   };
   const context = vm.createContext(sandbox);
   for (const file of ['domain/study-hub-calculations.js', 'infrastructure/study-hub-storage.js',
-    'presentation/study-hub-propfirm.js']) {
+    'presentation/study-hub-propfirm.js', 'presentation/study-hub-plan.js',
+    'presentation/study-hub-tradesim.js', 'presentation/study-hub-mental.js']) {
     vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/study-hub', file), 'utf8'), context);
   }
   return {context, window, elements, listeners, timers, frames, errors, writes, host};
@@ -125,7 +126,10 @@ test('StudyHub scripts execute synchronously after app.js with runtime before in
   }));
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
   const sequence = ['src/modules/study-hub/infrastructure/study-hub-storage.js',
-    'src/modules/study-hub/presentation/study-hub-propfirm.js', runtimePath, intradayPath];
+    'src/modules/study-hub/presentation/study-hub-propfirm.js',
+    'src/modules/study-hub/presentation/study-hub-plan.js',
+    'src/modules/study-hub/presentation/study-hub-tradesim.js',
+    'src/modules/study-hub/presentation/study-hub-mental.js', runtimePath, intradayPath];
   assert.deepEqual(scripts.slice(appIndex + 1).map(script => script.src), sequence);
   for (const src of sequence) {
     const matching = scripts.filter(script => script.src === src);

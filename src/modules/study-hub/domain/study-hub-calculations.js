@@ -103,5 +103,25 @@ globalThis.TradeDiaryStudyHubCalculations = (() => {
     return out;
   }
 
-  return {countStudyChecklistItems, seededRand, getStudyPropSnapshot, getStudyMentalSnapshot, buildStudySimulation, liqBRL, genSteps, gerarCenarios};
+  function calcCapFinal(cap,risco,rrr,n){let s=cap;for(let i=0;i<n;i++)s+=s*(risco/100)*rrr;return s;}
+
+  function calcParcMedia(p,r){const t=p.reduce((a,b)=>a+b,0);return t===0?0:p.reduce((s,v,i)=>s+(v/t)*r[i],0);}
+
+  function gerarContinuo(cap,risco,n){const t=[];let s=cap;for(let i=0;i<n;i++){const pnl=-(s*risco);s=Math.max(0,s+pnl);t.push({n:i+1,res:'L',pnl,saldo:s});}return t;}
+
+  function gerarAlternado(cap,risco,rrr,n){const t=[];let s=cap,isL=true;for(let i=0;i<n;i++){const pnl=isL?-(s*risco):s*risco*rrr;s=Math.max(0,s+pnl);t.push({n:i+1,res:isL?'L':'W',pnl,saldo:s});isL=!isL;}return t;}
+
+  function calcCol(cap,rrr,taxa,seq,perigoLim){
+    const r=[];let s=cap,dead=false;
+    for(const res of seq){
+      if(dead){r.push({s:0,dead:true,danger:false,res});continue;}
+      const g=res===1 ? s*taxa*rrr : -(s*taxa);   // +ganho ou -perda
+      s=Math.max(0,s+g);
+      if(s<=0){s=0;dead=true;}
+      r.push({s,dead,danger:!dead&&s>0&&s<perigoLim,res});
+    }
+    return r;
+  }
+
+  return {countStudyChecklistItems, seededRand, getStudyPropSnapshot, getStudyMentalSnapshot, buildStudySimulation, liqBRL, genSteps, gerarCenarios, calcCapFinal, calcParcMedia, gerarContinuo, gerarAlternado, calcCol};
 })();

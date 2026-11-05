@@ -40,7 +40,7 @@ Inventários completos e condições: [análise global](modularization-analysis.
 | G3 | JS de páginas e componentes por feature, uma responsabilidade por commit | Declarações preservadas, handlers/globals, fluxo de navegação, modais e efeitos de estado |
 | G4 | Domínios de métricas, timing, risco e simulação, individualmente | Caracterização numérica, limites, defaults, relógio/RNG e compatibilidade dos consumidores |
 | G5 | Importação, backup e persistência por formato/coordenação/IO | Fixtures, deduplicação, restauração parcial/completa, chaves e sequência de efeitos |
-| G6 | StudyHub: montagem, runtime isolado e intraday; depois subferramentas | Closure intacta, template/pontes, console, quatro módulos, storage e cálculos determinísticos |
+| G6 (estrutura concluída) | StudyHub: montagem/runtime e intraday; quatro ferramentas privadas, domínio e storage | Closures, template/pontes, console, callbacks, quatro módulos, storage e cálculos determinísticos preservados |
 | G7 | HTML de autoria e remoção de compatibilidade, se ainda necessários | ADR próprio para composição estática; DOM/IDs/handlers/carga equivalentes, todos consumidores migrados |
 
 G2–G6 contêm vários lotes pequenos: não executar uma frente inteira como um único commit.
@@ -978,6 +978,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterizações pré-corte protegem sizing/charts, importação/exportação, restauração, ordem e políticas de erro; suíte com 89 arquivos e smoke com 113 checks.
 - Runtime: 2.389 → 1.672 linhas; `app.js` permanece em 2.269. Próximo G6d: plano, TradeSim e mental; depois G7 e fechamento.
 
+## G6d: plano, TradeSim e mental privados
+
+- Três factories coesos em `presentation/study-hub-plan.js` (394 linhas), `study-hub-tradesim.js` (627) e `study-hub-mental.js` (423); recebem `shAddLoad` e são criados nos pontos originais do runtime.
+- Retornam somente as 21/5/10 funções usadas pelas pontes existentes; estado, nomes privados, bindings imediatos e callbacks load/resize permanecem isolados e ordenados.
+- Cinco cálculos puros de plano/mental incorporados ao domínio StudyHub existente (127 linhas). Cálculos complexos que ainda misturam UI não foram reescritos neste corte.
+- Caracterização pré-corte protege restauração, cotação, falhas, bindings, timers, resize, histórico/exportação, compounding e ruína. Suite com 90 arquivos e smoke com 113 checks.
+- Runtime: 1.672 → 233 linhas; `app.js` permanece em 2.269. G6 estrutural encerrado; próximo G7, seguido da revisão de acoplamentos e fechamento arquitetural.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1037,5 +1045,5 @@ Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobert
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
-Desde G6a, `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` tem exceção temporária; G6c reduziu de 2.389 para 1.672 linhas ao separar PropFirm, regras e storage. O restante do G6 deve separar plano, TradeSim e mental antes de remover essa exceção; não dividir por contagem de linhas. O template gigante permanece intacto junto da montagem até existir um corte próprio verificado.
+A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. O template gigante permanece intacto junto da montagem até a avaliação de composição HTML G7. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.

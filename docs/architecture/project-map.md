@@ -15,7 +15,7 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: `renderPremarket`; `savePM`, `preMarketData` em `app.js` |
 | Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
 | Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
-| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página/pontes nativas; `presentation/study-hub-propfirm.js`: PropFirm privado; `presentation/study-hub-legacy-runtime.js`: montagem/orquestração; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
+| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página nativa; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas privadas; `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
 | Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: `renderDocumentsPage`; `getDocumentEntries`, `saveCurrentDocument` em `app.js` |
 | Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
@@ -50,6 +50,16 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 - Carga clássica após `app.js`: storage → definição PropFirm → runtime → intraday. A definição do factory não acessa DOM/storage nem registra callbacks; a criação ocorre dentro do runtime na posição anterior do bloco.
 - Runtime: 2.389 → 1.672 linhas; `app.js` permanece em 2.269. Testes: `study-hub-propfirm.test.cjs`, `study-hub-storage.test.cjs` e `study-hub-runtime.test.cjs`; 89 arquivos Node e 113 checks no navegador aprovados.
 - Próximo G6d: plano, TradeSim e mental ainda internos ao runtime; depois G7 e fechamento.
+
+## StudyHub: plano, TradeSim e mental (G6d)
+
+- `src/modules/study-hub/presentation/study-hub-plan.js` (394 linhas), `study-hub-tradesim.js` (627) e `study-hub-mental.js` (423): factories por ferramenta, criadas nas posições originais do runtime; estado, charts, handlers e callbacks permanecem privados.
+- O plano retorna 21 funções para as pontes existentes, TradeSim retorna cinco e mental dez. Helpers não são promovidos a globais; `renderLog` mental permanece isolado do diário principal.
+- Cinco cálculos puros de compounding, parciais, sequência de perdas e ruína incorporados ao domínio existente, agora com 127 linhas; wrappers privados mantêm assinaturas.
+- `study-hub-legacy-runtime.js`: 1.672 → 233 linhas; mantém template, shell, tooltips, registro comum de load e pontes `sh_*`. `app.js` continua com 2.269 linhas.
+- `tests/study-hub-tools.test.cjs`: caracterização pré-corte de restauração, cotação, falhas de storage, bindings, execução adiada, resize, histórico/exportação e fórmulas.
+- Carga clássica após `app.js`: storage → definição das quatro ferramentas → runtime → intraday. 90 arquivos Node e 113 checks no navegador aprovados.
+- G6 estrutural encerrado; seguir para G7: composição HTML e compatibilidade, revisão dos acoplamentos restantes e fechamento arquitetural.
 
 ## Simulação: primeiro domínio extraído
 

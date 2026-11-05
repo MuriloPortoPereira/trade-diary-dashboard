@@ -17,7 +17,7 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Importação | `parseMT5Rows`, `parseGenericTradeRows`, `parseMT5HTML`, `confirmImport` | FileReader, datas, IDs, normalizadores, contas e `save` |
 | Backup/exportação | `createBackupPayload`, `restoreBackupData`, `exportJSON`, `buildTradesCSV` | Estado global, JSON, CSV, Blob, confirmação e storage |
 | StudyHub nativo | `src/modules/study-hub/presentation/study-hub-page.js`: `renderStudyHub`, wrappers de cálculo, `syncStudyHubLegacyInputs` | Estado `studyHubState`, conta, risco, domínio nativo, DOM legado e `window.sh_*` |
-| StudyHub legado | `presentation/study-hub-legacy-runtime.js`: montagem e orquestração; `presentation/study-hub-propfirm.js`: PropFirm isolado | Estado privado, Chart.js, helpers puros no domínio e storage em infrastructure |
+| StudyHub legado | `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas isoladas | Estado privado por ferramenta, Chart.js, helpers puros no domínio e storage em infrastructure |
 | Intraday adicional | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
 | Documentos/imagens | `renderDocumentsPage`, `saveCurrentDocument`, `getDocumentEntries` | Trades, rotina, `config.generalDocs`, FileReader, DOM |
 | Parceiros | `renderPartnersPage`, `ensurePartnerHubConfig` | `config.partnerHub`, links, imagens, clipboard |
@@ -38,11 +38,15 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | Arquivo | Responsabilidade |
 |---|---|
 | `src/modules/study-hub/application/study-hub-state.js` | Defaults/merge permissivo nativo; duas APIs globais/61 linhas; defaults de simulação compartilhados permanecem dependência de aplicação |
-| `src/modules/study-hub/domain/study-hub-calculations.js` | Checklist, RNG, snapshots, simulação e helpers PropFirm legado puros; namespace/107 linhas |
+| `src/modules/study-hub/domain/study-hub-calculations.js` | Checklist, RNG, snapshots, simulação, helpers PropFirm/plano/mental puros; namespace/127 linhas |
 | `src/modules/study-hub/presentation/study-hub-page.js` | Página nativa coesa: metadata, formulários, markup, renderers, pontes e wrappers globais; 759 linhas |
 | `tests/study-hub-native.test.cjs` | Estado/backups parciais, parsing, persistência real, refresh, eventos, abas, cálculo, seed e isolamento/carga |
-| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template, shell, plano, TradeSim, mental e pontes; exceção temporária de 1.672 linhas até concluir G6 |
+| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template, shell, tooltips e pontes; 233 linhas, com template em linha gigante preservado até composição HTML G7 |
 | `src/modules/study-hub/presentation/study-hub-propfirm.js` | Factory PropFirm privado, callbacks e 12 funções para as pontes do runtime; 703 linhas |
+| `src/modules/study-hub/presentation/study-hub-plan.js` | Factory plano privado, ciclos, diário, projeções, cotação e callbacks; 394 linhas/21 funções para pontes |
+| `src/modules/study-hub/presentation/study-hub-tradesim.js` | Factory TradeSim privado, cenários, Monte Carlo, bindings e resize; 627 linhas/cinco funções para pontes |
+| `src/modules/study-hub/presentation/study-hub-mental.js` | Factory mental privado, histórico, analytics, exportação e callbacks; 423 linhas/dez funções para pontes |
+| `tests/study-hub-tools.test.cjs` | Restauração, IO, bindings, timers, resize, histórico/exportação, helpers puros e isolamento |
 | `src/modules/study-hub/infrastructure/study-hub-storage.js` | IO das cinco chaves privadas, sem unificar com tl_*; dez operações/12 linhas |
 | `tests/study-hub-propfirm.test.cjs` | Criação adiada, sizing/charts, restauração, CSV/JSON, falhas, exportação e regras puras |
 | `tests/study-hub-storage.test.cjs` | Chaves, defaults, JSON/raw reads, round-trip e propagação de erros |
