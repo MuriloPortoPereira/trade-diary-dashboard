@@ -8,12 +8,12 @@ const root = path.resolve(__dirname, '..');
 const index = fs.readFileSync(path.join(root, 'index.html'));
 
 test('published shell preserves every byte and its existing mixed line endings', () => {
-  // G7f: register strategy queries before the presentation consumers.
-  assert.equal(index.length, 107273);
+  // G7i: the read-only notice is incorporated into the journal controls.
+  assert.equal(index.length, 107187);
   assert.equal(createHash('sha256').update(index).digest('hex'),
-    'f22c8d670938008407c3c708fb66e3c7654773593677d25e702a573e49003a32');
+    '4072518b223b054d57a4e312eb15c2432db605d1fbd8657719262f7950fa52a7');
   assert.equal((index.toString().match(/\r\n/g) || []).length, 1420);
-  assert.equal((index.toString().match(/\n/g) || []).length, 1569);
+  assert.equal((index.toString().match(/\n/g) || []).length, 1568);
 });
 
 test('shell keeps all fifteen pages in order including psychology outside the sidebar', () => {

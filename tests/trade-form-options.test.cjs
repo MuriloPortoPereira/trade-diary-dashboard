@@ -96,7 +96,7 @@ test('trade form loads once before its dependent presentation components', () =>
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const chipsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-error-chips.js');
   const optionsIndex = scripts.findIndex(script => script.src === modulePath);
-  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-read-only-notice.js');
+  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-controls.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
   assert.ok(chipsIndex < optionsIndex && optionsIndex < noticeIndex && noticeIndex < appIndex);
 });

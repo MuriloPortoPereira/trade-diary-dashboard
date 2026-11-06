@@ -26,6 +26,7 @@ function render({ids = [], index = -1, editingId = null, trades = [], flowTrade 
     document: {getElementById(id) { calls.push(['target', id]); return elements[id] ?? null; }},
   });
   vm.runInContext(source, context, {filename: modulePath});
+  context.isBulkIncompleteFlowTrade = id => { calls.push(['flow-trade', id]); return flowTrade; };
   vm.runInContext('updateTradeModalFlowUI()', context);
   return {calls};
 }

@@ -249,112 +249,11 @@ function setMode(m){
 }
 
 
-function isBulkIncompleteFlowTrade(tradeId){
-  return !!tradeId&&bulkIncompleteEditIds.includes(tradeId);
-}
-
-function clearBulkIncompleteFlow(){
-  bulkIncompleteEditIds=[];
-  bulkIncompleteEditIndex=-1;
-  updateTradeModalFlowUI();
-}
-
-function openBulkIncompleteTradeAt(index){
-  const queue=bulkIncompleteEditIds.filter(id=>getAccountTrades(activeAccountId).some(t=>t.id===id&&t.incomplete));
-  bulkIncompleteEditIds=[...new Set(queue)];
-  if(!bulkIncompleteEditIds.length){
-    clearBulkIncompleteFlow();
-    return false;
-  }
-  bulkIncompleteEditIndex=Math.max(0,Math.min(index,bulkIncompleteEditIds.length-1));
-  return openModal('tradeModal',bulkIncompleteEditIds[bulkIncompleteEditIndex]);
-}
-
-function openPreviousBulkIncompleteTrade(){
-  if(bulkIncompleteEditIndex<=0)return;
-  openBulkIncompleteTradeAt(bulkIncompleteEditIndex-1);
-}
-
-function openNextBulkIncompleteTrade(){
-  if(bulkIncompleteEditIndex<0||bulkIncompleteEditIndex>=bulkIncompleteEditIds.length-1)return;
-  openBulkIncompleteTradeAt(bulkIncompleteEditIndex+1);
-}
-
-function startBulkIncompleteFlow(ids=[]){
-  bulkIncompleteEditIds=[...new Set(ids.filter(id=>getAccountTrades(activeAccountId).some(t=>t.id===id&&t.incomplete)))];
-  if(!bulkIncompleteEditIds.length){
-    clearBulkIncompleteFlow();
-    showAppNotice(t('notice.incomplete'),t('notice.noIncomplete'));
-    return false;
-  }
-  bulkIncompleteEditIndex=0;
-  return openBulkIncompleteTradeAt(0);
-}
-
-function getNextBulkIncompleteTradeAfterSave(currentId){
-  if(!bulkIncompleteEditIds.length)return null;
-  bulkIncompleteEditIds=[...new Set(bulkIncompleteEditIds.filter(id=>getAccountTrades(activeAccountId).some(t=>t.id===id&&t.incomplete)))];
-  if(!bulkIncompleteEditIds.length){
-    clearBulkIncompleteFlow();
-    return null;
-  }
-  const nextId=bulkIncompleteEditIds.find(id=>id!==currentId)||null;
-  if(!nextId){
-    clearBulkIncompleteFlow();
-    return null;
-  }
-  bulkIncompleteEditIndex=Math.max(0,bulkIncompleteEditIds.indexOf(nextId));
-  return nextId;
-}
 
 
 
 
 
-
-
-function isLogPageActive(){
-  return document.querySelector('.page.active')?.id==='page-log';
-}
-
-function accountDisplayName(accountId){
-  if(accountId==='all')return 'todas as contas';
-  if(accountId==='active')return accountDisplayName(activeAccountId);
-  const acct=accounts.find(a=>a.id===accountId);
-  return acct?.name||accountId||'conta selecionada';
-}
-
-function getLogAccountEditLock(options={}){
-  const requireActivePage=options.requireActivePage!==false;
-  if(requireActivePage&&!isLogPageActive())return {locked:false};
-  const accountFilter=options.accountFilter??document.getElementById('filterAccount')?.value??'active';
-  if(!accountFilter||accountFilter==='active'||accountFilter===activeAccountId)return {locked:false};
-  return {
-    locked:true,
-    accountId:accountFilter,
-    accountName:accountDisplayName(accountFilter),
-    activeAccountName:accountDisplayName(activeAccountId),
-    allAccounts:accountFilter==='all',
-  };
-}
-
-function buildLogAccountEditLockMessage(lock,action='editar'){
-  if(lock.allAccounts){
-    return `Você está vendo todas as contas em modo consulta. Para ${action} operações, primeiro escolha uma conta específica como conta ativa. Assim o diário mantém cada histórico protegido e evita alterações na conta errada.`;
-  }
-  return `Você está visualizando ${lock.accountName}, mas a conta ativa agora é ${lock.activeAccountName}. Para ${action} operações, primeiro troque a conta ativa para ${lock.accountName}. Assim o diário mantém o histórico protegido e evita mudanças na conta errada.`;
-}
-
-function showLogAccountEditLockNotice(action='editar'){
-  const lock=getLogAccountEditLock();
-  if(!lock.locked)return false;
-  showAppNotice(
-    'Histórico em modo visualização',
-    buildLogAccountEditLockMessage(lock,action),
-    {confirmText:'Entendi'}
-  );
-  return true;
-}
 
 
 

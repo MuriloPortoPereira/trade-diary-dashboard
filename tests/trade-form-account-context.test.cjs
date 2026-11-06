@@ -109,7 +109,7 @@ test('trade form account context shares the cohesive form script before consumer
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const contextIndex = scripts.findIndex(script => script.src === modulePath);
-  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-read-only-notice.js');
+  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-controls.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
   assert.ok(contextIndex < noticeIndex && noticeIndex < appIndex);
 });

@@ -166,6 +166,8 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
+- G7i: 12 APIs de edição/bloqueios reunidas em `incomplete-trade-flow.js` (90 linhas) e `trade-log-controls.js` (104); aviso somente leitura incorporado e arquivo minúsculo removido. Corpos e regras preservados. `app.js`: 1.215 → 1.114 linhas.
+- G7i validado: 603 testes Node, 113 checks no navegador, dois geradores, sintaxe/diff e revisão independente sem bloqueios.
 - G7h: 13 controles de contas/setup/tags reunidos nos três módulos de apresentação existentes; dez caracterizações pré-corte e revisão independente sem bloqueios. Defaults, preservação de trades e timing das confirmações mantidos. `app.js`: 1.375 → 1.215 linhas.
 - G7h validado: 596 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios.
 - G7g: dez funções de parceiros reunidas à página existente (142 linhas), incluindo configuração, clipboard e QR. Corpos e callbacks preservados; oito caracterizações, consumidores e revisão independente sem bloqueios. `app.js`: 1.470 → 1.375 linhas.

@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-log-read-only-notice.js';
+const modulePath = 'src/modules/trades/presentation/trade-log-controls.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderLogReadOnlyNotice\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -20,6 +20,7 @@ function render({accountFilter = 'active', lock, target = {style: {display: 'bef
     escapeHtml(value) { calls.push(['escape', value]); return `escaped:${value}`; },
   });
   vm.runInContext(source, context, {filename: legacy ? 'app.js#renderLogReadOnlyNotice' : modulePath});
+  context.getLogAccountEditLock = options => { calls.push(['lock', options]); return lock; };
   vm.runInContext('renderLogReadOnlyNotice(inputFilter)', context);
   return {target, calls: JSON.parse(JSON.stringify(calls))};
 }

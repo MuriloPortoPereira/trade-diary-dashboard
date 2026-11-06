@@ -18,6 +18,7 @@ HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` p
 |---|---|
 | Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
 | Operação/diário | `src/modules/trades/application/trade-workflows.js`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js` |
+| Edição/bloqueios do diário | `trades/presentation/incomplete-trade-flow.js`: fluxo em lote; `trade-log-controls.js`: controles, locks e aviso somente leitura; globals preservados |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
 | Conta/saldo/risco | `accounts/application/account-risk-workflows.js`: workflows; `presentation/account-form.js`: seleção/salvar/excluir; `risk-setup-page.js` e `risk-tags.js`: setup/controles; `normalizeAccount` permanece em `app.js` |
 | Dashboard/estratégia | `src/modules/analytics/application/strategy-analysis.js`: snapshots, equity, resultados e comparação; `calcMetrics` em `app.js`; apresentação em `dashboard-page.js`/`strategy-hub-page.js` |

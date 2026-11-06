@@ -1038,6 +1038,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Dez caracterizações pré-corte cobrem validação/defaults, edição/exclusão sem apagar trades, risco/zero, projeções, cashflow e confirmações, tags e salvar configuração.
 - Corpos idênticos; exclusão de cashflow captura conta original, adição consulta a conta ativa na confirmação conforme legado. `app.js`: 1.375 → 1.215 linhas.
 
+## G7i: edição em lote e bloqueios do diário
+
+- Sete funções do fluxo em lote e cinco de locks/conta nos módulos de apresentação existentes, com corpos idênticos ao legado.
+- Aviso somente leitura incorporado a `trade-log-controls.js`; script isolado removido e consumidores/carga atualizados.
+- Caracterização cobre filtros/dedupe, navegação/fim, continuação após salvar e locks de conta/all/readonly; revisão independente sem bloqueios. `app.js`: 1.215 → 1.114 linhas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
