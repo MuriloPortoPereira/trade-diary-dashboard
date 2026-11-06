@@ -1,3 +1,5 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Análise da modularização do projeto inteiro
 
 Data: 2026-09-11. Referência histórica: `5c9859f`, agora contida na branch `refactor`.

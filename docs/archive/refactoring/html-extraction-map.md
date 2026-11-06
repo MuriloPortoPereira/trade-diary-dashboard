@@ -1,11 +1,13 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Páginas e contratos HTML
 
 ## Autoria atual (G7b)
 
 - Localizar a view no manifesto `src/app/presentation/shell/index.fragments.json`: quinze páginas completas nas features, abertura/navegação e fechamento/modais/scripts no shell.
 - Editar essas fontes e executar `node scripts/build-index.cjs`; conferir sincronização com `--check`. `index.html` é a distribuição versionada, sem composição no navegador.
-- Concatenação preservou os 107.193 bytes da baseline `953d990`, inclusive ordem, IDs, handlers, estilos inline e LF/CRLF. Caracterização: `tests/index-composition.test.cjs`; decisão: [ADR-005](adr/005-static-shell-composition.md).
-- StudyHub possui quatro fontes adicionais em `presentation/templates/`, geradas pelo helper próprio descrito no [ADR-004](adr/004-study-hub-html-authoring.md).
+- Concatenação preservou os 107.193 bytes da baseline `953d990`, inclusive ordem, IDs, handlers, estilos inline e LF/CRLF. Caracterização: `tests/index-composition.test.cjs`; decisão: [ADR-005](../../architecture/adr/005-static-shell-composition.md).
+- StudyHub possui quatro fontes adicionais em `presentation/templates/`, geradas pelo helper próprio descrito no [ADR-004](../../architecture/adr/004-study-hub-html-authoring.md).
 
 ## Inventário histórico
 
@@ -90,7 +92,7 @@ Nenhuma configuração remota foi consultada. Os números de linhas deste invent
 
 G7a executado: HTML StudyHub agora possui quatro fontes de autoria em
 `src/modules/study-hub/presentation/templates/`, geradas em um asset clássico versionado.
-[ADR-004](adr/004-study-hub-html-authoring.md) preserva deploy sem build, carga síncrona e os mesmos
+[ADR-004](../../architecture/adr/004-study-hub-html-authoring.md) preserva deploy sem build, carga síncrona e os mesmos
 151.521 bytes montados. O shell `index.html` e seus estilos/handlers permanecem inalterados neste corte;
 apenas uma tag de script foi adicionada antes do consumidor. G7b concluiu a autoria do shell sem alterar sua distribuição.
 

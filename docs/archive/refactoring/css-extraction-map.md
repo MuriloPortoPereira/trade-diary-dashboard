@@ -1,3 +1,5 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Mapa de extração do CSS
 
 ## Autoria atual após consolidação

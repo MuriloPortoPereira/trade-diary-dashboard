@@ -1,143 +1,75 @@
 # Trade Diary Dashboard
 
-Aplicação web estática para registrar operações de trading, acompanhar contas e risco, analisar resultados e organizar estudos. Funciona no navegador com HTML, CSS, JavaScript clássico, Chart.js e `localStorage`; não há backend, login ou etapa de build.
+Aplicação estática para registrar operações, acompanhar contas e risco, analisar resultados e organizar estudos. Usa HTML, CSS, JavaScript clássico, Chart.js e `localStorage`.
 
-[Versão pública informada pelo projeto](https://trade-diary-dashboard.vercel.app/) · [Repositório](https://github.com/MuriloPortoPereira/trade-diary-dashboard) · [Licença MIT](LICENSE)
+Este repositório mantém a versão estática. Não há migração para framework planejada aqui.
 
-> **Branch `refactor`:** versão básica com reorganização arquitetural concluída. A versão estável original permanece em `main` e está marcada por `v1.0.0`. Esta branch ainda não representa uma nova versão publicada.
+## Abrir a aplicação
 
-> Os dados ficam no `localStorage` do navegador e da origem usada para abrir a aplicação. Não há sincronização entre dispositivos ou contas de usuário. Exporte backups antes de limpar os dados do navegador ou mudar de origem.
-
-## O que a aplicação oferece
-
-| Área | Recursos existentes |
-|---|---|
-| Diário e dashboard | Registro de trades, filtros, tabelas, métricas, gráficos e calendário |
-| Contas e risco | Múltiplas contas, visão geral de saldos, limites e acompanhamento de risco |
-| Análises | Estratégias, resultados, disciplina, psicologia e simulação |
-| Rotina e StudyHub | Checklist pré-mercado e ferramentas de estudo integradas |
-| Dados | Importação de relatórios/planilhas, exportação CSV e backup JSON |
-| Workspace | Documentos, notificações, parceiros, perfil e preferências de idioma |
-
-A interface contém 15 páginas internas alternadas por `showPage(id)`. O perfil é um resumo local da conta ativa; não implementa autenticação. Este software é uma ferramenta de registro e estudo, não aconselhamento financeiro.
-
-## Executar localmente
-
-Não é necessário `npm install`. Use um servidor HTTP na raiz do repositório para carregar os scripts e CSS locais:
+Na raiz do projeto:
 
 ```bash
-git clone https://github.com/MuriloPortoPereira/trade-diary-dashboard.git
-cd trade-diary-dashboard
-git switch --track origin/refactor
-python3 -m http.server 8000
+python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Abra [http://localhost:8000](http://localhost:8000). A versão publicada usa arquivos estáticos; não há compilação. Chart.js pelo CDN, fontes externas e a consulta da cotação USD/BRL exigem conexão com a internet; os arquivos locais continuam disponíveis sem ela. A biblioteca XLSX é carregada pelo CDN apenas quando uma importação de planilha exige isso.
+Abra http://127.0.0.1:8000. Não é necessário `npm install`.
 
-A branch `refactor` contém o trabalho incremental de refatoração. A aplicação continua usando scripts clássicos síncronos; a ordem dos `<script>` e `<link>` em `index.html` faz parte do contrato de compatibilidade.
+Os dados ficam no navegador e na origem utilizada. Trocar de porta/domínio cria outro espaço de armazenamento; exporte um backup antes de mudar. Chart.js, fontes, cotação e a importação XLSX usam serviços externos existentes.
 
-## Branches, GitFlow e versões
-
-| Branch | Responsabilidade |
-|---|---|
-| `main` | Versão estável. Atualmente representa a versão inicial `v1.0.0` e permanece sem alterações durante a refatoração. |
-| `develop` | Integração de funcionalidades. Por enquanto é uma cópia da `main`; receberá a refatoração somente após a conclusão e validação desta branch. |
-| `refactor` | Versão básica refatorada, com histórico completo dos lotes e fechamento documentado. |
-| `feature/*` | Funcionalidades futuras criadas a partir da `develop` e integradas novamente nela após revisão. |
-| `hotfix/*` | Correções urgentes criadas a partir da `main`, devolvidas à `main` e à `develop`. |
-
-Fluxo planejado para esta reorganização:
+## Estrutura final
 
 ```text
-main (v1.0.0) ────────────────┐
-  └─ refactor ── lotes G1–G7 ─┴─> develop ── validação final ──> main (v2.0.0)
+index.html             Aplicação pronta para servir, gerada e versionada
+app.js                 Estado, composição e wrappers públicos
+src/
+  app/                 Shell, inicialização e persistência principal
+  modules/             Funcionalidades: contas, operações, análises e demais páginas
+  shared/              Widgets usados por várias funcionalidades
+  styles/              Estilos comuns e responsividade
+docs/
+  architecture/        Guia atual, mapa e decisões
+  archive/refactoring/ Histórico do processo de refatoração
+tests/                 Testes de comportamento; não são carregados pelo site
+scripts/               Geração e verificação; não são carregados pelo site
+dist/                  Cópia de entrega local, criada pelo comando abaixo
 ```
 
-Depois da versão 2, o fluxo normal será `develop` → `feature/*` → `develop` → `main`. A `main` recebe apenas versões validadas; tags seguem versionamento semântico (`v1.0.0`, `v2.0.0` e versões posteriores). Commits permanecem pequenos e conceituais, e cada integração deve registrar testes e revisão correspondentes.
+Para entender ou editar uma funcionalidade, comece pelo [mapa do projeto](docs/architecture/project-map.md). Cada feature tem poucos arquivos com responsabilidades explícitas; não há um arquivo por função. A fonte atual reúne 48 scripts e 22 CSS, consolidados a partir de 95 e 40. `app.js` passou de 11.068 para 181 linhas.
 
-## Estrutura do repositório
+## Pasta somente com a aplicação
 
-```text
-index.html                  Distribuição HTML gerada e versionada
-app.js                      Estado, composição e wrappers de compatibilidade
-src/app/presentation/shell/  Manifesto e fontes da navegação/modais/scripts
-src/styles/                 CSS comum e responsividade
-src/modules/                Código e CSS organizados por feature
-  accounts/presentation/    Visão de contas
-  partners/presentation/    Página e estilos de parceiros
-  profile/presentation/     Página de perfil
-  preferences/presentation/ Idiomas, catálogos e widgets
-  simulation/{domain,presentation}/ Cálculo e projeção do sizing
-  data-transfer/infrastructure/ Serialização CSV
-  data-transfer/presentation/ Resumo de backup e filtro de exportação
-  trades/presentation/        Operação e apresentação do diário
-  ...                       Demais módulos organizados por feature
-tests/                      Testes Node de caracterização
-scripts/                    Smoke e comparação visual no navegador
-docs/architecture/          Mapas, arquitetura, roadmap e progresso
-AGENTS.md                   Instruções operacionais dos agentes
+```bash
+node scripts/build-index.cjs --export
+python3 -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
-`src/modules/` também contém módulos de apresentação para analytics, calendar, documents, routine, StudyHub e trades. O [mapa do projeto](docs/architecture/project-map.md) é a fonte rápida para localizar código real. O [mapa de extração JavaScript](docs/architecture/javascript-extraction-map.md) distingue destinos propostos dos arquivos já criados.
+`dist/` contém somente os 71 arquivos carregados pelo site, a licença e instruções de execução: 73 arquivos ao todo. Não inclui testes, ferramentas, arquivos de agentes ou histórico. Mantém os mesmos bytes, caminhos e ordem dos scripts/CSS. É uma cópia de entrega; a manutenção continua nas fontes da raiz e de `src/`.
 
-## Arquitetura e compatibilidade
+O comando verifica uma exportação idêntica sem reescrever. Se `dist/` tiver alterações, ele interrompe; preserve essa pasta com outro nome antes de exportar novamente. A pasta é ignorada pelo Git e pode ser recriada pelo comando.
 
-A refatoração segue Clean Architecture de forma proporcional a uma aplicação estática:
+## Onde editar
 
-- **Presentation:** DOM, renderização, handlers e CSS da feature.
-- **Application:** coordenação de casos de uso, quando houver um boundary real.
-- **Domain:** cálculos e regras puras, sem DOM, Chart.js ou storage.
-- **Infrastructure:** formatos, `localStorage`, arquivos e integrações externas.
-- **Composição legada:** `app.js` ainda liga os módulos e preserva funções globais usadas pelo HTML.
+- HTML das páginas: encontre a feature no [manifesto](src/app/presentation/shell/index.fragments.json), edite seu HTML e execute `node scripts/build-index.cjs`.
+- JavaScript e CSS: use o [mapa atual](docs/architecture/project-map.md) para localizar o arquivo responsável.
+- Ferramentas StudyHub: edite `src/modules/study-hub/presentation/templates/` e execute `node scripts/build-study-hub-template.cjs`.
 
-As extrações são feitas por responsabilidade, com testes antes da mudança. Funções globais, handlers inline, dados salvos, ordem dos scripts e comportamento existente devem continuar compatíveis. Não há migração para ES modules nem dependência de runtime nova. Consulte [arquitetura alvo](docs/architecture/target-architecture.md), [regras de dependência](docs/architecture/dependency-rules.md) e [ADRs](docs/architecture/README.md).
+Os módulos separam apresentação, regras puras, coordenação e IO quando existe uma responsabilidade concreta. Estado e APIs globais permanecem por compatibilidade; os limites aceitos estão no [ADR-006](docs/architecture/adr/006-basic-static-version-closure.md).
 
-## Testes e verificação
-
-Requer Node.js para os testes. O smoke também requer Chrome ou Chromium instalado; configure `CHROME_BIN` se o executável não for `google-chrome`.
+## Verificar
 
 ```bash
 node --test tests/*.test.cjs
 node scripts/build-index.cjs --check
 node scripts/build-study-hub-template.cjs --check
 node scripts/browser-smoke.cjs
-node --check app.js
+APP_ROOT=dist node scripts/browser-smoke.cjs
 git diff --check
 ```
 
-Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` em cada um. O smoke usa um perfil isolado do navegador, verifica navegação e assets locais e não usa os dados do seu navegador habitual. A comparação visual por estados, geometria e imagens é descrita em [ferramentas e verificações](docs/architecture/tooling.md). A cobertura caracteriza fluxos específicos; ela não equivale a uma prova de todos os cálculos ou estados possíveis.
+Node.js é necessário para as ferramentas; o smoke requer Chrome/Chromium e usa um perfil descartável. [Detalhes de manutenção](docs/architecture/tooling.md).
 
-Para editar HTML, localize a página no [manifesto de composição](src/app/presentation/shell/index.fragments.json), altere sua fonte em `src/modules/<feature>/presentation/` e execute `node scripts/build-index.cjs`. O shell fica em `src/app/presentation/shell/`. Para as quatro ferramentas StudyHub, edite `presentation/templates/*.html` da feature e execute `node scripts/build-study-hub-template.cjs`. Versione fontes e saídas geradas; o deploy continua servindo os arquivos prontos, sem executar build.
+## Branches e histórico
 
-## Estado da refatoração
+`main` preserva a versão inicial; `develop` continua como cópia dela; `refactor` contém a versão reorganizada. A integração dessas branches é uma decisão separada. O [histórico arquivado](docs/archive/refactoring/README.md) documenta o aprendizado e os lotes anteriores, sem impor novas extrações.
 
-| Frente | Situação |
-|---|---|
-| Preparação, auditoria e mapas | Concluídos |
-| Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
-| G1–G2: CSS | Extração concluída; consolidados de 40 para 22 arquivos mantendo bytes/cascata |
-| G3: JavaScript por feature | Concluído para apresentação; renderers, shell, formulários e controles principais separados |
-| G4: regras de domínio | Núcleo puro e métricas comportamentais extraídos; limites globais aceitos documentados |
-| G5: persistência/importação | Formatos, coordenação, IO, bootstrap e workflows extraídos em G5a–G5p |
-| G6: StudyHub | Estrutura concluída: quatro ferramentas privadas, domínio, estado, storage e runtime de montagem |
-| G7: HTML e compatibilidade | Autoria, controllers, composição e revisão de compatibilidade concluídos |
-
-O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 181 linhas; contém estado, composição e wrappers públicos. Documentos, rotina, simulação, estratégias, parceiros, contas e controles do diário possuem módulos coesos; dois arquivos pequenos foram incorporados aos módulos responsáveis.
-
-Após G7j, a prioridade passou à consolidação: scripts locais de 95 para 48 e CSS de 40 para 22, com 65 arquivos de produção a menos no acumulado. Nesta segunda rodada, foram 36 arquivos a menos. Cada feature tem poucos pontos de entrada: contas e análises possuem um workspace UI, cálculos ficam no domínio, e transferência separa página, fluxos, formatos e IO. O [mapa compacto](docs/architecture/project-map.md) mostra os caminhos atuais.
-
-Validação final: 637 testes Node em 104 arquivos, 113 verificações no navegador, dois geradores, sintaxe dos 180 scripts JS/CJS e revisão independente sem bloqueios, em cópia limpa. Corpos e namespaces JS foram preservados; catálogos mantêm 585 chaves por idioma. Marcação da interface e os 162.576 bytes CSS na mesma ordem permaneceram intactos. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada.
-
-A versão básica está encerrada: os resíduos finais foram incorporados aos módulos existentes, sem novos arquivos de produção. Estado/adaptadores globais, handlers inline e ferramentas privadas do StudyHub permanecem por compatibilidade, conforme [ADR-006](docs/architecture/adr/006-basic-static-version-closure.md). Isso não é isolamento completo de todas as camadas. A próxima versão poderá adotar um framework em um plano separado; esta etapa preserva o percurso inicial → refatoração estática → framework.
-
-## Deploy e dados
-
-A aplicação pode ser servida como site estático a partir da raiz do repositório, mantendo os caminhos e a ordem dos assets de `index.html`. O endereço Vercel acima é o link divulgado pelo projeto; esta branch de refatoração não é publicada automaticamente por este README.
-
-Trades, contas, configuração e dados do StudyHub usam armazenamento local do navegador. Importação, exportação e restauração têm contratos próprios: consulte [mapa de módulos](docs/architecture/module-map.md) e [mapa do projeto](docs/architecture/project-map.md) antes de alterá-los. Não mude chaves de storage ou formato de backup como parte de uma extração visual ou de arquivos.
-
-## Documentação e contribuição
-
-Comece pelo [índice de arquitetura](docs/architecture/README.md). Para contribuir em um lote, leia [AGENTS.md](AGENTS.md), localize a feature no mapa, registre o comportamento atual, faça uma extração coesa, rode as verificações e revise o diff. Ferramentas de agente como Serena, Context7, Caveman e Superpowers auxiliam o desenvolvimento; a aplicação não depende delas em runtime.
-
-Desenvolvido por **Murilo Porto Pereira**. Licenciado sob [MIT](LICENSE).
+Desenvolvido por Murilo Porto Pereira. [Licença MIT](LICENSE).

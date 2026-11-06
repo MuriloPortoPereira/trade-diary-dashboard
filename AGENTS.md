@@ -5,14 +5,14 @@ Preserve behavior while continuously improving modularity, readability, testabil
 
 ## Architecture
 Aplicação estática: JavaScript clássico, HTML/CSS e Chart.js 4.4.1 por CDN.
-Transição incremental do monólito `app.js` para módulos por feature.
+Versão estática refatorada por feature; framework está fora do escopo deste repositório.
 Leia primeiro `docs/architecture/project-map.md`; visão atual e alvo no índice arquitetural.
 Não existe backend, banco remoto, ORM nem autenticação.
 
 ## Main Modules
 Operações; contas/risco; dashboard/análise; calendário/rotina; simulação;
 importação/backup; StudyHub; documentos; parceiros/perfil; idiomas/cotação.
-Localização e símbolos: `docs/architecture/module-map.md`.
+Localização e símbolos: `docs/architecture/project-map.md`.
 
 ## Dependency Direction
 Presentation usa Application; Application usa Domain e contratos de IO.
@@ -53,7 +53,7 @@ Verifique `git status` antes de alterar. Preserve mudanças preexistentes.
 Leia mapa, localize símbolos/referências, caracterize, extraia, valide, revise diff.
 Lotes pequenos; uma responsabilidade por lote. Commits conceituais; push somente na branch autorizada pelo usuário.
 Investigue funções >40–60 linhas e arquivos >300; >500 fortes candidatos; >800 prioridade.
-Arquivos >1.000 linhas exigem justificativa temporária e estratégia registrada no roadmap.
+Arquivos >1.000 linhas exigem justificativa explícita; assets gerados são mantidos por compatibilidade.
 Não divida apenas por contagem. Atualize mapa/ADR/progresso quando houver mudança estrutural.
 Use subagentes para investigação/revisão independentes; um escritor por arquivo.
 
@@ -80,5 +80,5 @@ Não execute push sem autorização explícita.
 ## Architectural Decisions
 - `docs/architecture/adr/001-incremental-classic-scripts.md`: módulos e compatibilidade estática.
 - `docs/architecture/adr/002-characterization-tests.md`: proteção antes de extrações.
-- `docs/architecture/adr/006-basic-static-version-closure.md`: versão básica encerrada; globals ativos preservados e framework em etapa separada.
+- `docs/architecture/adr/006-basic-static-version-closure.md`: versão estática encerrada; globals ativos preservados e framework fora do escopo.
 - Estado dos lotes: `docs/architecture/refactoring-progress.md`.

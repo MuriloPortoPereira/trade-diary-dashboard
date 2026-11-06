@@ -1,3 +1,5 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Mapa de módulos
 
 Catálogo iniciado na baseline `ab0cb63`, atualizado com os limites físicos extraídos.
@@ -5,7 +7,7 @@ Localizar símbolos com Serena antes de ler trechos; o índice atual é `project
 
 HTML de autoria: `src/app/presentation/shell/index.fragments.json` lista, em ordem, duas fontes do shell
 e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `index.html` versionado;
-`tests/index-composition.test.cjs` protege sincronização, bytes e páginas. Ver [ADR-005](adr/005-static-shell-composition.md).
+`tests/index-composition.test.cjs` protege sincronização, bytes e páginas. Ver [ADR-005](../../architecture/adr/005-static-shell-composition.md).
 
 | Feature | Entradas/símbolos | Dependências atuais |
 |---|---|---|
@@ -43,11 +45,11 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 - Sementes/enriquecimento em `trades/application/demo-data.js`; filtros/cronologia em `trade-workflows.js`; datas/ordenação visual em `presentation/trade-log.js`.
 - Métricas comportamentais puras em `analytics/domain/calculate-trade-metrics.js`; mensagens de alerta em `notifications/presentation/notifications-page.js`.
 - Charts/formatadores/tooltips em `shared/presentation/analysis-widgets.js`; topbar e eventos em `app/presentation/app-workspace.js`.
-- Contratos globais e limites aceitos no [ADR-006](adr/006-basic-static-version-closure.md).
+- Contratos globais e limites aceitos no [ADR-006](../../architecture/adr/006-basic-static-version-closure.md).
 
 ## Fronteiras físicas extraídas
 
-Registro histórico por lote; caminhos e contagens abaixo refletem a extração original. Para editar o código atual, usar as tabelas no [mapa compacto](project-map.md), que já incluem as consolidações por workspace.
+Registro histórico por lote; caminhos e contagens abaixo refletem a extração original. Para editar o código atual, usar as tabelas no [mapa compacto](../../architecture/project-map.md), que já incluem as consolidações por workspace.
 
 | Arquivo | Responsabilidade |
 |---|---|
@@ -288,7 +290,7 @@ criadas apenas quando uma extração real justificar sua existência.
 
 ## Histórico detalhado de extrações por lote
 
-Notas históricas preservadas; a localização atual está no [mapa compacto](project-map.md).
+Notas históricas preservadas; a localização atual está no [mapa compacto](../../architecture/project-map.md).
 
 ## StudyHub: runtime e intraday (G6a)
 
@@ -333,7 +335,7 @@ Notas históricas preservadas; a localização atual está no [mapa compacto](pr
 - Distribuição versionada: `presentation/study-hub-template.js`, script clássico de dados, carregado após a definição das ferramentas e antes do runtime. O deploy continua sem build e sem fetch de fragmentos.
 - Montagem preservada: mesmo `host.innerHTML`, guardas, IDs, handlers e 151.521 bytes de texto; SHA-256 protegido em `tests/study-hub-template.test.cjs`.
 - Runtime: 170.565 → 11.187 bytes, mantendo 233 linhas; a linha gigante de autoria foi eliminada. `app.js` permanece em 2.269 linhas.
-- Decisão/custos: [ADR-004](adr/004-study-hub-html-authoring.md). Próximo G7b: avaliar autoria do shell `index.html` e compatibilidade antes do fechamento arquitetural.
+- Decisão/custos: [ADR-004](../../architecture/adr/004-study-hub-html-authoring.md). Próximo G7b: avaliar autoria do shell `index.html` e compatibilidade antes do fechamento arquitetural.
 
 ## Simulação: primeiro domínio extraído
 
@@ -548,7 +550,7 @@ Notas históricas preservadas; a localização atual está no [mapa compacto](pr
 
 - `src/app/infrastructure/app-state-storage.js`: save global intacto e readPersistedAppState; seis chaves/valores brutos, ordem e gravações parciais preservadas. save ainda lê estado global.
 - `src/app/application/load-app-state.js`: load global restaura/normaliza pela leitura substituível; lê todas as chaves antes de aplicar valores, mantém permissividade e catch existente.
-- Scripts sem IO inicial, antes de navigation/app; nenhum formato, seed ou migração alterado. [ADR-003](adr/003-main-state-persistence.md).
+- Scripts sem IO inicial, antes de navigation/app; nenhum formato, seed ou migração alterado. [ADR-003](../../architecture/adr/003-main-state-persistence.md).
 - `tests/app-state-storage.test.cjs`: caracterização de serialização, leitura, normalização, round-trip, defaults, erros e ordem; smoke com localStorage nativo e cleanup em finally.
 - 454 testes Node, 103 checks; `app.js`: 7.049 linhas. Seeds/bootstrap e persistências auxiliares continuam fora do corte.
 
@@ -757,9 +759,9 @@ Notas históricas preservadas; a localização atual está no [mapa compacto](pr
 - Inventários de extração: [JavaScript](javascript-extraction-map.md), [CSS/cascata](css-extraction-map.md), [HTML/páginas](html-extraction-map.md).
 - [Arquitetura atual](current-architecture.md): stack, números, hotspots e riscos.
 - [Catálogo de módulos](module-map.md): entradas e dependências por feature.
-- [Arquitetura alvo](target-architecture.md) e [dependências](dependency-rules.md): fronteiras novas.
+- [Arquitetura alvo](target-architecture.md) e [dependências](../../architecture/dependency-rules.md): fronteiras novas.
 - [Roadmap](refactoring-roadmap.md) e [progresso](refactoring-progress.md): próximo lote e validações.
-- [ADRs](adr/): decisões; consultar somente a decisão relevante.
+- [ADRs](../../architecture/adr): decisões; consultar somente a decisão relevante.
 
 Não reescanear caches, dependências instaladas ou o repositório inteiro para tarefas locais.
 

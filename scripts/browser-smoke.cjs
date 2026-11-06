@@ -6,7 +6,7 @@ const { readFile, mkdtemp, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(process.env.APP_ROOT || path.join(__dirname, '..'));
 const chrome = process.env.CHROME_BIN || 'google-chrome';
 
 function browserProbe() {

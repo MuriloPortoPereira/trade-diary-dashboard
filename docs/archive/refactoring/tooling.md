@@ -1,0 +1,1425 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
+# Ferramentas e verificações
+
+Verificado em 2026-09-10. Codex CLI 0.154.0, Node.js 24.21.0, Python 3.12.3.
+Configuração MCP por projeto: `.codex/config.toml`. Nenhuma dependência de runtime adicionada.
+
+| Ferramenta | Resultado | Evidência |
+|---|---|---|
+| Caveman | OK | Skill local `.agents/skills/caveman/SKILL.md`; origem JuliusBrussee/caveman e `skills-lock.json` |
+| Serena | OK | MCP 1.7.1.dev0; raiz ativada, `get_symbols_overview`, `find_symbol`, `find_referencing_symbols` reais |
+| Context7 | OK | MCP 4.0.7; `resolve-library-id` e `query-docs` para Node.js v24 retornaram documentação |
+| Superpowers | OK | `superpowers@openai-curated-remote` 6.3.0, instalado por `codex plugin add` |
+
+MCPs habilitados detectados: `cua_repl`, `node_repl`, `serena`, `context7`.
+`codex mcp list` comprova configuração/habilitação, não conexão de uma sessão específica.
+Os novos servidores foram iniciados e testados via cliente MCP stdio temporário nesta sessão;
+seus nomes não foram adicionados automaticamente à lista de ferramentas nativas da conversa.
+Na próxima sessão/reinicialização, conferir `/mcp` e ativar a raiz com `activate_project`.
+As skills instaladas ficam disponíveis na próxima interação; os SKILL.md usados foram lidos nesta sessão.
+
+Atualização do lote 2: Serena e Context7 estão disponíveis como ferramentas nativas.
+Raiz ativada com `activate_project`; `find_symbol` e `find_referencing_symbols` usados no CSV.
+Context7 não foi consultado: o lote não exige documentação externa.
+Caveman local lido. Superpowers não foi exposto no catálogo de skills desta sessão;
+a tentativa de conferir `~/.codex/plugins/installed_plugins.json` encontrou caminho inexistente.
+Mantido o registro anterior de instalação; revisão independente e verificações executadas diretamente, sem reinstalação.
+
+## Instalar em outra máquina
+
+```bash
+# Somente Caveman para Codex, escopo local do projeto
+npx -y skills add JuliusBrussee/caveman -a codex --skill caveman -y
+
+# Plugin recomendado atualmente pelo projeto Superpowers
+codex plugin add superpowers@openai-curated-remote
+
+# Com uv/uvx instalado, aquece o cache e verifica a CLI Serena
+uvx --from git+https://github.com/oraios/serena serena start-mcp-server --help
+
+# Verificar configuração carregada a partir da raiz confiável
+codex mcp list
+```
+
+`uv` não existia nesta máquina: instalado isoladamente com `python3 -m venv`
+em `~/.local/share/codex-tooling/uv-env`, `pip install uv` nesse ambiente e links
+`~/.local/bin/uv`/`uvx`. Versão instalada: 0.12.13. Não alterou o Python do sistema.
+Serena resolvida no commit `701e7c843f46c6a649203a488cece1bf19f1df90`.
+Config usa upstream; novas instalações podem resolver revisões diferentes: validar novamente.
+
+Context7 usa `npx -y @upstash/context7-mcp`, conforme `.codex/config.toml`.
+Não exigiu chave na consulta verificada; autenticação/cotas podem mudar.
+Não grave segredos em arquivos versionados.
+
+Caveman local é ignorado no Git; reinstalar pelo comando acima, não instalar o pacote npm `caveman`.
+Superpowers é instalação do usuário, não dependência do app. Não duplicar suas skills no projeto.
+Não foram adicionados hooks globais nem alterados modelos, permissões ou orçamento de tokens.
+
+## Uso econômico
+
+- Caveman `full` no cotidiano, `lite` em arquitetura; comandos/código/erros intactos.
+- Serena para código interno. Limitar caminho, símbolo e tamanho de resposta.
+- Context7 somente para documentação externa; nunca enviar dados/código privado.
+- Superpowers: planejamento arquitetural, caracterização, revisão e verificação; execução direta para ajustes triviais.
+- Onboarding operacional fica em `AGENTS.md` e nos mapas; memória Serena `core` aponta para essas fontes, sem duplicar conteúdo.
+
+## Verificação do projeto
+
+```bash
+node --test tests/*.test.cjs
+node tests/classic-script-contract.test.cjs
+node scripts/build-index.cjs --check
+node scripts/build-study-hub-template.cjs --check
+node --check app.js
+node --check src/modules/simulation/domain/simulation-calculations.js
+node --check src/modules/data-transfer/infrastructure/trade-file-formats.js
+node --check tests/trades-csv.test.cjs
+node --check tests/language-selector.test.cjs
+node --check scripts/browser-smoke.cjs
+node scripts/browser-smoke.cjs
+git diff --check
+```
+
+Domínio extraído no lote 1. Resultado efetivo: [progresso](refactoring-progress.md).
+Lint, typecheck, formatador e build não existem no baseline; não foram simulados ou marcados como aprovados.
+
+Desde G7a, após editar `src/modules/study-hub/presentation/templates/*.html`, executar
+`node scripts/build-study-hub-template.cjs`. O asset é commitado; produção continua servindo arquivos estáticos
+sem executar build. `--check` e a suíte validam sincronização. Contrato em [ADR-004](../../architecture/adr/004-study-hub-html-authoring.md).
+
+Desde G7b, localizar a página HTML pelo manifesto `src/app/presentation/shell/index.fragments.json`.
+Após editar a fonte da feature ou `shell/{open,close}.html`, executar `node scripts/build-index.cjs`
+e versionar fonte e saída. O gerador preserva bytes/ordem; `--check` detecta saída desatualizada.
+Não editar somente `index.html`. Produção não executa o gerador; ver [ADR-005](../../architecture/adr/005-static-shell-composition.md).
+
+G7j acrescenta contrato central de carga: arquivos locais existentes/únicos, scripts clássicos síncronos,
+compilação individual/conjunta e providers/ordem crítica. Compilação não executa DOM/bootstrap; manter o smoke.
+Consolidação por workspace: JS 95 → 48, CSS 40 → 22. O teste de CSS manteve o SHA-256 original;
+somente o fingerprint HTML foi atualizado para os registros de assets consolidados. Papéis/caminhos atuais
+ficam no mapa compacto; o histórico detalhado foi reunido no mapa de módulos, sem criar outro arquivo.
+Consolidações atuais: `simulation-sizing-fields.js` está em `simulation-panel.js`; `trade-log-read-only-notice.js`
+está em `trade-log.js`. Os nomes dos testes históricos permanecem válidos.
+
+Na segunda rodada, providers por feature e workspaces substituíram mais endpoints: paths atuais no mapa compacto. As definições UI podem aparecer antes de outras funções, pois só são invocadas após a inicialização; providers que executam na carga preservam precedência. O teste completo de sequência, a compilação, os testes comportamentais e o smoke cobrem essas condições.
+
+Retomada: `/tmp` foi limpo e processos auxiliares perderam artefatos. Usar checkout persistente, commitar e
+aplicar cada etapa validada imediatamente à branch original. O sandbox também restringiu subprocessos Node;
+o comando completo foi executado com permissão apropriada, sem alterar testes para esconder falhas.
+
+Smoke requer Chrome/Chromium instalado. Por padrão usa `google-chrome`;
+para outro binário: `CHROME_BIN=/caminho/chromium node scripts/browser-smoke.cjs`.
+Cria servidor HTTP em loopback com porta aleatória e perfil temporário; remove perfil ao terminar.
+Chrome headless roda com `--no-sandbox` para compatibilidade do ambiente de teste;
+o probe acessa somente a aplicação e seus recursos externos, nunca o perfil pessoal.
+Verifica CDN Chart.js, inicialização, navegação, tab de simulação, handler inline,
+valores 10/50/30, API global, storage inalterado e retorno ao dashboard.
+No lote 2, soma três checks CSV: saída com arrays/aspas/vírgula/LF, default `trades`
+e compatibilidade de helper/cabeçalhos. Total: 14 checks; não realiza download real.
+No lote 2b, soma quatro checks de idioma: handler EN, catálogo renderizado, handler PT e
+preservação dos dados de storage exceto `appLanguage`. Total no lote 2b: 18 checks.
+Somente o perfil temporário recebe a escolha de idioma; não acessa dados pessoais.
+Requer rede para os recursos CDN/fontes e falha em erros de script ou assets locais ausentes.
+Resultado coletado após `load + 250ms`; não captura erros assíncronos posteriores,
+erros silenciados ou mensagens de `console.error`. Verifica Chart.js real pela versão.
+Storage é comparado somente entre navegação e simulação, após bootstrap.
+Não cobre todos os fluxos, migrações de dados nem compara pixels.
+
+## Comparação visual StudyHub (G1)
+
+Smoke ampliado para 22 checks: montagem e navegação pelas quatro abas principais.
+A comparação visual usa Node.js 24 (WebSocket nativo), Chrome/CDP e perfil temporário;
+`scripts/lib/study-hub-browser.cjs` atende somente assets locais da aplicação.
+Nenhuma dependência npm foi adicionada.
+
+```bash
+# Executar capture ANTES da alteração, compare DEPOIS; destinos novos e fora do repositório.
+node scripts/study-hub-style-check.cjs capture /tmp/study-hub-before
+node scripts/study-hub-style-check.cjs compare /tmp/study-hub-before /tmp/study-hub-after
+node --test tests/study-hub-styles.test.cjs
+```
+
+São 64 casos: quatro abas × 16 larguras (390 e breakpoint ±1/igual para 720, 768, 900, 1200, 1600).
+Relógio/RNG/cotação e dados sintéticos fixos; animações desativadas; aguarda fontes/resize/gráficos.
+Salva PNG, JSON com estilos/geometria/storage e relatório SHA-256. Exige igualdade de pixels e estado;
+verifica links carregados/404 e compara console/runtime. Erros preexistentes iguais são tolerados;
+a baseline G1 teve zero. Artefatos desta execução: `/tmp/trade-diary-g1-baseline` e `/tmp/trade-diary-g1-after`.
+São temporários, não versionados; recapturar em cada ambiente e antes de cada próximo corte.
+
+Limites: somente subabas iniciais, viewport de 1.000px de altura, sem scroll/hover/focus;
+snapshot considera elementos renderizados e não comprova demais fluxos ou Monte Carlo.
+Fontes externas dependem da rede; `document.fonts.ready` não garante download bem-sucedido.
+O fingerprint em `tests/study-hub-styles.test.cjs` fixa todo o CSS anterior na ordem efetiva dos links;
+atualizá-lo em mudanças visuais futuras exige nova baseline, não mera aceitação de um hash diferente.
+
+G1: Serena ativada na raiz; CSS inspecionado por cortes localizados e parsing, pois navegação semântica
+está configurada para JavaScript/TypeScript. Context7 disponível, sem necessidade de consulta externa.
+Caveman e skills Superpowers disponíveis e utilizados. Primeira captura falhou por aspas no seletor
+do próprio runner; ajuste local corrigido e baseline concluída antes de mover CSS.
+
+Git local usa `core.autocrlf=input`; o primeiro stage normalizou dois arquivos novos.
+`.gitattributes` fixa `-text` somente no CSS residual e nos quatro blocos legados;
+`git add --renormalize` refez o índice com os bytes originais, conferidos contra HEAD.
+`whitespace=-blank-at-eof,cr-at-eol` preserva separadores finais e CRLF herdados;
+demais verificações de whitespace permanecem ativas. `git diff --check` e `--cached --check` passaram.
+
+## Comparação visual do shell (G2a)
+
+```bash
+node scripts/shell-style-check.cjs capture /tmp/shell-before
+node scripts/shell-style-check.cjs compare /tmp/shell-before /tmp/shell-after
+```
+
+Capturar antes de editar CSS; comparar depois, usando diretórios novos. O runner reutiliza o
+Chrome/CDP isolado e a fixture do StudyHub; importar essa fixture não executa o CLI StudyHub.
+São 196 casos: 15 páginas em 390/1080/1440px e dashboard mais dez estados em 14 larguras
+(390, 1440 e breakpoint ±1/igual para 440, 720, 1080, 1240).
+
+Estados: sidebar aberta, navegação com hover, botão/menu/opção de idioma, foco e hover de cotação,
+hover da conta e modais de conta/operação abertos. Hover é forçado via CDP; foco usa `.focus()` com
+assertion do elemento ativo. O smoke soma cinco checks de menu, clique externo, sidebar, overlay e
+navegação; total 27. O teste de bytes G1 continua protegendo todos os nove links de CSS.
+
+A comparação exige igualdade exata de estilos, geometria, fontes e storage; exige zero console/runtime errors
+e assets locais ausentes. Verifica `cot-spin` antes de desativar animações e carrega explicitamente
+todas as faces declaradas após cada montagem para evitar diferenças incidentais nos pesos baixados durante o layout inicial.
+Requer rede para Chart.js e fontes. `getElementById` no runner evita nomes globais ambíguos quando
+o StudyHub monta seu template com IDs repetidos; esse comportamento legado não foi modificado.
+
+Pixels são comparados por `scripts/compare-browser-images.py` quando hashes PNG diferem.
+Esse teste visual opcional requer Python 3 e Pillow (já disponíveis no ambiente); nenhuma dependência
+foi adicionada à aplicação, ao smoke ou à suíte Node. Limites por imagem: até 64 pixels diferentes,
+até 20 pixels com delta maior que 1 e delta máximo de 20/255 por canal. Dimensões e formato RGB são exigidos.
+Estes limites foram definidos após controle repetido do código original revelar antialiasing variável
+em cantos arredondados, ícones e sombras. A tolerância é numérica, não identifica bordas automaticamente;
+alterações maiores falham e nenhuma região é mascarada.
+Seis casos sintéticos verificaram identidade, ruído aceito, excesso de pixels, excesso de pixels fortes,
+contraste e dimensões. O relatório `pixel-comparison.json` lista cada imagem com diferença aceita.
+
+```bash
+# Comparar artefatos existentes sem abrir outra sessão de navegador:
+node scripts/shell-style-check.cjs compare-saved /tmp/shell-before /tmp/shell-after
+```
+
+`compare-saved` confia nos hashes do relatório; use artefatos íntegros gerados pelo runner.
+G2a retomou em 2026-09-12 após perda dos processos e artefatos temporários da sessão anterior.
+Referência reconstruída dos assets de `387d9ec` em pasta temporária, com o mesmo runner da extração.
+Resultados preservados nesta sessão em `/tmp/trade-diary-g2-stable-{baseline,control,after}`:
+196 estados exatos; controle original repetido com 159 pixels diferentes em 28 imagens;
+extração com 202 pixels em 14 imagens. Todos dentro dos limites; zero erros de console/runtime.
+Artefatos são temporários e devem ser recapturados em outras sessões/ambientes.
+
+Limites: viewport de 1.000px de altura, estados iniciais das páginas e dois modais sem submissão.
+Não cobre todas as subabas, inputs, variações de dados nem animações em movimento. Os estilos base
+permanecem globais; arquivos não são carregados por página. `.gitattributes` preserva os bytes dos
+quatro novos CSS, incluindo LF/CRLF e separadores finais herdados.
+
+## Ampliação de superfícies e cabeçalhos (G2b)
+
+O mesmo runner shell agora registra 211 casos (196 anteriores + cinco abas de análise em três larguras).
+Snapshot versão 2: pseudo-elementos `::before` das oito superfícies, `::after` dos cabeçalhos,
+máscaras/posições e display das 15 páginas. Verifica também `fade-up` antes de desativar animações.
+Abas usam os botões reais de `switchStatTab`; os filhos diretos entram na comparação de margens.
+Recapturar a baseline ao mudar a versão do snapshot; relatórios G2a não têm os mesmos campos.
+
+G2b: baseline capturada antes de mover CSS em `/tmp/trade-diary-g2b-baseline`, resultado em
+`/tmp/trade-diary-g2b-after`. 211 estados idênticos e zero erros; 11 imagens com 170 pixels diferentes,
+dentro da tolerância já documentada, sem ampliar limites. Smoke permanece com 27 checks.
+O fingerprint integral existente passou antes/depois sem alteração do hash esperado.
+Os limites de viewport, dados sintéticos, subfluxos não cobertos e comparação numérica de pixels permanecem.
+
+## Botões e intervalos de datas (G2c)
+
+Snapshot versão 3 no runner shell: 323 casos, incluindo oito estados de ações em todas as 14 larguras.
+Acrescenta `min-height`, `flex`, `flex-wrap`, `filter`, `color-scheme` e cores computadas das opções de análise.
+Hover de botões primary/ghost/ícone e limpeza; foco nos dois inputs de data; filtro e limpeza por eventos reais.
+Datas 2026-09-10 selecionam `visual-win`; limpar restaura `visual-win` e `visual-loss`, sem mudar a fixture.
+O teste reinicia os filtros entre cenários. Não clica em exclusão nem submete operação.
+
+O primeiro ensaio detectou `const ids` repetido no contexto persistente de `Runtime.evaluate`.
+IIFEs passaram a delimitar essas variáveis no runner; a aplicação não foi alterada para contornar a falha.
+Serena ativo na raiz; investigação CSS do subagente usou busca localizada/parsing como alternativa ao MCP indisponível naquele contexto.
+Limites anteriores mantidos; seletor nativo de datas e popup nativo de opções não são capturados.
+Amostra das opções verifica suas cores computadas, sem alegar cobertura do popup.
+
+G2c: referência anterior ao corte em `/tmp/trade-diary-g2c-before`, resultado em `/tmp/trade-diary-g2c-after`.
+323 estados idênticos; 19 imagens com 54 pixels de diferença dentro dos limites anteriores.
+Zero erros de console/runtime, 27 checks no smoke e fingerprint integral sem mudança de expectativa.
+Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
+
+## Métricas e indicadores de risco (G2d)
+
+Snapshot versão 4: 358 casos, preservando os 323 anteriores e acrescentando 35.
+Inclui dashboard/risco em 1419/1420/1421px, tons safe/warn/danger nas 17 larguras e cinco estados
+em 390/1080/1440px: hover de card, tooltip acima/abaixo/oculto e tooltip de risco com linhas internas.
+`scripts/lib/metric-style-scenarios.cjs` chama o renderer existente com dados sintéticos explícitos,
+sem substituir trades nem gravar storage. Verifica conteúdo, posição/clamping e fontes ocultas dos tooltips;
+o snapshot inclui `::after` dos cards. Reset usa mouseout e aguarda o timeout real entre os casos.
+Eventos DOM exercitam o manager existente; não comprovam hit testing físico, acesso por teclado ou cálculos financeiros.
+
+Referência capturada antes do corte em `/tmp/trade-diary-g2d-before`; comparação em `/tmp/trade-diary-g2d-after`.
+Antes/depois: 358 estados exatos e zero erros de console/runtime ou assets locais ausentes.
+35 imagens com 99 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no smoke, sintaxe e diff passaram; fingerprint integral permanece o original.
+Serena ativo na raiz; revisão independente confirmou bytes, cascata e ausência de URLs relativas no corte.
+Um check auxiliar da revisão presumiu CRLF no link; repetido com o LF observado, passou sem mudança no código.
+Artefatos temporários; recapturar em outras sessões ou ao alterar a versão do snapshot.
+
+## Dashboard e layouts comuns de cards (G2e)
+
+Snapshot versão 5: 378 casos, preservando os 358 anteriores. Acrescenta tabela inferior no viewport
+em 17 larguras e hover de card de gráfico em 390/1080/1440px.
+`scripts/lib/dashboard-layout-scenarios.cjs` rola a tabela real até seu limite horizontal;
+quando há overflow, exige deslocamento positivo. Não altera trades, renderers nem storage.
+O runner reinicia a rolagem entre casos e compara scrollLeft/Top, scrollWidth/Height, clientWidth/Height,
+overflow-x/y, scrollbar-width/color e align-self, além dos campos anteriores.
+
+Referência anterior ao corte em `/tmp/trade-diary-g2e-before`; comparação em `/tmp/trade-diary-g2e-after`.
+Antes/depois: 378 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+22 imagens com 156 pixels de diferença dentro da tolerância existente; limites não ampliados.
+59 testes Node, 27 checks no smoke, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Limites: os dois trades da fixture não geram overflow vertical; não se afirma cobertura de deslocamento vertical positivo.
+`.board-card-sticky` não tem consumidor encontrado; sua regra permanece protegida pelo fingerprint integral.
+Serena ativo; revisão independente confirmou o corte, a cascata e a preservação do JavaScript.
+Artefatos temporários; recapturar ao mudar ambiente ou versão do snapshot.
+
+## Risco e caixa da conta (G2f)
+
+Snapshot versão 6: 407 casos; 17 estados de risco misto e 12 de meta/caixa somados aos 378 anteriores.
+`scripts/lib/account-style-scenarios.cjs` usa renderers reais: LOSS -35 em 2026-09-11 gera valores/fills
+safe/warn/danger e alertas safe/warn/danger/neutral; WIN 210 exercita o badge de meta atingida.
+Caixa preenchido: aporte 125 e retirada 25 no editor e no setup, em 390/1080/1440px; editor vazio também capturado.
+O formulário é aberto por `editAccount`; não há submissão nem exclusão. Campos temporários são restaurados em `finally`.
+Comparações antes/depois de cada cenário exigem storage, contas e trades inalterados.
+Snapshot acrescenta text-shadow, text-transform e vertical-align. A transição width/0.28s/ease é verificada
+antes de desativar animações; não se compara a animação em movimento.
+
+Na revisão, o primeiro revisor atingiu limite de uso; outro subagente assumiu a revisão independente.
+Processo e artefatos temporários ficaram indisponíveis após retomada; captura reiniciada com CSS ainda intacto.
+O segundo revisor encontrou vazamento da fixture em memória: `getActiveAccount` recria `accounts`,
+portanto restaurar só cashflows no objeto antigo era insuficiente. O helper passou a restaurar o array original
+em `finally` e comparar também contas/trades; referência contaminada descartada antes de qualquer corte.
+Referência corrigida: `/tmp/trade-diary-g2f-reference`; resultado em `/tmp/trade-diary-g2f-after`.
+407 estados exatos; nove imagens com 62 pixels diferentes dentro dos limites existentes, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes; 59 testes Node, 27 checks no navegador, sintaxe e diff aprovados.
+Recapturar artefatos em outras sessões/ambientes.
+Limites: não é auditoria dos cálculos financeiros; badge-warn e risk-period-label não têm consumidor encontrado.
+
+## Ranking e comparação de estratégias (G2g)
+
+Snapshot versão 7: 448 casos, os 407 anteriores mais comparação completa em 17 larguras e oito estados
+em 390/1080/1440px. `scripts/lib/strategy-style-scenarios.cjs` clona os dois trades da fixture atribuindo
+Breakout/Pullback, preserva contas/trades em `finally` e exige dados e storage inalterados.
+Ranking positivo/negativo/vazio; comparação com seleção parcial, repetida, limpa e invertida; foco no seletor e gráficos.
+A/B usam eventos `change` reais e são zerados entre casos. O runner verifica display do painel, dois cards,
+ordem após inversão, vencedor e quatro gráficos Chart.js visíveis. Capturas incluem cards, gráficos e resumo por rolagem.
+`compare-empty` limpa seleções com trades presentes: não exercita o ramo sem trades do comparador.
+Popup nativo, fórmulas financeiras, timing e grandes amostras ficam fora da cobertura deste corte de CSS.
+
+Referência anterior ao corte: `/tmp/trade-diary-g2g-before`; resultado em `/tmp/trade-diary-g2g-after`.
+Antes/depois: 448 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+21 imagens com 147 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Um patch do runner foi recusado por contexto antigo; leitura localizada permitiu reaplicar sem alterações parciais.
+O primeiro revisor atingiu limite de uso; outro subagente concluiu revisão independente sem bloqueios.
+Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
+
+## Grids e células do calendário (G2h)
+
+Snapshot versão 8: 509 casos, os 448 anteriores mais week/biweek em 17 larguras e nove estados
+em 390/1080/1440px. `scripts/lib/calendar-style-scenarios.cjs` reinicia ano/mês/modo/botões/detalhe/scroll
+antes de cada caso. Contas são restauradas em `finally`; dados e storage devem permanecer iguais.
+A UI chama `week` de Mensal e oferece `biweek`; `month` é exercitado pela API global, sem inventar botão.
+Mini e células têm hover forçado via CDP; cliques abrem calendário/detalhes, e dia vazio oculta a tabela.
+Nav cruza dezembro/2026 para janeiro/2027 e retorna; janeiro é assertion intermediária, dezembro é a captura.
+Picker por evento `change` verifica fevereiro/2024 com 29 dias. O popup nativo não é capturado.
+
+Snapshot acrescenta estado ano/mês/modo, dimensões/rolagem de `calGridWrap`, text-align/text-overflow,
+white-space/scrollbar-gutter. Transições transform/border-color/background de 0.18s/ease são verificadas
+antes de desativar animações; não se compara animação em movimento. Somas/períodos/fusos não são auditados integralmente.
+Referência anterior ao corte: `/tmp/trade-diary-g2h-before`; resultado em `/tmp/trade-diary-g2h-after`.
+Antes/depois: 509 estados exatos, zero erros de console/runtime ou assets locais ausentes.
+23 imagens com 190 pixels de diferença dentro dos limites existentes; tolerância não ampliada.
+59 testes Node, 27 checks no navegador, sintaxe e diff aprovados; fingerprint integral permanece o original.
+Revisão independente confirmou fronteira, bytes, cascata, isolamento e limites da cobertura.
+Artefatos temporários; recapturar em outra sessão/ambiente ou após mudança do snapshot.
+
+## Tabelas e estados de operações (G2i)
+
+Snapshot versão 9: 559 casos, os 509 anteriores mais scroll horizontal do diário em 17 larguras
+e onze estados em 390/1080/1440px. `scripts/lib/trade-table-style-scenarios.cjs` reinicia ordenação,
+indicadores, seleção e scroll antes de cada caso; restaura contas/trades em `finally` e compara dados/storage.
+Ordenação ascendente/descendente por P/L e checkboxes usam cliques reais; limpar seleção usa o segundo clique
+em selecionar todos. Hover de linha/cabeçalho e linha selecionada é forçado por CDP.
+Fixtures contrastam uma linha incompleta, duas completas e badges WIN/LOSS/OPEN/Long/Short; ação de completar
+recebe foco, sem execução nem submissão. Vinte trades temporários pelo renderer do dashboard exercitam
+scroll vertical e cabeçalho sticky, inclusive indicadores incompletos na tabela compacta.
+
+Snapshot acrescenta estado de seleção/ordenação, scroll do wrapper do diário e estilos de bordas/tabela,
+cursor, user-select e sublinhado. A primeira referência falhou: as duas operações base eram marcadas incompletas
+na inicialização, e clones herdavam a marca. A fixture passou a definir flags explicitamente; referência refeita
+antes de mover CSS. Isso caracteriza apresentação das flags, sem auditar a regra que calcula incompletude.
+Referência corrigida: `/tmp/trade-diary-g2i-reference`; comparação: `/tmp/trade-diary-g2i-after`.
+Resultado: 559 estados exatos; 22 imagens com 195 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Revisão independente aprovada; resultados devem ser recapturados em cada ambiente.
+Limites: não testa exclusão, duplicação, conclusão/salvamento nem ordenação por todas as colunas.
+
+## Campos de formulário (G2j)
+
+Snapshot versão 10: 577 casos, os 559 anteriores mais seis estados de foco em 390/1080/1440px.
+`scripts/lib/form-field-style-scenarios.cjs` abre o modal real de operações e caracteriza texto,
+número com unidade %, campo readonly, select, textarea vazio e preenchido com múltiplas linhas.
+Valores são somente de apresentação, sem eventos input/change, salvamento ou gravação de dados.
+Cada cenário confirma contas/trades/storage intactos. O runner reinicia scroll dos corpos de modal;
+`scrollIntoView` posiciona o campo em foco. Grids fg-2/3/4 continuam cobertos pelo modal passivo
+nas 17 larguras existentes, incluindo 720±1 e 1080±1. Snapshot acrescenta resize e appearance;
+a declaração de transição dos campos é verificada antes de desabilitar animações.
+
+A primeira caracterização falhou com `Required marker missing`: `applyLanguage` substitui o
+conteúdo dos labels traduzidos por textContent e remove seus spans `.required`. O teste agora
+registra essa ausência existente; comportamento da aplicação não foi corrigido neste lote.
+Artefatos temporários da tentativa inicial desapareceram após troca de ambiente; referência recapturada
+em worktree isolada no commit `f888a4f`, antes de extrair CSS.
+Resultado: 577 estados exatos; 32 imagens com 188 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Limites: sem submissão/validação dos formulários, popup nativo de select, arraste para redimensionar
+textarea ou animação em movimento. `.field-hint` não possui consumidor encontrado; regra preservada.
+
+## Modais e abas comuns (G2k)
+
+Snapshot versão 11: 595 casos, os 577 anteriores mais seis estados em 390/1080/1440px.
+`scripts/lib/modal-tab-style-scenarios.cjs` caracteriza scroll vertical do modal de operação,
+footer simples do CSV, diálogo com input e abas de importação, calendário e StudyHub pelos handlers reais.
+O snapshot acrescenta `border-top`, `backdrop-filter`, `overscroll-behavior`, modais abertos,
+scroll do corpo, alinhamento do footer e abas ativas. Fingerprint confirma contas, trades e storage intactos.
+
+A primeira referência falhou em `tabs-studyhub-plano`: o runner roteava para `study-hub`, mas o ID real
+é `studyHub`. A aba mudava, porém a página permanecia oculta. O roteamento foi corrigido e a baseline
+foi refeita antes de mover CSS em `/tmp/trade-diary-g2k-reference-corrected`.
+Resultado: 595 estados exatos; 22 imagens com 170 pixels de diferença dentro da tolerância existente.
+Zero erros de console/runtime e assets locais ausentes; 59 testes Node e 27 checks de smoke aprovados.
+Limites: não confirma importação nem diálogo, não testa fechamento por Escape e não percorre todas as
+subabas internas do StudyHub legado. Trade/account e 720±1 permanecem cobertos pelos estados existentes.
+
+## Toolbar do calendário (G2l)
+
+Snapshot versão 12: 598 casos, os 595 anteriores mais foco do seletor de mês em 390/1080/1440px.
+`scripts/lib/calendar-style-scenarios.cjs` confirma foco, tipo month, padding, min-height, largura,
+fonte e dimensões dos botões; week/biweek continuam exercitados nas 17 larguras existentes.
+
+A primeira assertion esperava gap de 12px pela regra `.calendar-toolbar`. A medição mostrou 8px:
+`.gap-8` aparece mais tarde no residual e vence por mesma especificidade. A caracterização passou a
+registrar 8px, sem corrigir o comportamento existente, e a baseline foi refeita antes da extração em
+`/tmp/trade-diary-g2l-reference-final`.
+Limite: o popup nativo do input month não é aberto; varia por navegador/OS.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 598 estados visuais
+idênticos; 27 imagens tiveram diferenças limitadas a 157 pixels de rasterização.
+
+## Upload comum (G2m)
+
+Snapshot versão 13: 607 casos, os 598 anteriores mais base, hover e `.drag` em
+390/1080/1440px. `scripts/lib/upload-zone-style-scenarios.cjs` monta e remove uma fixture
+descartável, pois não existe consumidor ativo confirmado para as classes globais.
+
+A fixture verifica padding, raio, alinhamento, input oculto, dimensões do ícone e tipografia;
+o estado `.drag` confirma fundo e borda. O pseudo-hover é forçado pelo CDP. Nenhum arquivo é
+enviado e os listeners/importadores não são exercitados. A primeira captura falhou porque a fixture
+procurava `.page-content`, ausente no dashboard; ela passou a montar diretamente em `#page-dashboard`
+antes da baseline válida em `/tmp/trade-diary-g2m-reference-v13b`.
+
+As duas primeiras comparações repetiram diferenças tipográficas de até 0,031px e excederam
+o limite de pixels, mesmo com os bytes CSS concatenados idênticos. Um controle fresco recolocou
+temporariamente o bloco no monólito e reproduziu os mesmos hashes da extração, isolando a primeira
+captura como condição subpixel transitória do navegador. Controle fresco versus extração passou:
+607 estados idênticos; 29 imagens com 148 pixels de rasterização dentro da tolerância.
+
+## Seletor de emoções (G2n)
+
+Snapshot versão 14: 616 casos, os 607 anteriores mais idle, hover e `.selected` em
+390/1080/1440px. `scripts/lib/emotion-picker-style-scenarios.cjs` monta dois chips em fixture
+descartável e confirma grid, espaçamento, cores, dimensões, tipografia e dados/storage intactos.
+
+Não existe consumidor ativo confirmado nem regra `:hover`; o pseudo-hover registra que o estado
+continua igual ao base. A primeira execução reforçada aplicava as cores-base também ao chip
+`.selected`; a expectativa foi separada e a baseline válida refeita antes do corte em
+`/tmp/trade-diary-g2n-reference-v14c`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 616 estados visuais
+idênticos; 24 imagens tiveram 190 pixels de rasterização dentro da tolerância.
+
+## Tags e edição (G2o)
+
+Snapshot versão 15: 631 casos. `scripts/lib/tag-editor-style-scenarios.cjs` cobre em
+390/1080/1440px as tags reais do Setup e Profile, contagem de uso, botões de editar/excluir,
+hovers e wrap. Uma fixture descartável cobre somente `.tag-add`, sem consumidor atual.
+
+A primeira execução esperava `inline-flex`, enquanto `getComputedStyle` normaliza o item externo
+para `flex`. A expectativa foi corrigida e a cobertura ampliada para Profile e tags secundárias
+antes da baseline válida em `/tmp/trade-diary-g2o-reference-v15b`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 631 estados visuais
+idênticos; 35 imagens tiveram 212 pixels de rasterização dentro da tolerância.
+
+## Alertas e utilitários (G2p)
+
+Snapshot versão 16: 640 casos. `scripts/lib/alert-utility-style-scenarios.cjs` cobre alert
+info real, warning isolado, separador real e headers/utilities em 390/1080/1440px. `.w-full`,
+sem consumidor ativo, usa um nó descartável; dados e storage são comparados antes/depois.
+
+A primeira expectativa comparava `margin-left:auto` literalmente, mas `getComputedStyle` retorna
+o valor resolvido em pixels. A checagem foi mantida na geometria capturada e a baseline válida
+foi refeita antes do corte em `/tmp/trade-diary-g2p-reference-v16b`.
+
+Resultado pós-extração: 59 testes Node, 27 checks no navegador e 640 estados visuais
+idênticos; 29 imagens tiveram 265 pixels de rasterização dentro da tolerância.
+
+## Ações em lote e fluxo do modal (G2q)
+
+Snapshot versão 17: 649 casos. `scripts/lib/trade-action-style-scenarios.cjs` cobre barra
+oculta, uma seleção e fluxo do modal visível em 390/1080/1440px, sem mutar dados persistidos.
+A primeira expectativa de `inline-flex` foi ajustada para o `flex` normalizado pelo estilo computado;
+a baseline válida foi refeita antes do corte em `/tmp/trade-diary-g2q-reference-v17b`.
+Após o corte, os 649 estados permaneceram idênticos; 35 imagens somaram 278 pixels de
+rasterização dentro da tolerância. Revisão independente sem bloqueios após corrigir a contagem documental para sete regras.
+
+## Premarket e chips de erro (G2r)
+
+Snapshot versão 18: 667 casos. `scripts/lib/premarket-error-chip-style-scenarios.cjs`
+cobre grade, dot hover/concluído e chips ocioso/hover/selecionado em 390/1080/1440px.
+A baseline pré-corte está em `/tmp/trade-diary-g2r-reference-v18`. Após separar o boundary
+por feature, os 667 estados permaneceram idênticos; 31 imagens somaram 220 pixels dentro da tolerância.
+
+## Importação, backup e exportação (G2s)
+
+Snapshot versão 19: 685 casos. `scripts/lib/data-transfer-style-scenarios.cjs` visita as duas
+abas por handlers reais em 390/719/720/721/1080/1419/1420/1421/1440px. Verifica layout,
+resumo/seletores e conservação de contas, trades, configuração, premarket, StudyHub e storage.
+Baseline pré-corte válida: `/tmp/trade-diary-g2s-reference-v19b`. Upload, restauração e downloads
+não são executados; a cobertura funcional desses fluxos pertence aos lotes de IO.
+Serena e Context7 disponíveis nesta sessão; raiz Serena ativada e símbolos das abas consultados.
+A primeira ativação omitiu `session_id`; repetida corretamente sem alterar código ou configuração.
+A primeira comparação v19 encontrou cinco casos com única diferença no `cotInput.value`
+(`5.8`/`5.80`): o timer real de cinco minutos cruzou pontos diferentes da captura.
+O runner passou a pausar somente `cotacaoInterval` após load e aguardar `fetchCotacao()`
+com resposta simulada. A baseline válida foi recapturada em
+`/tmp/trade-diary-g2s-reference-v19b`, com CSS anterior e o mesmo harness do resultado.
+Não houve alteração de `app.js`, normalização de snapshots nem ampliação de tolerâncias.
+Resultado final: 685 estados idênticos, 36 imagens/181 pixels de rasterização aceitos;
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## Diálogo comum (G2t)
+
+Snapshot versão 20: 691 casos. `scripts/lib/modal-tab-style-scenarios.cjs` acrescenta
+confirmação sem input com mensagem multilinha e erro real de `requiredValue`, além do input/foco
+já coberto, em 390/1080/1440px. Callback protegido não deve executar; estado é restaurado em
+`finally`, e contas/trades/storage são comparados antes/depois. Baseline pré-corte:
+`/tmp/trade-diary-g2t-reference-v20`. O timer de cotação continua pausado somente no runner.
+Resultado final: 691 estados idênticos; 46 imagens/192 pixels de rasterização aceitos.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## Rodapé da navegação (G2u)
+
+Snapshot versão 21: 697 casos. `scripts/lib/navigation-footer-style-scenarios.cjs` cobre
+hover, rolagem e seleção ativa/idempotente de Profile em 390/1080/1440px. A sidebar é aberta
+pelo handler real e o último link é trazido à vista; dados/storage são comparados antes/depois.
+O reset existente fecha a sidebar e zera sua rolagem entre casos. Hover usa pseudoestado CDP;
+Profile já é a página inicial do respectivo cenário, portanto não se alega transição entre páginas.
+Baseline pré-corte: `/tmp/trade-diary-g2u-reference-v21`. Checkpoint local em
+`.agents/state/refactoring-g2u.yaml`; configurações preexistentes continuam fora do commit.
+Resultado final: 697 estados idênticos; 33 imagens/170 pixels de rasterização aceitos.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## Grids compartilhados (G2v)
+
+Snapshot versão 22: 715 casos. `scripts/lib/workspace-grid-style-scenarios.cjs` cobre
+estratégias, ambas as grades do perfil e configuração de parceiros em
+390/1080/1419/1420/1421/1440px. Valida uma/duas colunas, gap, margens, dados/storage e
+`partnersGrid` oculto pelo renderer. Estilos e geometria das proporções são comparados no snapshot.
+A captura inicial interrompeu antes da extração: a expectativa de margem 14px ignorava
+`.page > *:last-child`, que já zera a margem do perfil secundário. Corrigido somente o
+helper; baseline válida refeita em `/tmp/trade-diary-g2v-reference-v22b`.
+Checkpoint local: `.agents/state/refactoring-g2v.yaml`; configurações preexistentes fora do commit.
+Resultado final: 715 estados idênticos; 41 imagens/206 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## StudyHub nativo (G2w)
+
+Snapshot versão 23: 787 casos. `scripts/lib/study-hub-native-style-scenarios.cjs` acrescenta
+72 cenários (nove estados em 390/719/720/721/1079/1080/1081/1440px). Usa botões reais para
+as quatro abas, hover ativo/inativo por CDP, foco DOM, scroll horizontal e posição sticky.
+Offsets de tabs/document/main entram no snapshot; cada caso reinicia seleção, foco e rolagem.
+Dados/storage são conferidos. Grids/cards/ranges nativos não montados não recebem UI sintética.
+
+Diagnóstico inicial usou método inexistente `browser.load`; API local inspecionada e substituída
+por `Page.navigate`. Ensaio sticky mediu antes de terminar o `scroll-behavior:smooth` existente;
+rolagem instantânea confirmou pinning em 390/719/1080/1440px. Somente ferramenta corrigida,
+72 casos direcionados passaram antes da baseline completa. A animação de scroll não é testada.
+Baseline pré-corte: `/tmp/trade-diary-g2w-reference-v23`; checkpoint local em
+`.agents/state/refactoring-g2w.yaml`; configurações preexistentes fora do commit.
+Resultado final: 787 estados idênticos; 23 imagens/114 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## Resumos compartilhados (G2x)
+
+Snapshot versão 24: 823 casos. `scripts/lib/workspace-summary-style-scenarios.cjs` acrescenta
+36 cenários (seis estados em 390/719/720/721/1080/1440px). Hero/compact reais do perfil;
+`renderStatusList` em notificationFeed (safe/warn/danger/info e vazio), `renderAnalysisSummary`
+em statDiscSummary (neutro/quatro tons e vazio), `renderStrategyRows` no ranking ampliado.
+Valores, ações não executadas e textos longos exercitam spacing/wrap. Fixture guarda/restaura
+somente innerHTML antes de cada caso; dados/config/premarket/StudyHub/storage são conferidos.
+
+Ensaio inicial interrompeu antes da extração: neutral chip declarado com alpha 0.025
+é serializado pelo Chrome como 0.024 no estilo computado. Diagnosticados os cinco chips;
+somente expectativa ajustada ao comportamento observado. Os 36 casos direcionados passaram
+antes da baseline completa. CSS permanece com o literal original e o fingerprint anterior.
+Baseline pré-corte original: `/tmp/trade-diary-g2x-reference-v24` (823 casos aprovados).
+Na retomada, processo e artefatos temporários ficaram indisponíveis; baseline reconstruída
+do commit `a374412` em cópia isolada com a mesma caracterização v24. Novos artefatos locais:
+`.agents/state/artifacts/refactoring-g2x/{reference-v24r,after-v24r}`.
+Revisor original concluiu código e atingiu limite de uso na documentação; revisão final
+transferida a outro subagente, somente leitura. Checkpoint: `.agents/state/refactoring-g2x.yaml`;
+artefatos e configurações preexistentes fora do commit.
+Resultado final: 823 estados idênticos; 37 imagens/159 pixels de rasterização aceitos, sem ampliar tolerância.
+59 testes Node, 27 checks no navegador, sintaxe, parsing, diff e revisão independente aprovados.
+
+## Documentos (G2y)
+
+Snapshot versão 25: 864 casos. `scripts/lib/document-style-scenarios.cjs` acrescenta
+41 casos: geral em 390/1079/1080/1081/1239/1240/1241/1419/1420/1421/1440px;
+dez variantes em 390/1080/1440px (vazio, diário, trades WIN/LOSS/R ausente, foco,
+hovers da toolbar/pasta/entrada e overflow). Renderers e seletores reais; dez documentos
+com título longo, nota sem conteúdo, texto longo composto por 70 trechos e nove SVGs data: autocontidos.
+Dados/config/premarket temporários restaurados em finally; fingerprint protege memória/storage.
+Nenhuma criação/salvamento/exclusão/formatação/upload/remoção é executada.
+Texto da fixture usa separadores literais `\n`; o overflow vem da quebra visual, sem alegar cobertura multiline.
+
+41 casos direcionados e 59 testes Node passaram antes da extração. A referência integral
+é cópia imutável de `c34344e` com runner/helper v25, capturada em paralelo ao código extraído
+em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2y/{baseline-root,reference-v25,after-v25}`.
+Snapshot acrescenta scroll de Documentos e font-style; limites de pixels permanecem iguais.
+Breakpoint columns 3/2/1, disabled, truncamento, vazio, mídia e tipografia são assertados.
+O contexto de trade não é ocultado pelo retorno antecipado do editor vazio no código atual;
+limitação preexistente mantida, sem ampliação do escopo. Checkpoint: `.agents/state/refactoring-g2y.yaml`.
+Resultado final: 864 estados idênticos; 48 imagens/197 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 35 CSS, diff e revisão independente aprovados.
+Fingerprint integral também conferido no índice Git; configurações/artefatos locais fora do commit.
+
+## Visão geral de contas (G2z)
+
+Snapshot versão 26: 881 casos. `scripts/lib/account-overview-style-scenarios.cjs`
+acrescenta 17 casos: conta única em 390/719/720/721/1419/1420/1421/1440px;
+duas contas, vazio e nome longo em 390/720/1440px. Renderer `renderAccountsPage`
+e contêiner reais; dois cards exercitam ações ativa/inativa sem acioná-las.
+Grid 2→1 coluna até 1420px, estatísticas e barras 4/3→1 coluna até 720px,
+composição do cabeçalho, ponto de cor e pseudo-elemento são assertados e capturados.
+Fixture restaura `accounts` em finally e confere memória/storage, sem persistir dados.
+Em 390px, nome longo encolhe o ponto de cor por flex; caracterização inicial esperava
+11px fixos, falhou e foi ajustada ao comportamento observado antes da extração.
+
+17 casos direcionados e 59 testes Node passaram antes do corte. A referência integral
+é cópia imutável de `0bc5a44` com runner/helper v26, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2z/{baseline-root,reference-v26,after-v26}`.
+Checkpoint: `.agents/state/refactoring-g2z.yaml`. Resultado final: 881 estados
+idênticos; 49 imagens/279 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 36 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
+## Parceiros (G2aa)
+
+Snapshot versão 27: 913 casos. `scripts/lib/partner-style-scenarios.cjs` acrescenta
+32 casos: vazio, afiliados+QR, só afiliado e só QR em 390/719/720/721/1419/1420/1421/1440px.
+`renderPartnersPage`/contêineres reais exercitam cards do editor, estados vazios,
+grade de campos e prévia de imagem SVG data: autocontida. QR é decodificado antes da captura.
+Fixture restaura `config` em finally e confere memória/storage; nenhum handler de edição,
+salvamento, upload ou remoção é acionado. O grid legado segue oculto; regras sem consumidor
+ativo são preservadas pelo fingerprint integral, sem fabricar interface.
+
+32 casos direcionados e 59 testes Node passaram antes do corte. Referência integral em
+cópia imutável de `f1d90a3` com runner/helper v27, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2aa/{baseline-root,reference-v27,after-v27}`.
+Checkpoint: `.agents/state/refactoring-g2aa.yaml`. Resultado final: 913 estados
+idênticos; 48 imagens/254 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 37 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
+## Nuvem de tags do perfil (G2ab)
+
+Snapshot versão 28: 922 casos. `scripts/lib/tag-editor-style-scenarios.cjs` foi ampliado
+com nove casos de `renderProfilePage`: configuração padrão, sem tags e com texto longo
+em 390/720/1440px. Três grupos/títulos reais exercitam margem entre irmãos,
+espaçamento do título, tamanho, peso, tracking e caixa alta. Fixture restaura `config`
+e confere memória/storage, sem acionar edição ou salvamento.
+
+Nove casos direcionados e 59 testes Node passaram antes do corte. Referência integral
+em cópia imutável de `3f434a9` com runner/helper v28, capturada em paralelo ao código
+extraído em perfis independentes. Artefatos duráveis locais:
+`.agents/state/artifacts/refactoring-g2ab/{baseline-root,reference-v28,after-v28}`.
+Checkpoint: `.agents/state/refactoring-g2ab.yaml`. Resultado final: 922 estados
+idênticos; 53 imagens/223 pixels de rasterização aceitos, sem ampliar tolerância.
+Zero erros de console/runtime ou assets locais ausentes nos dois perfis.
+59 testes Node, 27 checks no navegador, sintaxe, parsing de 38 CSS, diff e revisão
+independente aprovados. Fingerprint integral também conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
+## Animação de entrada (G2ac)
+
+Snapshot versão 29: mesmos 922 casos da versão 28. Antes do corte, CSSOM confirmou
+uma única regra `fade-up` com 0% (opacity 0, translateY(10px)) e 100% (opacity 1,
+translateY(0px)); dashboard, perfil e parceiros ativos computam `fade-up 0.28s ease`.
+O runner registra e afirma esses quadros antes do override que desativa animações para
+capturas estáveis. O fingerprint integral protege também os 144 bytes da regra e sua ordem.
+
+59 testes Node passaram antes do corte. Referência integral em cópia imutável de
+`080c0d7` com runner v29, capturada em paralelo ao código extraído em perfis isolados.
+Artefatos duráveis locais: `.agents/state/artifacts/refactoring-g2ac/{baseline-root,reference-v29,after-v29}`.
+O primeiro revisor independente atingiu limite de uso; revisão somente leitura transferida
+a outro subagente. Checkpoint: `.agents/state/refactoring-g2ac.yaml`.
+Resultado final: 922 estados idênticos; 62 imagens/303 pixels de rasterização aceitos,
+sem ampliar tolerância. Zero erros de console/runtime ou assets locais ausentes nos dois
+perfis. 59 testes Node, 27 checks no navegador, sintaxe, parsing de 39 CSS, diff e
+revisão independente aprovados. Fingerprint integral conferido no índice Git;
+configurações/artefatos locais fora do commit.
+
+## Responsividade desktop/tablet (G2ad)
+
+Snapshot versão 29: 922 casos, com dashboard em 1080/1240/1420±1, documentos nos
+mesmos breakpoints, StudyHub em 1080±1, métricas em 1420±1 e sidebar aberta em
+1240±1. Referência pré-corte de `e612fed` em
+`.agents/state/artifacts/refactoring-g2ad/reference-v29`; captura pós-corte no mesmo
+runner em `after-v29`. Resultado: 922 estados idênticos; 46 imagens/263 pixels de
+rasterização dentro da tolerância existente, zero erros de console/runtime.
+59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
+Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
+
+## Responsividade mobile (G2ae)
+
+Snapshot versão 29: 922 casos, incluindo 390, 439/440/441 e 719/720/721px.
+Referência pré-corte de `63ed009` em
+`.agents/state/artifacts/refactoring-g2ae/reference-v29`; captura pós-corte no
+mesmo runner em `after-v29`. Resultado: 922 estados idênticos; 62 imagens/369 pixels
+de rasterização dentro da tolerância existente, zero erros de console/runtime.
+59 testes Node, 27 checks no navegador, parsing dos 40 CSS, sintaxe e diff aprovados.
+Fingerprint dos bytes concatenados preservado; revisão independente sem bloqueios.
+
+## Renderer do perfil (G3a)
+
+`tests/profile-page.test.cjs` caracterizou antes do corte hero, risco, tags, alertas e
+alvos opcionais da função global. O smoke passou a abrir o perfil pelo menu, verificar
+os quatro blocos e exercitar `refreshAll` (31 checks). A matriz visual v29 usa como
+referência a captura de `47371b4` em
+`.agents/state/artifacts/refactoring-g2ae/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3a/after-v29`. Resultado: 922 estados idênticos,
+56 imagens/372 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 62 testes Node e sintaxe aprovados.
+
+## Renderer de parceiros (G3b)
+
+`tests/partners-page.test.cjs` caracterizou antes do corte hub vazio/preenchido,
+escaping, handlers inline e ausência de nós obrigatórios. O smoke abre parceiros,
+verifica afiliados/QR, grade legada oculta e `refreshAll` (35 checks).
+Referência visual v29 de `f5a11a0` em
+`.agents/state/artifacts/refactoring-g3a/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3b/after-v29`. Resultado: 922 estados idênticos,
+47 imagens/168 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 66 testes Node e sintaxe aprovados.
+
+## Renderer de contas (G3c)
+
+`tests/accounts-page.test.cjs` caracterizou antes do corte contas múltiplas, vazio,
+alvos opcionais e ordem de carga. O smoke abre contas, verifica métricas e overview e
+exercita `refreshAll` (39 checks). Referência visual v29 de `bc3ef23` em
+`.agents/state/artifacts/refactoring-g3b/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3c/after-v29`. Resultado: 922 estados idênticos,
+59 imagens/291 pixels de rasterização dentro da tolerância existente; zero erros de
+console/runtime. Corpo da função movido byte a byte; 70 testes Node e sintaxe aprovados.
+
+## Renderer de documentos (G3d)
+
+`tests/documents-page.test.cjs` caracterizou antes do corte pastas, lista, editor,
+vazio, contexto de trade e nó ausente. O smoke abre documentos, verifica pastas,
+lista/editor e exercita `refreshAll` (43 checks). Referência visual v29 de
+`3b95e19` em `.agents/state/artifacts/refactoring-g3c/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3d/after-v29`. O corpo da função foi movido
+byte a byte; 922 estados idênticos, 52 imagens/188 pixels de rasterização dentro da
+tolerância existente, zero erros de console/runtime; 75 testes Node, sintaxe e diff aprovados.
+
+## Renderer do premarket (G3e)
+
+`tests/premarket-page.test.cjs` caracterizou antes do corte resultados mensais,
+grade de hábitos, fevereiro bissexto e ausência da grade. O smoke abre a rotina,
+verifica resultados e grade e exercita `refreshAll` (47 checks). Referência visual
+v29 de `21688f4` em `.agents/state/artifacts/refactoring-g3d/after-v29`; pós-corte
+em `.agents/state/artifacts/refactoring-g3e/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 52 imagens/191 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 79 testes Node, sintaxe e diff aprovados.
+
+## Renderer do hub de estratégias (G3f)
+
+`tests/strategy-hub-page.test.cjs` caracterizou antes do corte métricas, tabela,
+foco, vazio e alvos opcionais. O smoke abre o hub, verifica métricas/board/foco e
+exercita `refreshAll` (51 checks). Referência visual v29 de `2c70ab9` em
+`.agents/state/artifacts/refactoring-g3e/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3f/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 55 imagens/288 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 83 testes Node, sintaxe e diff aprovados.
+
+## Renderer da página de psicologia (G3g)
+
+`tests/psychology-page.test.cjs` caracterizou antes do corte resumos, gráficos,
+tabela, vazio e alvos opcionais. O smoke abre psicologia, verifica resumos, gráficos
+e tabela e exercita `refreshAll` (55 checks). Referência visual v29 do lote G3f em
+`.agents/state/artifacts/refactoring-g3f/after-v29`; pós-corte em
+`.agents/state/artifacts/refactoring-g3g/after-v29`. Corpo movido byte a byte;
+922 estados idênticos, 49 imagens/293 pixels de rasterização dentro da tolerância
+existente, zero erros de console/runtime; 87 testes Node, sintaxe e diff aprovados.
+
+## Renderer da página de notificações (G3h)
+
+`tests/notifications-page.test.cjs` caracterizou conta ativa, cópia dos alertas,
+mensagem vazia e propagação de falhas antes do corte; pós-corte protege também
+ordem de carga. Corpo movido byte a byte, restante de `app.js` idêntico à base
+`77eb592`. Smoke abre notificações e exercita `refreshAll`: 58 checks, zero erros
+ou assets locais ausentes. 91 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem alteração de HTML gerado/CSS;
+a última matriz completa permanece a do G3g, sem atribuir seu resultado ao G3h.
+
+## Renderer da página de calendário (G3i)
+
+`tests/calendar-page.test.cjs` caracterizou três visões, ano bissexto, totais,
+vazio, tradução e limite preexistente do último dia antes do corte. Pós-corte
+protege também carga clássica. Corpo movido byte a byte contra `6955e9d`, com
+restante de `app.js` idêntico. Smoke abre calendário, escolhe mês, alterna três
+visões, atualiza e cruza ano: 64 checks, zero erros/assets locais ausentes.
+97 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
+neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Apresentação de stops e taxas (G3j)
+
+`tests/stop-fee-analysis.test.cjs` caracterizou quatro cards, tons, percentuais,
+limite inclusivo em 25%, tooltips, formatação e alvo ausente antes do corte.
+Pós-corte protege também carga clássica. Corpo movido byte a byte contra
+`ef7a517`, restante de `app.js` idêntico. Smoke verifica cards na página de
+análises e após refresh: 67 checks, zero erros/assets locais ausentes.
+102 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
+neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Calendário compacto do dashboard (G3k)
+
+`tests/dashboard-calendar.test.cjs` caracterizou mês âncora, bissexto, resultados
+diários/semanais, tradução, vazio, não-array e alvos ausentes antes do corte.
+Pós-corte protege carga clássica. Corpo movido byte a byte contra `c96b3c6`,
+restante de `app.js` idêntico. Smoke verifica grade, totais, refresh e clique
+na célula: 71 checks, zero erros/assets locais ausentes. 107 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte
+sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Linhas de estratégias compartilhadas (G3l)
+
+`tests/strategy-rows.test.cjs` caracterizou limite/default, ordem, escaping,
+sinais, métricas, normalização das barras, vazio e alvo ausente antes do corte.
+Pós-corte protege carga clássica. Corpo movido byte a byte contra `30bc1d1`,
+restante de `app.js` idêntico. Smoke verifica dashboard/refresh e linhas do hub:
+74 checks, zero erros/assets locais ausentes. 112 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Renderer principal do dashboard (G3m)
+
+`tests/dashboard-page.test.cjs` caracterizou cards, sete gráficos, curva,
+defaults, componentes, recentes/limite 20 e tooltips antes do corte. Pós-corte
+protege carga clássica. Corpo movido byte a byte contra `b84961e`, restante de
+`app.js` idêntico. Smoke verifica cards, gráficos e alternância da curva:
+78 checks, zero erros/assets locais ausentes. 119 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Painel de risco do dashboard (G3n)
+
+`tests/risk-board.test.cjs` caracterizou barras, sinais, excessos, thresholds,
+metas, defaults e guards antes do corte. Pós-corte protege carga clássica.
+Corpo movido byte a byte contra `46bbc40`, restante de `app.js` idêntico.
+Smoke verifica risco ideal, quatro barras/sinais e refresh: 81 checks,
+zero erros/assets locais ausentes. 126 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Controles do calendário (G3o)
+
+`tests/calendar-controls.test.cjs` caracterizou navegação, parsing, sync/render,
+modos, controles opcionais e detalhe do dia antes do corte. Pós-corte protege
+carga clássica. Cinco declarações/41 linhas movidas byte a byte contra `c8e8538`,
+restante de `app.js` idêntico. Smoke verifica controles e dias com trades/vazios:
+84 checks, zero erros/assets locais ausentes. 133 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança dos
+corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Estatísticas de psicologia em análises (G3p)
+
+`tests/psychology-statistics.test.cjs` caracterizou cards, cinco gráficos,
+resumos, limites de hesitações/erros, tabela, vazio e alvo opcional antes do
+corte. Pós-corte protege carga clássica. Corpo movido byte a byte contra
+`bd209ad`, restante de `app.js` idêntico. Smoke verifica aba, gráficos,
+resumos e tabela: 88 checks, zero erros/assets locais ausentes.
+139 testes Node, sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Lista de status compartilhada (G3q)
+
+`tests/status-list.test.cjs` caracterizou vazio, escaping, ações, valores,
+alvo ausente e interpolações legadas antes do corte. Pós-corte protege carga
+clássica. Corpo movido byte a byte contra `a936863`, restante de `app.js`
+idêntico. Smoke verifica listas em notificações, perfil e estratégias: 91
+checks, zero erros/assets locais ausentes. 145 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Resumos analíticos compartilhados (G3r)
+
+`tests/analysis-summary.test.cjs` caracterizou ordem, tons, escaping, defaults,
+itens falsy, vazio/não-array e alvo ausente antes do corte. Pós-corte protege
+carga clássica. Corpo movido byte a byte contra `c197586`, restante de `app.js`
+idêntico. Smoke verifica resumos reais de psicologia: 92 checks, zero
+erros/assets locais ausentes. 150 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Mídia de documentos (G3s)
+
+`tests/document-media.test.cjs` caracterizou mensagens vazias, ordem, URLs,
+escaping, fallback, ações, ausência de mutação e falhas antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `a524bae`;
+o restante de `app.js` difere apenas por dois separadores de linha removidos.
+Smoke abre documentos e confirma os renderers globais: 92 checks, zero
+erros/assets locais ausentes. 154 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Caixa no formulário de conta (G3t)
+
+`tests/account-cashflow-form.test.cjs` caracterizou guard, vazio, resumo,
+sinais, tons, ordem, tipos, datas, valores, escaping, handlers e não mutação
+antes do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte
+contra `9521bd1`; o restante de `app.js` difere apenas por dois separadores de
+linha removidos. Smoke abre contas e confirma os renderers globais: 92 checks,
+zero erros/assets locais ausentes. 159 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Caixa na configuração (G3u)
+
+`tests/setup-cashflow-list.test.cjs` caracterizou guards, conta ativa, vazio,
+cálculo, resumo, sinais, tons, ordem, tipos, datas, valores, escaping, handlers
+e não mutação antes do corte. Pós-corte protege a carga clássica. Corpo movido
+byte a byte contra `7564c76`; o restante de `app.js` difere apenas por dois
+separadores de linha removidos. Smoke abre contas e confirma os renderers
+globais: 92 checks, zero erros/assets locais ausentes. 165 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Resumo de risco na configuração (G3v)
+
+`tests/setup-risk-summary.test.cjs` caracterizou conta ativa, dependências,
+oito campos, sinais, defaults percentuais, alvos opcionais e não mutação antes
+do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`150b8c6`; o restante de `app.js` difere apenas por dois separadores de linha
+removidos. Smoke abre contas e confirma os renderers globais: 92 checks, zero
+erros/assets locais ausentes. 170 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Lista de contas (G3w)
+
+`tests/account-list.test.cjs` caracterizou guard, vazio, uma/múltiplas contas,
+dependências, ordem, campos, ações e não mutação antes do corte. Pós-corte
+protege a carga clássica. Corpo movido byte a byte contra `8a12083`; o restante
+de `app.js` difere apenas por dois separadores de linha removidos. Smoke abre
+contas e confirma os renderers globais: 92 checks, zero erros/assets locais
+ausentes. 175 testes Node, sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Página de configuração de risco (G3x)
+
+`tests/risk-setup-page.test.cjs` caracterizou precedência conta/configuração,
+zeros, defaults `??`/`||`, data, campos opcionais e ordem das chamadas antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`7a9a357`; o restante de `app.js` difere apenas por dois separadores de linha
+removidos. Smoke abre contas e confirma os renderers globais: 92 checks, zero
+erros/assets locais ausentes. 179 testes Node, sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML
+gerado ou CSS; última matriz: G3g.
+
+## Resumo da conta no shell (G3y)
+
+`tests/account-summary.test.cjs` caracterizou guard de conta, cor, nome, tipo,
+targets opcionais e não mutação antes do corte. Pós-corte protege a carga
+clássica. Corpo movido byte a byte contra `fedca09`; o restante de `app.js`
+difere apenas por dois separadores de linha removidos. Smoke abre contas e
+confirma os renderers globais: 92 checks, zero erros/assets locais ausentes.
+183 testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida
+neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Ícones das pastas de documentos (G3z)
+
+`tests/document-folder-icon.test.cjs` caracterizou wrapper, contrato SVG,
+quatro tipos, paths distintos e fallback antes do corte. Pós-corte protege a
+carga clássica. Corpo movido byte a byte contra `73cd31d`; o restante de
+`app.js` difere apenas por dois separadores de linha removidos. Smoke abre
+documentos e confirma os renderers globais: 92 checks, zero erros/assets locais
+ausentes. 187 testes Node, sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Filtro de contas da exportação (G3aa)
+
+`tests/export-account-filter.test.cjs` caracterizou guard do select, ordem,
+IDs, escaping dos nomes e preservação/limpeza da seleção antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `19faebf`;
+o restante de `app.js` difere apenas por dois separadores de linha removidos.
+Smoke: 95 checks, zero erros/assets locais ausentes. 191 testes Node, sintaxe e
+diff aprovados. O comando auxiliar `python` não existia; a equivalência exata
+foi repetida com `python3`. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Resumo do backup (G3ab)
+
+`tests/backup-summary.test.cjs` caracterizou guard do DOM, tradução,
+formatação, preservação do dado e avaliação do argumento padrão antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`1c63af0`; o restante de `app.js` difere apenas por dois separadores de linha
+removidos. Smoke: 95 checks, zero erros/assets locais ausentes. 195 testes
+Node, sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Valor responsivo do topbar (G3ac)
+
+`tests/topbar-value.test.cjs` caracterizou cache/target ausentes, densidade
+completa/compacta, título e argumentos de classe antes do corte. Pós-corte
+protege a carga clássica. Corpo movido byte a byte contra `3193ab9`; o restante
+de `app.js` difere apenas por dois separadores de linha removidos. Smoke: 95
+checks, zero erros/assets locais ausentes. 199 testes Node, sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Prévia das imagens da operação (G3ad)
+
+`tests/trade-images.test.cjs` caracterizou guard do DOM, vazio, ordem, URLs,
+títulos, estilos, índices de remoção e não mutação antes do corte. Pós-corte
+protege a carga clássica. Corpo movido byte a byte contra `7f60ebb`; o restante
+de `app.js` difere apenas pela declaração removida. Smoke: 95 checks, zero
+erros/assets locais ausentes. 203 testes Node, sintaxe e diff aprovados. Matriz
+visual completa não repetida neste corte sem mudança do corpo/HTML gerado ou
+CSS; última matriz: G3g.
+
+## Aviso de consulta do diário (G3ae)
+
+`tests/trade-log-read-only-notice.test.cjs` caracterizou guard do DOM,
+desbloqueio, todas/uma conta, mensagens, escaping e não mutação antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `1811212`;
+o restante de `app.js` difere apenas pela declaração e separadores removidos.
+Smoke: 95 checks, zero erros/assets locais ausentes. 208 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Chips de erros da operação (G3af)
+
+`tests/trade-error-chips.test.cjs` caracterizou guard do DOM, vazio,
+normalização, deduplicação, ordem, seleção, encoding, escaping e não mutação
+antes do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte
+contra `caa93e1`; o restante de `app.js` difere apenas pela declaração e
+separadores removidos. Smoke: 95 checks, zero erros/assets locais ausentes. 212
+testes Node, sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Métricas do diário (G3ag)
+
+`tests/trade-log-metrics.test.cjs` caracterizou guard do DOM, quatro cards,
+sinais, win rate, risco médio, incompletos e não mutação antes do corte.
+Pós-corte protege a carga clássica. Corpo movido byte a byte contra `1ceda37`;
+o restante de `app.js` difere apenas pela declaração e separadores removidos.
+Smoke: 95 checks, zero erros/assets locais ausentes. 216 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Barra de seleção do diário (G3ah)
+
+`tests/trade-log-selection.test.cjs` caracterizou guard do DOM, seleção
+vazia/simples/múltipla, incompletos, textos, classes, ações e checkbox geral
+antes do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte
+contra `e68b77d`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 221 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Saldo da conta no shell (G3ai)
+
+`tests/account-balance-chrome.test.cjs` caracterizou argumentos padrão, conta
+ausente, retorno, saldo, variação positiva/negativa, contagem e alvos opcionais
+antes do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte
+contra `bbc5ea6`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 226 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Duração da operação no formulário (G3aj)
+
+`tests/trade-duration-field.test.cjs` caracterizou guard do DOM, datas,
+horários, fallback da data de saída, dependências e duração nula/zero antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`d075c07`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 231 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Fluxo visual de trades incompletos (G3ak)
+
+`tests/incomplete-trade-flow.test.cjs` caracterizou alvos ausentes/parciais,
+cadastro, edição, fluxo único/múltiplo, título, progresso, símbolo, botões e
+navegação antes do corte. Pós-corte protege a carga clássica. Corpo movido byte
+a byte contra `4a9dd63`; o restante de `app.js` difere apenas pela declaração
+removida. Smoke: 95 checks, zero erros/assets locais ausentes. 237 testes Node,
+sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Tags da configuração de risco (G3al)
+
+`tests/risk-tags.test.cjs` caracterizou guard do DOM, tags comuns, lista
+inválida, estratégias, ordem, escaping, contagem de uso e controles antes do
+corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`c65514a`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 242 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Campos monetários da simulação (G3am)
+
+`tests/simulation-sizing-fields.test.cjs` caracterizou conta ativa/selecionada,
+fallbacks, entradas explícitas, zero, conversão, projeções, ordem e retorno antes
+do corte. Pós-corte protege a carga clássica. Corpo movido byte a byte contra
+`9a23aec`; o restante de `app.js` difere apenas pela declaração removida.
+Smoke: 95 checks, zero erros/assets locais ausentes. 245 testes Node, sintaxe e
+diff aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Banner de trades incompletos (G3an)
+
+`tests/incomplete-trade-banner.test.cjs` caracterizou contagem truthy, exibição,
+zero, alvos opcionais, não mutação e descarte persistente antes do corte.
+Pós-corte protege também a carga clássica. Estado e funções foram movidos byte a
+byte contra `aa8d1e9`. Smoke: 95 checks, zero erros/assets locais ausentes. A
+execução literal da suíte encontrou uma linha local alheia no teste de controles
+do calendário; com a versão commitada desse único teste, 250 testes Node passaram.
+Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem
+mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Abas de importação e exportação (G3ao)
+
+`tests/import-tabs.test.cjs` caracterizou abas conhecidas/desconhecidas, painéis
+opcionais, classes e ordem de payload, resumo e filtro antes do corte. Pós-corte
+protege também a carga clássica e a posição após as dependências. Corpo movido
+byte a byte contra `5698df5`. Smoke: 95 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste
+de controles do calendário; com a versão commitada desse único teste, 255 testes
+Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Abas de estatísticas (G3ap)
+
+`tests/statistics-tabs.test.cjs` caracterizou cinco painéis, classes, elemento
+opcional, ID desconhecido, fallback geral, psicologia e ordem da simulação antes
+do corte. Pós-corte protege também a carga clássica após o renderer psicológico.
+Corpo movido byte a byte contra `634356a`. Smoke: 95 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse
+único teste, 260 testes Node passaram. Sintaxe e diff aprovados. Matriz visual
+completa não repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última
+matriz: G3g.
+
+## Filtros de estatísticas (G3aq)
+
+`tests/statistics-filters.test.cjs` caracterizou período personalizado/predefinido,
+fallback, barra opcional e fixação da conta antes do renderer. Pós-corte protege
+também a carga clássica após as abas. Corpos movidos byte a byte contra `7e15d33`.
+Smoke: 95 checks, zero erros/assets locais ausentes. A execução literal da suíte
+encontrou a linha local alheia já registrada no teste de controles do calendário;
+com a versão commitada desse único teste, 265 testes Node passaram. Sintaxe e diff
+aprovados. Matriz visual completa não repetida neste corte sem mudança do
+corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Modo da curva de equity (G3ar)
+
+`tests/dashboard-equity-mode.test.cjs` caracterizou alternância valor/percentual,
+labels, fallback desconhecido, botão opcional e ordem dos efeitos antes do corte.
+Pós-corte protege também a carga clássica após o renderer do dashboard. Corpo
+movido byte a byte contra `a38d582`. Smoke: 95 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+270 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Desvio do plano no formulário (G3as)
+
+`tests/trade-plan-deviation.test.cjs` caracterizou guard do DOM, opções sim/não,
+fallback do campo ausente e ordem da atualização de disciplina antes do corte.
+Pós-corte protege também a carga clássica após o campo de duração. Corpo movido
+byte a byte contra `d984237`. Smoke: 95 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste
+de controles do calendário; com a versão commitada desse único teste, 275 testes
+Node passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste
+corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Comparação de estratégias (G3at)
+
+`tests/strategy-comparison.test.cjs` caracterizou retorno sem painel, estado vazio,
+seleção duplicada e comparação completa com resumos, vencedores e quatro gráficos.
+Pós-corte protege também a carga clássica após as linhas de estratégias. Corpo
+movido byte a byte contra `1a04be6`. Smoke: 95 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+280 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Página de análises (G3au)
+
+`tests/statistics-page.test.cjs` caracterizou seleção padrão/fixada de conta, escopo
+de risco, estado vazio e saída preenchida com gráficos, símbolos, dias e horários.
+Pós-corte protege também a carga clássica após a comparação de estratégias. Corpo
+movido byte a byte contra `76e8425`. Smoke: 95 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+285 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Página do diário (G3av)
+
+`tests/trade-log-page.test.cjs` caracterizou filtros, ordem da orquestração, estado
+vazio, alerta de incompletos, labels e variantes compacta/completa das linhas.
+Pós-corte protege também a carga clássica após os componentes do diário. Bloco
+movido byte a byte contra `98c6b11`. Um teste estrutural e um check no navegador confirmam que o `renderLog` homônimo do StudyHub permanece isolado em sua IIFE. Smoke: 96 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+293 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança do corpo/HTML gerado ou CSS; última matriz: G3g.
+
+## Painel de simulação (G3aw)
+
+`tests/simulation-panel.test.cjs` caracterizou snapshot, reset, modos manual/conta,
+ordem dos efeitos e renderer com opções, RRR customizado, cards, resumo, plano e
+gráfico. Pós-corte protege também a carga clássica antes dos dispatchers de
+estatísticas. Quatro corpos movidos byte a byte contra `8b8d7d3`. Smoke: 96 checks,
+zero erros/assets locais ausentes. A execução literal da suíte encontrou a linha
+local alheia já registrada no teste de controles do calendário; com a versão
+commitada desse único teste, 299 testes Node passaram. Sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança do corpo/HTML gerado
+ou CSS; última matriz: G3g.
+
+## Formulário de contas (G3ax)
+
+`tests/account-form.test.cjs` caracterizou conta nova, conta ausente, edição com
+clone de cashflows, movimento válido/inválido, remoção e alternância CFD/futuros.
+Pós-corte protege também a carga clássica após o renderer de cashflows. Cinco
+corpos movidos byte a byte contra `72d8c3d`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse
+único teste, 306 testes Node passaram. Sintaxe e diff aprovados. Matriz visual
+completa não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS;
+última matriz: G3g.
+
+## Diálogo comum da aplicação (G3ay)
+
+`tests/app-dialog.test.cjs` caracterizou defaults, projeção no DOM, foco diferido,
+fechamento, confirmação, valor obrigatório, callbacks e fallbacks nativos. Pós-corte
+protege também a carga clássica depois do seletor de idioma e antes dos consumidores.
+Seis corpos movidos byte a byte contra `eee28e7`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 314 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Controles do diário (G3az)
+
+`tests/trade-log-controls.test.cjs` caracterizou ordenação, indicadores, limpeza do
+período, seleção total/individual, classes das linhas e limpeza da seleção. Pós-corte
+protege também a carga clássica depois dos renderers do diário. Cinco corpos movidos
+byte a byte contra `fb256d1`. Smoke: 96 checks, zero erros/assets locais ausentes.
+A execução literal da suíte encontrou a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse único teste, 321 testes Node
+passaram. Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte
+sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Navegação da aplicação (G3ba)
+
+`tests/navigation.test.cjs` caracterizou despacho conhecido/desconhecido, ordem do
+refresh compartilhado, sidebar, classes ativas, período do dashboard e reset da
+simulação. Pós-corte protege também a carga clássica como último módulo antes de
+`app.js`. Três corpos movidos byte a byte contra `7267fc7`. O teste estrutural do
+perfil foi ajustado após diagnóstico: sua intenção é preceder `app.js`, enquanto o
+novo teste protege a navegação intermediária. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 328 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Opções do formulário de trade (G3bb)
+
+`tests/trade-form-options.test.cjs` caracterizou ordem e conteúdo dos selects,
+labels crus, campos opcionais, conta ativa, símbolos, reset e alternância dos erros.
+Pós-corte protege também a carga clássica depois dos chips de erro. Dois corpos
+movidos byte a byte contra `77c7720`. Smoke: 96 checks, zero erros/assets locais
+ausentes. A execução literal da suíte encontrou a linha local alheia já registrada
+no teste de controles do calendário; com a versão commitada desse único teste,
+334 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa não
+repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Controlador de modais (G3bc)
+
+`tests/modal-controller.test.cjs` caracterizou bloqueio do diário, edição encontrada
+ou ausente, trade novo, data/duração, modal de contas/importação, fechamento e fila.
+Pós-corte protege também a carga clássica depois dos renderers e antes da navegação.
+Dois corpos movidos byte a byte contra `c4cb0d6`. Smoke: 96 checks, zero erros/assets
+locais ausentes. A execução literal da suíte encontrou a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse único
+teste, 341 testes Node passaram. Sintaxe e diff aprovados. Matriz visual completa
+não repetida neste corte sem mudança dos corpos/HTML gerado ou CSS; última matriz: G3g.
+
+## Contexto de conta do formulário de trade (G3bd)
+
+`tests/trade-form-account-context.test.cjs` caracterizou conta selecionada e fallback,
+risco, multiplicador, visibilidade percentual/absoluta, resumo, alvos opcionais,
+símbolo e mercado. Pós-corte protege também a carga clássica depois das opções do
+formulário. Dois corpos movidos byte a byte contra `608b791`. Smoke: 96 checks,
+zero erros/assets locais ausentes. A execução literal da suíte encontrou a linha
+local alheia já registrada no teste de controles do calendário; com a versão
+commitada desse único teste, 347 testes Node passaram. Sintaxe e diff aprovados.
+Matriz visual completa não repetida neste corte sem mudança dos corpos/HTML gerado
+ou CSS; última matriz: G3g.
+
+## Estatísticas da topbar (G3be)
+
+`tests/topbar-statistics.test.cjs` caracterizou limites semanal/mensal, percentuais,
+tons, drawdown, meta, badge, alvos opcionais e densidade. Pós-corte protege também a
+carga clássica depois dos componentes compartilhados da topbar. Corpo movido byte a
+byte contra `c85c560`. Smoke: 96 checks, zero erros/assets locais ausentes. A execução
+literal da suíte encontrou a linha local alheia já registrada no teste de controles
+do calendário; com a versão commitada desse único teste, 352 testes Node passaram.
+Sintaxe e diff aprovados. Matriz visual completa não repetida neste corte sem mudança
+do corpo/HTML gerado ou CSS; última matriz: G3g. Este lote encerra G3.
+
+## Domínio de timing de trades (G4a)
+
+`tests/trade-timing.test.cjs` caracterizou normalização e formatação, intervalos
+frouxos, virada da meia-noite, datas explícitas, inválidos, médias, grupos,
+ordenação e imutabilidade. Pós-corte protege também o factory isolado, wrappers e
+ordem clássica. A execução literal encontrou somente a linha local alheia já
+registrada no teste de controles do calendário; com a versão commitada desse teste,
+359 testes Node passaram. Smoke: 96 checks; sintaxe e diff aprovados. Revisão
+independente sem bloqueios. Matriz visual completa não repetida neste corte sem
+mudança de HTML/CSS ou saída esperada; última matriz: G3g.
+
+## Domínio de métricas de trades (G4b)
+
+`tests/trade-metrics.test.cjs` caracterizou resolução do saldo inicial, grupos,
+referências, OPEN/BE, Infinity, ordem invertida, drawdown, streaks e índices
+anualizados. Pós-corte protege também isolamento, wrapper e ordem clássica. A
+execução literal encontrou somente a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse teste, 366 testes Node passaram.
+Smoke: 96 checks; sintaxe e diff aprovados. Revisão independente incluiu comparação
+diferencial de 500 casos variados, sem divergências. Matriz visual completa não
+repetida neste corte sem mudança de HTML/CSS ou saída esperada; última matriz: G3g.
+
+## Domínio de totais de cashflow (G4c)
+
+`tests/account-cashflow.test.cjs` caracterizou lookup/fallbacks, parsing parcial,
+valores absolutos, tipos desconhecidos, vazio, Infinity/NaN, erros, imutabilidade e
+saldo textual. Pós-corte protege também isolamento, wrappers e ordem clássica. A
+execução literal encontrou somente a linha local alheia já registrada no teste de
+controles do calendário; com a versão commitada desse teste, 373 testes Node passaram.
+Smoke: 96 checks; sintaxe e diff aprovados; revisão independente sem bloqueios.
+Matriz visual completa não repetida neste corte sem mudança de HTML/CSS ou saída
+esperada; última matriz: G3g.
+
+## Limites e consumo monetário de risco (G4d)
+
+`tests/account-risk-limits.test.cjs` caracterizou defaults, capital com cashflow,
+escopos diário/semanal/mensal/total, excesso, zero, isolamento e carga clássica.
+Na cópia isolada, `node --test --test-isolation=none tests/*.test.cjs` executou 379
+testes reais; o runner padrão do sandbox contou somente 65 arquivos. O smoke local
+precisou permissão para abrir `127.0.0.1` e passou com 96 checks. Sintaxe e diff
+passaram; comparação diferencial de 500 casos e revisão independente não encontraram divergências.
+
+## Metas cíclicas de risco (G4e)
+
+`tests/account-goal-cycle.test.cjs` fixou o cálculo anterior, inclusive o limite
+de 1210 preservado por precisão de ponto flutuante. Após o corte, a suíte isolada
+executou 383 testes reais e o smoke passou com 96 checks. O runner padrão do
+sandbox contou 66 arquivos como testes. A tentativa inicial de checar valores
+com um comando `node -e` falhou por erro de sintaxe; um heredoc local substituiu
+esse auxiliar. A primeira leitura do separador de linha de `index.html` também
+falhou; foi ajustada para LF antes da edição.
+
+## Saldo e drawdown de risco (G4f)
+
+Serena/Context7 constam em `.codex/config.toml`, mas não apareceram nas ferramentas
+MCP desta sessão; navegação por `rg` e leitura localizada. Quatro testes de
+caracterização passaram antes do corte. Após a extração, o runner padrão contou
+67 arquivos e `--test-isolation=none` executou 388 testes reais. Smoke: 96 checks.
+Um separador CRLF introduzido em `index.html` fez `git diff --check` falhar;
+foi convertido para LF e a verificação passou. Revisão independente aprovada.
+
+## P/L temporal de risco (G4g)
+
+Serena ainda não estava disponível como ferramenta MCP nesta sessão; `rg` e
+leitura localizada serviram de fallback. Quatro testes de caracterização passaram
+antes do corte. Após a extração, o runner padrão contou 68 arquivos e
+`--test-isolation=none` executou 393 testes reais. O smoke passou com 96 checks;
+sintaxe, diff e revisão independente aprovados.
+
+## Linhas delimitadas de importação (G5a)
+
+Quatro testes de caracterização passaram antes da extração. Depois, a suíte
+executou 398 testes reais com `--test-isolation=none`; o runner padrão contou
+69 arquivos. O smoke ganhou uma verificação para o parser no navegador e passou
+com 97 checks. A cópia isolada temporária foi recriada após a sessão limpar
+`/tmp`; código e testes foram revalidados. Sintaxe, diff e revisão independente
+aprovados.
+
+## Formato de backup (G5b)
+
+Cinco testes de caracterização passaram antes da extração. Após o corte,
+`node --test --test-isolation=none tests/*.test.cjs` executou 404 testes reais;
+o runner padrão contou 70 arquivos. Smoke ampliado: 98 checks. Sintaxe, diff e
+revisão independente aprovados.
+
+## Payload de backup (G5c)
+
+Dois testes de caracterização passaram antes da extração. Após o corte,
+`node --test --test-isolation=none tests/*.test.cjs` executou 406 testes reais;
+o runner padrão contou 71 arquivos. Smoke: 98 checks. Sintaxe, diff e revisão
+independente aprovados. A primeira tentativa do smoke no sandbox falhou ao abrir
+`127.0.0.1` (EPERM); a execução com acesso local passou.
+
+## Restauração de backup (G5d)
+
+Cinco testes pré-corte passaram. Após a extração, 412 testes individuais com
+`--test-isolation=none` e 72 arquivos no runner padrão; smoke com 99 checks,
+sintaxe, diff e revisão independente aprovados na cópia isolada.
+Serena/Context7 não expostos nesta sessão: usada busca localizada. `python`
+ausente: usado `python3`. CRLF apenas na nova linha de script corrigido após
+`diff --check`; smoke reexecutado após atualizar a contagem esperada de 98 para 99.
+
+## Fontes consultadas
+
+- [Codex MCP](https://developers.openai.com/codex/mcp/): configuração local e Context7.
+- [Caveman INSTALL](https://github.com/JuliusBrussee/caveman/blob/main/INSTALL.md): instalação específica para Codex.
+- [Superpowers README](https://github.com/obra/superpowers#codex-cli): marketplace atual; antigo `.codex/INSTALL.md` retornou 404.
+- [Serena para Codex](https://oraios.github.io/serena/02-usage/030_clients.html#codex-cli-and-app): contexto e ativação.
+- [Context7](https://github.com/upstash/context7): servidor de documentação externa.
+- [Node.js v24 test runner](https://nodejs.org/docs/latest-v24.x/api/test.html): consultado via Context7.

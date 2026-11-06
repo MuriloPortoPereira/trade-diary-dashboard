@@ -51,7 +51,7 @@ Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as cama
 | Integração tardia: diálogos, navegação e grids compartilhados | `src/styles/workspace-integration.css` |
 | StudyHub legado: controles/sequência e painéis/integração | `src/modules/study-hub/presentation/legacy-controls.css` e `legacy-panels.css` |
 
-22 folhas no total; estilos específicos restantes ficam junto das features. Ordem completa em `src/app/presentation/shell/open.html`; mapa CSS distingue autoria atual de intervalos históricos.
+22 folhas no total; estilos específicos restantes ficam junto das features. Ordem completa em `src/app/presentation/shell/open.html`; o histórico CSS está arquivado em `docs/archive/refactoring/css-extraction-map.md`.
 
 ## Shell e páginas: composição estática (G7b)
 
@@ -76,4 +76,4 @@ Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as cama
 - Configuração de estratégias em `app/application/load-app-state.js`; edição e consultas de período na UI de analytics.
 - Psicologia: quatro agregações puras em `analytics/domain/calculate-trade-metrics.js`, wrappers em `psychology-page.js`; alertas/mensagens em `notifications-page.js`.
 - Charts/formatadores/tooltips compartilhados em `shared/presentation/analysis-widgets.js`; topbar e atalhos/drag-drop em `app-workspace.js`. Os inicializadores continuam chamados nos pontos anteriores de `app.js`.
-- Nenhum arquivo de produção adicional nesta conclusão; 48 scripts e 22 CSS. Limites aceitos e próxima versão: [ADR-006](adr/006-basic-static-version-closure.md).
+- Nenhum arquivo de produção adicional nesta conclusão; 48 scripts e 22 CSS. Limites aceitos da versão estática: [ADR-006](adr/006-basic-static-version-closure.md).

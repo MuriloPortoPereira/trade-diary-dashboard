@@ -2,7 +2,7 @@
 
 ## Context
 
-O objetivo atual é concluir a organização do código existente e preservar o percurso de aprendizagem antes de uma futura versão com framework. A fragmentação inicial dificultou localizar responsabilidades; a consolidação reduziu 95 scripts/40 CSS para 48/22.
+O objetivo atual é concluir a organização do código existente e preservar o percurso de aprendizagem como versão estática definitiva deste repositório. A fragmentação inicial dificultou localizar responsabilidades; a consolidação reduziu 95 scripts/40 CSS para 48/22.
 
 ## Decision
 
@@ -12,7 +12,7 @@ O objetivo atual é concluir a organização do código existente e preservar o 
 - Aceitar como limites desta versão: estado/adaptadores globais nos workflows, queries que usam formatadores globais, controllers de documentos/rotina/StudyHub com cálculos locais e chamadas de cotação legadas distintas. Não afirmar isolamento integral de Clean Architecture.
 - `normalizeDocImages` é normalização pura do formato de mídia das operações legadas; fica em `trades/domain/trade-rules.js`, também consumida por documentos/importação. Evita depender da UI documental sem criar um módulo shared por seis linhas. Rever a coesão ao projetar novos modelos.
 - Fontes de produção JS ficam abaixo de 800 linhas. HTML grande é distribuição gerada a partir de views/templates legíveis; não fazer montagem assíncrona apenas para reduzir o tamanho do arquivo distribuído.
-- Framework, ESM, novo estado e correções de comportamentos legados exigem outro plano. Não iniciar incidentalmente nem integrar `main`/`develop` neste fechamento.
+- Este repositório permanece em JavaScript clássico; migração para framework está fora do seu escopo. Novas funcionalidades e correções de comportamentos legados exigem plano próprio. Não integrar `main`/`develop` incidentalmente.
 
 ## Consequences
 

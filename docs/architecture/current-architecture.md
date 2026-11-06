@@ -1,95 +1,21 @@
 # Arquitetura atual
 
-Baseline auditada: `ab0cb63`. Linhas e contagens abaixo referem-se à baseline;
-após extrações, localizar pelos símbolos. Auditoria estrutural, sem afirmar cobertura funcional completa.
+Aplicação estática: 15 páginas internas, JavaScript clássico, CSS, Chart.js CDN e `localStorage`. Não possui backend, autenticação, banco remoto nem migração para framework neste repositório.
 
-## Versão básica após refatoração
-
-Organização concluída: 48 scripts clássicos, 22 CSS e quinze views de autoria por feature. `app.js` tem 181 linhas de estado/composição/wrappers; regras numéricas puras e IO possuem limites próprios. Controllers ainda usam estado/adaptadores globais por compatibilidade. O [mapa atual](project-map.md) e o [ADR-006](adr/006-basic-static-version-closure.md) orientam manutenção; o inventário abaixo é histórico.
-
-## Stack e execução
-
-| Aspecto | Encontrado |
+| Área | Responsabilidade |
 |---|---|
-| Linguagem/runtime | JavaScript clássico no navegador, HTML5, CSS3 |
-| Framework/estado | Sem framework; variáveis globais e DOM direto |
-| Entrada | `index.html` carrega Chart.js, `styles.css`, `app.js`; bootstrap em `window.load` |
-| Rotas | `showPage(id)` alterna 15 páginas via classes; sem router ou URL própria |
-| Gráficos/fontes | Chart.js 4.4.1 via cdnjs; Google Fonts via CSS |
-| Persistência | localStorage; JSON/CSV e relatórios MT4/MT5 via FileReader/Blob |
-| Rede | AwesomeAPI, endpoint USD/BRL; chamadas de cotação duplicadas |
-| Banco/ORM/auth | Não encontrados; perfil é informação local, sem login |
-| Backend/filas/workers/jobs | Não encontrados; atualização de cotação por timer no navegador |
-| Package manager/runtime de tooling | Nenhum manifesto ou gerenciador estabelecido na baseline |
-| Testes/lint/format/typecheck | Nenhum comando ou suíte versionado na baseline |
-| Build | Sem compilação; arquivos estáticos |
-| Docker/CI/CD | Sem configuração versionada; README informa publicação Vercel |
-| Desenvolvimento | `python3 -m http.server 8000`; `python` ausente no ambiente auditado |
+| `app.js` | Estado/defaults, composição e APIs globais compatíveis; 181 linhas |
+| `src/app/` | Shell HTML, navegação, bootstrap, carga e persistência principal |
+| `src/modules/<feature>/presentation/` | DOM, gráficos, handlers, HTML e CSS da funcionalidade |
+| `domain/` | Cálculos e regras puros, sem DOM/storage/rede |
+| `application/` | Coordenação dos fluxos; adapters globais legados explicitados |
+| `infrastructure/` | Formatos, arquivos, storage e rede |
+| `src/shared/` e `src/styles/` | Widgets reutilizados e estilos comuns |
 
-## Fluxo e acoplamento
+Uma feature só possui as camadas de que precisa. Scripts clássicos e handlers inline permanecem como contratos. Alguns controllers e workflows compartilham estado/adaptadores globais; esta organização não representa isolamento integral de todas as camadas.
 
-```mermaid
-flowchart LR
-  HTML[index.html e handlers inline] --> JS[app.js: estado e orquestração]
-  JS --> DOM[DOM e Chart.js]
-  JS --> STORAGE[localStorage]
-  JS --> FILES[FileReader e Blob]
-  JS --> API[AwesomeAPI]
-  JS <--> LEGACY[StudyHub legado: window.sh_*]
-```
+`index.html` é distribuição versionada; suas fontes são quinze views de feature e dois fragmentos do shell. O template StudyHub também é gerado a partir de quatro HTMLs legíveis. Não há montagem assíncrona nem bundler em produção.
 
-`trades`, `accounts`, `config`, `preMarketData` e `studyHubState` são estado compartilhado.
-`saveTrade` mistura formulário, validação, cálculo, mutação, persistência e renderização.
-`save`/`load` serializam o estado; bootstrap normaliza dados e insere exemplos quando não há trades.
+A ordem completa de scripts e CSS está nos fragmentos do shell. A distribuição tem 48 scripts e 22 CSS, todos utilizados; o mapa atual mostra onde editar. CSS e marcação funcional mantêm a versão original. A exportação em `dist/` copia apenas a aplicação, com os mesmos caminhos e bytes.
 
-Chaves persistidas: `tl_trades`, `tl_config`, `tl_pm`, `tl_accounts`, `tl_activeAccount`,
-`tl_studyhub`, `appLanguage`, `appCotacao`, `pfCot`, `pfState`, `cot`, `hubCiclos`, `diary2026`.
-Preservar nomes e formatos até uma migração explicitamente planejada.
-
-## Indicadores
-
-- `app.js`: 11.068 linhas; `styles.css`: 6.090; `index.html`: 1.435.
-- Contagem textual JS: 515 funções nomeadas, 826 ocorrências `document.`, 160 `.innerHTML`,
-  26 chamadas localStorage e 60 atribuições `window.*`.
-- HTML principal: 172 handlers inline; 15 páginas.
-- `app.js:8378`: atribuição `host.innerHTML` com 156.671 caracteres em uma linha.
-- Sem imports/exports na baseline: ciclos de imports não se aplicam; o risco está nas
-  dependências globais e na ordem de inicialização. As contagens não substituem um grafo semântico.
-
-## Top 10 hotspots
-
-| Prioridade | Arquivo | Problema | Risco | Estratégia |
-|---|---|---|---|---|
-| P1 | `app.js` | 11.068 linhas, múltiplos domínios e camadas | Alto | Extrações por responsabilidade com API temporária compatível |
-| P1 | `app.js:8378`, `host.innerHTML` | Template legado de 156.671 caracteres numa linha | Alto | Separar recurso preservando montagem e ordem |
-| P1 | `app.js:8373–10761`, StudyHub legado | Quatro módulos, estado, gráficos e IO num bundle | Alto | Isolar bundle e depois subfeatures; preservar `sh_*` |
-| P1 | `src/modules/trades/application/trade-workflows.js`, `saveTrade` | Validação, cálculo, persistência e UI ainda acoplados | Médio | Boundary explícito no G5n; separar cálculo somente quando houver ganho real |
-| P1 | `app.js:1485`, `calcAccountRiskState` | 186 linhas: calendário, risco e texto formatado | Alto | Fixar tempo nos testes; separar cálculo e apresentação |
-| P1 | `app.js:6932–7033`, persistência/bootstrap | Storage global, normalizações, seed e erros silenciados | Alto | Caracterizar restauração e storage antes de adapter |
-| P2 | `app.js:2218`, `renderStrategyCompareCards` | Aproximadamente 223 linhas com métricas e HTML | Médio | Separar modelo de apresentação e render |
-| P2 | `app.js:3111`, `renderStats` | Aproximadamente 193 linhas de consultas, gráficos e DOM | Médio | Extrair métricas e componentes de gráficos |
-| P2 | `styles.css` | Cascata de todas features; legado em `4880–6089` | Médio | Separar mantendo ordem e especificidade |
-| P2 | `index.html` | Todas páginas e handlers no shell | Médio | Preservar IDs e contratos antes de separar templates |
-
-P0 = risco estrutural crítico; P1 = alto retorno; P2 = importante; P3 = cosmético.
-Nenhum P0 comprovado nesta auditoria. Arquivos acima de 1.000 linhas permanecem temporariamente
-como fronteiras legadas: extração ampla sem cobertura aumentaria o risco. Esta é uma exceção
-de transição, acompanhada no [roadmap](refactoring-roadmap.md).
-
-## Riscos e limites
-
-- Handlers HTML dependem de nomes globais; conversão imediata para ES modules quebraria esse contrato.
-- `renderLog` do diário e do StudyHub vivem em escopos diferentes; preservar IIFEs evita colisões.
-- `renderStudyHub` integra código nativo, `window.sh_*` e wrappers intraday dependentes da ordem.
-- `fetchCotacao`, `hubFetchCot`, `pfFetchCot` e `ptFetchCot` repetem a mesma rede, com estados distintos.
-- `load` silencia exceções; bootstrap sem trades gera exemplos. Não mudar isso incidentalmente.
-- Datas misturam relógio atual, UTC e horário local; resultados de risco exigem testes de calendário.
-- `calcSaque` e `calcRRRManual` vazios e um ramo `if(false)` são candidatos a código morto,
-  não remoções autorizadas sem análise de referências.
-- Simulações usam aleatoriedade; caracterização deve controlar a fonte aleatória quando necessário.
-- A baseline não oferece testes de regressão nem pipeline. Verificações do primeiro lote serão
-  registradas no [progresso](refactoring-progress.md), somente após execução.
-
-Extrações concluídas: sizing, serialização CSV e apresentação de idiomas.
-Estado após lote 2b: `app.js` com 9.770 linhas; oito arquivos de idioma com 10–253 linhas.
-Números da auditoria acima permanecem históricos. Ver [mapa compacto](project-map.md).
+Chaves persistidas, formatos de backup e APIs públicas permanecem compatíveis. Dados ficam associados à origem no navegador. [Mapa](project-map.md), [regras](dependency-rules.md), [limites aceitos](adr/006-basic-static-version-closure.md) e [auditoria histórica](../archive/refactoring/current-architecture.md).

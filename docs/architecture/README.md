@@ -1,25 +1,13 @@
-# Architecture
+# Guia atual do projeto
 
-Comece pelo [mapa compacto](project-map.md). Abra somente a feature necessária.
+Comece pelo [mapa do projeto](project-map.md): ele informa o arquivo responsável por cada funcionalidade.
 
-| Documento | Uso |
+| Documento | Quando consultar |
 |---|---|
-| [Arquitetura atual](current-architecture.md) | Stack, baseline, hotspots e riscos |
-| [Mapa de módulos](module-map.md) | Símbolos, responsabilidades e dependências |
-| [Arquitetura alvo](target-architecture.md) | Limites pretendidos por feature |
-| [Dependências](dependency-rules.md) | Direção e compatibilidade |
-| [Roadmap](refactoring-roadmap.md) | Lotes e primeiro plano executável |
-| [Progresso](refactoring-progress.md) | Entregue, próximo e limitações |
-| [Análise global](modularization-analysis.md) | Diagnóstico atualizado e estratégia de preservação |
-| [Extração JavaScript](javascript-extraction-map.md) | Destinos por responsabilidade, dependências e contratos |
-| [Extração CSS](css-extraction-map.md) | Fronteiras de todo stylesheet, cascata e primeiro corte |
-| [Extração HTML](html-extraction-map.md) | Todas as páginas/modais, handlers e validação por fluxo |
-| [Ferramentas](tooling.md) | Instalação, verificação e comandos |
-| [ADR-001](adr/001-incremental-classic-scripts.md) | Scripts clássicos durante transição |
-| [ADR-002](adr/002-characterization-tests.md) | Testes de caracterização |
-| [ADR-004](adr/004-study-hub-html-authoring.md) | HTML StudyHub de autoria, geração determinística e deploy estático |
-| [ADR-006](adr/006-basic-static-version-closure.md) | Fechamento básico, limites aceitos e próxima versão com framework |
-| [ADR-005](adr/005-static-shell-composition.md) | Páginas por feature, manifesto do shell e `index.html` versionado |
+| [Mapa](project-map.md) | Localizar código e estilos |
+| [Arquitetura atual](current-architecture.md) | Entender as camadas e a composição |
+| [Dependências](dependency-rules.md) | Preservar limites e contratos |
+| [Manutenção](tooling.md) | Executar, editar, exportar e validar |
+| [Estado](refactoring-progress.md) | Confirmar o fechamento e as limitações |
 
-Baseline histórico auditado: `ab0cb63`, preservado em `main` e na tag `v1.0.0`; trabalho incremental atual em `refactor`.
-Linhas do baseline são referências históricas; localize símbolos após cada extração.
+As decisões ficam em [adr/](adr/); o [ADR-006](adr/006-basic-static-version-closure.md) registra o escopo final. Auditorias, mapas antigos e planos detalhados estão no [arquivo histórico](../archive/refactoring/README.md).

@@ -1,9 +1,11 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Refactoring Roadmap
 
 **Goal:** Preservar comportamento e reduzir acoplamento por extrações pequenas.
 **Architecture:** Domínios puros por feature; scripts clássicos e wrappers compatíveis durante a transição.
 **Tech Stack:** JavaScript, HTML/CSS, Chart.js CDN, Node.js apenas para ferramentas/testes.
-**Spec:** [Arquitetura alvo](target-architecture.md), [regras](dependency-rules.md) e `AGENTS.md`.
+**Spec:** [Arquitetura alvo](target-architecture.md), [regras](../../architecture/dependency-rules.md) e `AGENTS.md`.
 
 ## Fechamento da versão básica (concluído)
 
@@ -11,7 +13,7 @@
 2. Granularidade revista: 95 → 48 scripts e 40 → 22 CSS; reutilizar os módulos coesos existentes.
 3. Resíduos finais de contas, demos, filtros, psicologia/alertas e UI comum retirados de `app.js` (181 linhas); composição e APIs globais preservadas.
 4. Validação: 637 testes, 113 checks no navegador, 180 scripts com sintaxe válida, dois geradores, diff e revisão independente sem bloqueios.
-5. Escopo encerrado pelo [ADR-006](adr/006-basic-static-version-closure.md). Remover globals ativos ou migrar para framework exige novo plano; não é uma continuação automática de microextrações.
+5. Escopo encerrado pelo [ADR-006](../../architecture/adr/006-basic-static-version-closure.md). Remover globals ativos ou migrar para framework exige novo plano; não é uma continuação automática de microextrações.
 
 As seções seguintes registram o planejamento e resultados históricos. Contagens e pendências de lotes antigos são substituídas pelo fechamento acima e pelo mapa atual.
 
@@ -900,7 +902,7 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 
 ## G5h: persistência principal
 
-- save intacto/leitura bruta em `app/infrastructure/app-state-storage.js`; load em `app/application/load-app-state.js` consumindo contrato substituível. Globals transitórios e seis chaves preservados; [ADR-003](adr/003-main-state-persistence.md).
+- save intacto/leitura bruta em `app/infrastructure/app-state-storage.js`; load em `app/application/load-app-state.js` consumindo contrato substituível. Globals transitórios e seis chaves preservados; [ADR-003](../../architecture/adr/003-main-state-persistence.md).
 - Dez testes pré-corte; após extração, 454 testes Node, 103 checks no navegador, sintaxe, diff e revisão independente aprovados.
 - Smoke faz round-trip com localStorage real em perfil temporário e restaura os dados em finally. Contrato navigation imediatamente antes de app.js preservado.
 - `app.js`: 7.078 para 7.049 linhas. Sem migração, seed ou mudança de comportamento em falhas parciais.
@@ -1007,7 +1009,7 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 ## G7b: HTML de autoria do shell e páginas
 
 - Quinze views completas nas respectivas features e dois fragmentos do shell; ordem explícita em `src/app/presentation/shell/index.fragments.json`.
-- `scripts/build-index.cjs` concatena buffers em `index.html` versionado, sem montagem no navegador ou build no deploy; [ADR-005](adr/005-static-shell-composition.md).
+- `scripts/build-index.cjs` concatena buffers em `index.html` versionado, sem montagem no navegador ou build no deploy; [ADR-005](../../architecture/adr/005-static-shell-composition.md).
 - Caracterização pré-corte e resultado protegem os mesmos 107.193 bytes, inclusive LF/CRLF, IDs, handlers, estilos e ordem dos scripts. `--check` protege sincronização.
 - 92 arquivos Node e 113 checks no navegador aprovados. Nenhum código de runtime alterado; `app.js` continua com 2.269 linhas.
 - Próximo: revisão de compatibilidade/consumidores e resíduos de `app.js`, seguida da consolidação justificada e fechamento dos critérios arquiteturais. Não remover wrappers por tamanho.

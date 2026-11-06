@@ -1,9 +1,11 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Arquitetura alvo
 
 Clean Architecture proporcional a uma aplicação estática. Manter JavaScript e deploy sem build.
 Criar pastas somente quando houver código para ocupar cada responsabilidade.
 
-Escopo básico encerrado: [ADR-006](adr/006-basic-static-version-closure.md). A tabela descreve direção conceitual, sem exigir uma pasta por célula. Estado/adaptadores globais mantidos são limites explícitos; framework e isolamento adicional ficam para a próxima versão.
+Escopo básico encerrado: [ADR-006](../../architecture/adr/006-basic-static-version-closure.md). A tabela descreve direção conceitual, sem exigir uma pasta por célula. Estado/adaptadores globais mantidos são limites explícitos; framework e isolamento adicional ficam para a próxima versão.
 
 ```mermaid
 flowchart LR

@@ -1,6 +1,8 @@
+> Registro histórico da refatoração. Este documento não define trabalho pendente. Manutenção atual: [mapa do projeto](../../architecture/project-map.md).
+
 # Mapa de extração do JavaScript
 
-Versão básica concluída: 48 scripts; `app.js` com 181 linhas. Para editar, use [mapa atual](project-map.md) e [ADR-006](adr/006-basic-static-version-closure.md). Caminhos/pendências abaixo são registro histórico das extrações anteriores à consolidação, não instruções de criar novos arquivos.
+Versão básica concluída: 48 scripts; `app.js` com 181 linhas. Para editar, use [mapa atual](../../architecture/project-map.md) e [ADR-006](../../architecture/adr/006-basic-static-version-closure.md). Caminhos/pendências abaixo são registro histórico das extrações anteriores à consolidação, não instruções de criar novos arquivos.
 
 Análise de 2026-09-11 sobre `5c9859f`; intervalos base 1 de `app.js` antes dos próximos cortes.
 Serena fornece linhas base zero; localizar pelo símbolo após qualquer movimentação.
@@ -234,7 +236,7 @@ somente depois da caracterização suas regras entram em `domain`.
 | Configuração: estratégias 4126–4174, setup 6704–6914 | `modules/preferences/presentation/tag-library.js`; UI de risco em accounts | Estratégias/emotions/markets e config; preview já modifica estado antes de persistir |
 | Persistência: `save` 6916–6923, `load` 6934–6952; G5h executado | `app/infrastructure/app-state-storage.js`, `app/application/load-app-state.js` | Seis chaves tl_*: save mantém serialização/gravação sequenciais e estado global; load consome contrato de leitura bruta, preservando normalização, recomputação e catch; seeds/bootstrap fora do corte |
 | Câmbio: 7024–7073 | `modules/preferences/presentation/exchange-rate-controls.js`; depois `infrastructure/fetch-usd-brl.js` | appCotacao, AwesomeAPI, polling, DOM e ponte StudyHub; não unificar as cotações legadas no mesmo lote |
-| Idiomas, sizing e CSV extraídos | Manter caminhos do [project-map](project-map.md) | Dez arquivos atuais, protegidos por testes; incorporar à lista de carga, sem refazer extrações |
+| Idiomas, sizing e CSV extraídos | Manter caminhos do [project-map](../../architecture/project-map.md) | Dez arquivos atuais, protegidos por testes; incorporar à lista de carga, sem refazer extrações |
 
 Os nomes indicam responsabilidade, não promessa de que cada intervalo cabe em um único arquivo.
 Por exemplo, formulário de trades e comparação de estratégias exigem helpers coesos próprios;
