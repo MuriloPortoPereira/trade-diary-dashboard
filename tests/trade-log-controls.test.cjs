@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-log-controls.js';
+const modulePath = 'src/modules/trades/presentation/trade-log.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['sortLog', 'clearLogDateRange', 'toggleSelectAll', 'toggleRowSelect', 'clearSelection'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
@@ -47,6 +47,8 @@ function setup({sortState = {col: 'date', dir: 'desc'}, selected = [], checkboxe
     updateBulkBar: () => calls.push('updateBulkBar'),
   });
   vm.runInContext(source, context, {filename: legacy ? 'app.js#trade-log-controls' : modulePath});
+  context.renderLog = () => calls.push('renderLog');
+  context.updateBulkBar = () => calls.push('updateBulkBar');
   return {context, elements, indicators, calls};
 }
 
@@ -142,9 +144,9 @@ test('trade log controls load once after their renderers and before app.js', () 
   const matches = scripts.filter(script => script.src === modulePath);
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
-  const selectionIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-selection.js');
+  const selectionIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log.js');
   const logIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log.js');
   const controlsIndex = scripts.findIndex(script => script.src === modulePath);
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(selectionIndex < logIndex && logIndex < controlsIndex && controlsIndex < appIndex);
+  assert.ok(selectionIndex === logIndex && logIndex === controlsIndex && controlsIndex < appIndex);
 });

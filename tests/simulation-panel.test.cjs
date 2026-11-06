@@ -19,7 +19,7 @@ test('simulation panel loads once as a classic script before statistics dispatch
     .filter(match => match[1].includes(`src=\"${modulePath}\"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/statistics-controls.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/statistics-page.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 

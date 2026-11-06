@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/accounts/presentation/setup-risk-summary.js';
+const modulePath = 'src/modules/accounts/presentation/risk-setup-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderSetupRiskSummary\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -97,6 +97,6 @@ test('setup risk summary loads once as a synchronous classic script before app.j
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/accounts/presentation/setup-cashflow-list.js'));
+  assert.ok(source.indexOf('function renderSetupRiskSummary(') < source.indexOf('function renderSetupCashflowList('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

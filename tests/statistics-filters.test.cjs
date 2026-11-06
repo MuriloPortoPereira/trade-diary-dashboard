@@ -5,13 +5,14 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/statistics-controls.js';
+const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyPeriod = appSource.match(/^function toggleCustomPeriod\([^]*?^\}/m)?.[0];
 const legacyAccount = appSource.match(/^function onStatsAccountChange\([^]*?^\}/m)?.[0];
 assert.equal(legacyPeriod, undefined, 'legacy period declaration must be moved');
 assert.equal(legacyAccount, undefined, 'legacy account declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ['toggleCustomPeriod', 'onStatsAccountChange'].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 test('statistics controls load once as a classic script before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

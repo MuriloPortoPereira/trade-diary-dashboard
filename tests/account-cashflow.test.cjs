@@ -110,10 +110,9 @@ test('cashflow domain loads once before consumers while legacy helpers remain gl
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/accounts/presentation/account-cashflow-form.js',
-    'src/modules/accounts/presentation/setup-cashflow-list.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
     'src/modules/accounts/presentation/account-form.js',
+    'src/modules/accounts/presentation/risk-setup-page.js',
+    'src/modules/analytics/presentation/dashboard-page.js',
     'app.js',
   ]) {
     assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));

@@ -61,6 +61,7 @@ function setup(overrides = {}) {
   delete sandbox.autoDisc;
   const context = vm.createContext(sandbox);
   vm.runInContext(source, context, {filename: legacySources.every(Boolean) ? 'app.js#trade-form' : modulePath});
+  context.renderErrorChips = () => calls.push(['errors']);
   context.renderImagePreviews = () => calls.push(['images']);
   context.updateTradeDurationField = () => calls.push(['duration']);
   return {context, sandbox, calls, elements};

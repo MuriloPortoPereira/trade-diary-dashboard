@@ -32,6 +32,7 @@ function setup({missing = [], selectedErrors = ['Anterior']} = {}) {
     autoDisc: force => calls.push(['discipline', force]),
   });
   vm.runInContext(source, context, {filename: legacy ? 'app.js#trade-form-options' : modulePath});
+  context.renderErrorChips = () => calls.push(['chips']);
   context.onAccountChange = () => calls.push(['account']);
   context.autoDisc = force => calls.push(['discipline', force]);
   return {context, elements, calls};
@@ -94,9 +95,9 @@ test('trade form loads once before its dependent presentation components', () =>
   const matches = scripts.filter(script => script.src === modulePath);
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
-  const chipsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-error-chips.js');
+  const chipsIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-form.js');
   const optionsIndex = scripts.findIndex(script => script.src === modulePath);
-  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log-controls.js');
+  const noticeIndex = scripts.findIndex(script => script.src === 'src/modules/trades/presentation/trade-log.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(chipsIndex < optionsIndex && optionsIndex < noticeIndex && noticeIndex < appIndex);
+  assert.ok(chipsIndex === optionsIndex && optionsIndex < noticeIndex && noticeIndex < appIndex);
 });

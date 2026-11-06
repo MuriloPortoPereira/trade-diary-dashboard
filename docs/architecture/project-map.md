@@ -4,7 +4,21 @@
 Fallback: `rg -n 'function NOME' app.js`; abrir apenas o trecho necessário.
 HTML StudyHub: editar `src/modules/study-hub/presentation/templates/*.html`; não abrir integralmente o asset gerado `study-hub-template.js` para análise. Usar símbolos e trechos localizados nas fontes de autoria.
 HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` para localizar a fonte na feature. Editar o fragmento e executar `node scripts/build-index.cjs`; `index.html` é a distribuição versionada.
-Localização atual na tabela abaixo. Seções por lote registram caminhos/contagens históricos: sizing-fields foi incorporado ao painel de simulação; aviso somente leitura foi incorporado aos controles do diário.
+Localização atual nas tabelas abaixo. Seções por lote registram caminhos/contagens históricos; os nomes de testes preservam os cenários caracterizados antes das consolidações.
+
+## Apresentação: onde editar agora
+
+| Tela ou fluxo | Arquivo principal em `src/modules/` |
+|---|---|
+| Diário: linhas, métricas, seleção, filtros e bloqueios | `trades/presentation/trade-log.js` |
+| Editor de trade: campos, erros e fluxo de incompletos | `trades/presentation/trade-form.js` |
+| Formulário de conta, caixa e lista de gestão | `accounts/presentation/account-form.js` |
+| Configuração de risco, resumos, caixa e tags | `accounts/presentation/risk-setup-page.js` |
+| Dashboard e modo da curva | `analytics/presentation/dashboard-page.js` |
+| Estatísticas: abas, filtros e análise de taxas | `analytics/presentation/statistics-page.js` |
+| Ranking e comparação de estratégias | `analytics/presentation/strategy-comparison.js` |
+
+Consolidação: 95 → 80 scripts locais; 75 funções preservadas. Domínio, aplicação e IO continuam separados da apresentação. Visões de contas, risk board e chrome compartilhado mantêm suas responsabilidades próprias.
 
 ## Shell e páginas: composição estática (G7b)
 
@@ -19,9 +33,9 @@ Localização atual na tabela abaixo. Seções por lote registram caminhos/conta
 |---|---|
 | Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
 | Operação/diário | `src/modules/trades/application/trade-workflows.js`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js` |
-| Edição/bloqueios do diário | `trades/presentation/incomplete-trade-flow.js`: fluxo em lote; `trade-log-controls.js`: controles, locks e aviso somente leitura; globals preservados |
+| Edição/bloqueios do diário | `trades/presentation/trade-form.js`: editor e fluxo em lote; `trade-log.js`: diário, controles, locks e aviso somente leitura |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
-| Conta/saldo/risco | `accounts/application/account-risk-workflows.js`: workflows; `presentation/account-form.js`: seleção/salvar/excluir; `risk-setup-page.js` e `risk-tags.js`: setup/controles; `normalizeAccount` permanece em `app.js` |
+| Conta/saldo/risco | `accounts/application/account-risk-workflows.js`: workflows; `presentation/account-form.js`: gestão; `risk-setup-page.js`: setup completo; `normalizeAccount` permanece em `app.js` |
 | Dashboard/estratégia | `src/modules/analytics/application/strategy-analysis.js`: snapshots, equity, resultados e comparação; `calcMetrics` em `app.js`; apresentação em `dashboard-page.js`/`strategy-hub-page.js` |
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: página, navegação mensal, hábitos, disciplina e correlação; `preMarketData` permanece na composição |

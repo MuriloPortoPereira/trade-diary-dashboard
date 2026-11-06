@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-log-controls.js';
+const modulePath = 'src/modules/trades/presentation/trade-log.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderLogReadOnlyNotice\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');

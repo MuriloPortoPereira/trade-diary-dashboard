@@ -5,11 +5,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/dashboard-equity-mode.js';
+const modulePath = 'src/modules/analytics/presentation/dashboard-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function toggleEqMode\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ['toggleEqMode'].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 test('equity mode loads once as a classic script after dashboard and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -17,7 +18,7 @@ test('equity mode loads once as a classic script after dashboard and before app.
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf('src/modules/analytics/presentation/dashboard-page.js') < html.indexOf(modulePath));
+  assert.ok(moduleSource.indexOf('function renderDashboard(') < moduleSource.indexOf('function toggleEqMode('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
 

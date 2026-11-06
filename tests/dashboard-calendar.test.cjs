@@ -80,10 +80,11 @@ test('every required target is guarded before reading anchor or changing other t
   }
 });
 
-test('dashboard calendar loads once as a synchronous classic script before stop fee presentation', () => {
+test('dashboard calendar loads once as a synchronous classic script after statistics and before calendar presentation', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/stop-fee-analysis.js'));
+  assert.ok(html.indexOf('src/modules/analytics/presentation/statistics-page.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/calendar/presentation/calendar-page.js'));
 });

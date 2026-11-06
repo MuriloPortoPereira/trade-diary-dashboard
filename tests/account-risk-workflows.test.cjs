@@ -133,7 +133,7 @@ test('risk workflows load once as classic globals after domains and before consu
   assert.ok(scripts.findIndex(script => script.src === 'src/modules/accounts/domain/calculate-risk-period-pnl.js') < workflowIndex);
   for (const consumer of [
     'src/modules/accounts/presentation/risk-board.js',
-    'src/modules/analytics/presentation/stop-fee-analysis.js',
+    'src/modules/analytics/presentation/statistics-page.js',
     'app.js',
   ]) assert.ok(workflowIndex < scripts.findIndex(script => script.src === consumer));
 });

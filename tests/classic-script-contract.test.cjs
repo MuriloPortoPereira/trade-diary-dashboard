@@ -56,8 +56,8 @@ test('bootstrap, locale catalogs and StudyHub preserve critical registration ord
   before('src/modules/simulation/domain/calculate-simulation-sizing.js','src/modules/simulation/domain/calculate-simulation-projection.js');
   before('src/modules/simulation/domain/calculate-simulation-projection.js','src/modules/simulation/presentation/simulation-panel.js');
   before('src/modules/simulation/presentation/simulation-panel.js','app.js');
-  before('src/modules/analytics/application/strategy-analysis.js','src/modules/analytics/presentation/strategy-rows.js');
-  before('src/modules/trades/presentation/trade-form.js','src/modules/trades/presentation/trade-log-controls.js');
+  before('src/modules/analytics/application/strategy-analysis.js','src/modules/analytics/presentation/strategy-comparison.js');
+  before('src/modules/trades/presentation/trade-form.js','src/modules/trades/presentation/trade-log.js');
   const study = 'src/modules/study-hub/', runtime = study + 'presentation/study-hub-legacy-runtime.js';
   before(study + 'application/study-hub-state.js',study + 'presentation/study-hub-page.js');
   before(study + 'presentation/study-hub-page.js','app.js');

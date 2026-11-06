@@ -17,7 +17,7 @@ test('strategy comparison loads once as a classic script after rows and before a
     .filter(match => match[1].includes(`src=\"${modulePath}\"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
-  assert.ok(html.indexOf('src/modules/analytics/presentation/strategy-rows.js') < html.indexOf(modulePath));
+  assert.ok(source.indexOf('function renderStrategyRows(') < source.indexOf('function renderStrategyCompareCards('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 

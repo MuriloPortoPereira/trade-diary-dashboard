@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/trades/presentation/trade-error-chips.js';
+const modulePath = 'src/modules/trades/presentation/trade-form.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderErrorChips\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -62,6 +62,6 @@ test('error chips load once as a synchronous classic script before trade consume
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/trades/presentation/trade-form.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/trades/presentation/trade-log.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

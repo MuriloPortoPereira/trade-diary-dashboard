@@ -9,7 +9,8 @@ const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderStats\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ['renderStats'].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 test('statistics page loads once as a classic script after strategy comparison and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

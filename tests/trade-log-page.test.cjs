@@ -19,7 +19,7 @@ test('trade log loads once as a classic script after its components and before a
     .filter(match => match[1].includes(`src=\"${modulePath}\"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
-  assert.ok(html.indexOf('src/modules/trades/presentation/trade-log-selection.js') < html.indexOf(modulePath));
+  assert.ok(html.indexOf('src/modules/trades/presentation/trade-form.js') < html.indexOf(modulePath));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
@@ -73,6 +73,9 @@ function setup({
     getMarket: symbol => `market:${symbol}`,
   });
   vm.runInContext(source, context, {filename: modulePath});
+  context.renderLogReadOnlyNotice = account => calls.push(['notice', account]);
+  context.renderLogMetrics = (rows, incomplete) => calls.push(['metrics', rows, incomplete]);
+  context.updateBulkBar = () => calls.push(['bulk']);
   return {context, elements, calls, selectedTrades};
 }
 

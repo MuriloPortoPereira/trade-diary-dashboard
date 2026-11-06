@@ -1052,6 +1052,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Próximas responsabilidades: helpers de demos/importação; consultas/normalização/datas; psicologia/alertas; apresentação comum. Caracterizar e aproveitar módulos existentes antes de novos arquivos.
 - Fechamento arquitetural ainda depende de rever esses resíduos e as exceções globais. O mapa distingue composição legítima de responsabilidade de feature pendente; não confundir redução de linhas com migração integral.
 
+## Consolidação orientada por workspace: prioridade atual
+
+- JS de apresentação: diário/editor de trades, formulário/setup de contas e dashboard/estatísticas/comparação de analytics reunidos em arquivos coesos existentes.
+- 95 → 80 scripts locais, com 75 funções idênticas e contratos de carga/casos de teste preservados. Módulos de domínio/aplicação/IO não são fundidos à UI.
+- Não criar arquivo por função nem preencher cotas de linhas. Manter separação quando houver responsabilidade/consumidores próprios.
+- Próximo: CSS em grupos contíguos coesos, sem reordenar regras; depois revisar os resíduos de `app.js` usando os módulos consolidados.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

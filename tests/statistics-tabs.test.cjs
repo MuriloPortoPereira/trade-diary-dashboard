@@ -5,11 +5,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/statistics-controls.js';
+const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function switchStatTab\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ['switchStatTab'].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 const tabIds = ['overview', 'strategy', 'time', 'psych', 'simulation'];
 
 test('statistics tabs load once as a classic script after psychology and before app.js', () => {

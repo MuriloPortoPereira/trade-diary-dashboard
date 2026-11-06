@@ -67,3 +67,10 @@ function renderDashboard(){
   document.getElementById('recentTrades').innerHTML=[...arr].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,20).map(t=>tradeRow(t,false)).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:16px">${t('misc.noTrades')}</td></tr>`;
   updateTopbarStats();
 }
+
+function toggleEqMode(){
+  eqMode=eqMode==='value'?'pct':'value';
+  const btn=document.getElementById('eqModeBtn');
+  if(btn)btn.textContent=eqMode==='value'?'% retorno':'$ valor';
+  renderDashboard();
+}

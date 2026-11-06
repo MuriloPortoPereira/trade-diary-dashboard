@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/accounts/presentation/risk-tags.js';
+const modulePath = 'src/modules/accounts/presentation/risk-setup-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderTags\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -39,7 +39,7 @@ test('risk tags classic script loads once before setup page and app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
   assert.equal(scripts.filter(src => src === modulePath).length, 1);
-  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('src/modules/accounts/presentation/risk-setup-page.js'));
+  assert.ok(source.indexOf('function renderTags(') < source.indexOf('function renderSetup('));
   assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 

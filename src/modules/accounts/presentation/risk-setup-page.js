@@ -1,3 +1,82 @@
+function renderSetupRiskSummary(){
+  const acct=getActiveAccount();
+  if(!acct)return;
+  const risk=calcAccountRiskState(acct,getAccountTrades(acct.id));
+  const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  setText('setupInitialBalance',fR(risk.initialBalance));
+  setText('setupCashflowNet',(risk.cashflowNet>=0?'+':'')+fR(risk.cashflowNet));
+  setText('setupCurrentBalance',fR(risk.currentBalance));
+  setText('setupRiskPerTrade',`${f2(acct.risk||0)}% · ${fR(risk.riskPerTradeUsd)}`);
+  setText('setupDailyDdLimit',`${f2(acct.ddDaily||0)}% · ${fR(risk.dayLimit)}`);
+  setText('setupWeeklyDdLimit',`${f2(acct.ddWeekly||0)}% · ${fR(risk.weekLimit)}`);
+  setText('setupMonthlyDdLimit',`${f2(acct.ddMonthly||0)}% · ${fR(risk.monthLimit)}`);
+  setText('setupMaxDdLimit',`${f2(acct.ddTotal||0)}% · ${fR(risk.totalLimit)}`);
+}
+
+function renderSetupCashflowList(){
+  const el=document.getElementById('setupCashflowList');if(!el)return;
+  const acct=getActiveAccount();if(!acct){el.innerHTML='';return;}
+  const flows=getAccountCashflows(acct);
+  const summary=calcAccountCashflow(acct);
+  if(!flows.length){
+    el.innerHTML=`<div class="account-cashflow-empty">Nenhum aporte ou retirada na conta ativa.</div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="account-cashflow-summary">
+      <span>Aportes: <b>${fR(summary.deposits)}</b></span>
+      <span>Retiradas: <b>${fR(summary.withdrawals)}</b></span>
+      <span>Líquido: <b class="${summary.net>=0?'text-green':'text-red'}">${summary.net>=0?'+':''}${fR(summary.net)}</b></span>
+    </div>
+    ${flows.map(flow=>`
+      <div class="account-cashflow-row">
+        <span class="${flow.type==='withdrawal'?'text-red':'text-green'}">${flow.type==='withdrawal'?'Retirada':'Aporte'}</span>
+        <span class="mono">${fDate(flow.date)}</span>
+        <strong>${fR(flow.amount)}</strong>
+        <span>${escapeHtml(flow.note||'—')}</span>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteSetupCashflow('${flow.id}')">×</button>
+      </div>`).join('')}`;
+}
+
+function addTag(type){
+  const inp=document.getElementById('new'+type.charAt(0).toUpperCase()+type.slice(1));
+  const val=inp?.value?.trim();if(!val)return;
+  if(type==='strategy')config=ensureDefaultStrategies(config);
+  const key=tagConfigKey(type);
+  if(!Array.isArray(config[key]))config[key]=[];
+  const exists=config[key].some(item=>type==='strategy'
+    ? normalizeStrategyName(item)===normalizeStrategyName(val)
+    : item===val);
+  if(exists){showAppNotice('Item duplicado','Já existe: '+val);return;}
+  config[key].push(val);
+  inp.value='';save();renderTags(type);
+}
+
+function removeTag(type,idx){
+  const key=tagConfigKey(type);
+  const name=config[key][idx];
+  showAppConfirm('Remover item',`Remover "${name}"?`,()=>{
+    config[key].splice(idx,1);save();renderTags(type);
+  },{danger:true,confirmText:'Remover'});
+}
+
+function renderTags(type){
+  const el=document.getElementById(type+'Tags');if(!el)return;
+  if(type==='strategy')config=ensureDefaultStrategies(config);
+  const key=tagConfigKey(type);
+  if(!Array.isArray(config[key]))config[key]=[];
+  const items=config[key];
+  if(type==='strategy'){
+    el.innerHTML=items.map((t,i)=>{
+      const count=strategyUsageCount(t);
+      const title=count?`Excluir da lista (${count} trade(s) usam esta estratégia)`:'Excluir da lista';
+      return`<div class="tag strategy-tag"><span>${escapeHtml(t)}</span>${count?`<span class="tag-count">${count}</span>`:''}<button class="tag-edit-btn" onclick="editStrategy(${i})" title="Editar" aria-label="Editar ${escapeHtml(t)}">✎</button><button class="tag-delete-btn" onclick="deleteStrategy(${i})" title="${escapeHtml(title)}" aria-label="Excluir ${escapeHtml(t)}">×</button></div>`;
+    }).join('');
+  } else {
+    el.innerHTML=items.map((t,i)=>`<div class="tag"><span>${escapeHtml(t)}</span><button class="tag-delete-btn" onclick="removeTag('${type}',${i})" title="Excluir" aria-label="Excluir ${escapeHtml(t)}">×</button></div>`).join('');
+  }
+}
+
 function setupRiskNumber(value,fallback){
   const n=parseFloat(value);
   return Number.isFinite(n)&&n>=0?n:fallback;

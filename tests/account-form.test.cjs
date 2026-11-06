@@ -10,7 +10,8 @@ const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['newAccount', 'editAccount', 'addAccountCashflowFromForm', 'removeAccountFormCashflow', 'onAcctTypeChange'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = legacy ?? names.map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function element(extra = {}) {
   return {style: {}, value: '', textContent: '', parentElement: {style: {}}, ...extra};
@@ -122,10 +123,10 @@ test('account form loads as a classic script before its consumers and leaves app
     assert.equal(legacyParts[names.indexOf(name)], undefined);
   }
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const cashflowIndex = html.indexOf('<script src="src/modules/accounts/presentation/account-cashflow-form.js"></script>');
   const formIndex = html.indexOf(`<script src="${modulePath}"></script>`);
-  const setupIndex = html.indexOf('<script src="src/modules/accounts/presentation/setup-risk-summary.js"></script>');
+  const setupIndex = html.indexOf('<script src="src/modules/accounts/presentation/risk-setup-page.js"></script>');
   const appIndex = html.indexOf('<script src="app.js"></script>');
-  assert.ok(cashflowIndex >= 0 && cashflowIndex < formIndex);
+  assert.ok(formIndex >= 0);
+  assert.ok(moduleSource.indexOf('function renderAccountCashflowList(') < moduleSource.indexOf('function newAccount('));
   assert.ok(formIndex < setupIndex && setupIndex < appIndex);
 });

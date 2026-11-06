@@ -9,7 +9,8 @@ const modulePath = 'src/modules/accounts/presentation/risk-setup-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderSetup\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = moduleSource.match(/^function renderSetup\([^]*?^\}/m)[0];
 
 const fieldIds = [
   'cfg-balance', 'cfg-goal', 'cfg-risk', 'cfg-dd-daily', 'cfg-dd-weekly',
@@ -92,7 +93,7 @@ test('risk setup page loads once after its components and before app.js', () => 
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf('src/modules/accounts/presentation/setup-risk-summary.js') < html.indexOf(modulePath));
-  assert.ok(html.indexOf('src/modules/accounts/presentation/setup-cashflow-list.js') < html.indexOf(modulePath));
+  assert.ok(moduleSource.indexOf('function renderSetupRiskSummary(') < moduleSource.indexOf('function renderSetup('));
+  assert.ok(moduleSource.indexOf('function renderSetupCashflowList(') < moduleSource.indexOf('function renderSetup('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
