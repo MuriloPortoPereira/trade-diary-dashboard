@@ -5,12 +5,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/app/presentation/app-dialog.js';
+const modulePath = 'src/app/presentation/app-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['openAppDialog', 'closeAppDialog', 'confirmAppDialog', 'showAppConfirm', 'showAppNotice', 'showAppPrompt'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = legacy ?? ["openAppDialog", "closeAppDialog", "confirmAppDialog", "showAppConfirm", "showAppNotice", "showAppPrompt"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function element(extra = {}) {
   const classes = new Set();
@@ -167,7 +168,7 @@ test('application dialog loads once as a classic script before every consumer an
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const dialogIndex = scripts.findIndex(script => script.src === modulePath);
   const languageIndex = scripts.findIndex(script => script.src === 'src/modules/preferences/presentation/language-selector.js');
-  const accountFormIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/account-form.js');
+  const accountFormIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/accounts-workspace.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
   assert.ok(languageIndex < dialogIndex && dialogIndex < accountFormIndex && accountFormIndex < appIndex);
 });

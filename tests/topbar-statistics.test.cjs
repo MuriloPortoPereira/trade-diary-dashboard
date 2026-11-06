@@ -5,10 +5,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/app/presentation/topbar.js';
+const modulePath = 'src/app/presentation/app-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyDeclaration = appSource.match(/^function updateTopbarStats\([^]*?^\}/m)?.[0];
-const source = legacyDeclaration ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = legacyDeclaration ?? ["renderTopbarValue", "renderTopbarAccount", "updateTopbarStats"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function setup({trades, risk, account, missingSubs = []} = {}) {
   const defaultTrades = [
@@ -108,7 +109,7 @@ test('topbar functions load once in their cohesive classic script before account
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const statisticsIndex = scripts.findIndex(script => script.src === modulePath);
-  const accountsIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/accounts-page.js');
+  const accountsIndex = scripts.findIndex(script => script.src === 'src/modules/accounts/presentation/accounts-workspace.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
   assert.ok(statisticsIndex < accountsIndex && accountsIndex < appIndex);
 });

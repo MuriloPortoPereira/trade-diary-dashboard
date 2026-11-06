@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const modules = ['src/modules/accounts/presentation/account-form.js', 'src/modules/accounts/presentation/risk-setup-page.js'];
+const modules = ['src/modules/accounts/presentation/accounts-workspace.js'];
 const names = ['selectAccount', 'saveAccount', 'deleteAccount', 'setupRiskNumber', 'readSetupRiskFormValues', 'applySetupRiskToActiveAccount', 'previewSetupRiskFromForm', 'addSetupCashflowToActiveAccount', 'addSetupCashflowFromForm', 'deleteSetupCashflow', 'addTag', 'removeTag', 'saveConfig'];
 const candidates = [...modules.map(file => fs.readFileSync(path.join(root, file), 'utf8')), fs.readFileSync(path.join(root, 'app.js'), 'utf8')];
 const source = names.map(name => {

@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
+const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderStats\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -18,7 +18,7 @@ test('statistics page loads once as a classic script after strategy comparison a
     .filter(match => match[1].includes(`src=\"${modulePath}\"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
-  assert.ok(html.indexOf('src/modules/analytics/presentation/strategy-comparison.js') < html.indexOf(modulePath));
+  assert.ok(moduleSource.indexOf('function renderStrategyCompareCards(') < moduleSource.indexOf('function renderStats('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 

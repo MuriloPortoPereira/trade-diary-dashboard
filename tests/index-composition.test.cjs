@@ -9,11 +9,11 @@ const index = fs.readFileSync(path.join(root, 'index.html'));
 
 test('published shell preserves every byte and its existing mixed line endings', () => {
   // Workspace consolidation changes script and stylesheet registrations only.
-  assert.equal(index.length, 104942);
+  assert.equal(index.length, 102336);
   assert.equal(createHash('sha256').update(index).digest('hex'),
-    'ff21c3c744832509c097fa89932ac107e3d184e125995d72ce7f59c907f6f656');
-  assert.equal((index.toString().match(/\r\n/g) || []).length, 1418);
-  assert.equal((index.toString().match(/\n/g) || []).length, 1539);
+    '5b126430e742d51eae2dd5337d85512b6cb4a1b3aba72cf940b985402b33d151');
+  assert.equal((index.toString().match(/\r\n/g) || []).length, 1417);
+  assert.equal((index.toString().match(/\n/g) || []).length, 1507);
 });
 
 test('shell keeps all fifteen pages in order including psychology outside the sidebar', () => {

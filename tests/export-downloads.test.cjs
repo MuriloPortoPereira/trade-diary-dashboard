@@ -6,9 +6,9 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const modulePaths = [
-  'src/modules/data-transfer/infrastructure/download-text-file.js',
-  'src/modules/data-transfer/application/select-export-trades.js',
-  'src/modules/data-transfer/presentation/export-downloads.js',
+  'src/modules/data-transfer/infrastructure/browser-file-io.js',
+  'src/modules/data-transfer/application/transfer-workflows.js',
+  'src/modules/data-transfer/presentation/data-transfer-page.js',
 ];
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const sources = [app, ...modulePaths.filter(file => fs.existsSync(path.join(root, file)))
@@ -165,7 +165,7 @@ test('export scripts load once as classic globals without executing IO during in
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
     attributes: match[1], src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
   }));
-  let previous = scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/serialize-trades-csv.js');
+  let previous = scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/trade-file-formats.js');
   assert.ok(previous >= 0);
   for (const file of modulePaths) {
     vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, {filename: file});

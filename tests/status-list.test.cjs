@@ -4,10 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/shared/presentation/status-list.js';
+const modulePath = 'src/shared/presentation/analysis-widgets.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStatusList\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["renderStatusList"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function render(items, {visible = true, emptyMessage} = {}) {
   const node = {innerHTML: 'before'}, context = vm.createContext({
@@ -74,6 +75,6 @@ test('status list loads once as a synchronous classic script before its consumer
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/psychology/presentation/psychology-statistics.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/psychology/presentation/psychology-page.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

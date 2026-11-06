@@ -180,6 +180,9 @@ Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e
 | G7i | Edição em lote, locks e aviso do diário consolidado | 1.114 | 603 |
 
 ## Current
+- Segunda consolidação: 80 → 48 scripts, por feature/camada. 47 fontes foram reunidas em 15 destinos; nomes públicos, corpos e ordem interna preservados.
+- Contas e analytics têm um workspace UI cada; domínios de contas/simulação agrupados; transferência tem quatro arquivos de camada, além do domínio. UI comum e catálogos por idioma também consolidados.
+- Validação desta rodada: mesmos 607 testes/100 arquivos, 113 checks no navegador, sintaxe de 85 scripts, dois geradores e duas revisões independentes sem bloqueios. app.js permanece em 1.114 linhas.
 - Prioridade atual: consolidação por workspace. JS local 95 → 80; CSS 40 → 26. Foram removidos 29 arquivos de produção líquidos, sem ampliar app.js (1.114 linhas).
 - Apresentação: trades 8 → 2 arquivos; contas 10 → 5; analytics 8 → 4. 75 funções preservadas byte a byte, sem efeitos antecipados; domínio/aplicação/IO mantêm seus limites.
 - CSS: seis grupos contíguos, maior com 699 linhas; mesmo fluxo de 162.576 bytes/SHA-256 e mesma cascata. O HTML mudou somente nos registros de assets.

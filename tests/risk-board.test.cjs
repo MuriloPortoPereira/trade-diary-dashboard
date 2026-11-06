@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/accounts/presentation/risk-board.js';
+const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderRiskBoard\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
@@ -105,5 +105,5 @@ test('risk board loads once as a synchronous classic script before dashboard', (
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/dashboard-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/analytics-workspace.js'));
 });

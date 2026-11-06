@@ -6,12 +6,10 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/data-transfer/infrastructure/parse-tabular-trades.js';
+const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const moduleFile = path.join(root, modulePath);
 const sources = [app];
 if (fs.existsSync(moduleFile)) sources.push(fs.readFileSync(moduleFile, 'utf8'));
-const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/normalize-tabular-values.js');
-if (fs.existsSync(normalizerFile)) sources.push(fs.readFileSync(normalizerFile, 'utf8'));
 const parserNames = ['parseMT5Rows', 'parseGenericTradeRows', 'parseSpreadsheetRows', 'parseMT4Raw'];
 function declaration(name) {
   const patterns = [new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'),
@@ -197,7 +195,7 @@ test('MT4 text adapter preserves naive delimiter splitting and the text source a
 test('tabular parser APIs load once as classic globals without initial IO or state access', () => {
   assert.ok(fs.existsSync(moduleFile));
   const sandbox = {};
-  for (const name of ['document', 'localStorage', 'fetch', 'trades', 'uid', 'Date', 'normalizeDate', 'getMarket']) {
+  for (const name of ['document', 'localStorage', 'fetch', 'trades', 'uid', 'Date', 'getMarket']) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`unexpected initialization access: ${name}`); }});
   }
   const context = vm.createContext(sandbox);
@@ -218,6 +216,6 @@ test('tabular parser APIs load once as classic globals without initial IO or sta
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/import-workflow.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-page.js'));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });

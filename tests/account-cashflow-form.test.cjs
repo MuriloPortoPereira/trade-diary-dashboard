@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/accounts/presentation/account-form.js';
+const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderAccountCashflowList\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -88,6 +88,6 @@ test('cashflow form renderer loads once as a synchronous classic script before a
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/accounts/presentation/accounts-page.js'));
+  assert.ok(source.indexOf('function renderAccountCashflowList(') < source.indexOf('function newAccount('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

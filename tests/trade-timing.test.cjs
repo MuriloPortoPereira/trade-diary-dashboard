@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/trades/domain/trade-timing.js';
 const moduleFile = path.join(root, modulePath);
-const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/normalize-tabular-values.js');
+const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/trade-file-formats.js');
 
 function between(source, start, end) {
   const from = source.indexOf(start);
@@ -133,8 +133,8 @@ test('timing domain loads once before presentation consumers and legacy wrappers
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
     'src/modules/trades/presentation/trade-form.js',
-    'src/modules/analytics/presentation/strategy-comparison.js',
-    'src/modules/analytics/presentation/statistics-page.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'app.js',
   ]) {
     assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));

@@ -5,12 +5,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/app/presentation/modal-controller.js';
+const modulePath = 'src/app/presentation/app-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['openModal', 'closeModal'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = legacy ?? ["openModal", "closeModal"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function classList() {
   const classes = new Set();
@@ -115,7 +116,7 @@ test('closing removes open state and only trade modal clears bulk flow', () => {
   assert.deepEqual(generic.calls, []);
 });
 
-test('modal controller loads once after feature renderers and before navigation', () => {
+test('modal and navigation declarations share one synchronous workspace before app.js', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -126,7 +127,7 @@ test('modal controller loads once after feature renderers and before navigation'
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const profileIndex = scripts.findIndex(script => script.src === 'src/modules/profile/presentation/profile-page.js');
   const modalIndex = scripts.findIndex(script => script.src === modulePath);
-  const navigationIndex = scripts.findIndex(script => script.src === 'src/app/presentation/navigation.js');
+  const navigationIndex = scripts.findIndex(script => script.src === 'src/app/presentation/app-workspace.js');
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(profileIndex < modalIndex && modalIndex < navigationIndex && navigationIndex < appIndex);
+  assert.ok(modalIndex === navigationIndex && modalIndex < profileIndex && profileIndex < appIndex);
 });

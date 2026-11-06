@@ -6,9 +6,9 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const preparationPath = 'src/modules/data-transfer/application/prepare-trade-import.js';
+const preparationPath = 'src/modules/data-transfer/application/transfer-workflows.js';
 const rulesPath = 'src/modules/data-transfer/domain/import-trade-rules.js';
-const candidates = [app, fs.readFileSync(path.join(root, 'src/modules/documents/presentation/document-rendering-helpers.js'), 'utf8')];
+const candidates = [app, fs.readFileSync(path.join(root, 'src/modules/documents/presentation/documents-page.js'), 'utf8')];
 if (fs.existsSync(path.join(root, preparationPath))) candidates.push(fs.readFileSync(path.join(root, preparationPath), 'utf8'));
 const names = ['calcImportMissingFields', 'prepareImportedTrades', 'setPendingImport', 'clearPendingImport',
   'getPendingImportAccountId', 'getTradeImportPositionKey', 'normalizeDocImages'];
@@ -207,7 +207,7 @@ test('preparation and rules load once before consumers as classic scripts withou
     assert.equal(matches.length, 1);
     assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
     const index = scripts.findIndex(script => script.src === file);
-    assert.ok(index > previous && index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/import-workflow.js'));
+    assert.ok(index > previous && index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-page.js'));
     previous = index;
   }
   for (const name of names.filter(name => !['calcImportMissingFields', 'normalizeDocImages'].includes(name))) {

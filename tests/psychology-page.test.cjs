@@ -10,7 +10,8 @@ const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyDeclaration = appSource.match(/^function renderPsych\([^]*?^\}/m)?.[0];
 assert.ok(fs.existsSync(path.join(root, modulePath)), 'extracted psychology renderer must exist');
 assert.ok(!legacyDeclaration, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["renderPsych"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function createHarness({trades = [], visible} = {}) {
   const ids = visible ?? ['bestEmotion', 'bestEmotionWR', 'worstEmotion', 'worstEmotionWR',
@@ -94,6 +95,6 @@ test('extracted psychology renderer stays a synchronous classic script before ap
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === modulePath).length, 1);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.equal(scripts[index + 1].src, 'src/modules/analytics/presentation/strategy-hub-page.js');
+  assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
   assert.doesNotMatch(scripts[index].attributes, /\b(?:async|defer|type="module")\b/i);
 });

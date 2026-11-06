@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
+const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStopFeeAnalysis\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
@@ -75,10 +75,10 @@ test('missing target returns before calculating or formatting', () => {
   assert.deepEqual(tips, []);
 });
 
-test('stop fee presentation loads once as a synchronous classic script before calendar', () => {
+test('stop fee and calendar presentation load synchronously before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/calendar/presentation/calendar-page.js'));
+  assert.ok(html.indexOf('src/modules/calendar/presentation/calendar-page.js') < html.indexOf('src="app.js"'));
 });

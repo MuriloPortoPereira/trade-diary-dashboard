@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/data-transfer/infrastructure/backup-format.js';
+const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const declarations = ['summarizeBackupData', 'formatBackupSummary', 'validateBackupData'].map(name => {
   const match = appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
   assert.ok(match, `Missing ${name}`);
@@ -80,7 +80,7 @@ test('backup format module is isolated and loads before classic consumers', () =
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-controls.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-page.js'));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
   assert.match(appSource, /^function summarizeBackupData\(data\)\{/m);
   assert.match(appSource, /^function validateBackupData\(data\)\{/m);

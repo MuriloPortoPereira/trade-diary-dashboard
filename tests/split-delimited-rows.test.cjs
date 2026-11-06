@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/data-transfer/infrastructure/split-delimited-rows.js';
+const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const declarations = ['normalizeCSVRow', 'isBinarySpreadsheetText', 'splitDelimitedRows', 'parseCSVText'].map(name => {
   const match = appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
   assert.ok(match, `Missing ${name}`);
@@ -16,12 +16,14 @@ const plain = value => JSON.parse(JSON.stringify(value));
 
 function setup() {
   const calls = [];
-  const context = vm.createContext({parseSpreadsheetRows: (rows, filename) => {
-    calls.push({rows: plain(rows), filename});
-    return {parsed: true};
-  }});
+  const context = vm.createContext({});
   const file = path.join(root, modulePath);
   if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: modulePath});
+  // Keep the CSV wrapper's parser collaborator isolated after the complete format endpoint loads.
+  context.parseSpreadsheetRows = (rows, filename) => {
+    calls.push({rows: plain(rows), filename});
+    return {parsed: true};
+  };
   vm.runInContext(declarations, context, {filename: 'app.js#delimited-rows'});
   return {context, calls};
 }
@@ -75,7 +77,8 @@ test('delimited row parser is isolated and loads before classic consumers', () =
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/serialize-trades-csv.js') < index);
+  const formatsSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+  assert.ok(formatsSource.indexOf('globalThis.TradeDiaryTradesCSV =') < formatsSource.indexOf('globalThis.TradeDiaryDelimitedRows ='));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
   assert.match(appSource, /^function normalizeCSVRow\(value\)\{/m);
   assert.match(appSource, /^function splitDelimitedRows\(text\)\{/m);

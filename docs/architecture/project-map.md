@@ -8,17 +8,35 @@ Localização atual nas tabelas abaixo. Os nomes de testes preservam os cenário
 
 ## Apresentação: onde editar agora
 
-| Tela ou fluxo | Arquivo principal em `src/modules/` |
-|---|---|
-| Diário: linhas, métricas, seleção, filtros e bloqueios | `trades/presentation/trade-log.js` |
-| Editor de trade: campos, erros e fluxo de incompletos | `trades/presentation/trade-form.js` |
-| Formulário de conta, caixa e lista de gestão | `accounts/presentation/account-form.js` |
-| Configuração de risco, resumos, caixa e tags | `accounts/presentation/risk-setup-page.js` |
-| Dashboard e modo da curva | `analytics/presentation/dashboard-page.js` |
-| Estatísticas: abas, filtros e análise de taxas | `analytics/presentation/statistics-page.js` |
-| Ranking e comparação de estratégias | `analytics/presentation/strategy-comparison.js` |
+Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as camadas numéricas e de IO permanecem separadas.
 
-Consolidação: 95 → 80 scripts locais; 75 funções preservadas. Domínio, aplicação e IO continuam separados da apresentação. Visões de contas, risk board e chrome compartilhado mantêm suas responsabilidades próprias.
+| Feature ou fluxo | Arquivo principal |
+|---|---|
+| Shell, navegação, topbar, modais e diálogos | `app/presentation/app-workspace.js` |
+| Diário e editor de trades | `modules/trades/presentation/trade-log.js` e `trade-form.js` |
+| Contas: painéis, formulários, risco e setup | `modules/accounts/presentation/accounts-workspace.js` |
+| Dashboard, estatísticas e comparação de estratégias | `modules/analytics/presentation/analytics-workspace.js` |
+| Importação, exportação e backup | `modules/data-transfer/presentation/data-transfer-page.js` |
+| Calendário e mini calendário do dashboard | `modules/calendar/presentation/calendar-page.js` e `dashboard-calendar.js` |
+| Psicologia e estatísticas subjetivas | `modules/psychology/presentation/psychology-page.js` |
+| Documentos: consultas, edição e mídia | `modules/documents/presentation/documents-page.js` |
+| Rotina, parceiros, perfil e notificações | Respectivo `modules/<feature>/presentation/*-page.js` |
+| Idiomas | `modules/preferences/presentation/locales/pt-BR.js` e `en-US.js`; registro/seletor continuam próprios |
+| Widgets analíticos compartilhados | `shared/presentation/analysis-widgets.js` |
+
+## Regras, orquestração e IO
+
+| Responsabilidade | Onde procurar em `src/modules/` |
+|---|---|
+| Cálculos financeiros e risco | `accounts/domain/account-risk-calculations.js`; fluxo em `accounts/application/account-risk-workflows.js` |
+| Sizing, expectativa e projeção | `simulation/domain/simulation-calculations.js`; UI em `simulation/presentation/simulation-panel.js` |
+| Métricas e estratégias | `analytics/domain/calculate-trade-metrics.js`; queries em `analytics/application/strategy-analysis.js` |
+| Importação/exportação: casos de uso | `data-transfer/application/transfer-workflows.js` |
+| CSV, backup, normalização e parsing | `data-transfer/infrastructure/trade-file-formats.js` |
+| Leitura de relatórios e download | `data-transfer/infrastructure/browser-file-io.js` |
+| Regras de importação | `data-transfer/domain/import-trade-rules.js` |
+
+48 scripts locais. Os namespaces/globals existentes foram preservados; não há módulos vazios de compatibilidade para os nomes antigos.
 
 ## CSS: onde editar agora
 
@@ -40,29 +58,13 @@ Consolidação: 95 → 80 scripts locais; 75 funções preservadas. Domínio, ap
 - `node scripts/build-index.cjs --check` verifica sincronização sem escrever. Teste: `tests/index-composition.test.cjs`; decisão: [ADR-005](adr/005-static-shell-composition.md).
 - A composição mantém os bytes das fontes, inclusive LF/CRLF mistos. Alterações autorizadas dos registros de assets são regeneradas no `index.html`; DOM/handlers e deploy sem build preservados.
 
-## Localização por responsabilidade
+## Integrações e estado
 
-| Trabalho | Procurar primeiro |
-|---|---|
-| Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
-| Operação/diário | `src/modules/trades/application/trade-workflows.js`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js` |
-| Edição/bloqueios do diário | `trades/presentation/trade-form.js`: editor e fluxo em lote; `trade-log.js`: diário, controles, locks e aviso somente leitura |
-| Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
-| Conta/saldo/risco | `accounts/application/account-risk-workflows.js`: workflows; `presentation/account-form.js`: gestão; `risk-setup-page.js`: setup completo; `normalizeAccount` permanece em `app.js` |
-| Dashboard/estratégia | `src/modules/analytics/application/strategy-analysis.js`: snapshots, equity, resultados e comparação; `calcMetrics` em `app.js`; apresentação em `dashboard-page.js`/`strategy-hub-page.js` |
-| Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
-| Rotina | `src/modules/routine/presentation/premarket-page.js`: página, navegação mensal, hábitos, disciplina e correlação; `preMarketData` permanece na composição |
-| Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
-| Simulação | `domain/calculate-simulation-{sizing,projection}.js`: cálculos numéricos; `presentation/simulation-panel.js`: defaults, snapshot, plano formatado, campos e gráficos; wrappers sizing/Monte Carlo em `app.js` |
-| StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página nativa; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas privadas; `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
-| Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
-| Documentos | `src/modules/documents/presentation/documents-page.js`: workspace, consultas, seleção, CRUD e mídia; `document-rendering-helpers.js`: formatação e imagens |
-| Parceiros | `src/modules/partners/presentation/partners-page.js`: página, configuração, afiliados, clipboard e QR; controller clássico coeso |
-| Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
-| Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
-| Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |
-| Idioma/câmbio | `src/modules/preferences/presentation/`; `src/modules/preferences/infrastructure/exchange-rate.js` |
-| Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
+- `app.js`: estado único, inicializadores de adaptadores e wrappers públicos, incluindo `buildTradesCSV(list=trades)`; ver os resíduos abaixo.
+- `src/app/application/bootstrap-app.js` e `load-app-state.js`: bootstrap/carga. Persistência bruta em `src/app/infrastructure/app-state-storage.js`.
+- Trades: workflows/amostras em `src/modules/trades/application/`; timing puro em `domain/trade-timing.js`.
+- StudyHub: `presentation/study-hub-page.js`, quatro ferramentas privadas `study-hub-{propfirm,plan,tradesim,mental}.js`, runtime/intraday; domínio, estado e storage próprios.
+- Câmbio: `src/modules/preferences/infrastructure/exchange-rate.js`.
 
 ## Resíduos de app.js após G7j
 

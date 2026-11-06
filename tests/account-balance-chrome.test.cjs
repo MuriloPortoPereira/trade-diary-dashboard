@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/accounts/presentation/account-balance-chrome.js';
+const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function syncAccountBalanceChrome\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
@@ -40,7 +40,7 @@ test('account balance chrome classic script loads once before dashboard and app.
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
   assert.equal(scripts.filter(src => src === modulePath).length, 1);
-  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('src/modules/analytics/presentation/dashboard-page.js'));
+  assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('src/modules/analytics/presentation/analytics-workspace.js'));
   assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));
 });
 

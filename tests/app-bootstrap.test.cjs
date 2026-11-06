@@ -97,6 +97,6 @@ test('bootstrap remains one synchronous classic script before navigation and app
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/app/presentation/navigation.js'));
+  assert.ok(html.indexOf('src/app/presentation/app-workspace.js') < html.indexOf(modulePath));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

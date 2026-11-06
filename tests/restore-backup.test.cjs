@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/data-transfer/application/restore-backup.js';
+const modulePath = 'src/modules/data-transfer/application/transfer-workflows.js';
 const moduleFile = path.join(root, modulePath);
 const start = app.indexOf('function restoreBackupData(');
 const end = app.indexOf('\nfunction exposeJsonExport(', start);
@@ -28,7 +28,7 @@ function setup(overrides = {}) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`unexpected ${name} access`); }});
   }
   const context = vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/data-transfer/infrastructure/backup-format.js'), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/data-transfer/infrastructure/trade-file-formats.js'), 'utf8'), context);
   vm.runInContext(`
     function validateBackupData(data){return TradeDiaryBackupFormat.validateBackupData(data);}
     function summarizeBackupData(data){return TradeDiaryBackupFormat.summarizeBackupData(data);}
@@ -115,7 +115,7 @@ test('normalization errors propagate while retaining earlier mutations', () => {
 test('restoration workflow remains global and loads once before classic consumers', () => {
   assert.ok(fs.existsSync(moduleFile));
   assert.doesNotMatch(app, /^function restoreBackupData\(/m);
-  const importWorkflow = fs.readFileSync(path.join(root, 'src/modules/data-transfer/presentation/import-workflow.js'), 'utf8');
+  const importWorkflow = fs.readFileSync(path.join(root, 'src/modules/data-transfer/presentation/data-transfer-page.js'), 'utf8');
   assert.match(importWorkflow, /restoreBackupData\(data\);/);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -125,7 +125,7 @@ test('restoration workflow remains global and loads once before classic consumer
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/backup-format.js'));
-  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-controls.js'));
+  assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/trade-file-formats.js'));
+  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/presentation/data-transfer-page.js'));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });

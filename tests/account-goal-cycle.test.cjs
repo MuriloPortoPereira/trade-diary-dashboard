@@ -20,7 +20,7 @@ function cycle({balance = 1000, goalPct = 10, pnl = 0, cashflow = {deposits: 0, 
     fR: value => String(value),
     f2: value => String(value),
   });
-  for (const name of ['calculate-risk-limits.js', 'calculate-goal-cycle.js', 'calculate-balance-drawdown.js', 'calculate-risk-period-pnl.js']) {
+  for (const name of ['account-risk-calculations.js']) {
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
@@ -50,7 +50,7 @@ test('goal base includes deposits but not withdrawals, and zero goal percent use
 });
 
 test('goal cycle domain stays pure and loads once before classic consumers', () => {
-  const modulePath = 'src/modules/accounts/domain/calculate-goal-cycle.js';
+  const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'fetch', 'accounts', 'trades']) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`goal cycle accessed ${name}`); }});
@@ -71,8 +71,8 @@ test('goal cycle domain stays pure and loads once before classic consumers', () 
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/accounts/presentation/risk-board.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
   assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);

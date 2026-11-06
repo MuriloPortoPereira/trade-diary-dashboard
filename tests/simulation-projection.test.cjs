@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const sizingPath = 'src/modules/simulation/domain/calculate-simulation-sizing.js';
-const projectionPath = 'src/modules/simulation/domain/calculate-simulation-projection.js';
+const sizingPath = 'src/modules/simulation/domain/simulation-calculations.js';
+const projectionPath = 'src/modules/simulation/domain/simulation-calculations.js';
 const panelPath = 'src/modules/simulation/presentation/simulation-panel.js';
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const declaration = name => app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0];
@@ -66,12 +66,12 @@ test('pure domain accepts injected RNG without DOM, storage or application globa
   assert.equal(p.probStop,1);
   assert.equal(c.TradeDiarySimulationProjection.calculateSimulationPlan({riskUsd:10,goalUsd:50,stopUsd:30}).expectedTradesToGoal,50);
 });
-test('projection loads after sizing and before panel and app as a classic script', () => {
+test('projection shares the sizing script and loads before panel and app', () => {
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const scripts=[...html.matchAll(/<script\b([^>]*)\bsrc="([^"]+)"[^>]*>/g)];
   const paths=scripts.map(match=>match[2]);
   assert.equal(paths.filter(value=>value===projectionPath).length,1);
-  assert.ok(paths.indexOf(sizingPath)<paths.indexOf(projectionPath));
+  assert.ok(paths.indexOf(sizingPath)===paths.indexOf(projectionPath));
   assert.ok(paths.indexOf(projectionPath)<paths.indexOf(panelPath));
   assert.ok(paths.indexOf(panelPath)<paths.indexOf('app.js'));
   assert.doesNotMatch(scripts.find(match=>match[2]===projectionPath)[0],/\b(?:async|defer|type="module")\b/);

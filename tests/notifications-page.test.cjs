@@ -61,11 +61,11 @@ test('notifications propagates alert failures without rendering a partial feed',
   assert.equal(calls.length, 3);
 });
 
-test('notifications loads once as a synchronous classic script before the other renderers', () => {
+test('notifications registers once as a synchronous classic script before app initialization', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)];
   const tag = tags.filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tag.length, 1);
   assert.doesNotMatch(tag[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/psychology/presentation/psychology-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

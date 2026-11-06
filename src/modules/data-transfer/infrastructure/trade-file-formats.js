@@ -1,3 +1,84 @@
+// Tabular value normalization; classic global APIs and helper lookup behavior retained.
+function parseMTNumber(value){
+  if(value===null||value===undefined)return null;
+  if(typeof value==='number')return Number.isFinite(value)?value:null;
+  let s=String(value).trim();
+  if(!s||s==='—')return null;
+  let neg=false;
+  if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+  s=s.replace(/\u00a0/g,' ').replace(/[^\d,.\-+]/g,'').replace(/\s/g,'');
+  if(!s)return null;
+  const comma=s.lastIndexOf(','),dot=s.lastIndexOf('.');
+  if(comma>-1&&dot>-1){
+    const decimal=comma>dot?',':'.';
+    const thousand=decimal===','?'.':',';
+    s=s.replace(new RegExp('\\'+thousand,'g'),'');
+    if(decimal===',')s=s.replace(',','.');
+  } else if(comma>-1){
+    s=s.replace(/\./g,'').replace(',','.');
+  }
+  const n=parseFloat(s);
+  if(!Number.isFinite(n))return null;
+  return neg?-Math.abs(n):n;
+}
+
+function normalizeDate(value){
+  if(value===null||value===undefined)return'';
+  if(value instanceof Date&&!isNaN(value.getTime()))return value.toISOString().slice(0,10);
+  const raw=String(value).trim();
+  if(!raw)return'';
+  const pad=n=>String(n).padStart(2,'0');
+  let m=raw.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+  if(m)return`${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  m=raw.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})/);
+  if(m)return`${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  const serial=parseMTNumber(raw);
+  if(/^\d+([.,]\d+)?$/.test(raw)&&serial&&serial>20000&&serial<80000){
+    const d=new Date(Date.UTC(1899,11,30)+serial*86400000);
+    return d.toISOString().slice(0,10);
+  }
+  const d=new Date(raw);
+  return isNaN(d.getTime())?'':d.toISOString().slice(0,10);
+}
+
+function cleanMTCell(value){return String(value??'').replace(/\s+/g,' ').trim();}
+
+function normalizeImportHeader(value){
+  return cleanMTCell(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w%]+/g,'');
+}
+// CSV format adapter. Classic-script namespace retained during migration.
+globalThis.TradeDiaryTradesCSV = (() => {
+  const TRADE_CSV_HEADERS = ['date','symbol','direction','placedTime','openTime','exitDate','exitTime','entry','exit','stop','tp','qty','riskUsd','riskPct','r','pnl','status','market','strategy','emotion','errors','remarks'];
+
+  function csvCell(value){
+    const raw=Array.isArray(value)?value.join('; '):value;
+    const text=raw==null?'':String(raw);
+    return `"${text.replace(/"/g,'""')}"`;
+  }
+
+  function buildTradesCSV(list){
+    const rows=(Array.isArray(list)?list:[]).map(t=>TRADE_CSV_HEADERS.map(h=>csvCell(t[h])).join(','));
+    return TRADE_CSV_HEADERS.join(',')+'\n'+rows.join('\n');
+  }
+
+  return { TRADE_CSV_HEADERS, csvCell, buildTradesCSV };
+})();
+// Delimited text rows for the existing CSV import format.
+globalThis.TradeDiaryDelimitedRows = (() => {
+  function normalizeCSVRow(value){
+    return String(value||'').trim().replace(/^"|"$/g,'');
+  }
+
+  function splitDelimitedRows(text){
+    const lines=String(text||'').split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length);
+    if(!lines.length)return[];
+    const first=lines[0];
+    const delimiter=first.includes(';')?';':first.includes('\t')?'\t':',';
+    return lines.map(line=>line.split(delimiter).map(c=>normalizeCSVRow(c)));
+  }
+
+  return {normalizeCSVRow,splitDelimitedRows};
+})();
 // Legacy tabular format adapters; live trades, IDs, clock and normalizers remain supplied by app.js.
 function parseMT5Rows(rows,filename){
   const existingIds=new Set(trades.map(t=>t.positionId).filter(Boolean));
@@ -141,3 +222,36 @@ function parseMT4Raw(text){
   const rows=text.split('\n').map(l=>l.trim().split(/\t|,/).map(c=>c.replace(/^"|"$/g,'')));
   return parseMT5Rows(rows,'text');
 }
+// Serialization, validation, and counts for the existing backup data format.
+globalThis.TradeDiaryBackupFormat = (() => {
+  function createBackupPayload({exportedAt,trades,config,preMarketData,accounts,activeAccountId,studyHubState}){
+    return {
+      version:2,
+      exportedAt,
+      trades,
+      config,
+      preMarketData,
+      accounts,
+      activeAccountId,
+      studyHubState,
+    };
+  }
+
+  function summarizeBackupData(data){
+    const src=(data&&typeof data==='object')?data:{};
+    return {
+      trades:Array.isArray(src.trades)?src.trades.length:0,
+      accounts:Array.isArray(src.accounts)?src.accounts.length:0,
+      preMarketDays:(src.preMarketData&&typeof src.preMarketData==='object'&&!Array.isArray(src.preMarketData))?Object.keys(src.preMarketData).length:0,
+      documents:Array.isArray(src.config?.generalDocs)?src.config.generalDocs.length:0,
+    };
+  }
+
+  function validateBackupData(data){
+    if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Arquivo de backup inválido.');
+    const keys=['trades','config','preMarketData','accounts','activeAccountId','studyHubState'];
+    if(!keys.some(k=>Object.prototype.hasOwnProperty.call(data,k)))throw new Error('Arquivo não parece ser um backup do diário.');
+  }
+
+  return {createBackupPayload,summarizeBackupData,validateBackupData};
+})();

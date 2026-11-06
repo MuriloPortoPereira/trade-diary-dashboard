@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/accounts/domain/calculate-cashflow-totals.js';
+const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
 const moduleFile = path.join(root, modulePath);
 const start = appSource.indexOf('function getAccountCashflows(');
 const end = appSource.indexOf('\nfunction getAccountCurrentBalance(', start);
@@ -92,7 +92,7 @@ test('isolated cashflow domain exposes one calculator without account state or I
   for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`cashflow domain accessed ${name}`); }});
   const context = vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
-  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryAccountCashflow']);
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryAccountCashflow', 'TradeDiaryRiskLimits', 'TradeDiaryGoalCycle', 'TradeDiaryBalanceDrawdown', 'TradeDiaryRiskPeriodPnl']);
   assert.deepEqual(Object.keys(context.TradeDiaryAccountCashflow), ['calculateCashflowTotals']);
   assert.deepEqual(plain(context.TradeDiaryAccountCashflow.calculateCashflowTotals([
     {type: 'deposit', amount: 30},
@@ -110,9 +110,9 @@ test('cashflow domain loads once before consumers while legacy helpers remain gl
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/accounts/presentation/account-form.js',
-    'src/modules/accounts/presentation/risk-setup-page.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'app.js',
   ]) {
     assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));

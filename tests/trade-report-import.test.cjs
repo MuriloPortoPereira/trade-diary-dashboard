@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const files = ['src/modules/data-transfer/infrastructure/read-trade-report.js', 'src/modules/data-transfer/presentation/import-workflow.js', 'app.js'];
+const files = ['src/modules/data-transfer/infrastructure/browser-file-io.js', 'src/modules/data-transfer/presentation/data-transfer-page.js', 'app.js'];
 const sources = files.filter(file => fs.existsSync(path.join(root, file))).map(file => fs.readFileSync(path.join(root, file), 'utf8'));
 const names = ['handleMT5Upload', 'handleReportUpload', 'handleHistoryUpload', 'loadSheetJS', 'parseMT5HTML', 'handleMT5Result'];
 const declarations = names.map(name => {

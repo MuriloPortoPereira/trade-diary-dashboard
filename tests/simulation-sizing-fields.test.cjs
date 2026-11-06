@@ -62,7 +62,7 @@ test('missing controls use active-account fallbacks and project all calculated m
 test('simulation sizing fields classic script loads once after domain and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(match => match[1]);
-  const domainPath = 'src/modules/simulation/domain/calculate-simulation-sizing.js';
+  const domainPath = 'src/modules/simulation/domain/simulation-calculations.js';
   assert.equal(scripts.filter(src => src === modulePath).length, 1);
   assert.ok(scripts.indexOf(domainPath) < scripts.indexOf(modulePath));
   assert.ok(scripts.indexOf(modulePath) < scripts.indexOf('app.js'));

@@ -4,12 +4,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/calendar/presentation/calendar-controls.js';
+const modulePath = 'src/modules/calendar/presentation/calendar-page.js';
 const names = ['calNav', 'calGoToMonth', 'syncCalPicker', 'setCalView', 'showCalDay'];
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const declarations = names.map(name => app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 assert.ok(declarations.every(declaration => declaration === undefined), 'legacy declarations must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["calNav", "calGoToMonth", "syncCalPicker", "setCalView", "showCalDay"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function harness(rows = [], missing = []) {
   const calls = [], toggles = [];
@@ -104,5 +105,5 @@ test('calendar controls loads once as a synchronous classic script before calend
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/calendar/presentation/calendar-page.js'));
+  assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

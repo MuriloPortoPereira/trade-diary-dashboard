@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/strategy-hub-page.js';
+const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStrategyHub\([^]*?^\}/m)?.[0];
 assert.ok(fs.existsSync(path.join(root, modulePath)), 'extracted strategy hub renderer must exist');
 assert.ok(!legacy, 'legacy declaration must be moved');
@@ -34,7 +34,9 @@ function harness({rows = [], missing = []} = {}) {
     formatStrategyRatio(value) { return `ratio:${value}`; },
     formatDocDate(value) { return `date:${value}`; },
   });
+  const renderStrategyRows = context.renderStrategyRows;
   vm.runInContext(source, context, {filename: modulePath});
+  context.renderStrategyRows = renderStrategyRows;
   return {context, nodes, calls};
 }
 
@@ -91,6 +93,6 @@ test('extracted strategy hub renderer stays a synchronous classic script before 
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === modulePath).length, 1);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.equal(scripts[index + 1].src, 'src/modules/routine/presentation/premarket-page.js');
+  assert.equal(scripts[index + 1].src, 'src/modules/analytics/application/strategy-analysis.js');
   assert.doesNotMatch(scripts[index].attributes, /\b(?:async|defer|type="module")\b/i);
 });

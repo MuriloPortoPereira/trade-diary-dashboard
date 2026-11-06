@@ -22,7 +22,7 @@ function setup() {
   }
   const context = vm.createContext({Date: DateStub, trades, config, preMarketData, accounts,
     activeAccountId: 'account', studyHubState});
-  const modulePath = path.join(root, 'src/modules/data-transfer/infrastructure/backup-format.js');
+  const modulePath = path.join(root, 'src/modules/data-transfer/infrastructure/trade-file-formats.js');
   vm.runInContext(fs.readFileSync(modulePath, 'utf8'), context, {filename: modulePath});
   vm.runInContext(source.slice(start, end), context, {filename: 'app.js#createBackupPayload'});
   return {context, trades, config, preMarketData, accounts, studyHubState, getClockCalls: () => clockCalls};

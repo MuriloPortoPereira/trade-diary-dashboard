@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/accounts/domain/calculate-risk-limits.js';
+const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
 const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
 const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
@@ -28,11 +28,11 @@ function setup({account, trades = [], period, cashflow} = {}) {
   });
   const moduleFile = path.join(root, modulePath);
   if (fs.existsSync(moduleFile)) vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
-  const goalCyclePath = path.join(root, 'src/modules/accounts/domain/calculate-goal-cycle.js');
+  const goalCyclePath = path.join(root, 'src/modules/accounts/domain/account-risk-calculations.js');
   if (fs.existsSync(goalCyclePath)) vm.runInContext(fs.readFileSync(goalCyclePath, 'utf8'), context, {filename: goalCyclePath});
-  const balanceDrawdownPath = path.join(root, 'src/modules/accounts/domain/calculate-balance-drawdown.js');
+  const balanceDrawdownPath = path.join(root, 'src/modules/accounts/domain/account-risk-calculations.js');
   if (fs.existsSync(balanceDrawdownPath)) vm.runInContext(fs.readFileSync(balanceDrawdownPath, 'utf8'), context, {filename: balanceDrawdownPath});
-  const periodPnlPath = path.join(root, 'src/modules/accounts/domain/calculate-risk-period-pnl.js');
+  const periodPnlPath = path.join(root, 'src/modules/accounts/domain/account-risk-calculations.js');
   if (fs.existsSync(periodPnlPath)) vm.runInContext(fs.readFileSync(periodPnlPath, 'utf8'), context, {filename: periodPnlPath});
   vm.runInContext(workflowSource, context, {filename: workflowPath});
   return {result: context.calcAccountRiskState(acct, trades, period), calls};
@@ -106,7 +106,7 @@ test('isolated risk limits expose only pure calculations', () => {
   for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`risk limits accessed ${name}`); }});
   const context = vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, modulePath), 'utf8'), context, {filename: modulePath});
-  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryRiskLimits']);
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryAccountCashflow', 'TradeDiaryRiskLimits', 'TradeDiaryGoalCycle', 'TradeDiaryBalanceDrawdown', 'TradeDiaryRiskPeriodPnl']);
   assert.deepEqual(Object.keys(context.TradeDiaryRiskLimits).sort(), ['calculateRiskConsumption', 'calculateRiskThresholds']);
   const thresholds = context.TradeDiaryRiskLimits.calculateRiskThresholds({ddDaily: 2, ddWeekly: 5, ddTotal: 10, risk: 1}, 1000);
   assert.deepEqual(JSON.parse(JSON.stringify(thresholds)), {dayLimit: 20, weekLimit: 50, monthLimit: 100, riskPerTradeUsd: 10});
@@ -122,9 +122,9 @@ test('risk limits load once before classic consumers and keep global risk API', 
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/accounts/presentation/risk-board.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
-    'src/modules/accounts/presentation/risk-setup-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
   assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);

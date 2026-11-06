@@ -152,10 +152,10 @@ test('metrics domain loads once before consumers while calcMetrics remains globa
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
     'src/modules/trades/presentation/trade-log.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
-    'src/modules/analytics/presentation/statistics-page.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'src/modules/calendar/presentation/calendar-page.js',
-    'src/modules/accounts/presentation/accounts-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
     'src/modules/profile/presentation/profile-page.js',
     'app.js',
   ]) {

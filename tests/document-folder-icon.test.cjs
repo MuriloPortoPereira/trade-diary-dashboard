@@ -5,11 +5,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/documents/presentation/document-rendering-helpers.js';
+const modulePath = 'src/modules/documents/presentation/documents-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderDocFolderIcon\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["formatDocDate", "normalizeDocImages", "formatDocumentSelection", "getDocumentEntryImages", "renderDocumentMedia", "renderDocFolderIcon"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function icon(type, useArgument = true) {
   const context = vm.createContext({type});
@@ -46,6 +47,5 @@ test('folder icons load once as a synchronous classic script before documents pa
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/documents/presentation/documents-page.js'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

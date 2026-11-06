@@ -13,13 +13,13 @@ const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined
 for (const [index, part] of legacyParts.entries()) assert.equal(part, undefined, `${names[index]} must be moved`);
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
-test('simulation panel loads once as a classic script before statistics dispatchers and app.js', () => {
+test('simulation panel and analytics dispatchers load before app.js as classic scripts', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
     .filter(match => match[1].includes(`src=\"${modulePath}\"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type=\"module\")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/modules/analytics/presentation/statistics-page.js'));
+  assert.ok(html.indexOf('src/modules/analytics/presentation/analytics-workspace.js') < html.indexOf('src="app.js"'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 

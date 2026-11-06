@@ -21,7 +21,7 @@ function balance({initial = 1000, trades = [], cashflow = {deposits: 0, withdraw
     fR: value => String(value),
     f2: value => String(value),
   });
-  for (const name of ['calculate-risk-limits.js', 'calculate-goal-cycle.js', 'calculate-balance-drawdown.js', 'calculate-risk-period-pnl.js']) {
+  for (const name of ['account-risk-calculations.js']) {
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
@@ -60,7 +60,7 @@ test('numeric text P/L keeps JavaScript addition and later coercion unchanged', 
 });
 
 test('balance drawdown domain is pure and loads once before classic consumers', () => {
-  const modulePath = 'src/modules/accounts/domain/calculate-balance-drawdown.js';
+  const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'fetch', 'accounts', 'trades']) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`balance drawdown accessed ${name}`); }});
@@ -81,8 +81,8 @@ test('balance drawdown domain is pure and loads once before classic consumers', 
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const domainIndex = scripts.findIndex(script => script.src === modulePath);
   for (const consumer of [
-    'src/modules/accounts/presentation/risk-board.js',
-    'src/modules/analytics/presentation/dashboard-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'app.js',
   ]) assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
   assert.doesNotMatch(appSource, /^function calcAccountRiskState\(acct, acctTrades, period\)\{/m);

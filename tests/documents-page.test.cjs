@@ -9,7 +9,8 @@ const modulePath = 'src/modules/documents/presentation/documents-page.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderDocumentsPage\([^]*?^\}/m)?.[0];
 assert.ok(fs.existsSync(path.join(root, modulePath)), 'extracted documents renderer must exist');
 assert.ok(!legacy, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["renderDocumentsPage"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function harness({folder = 'generalNotes', selected = null, entries = [], folders, trade = null, missing = []} = {}) {
   const ids = ['docFolders', 'docCreateBtn', 'docDeleteBtn', 'docListTitle', 'docListCount', 'docEntries',
@@ -108,6 +109,6 @@ test('extracted documents renderer stays a synchronous classic script before app
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === modulePath).length, 1);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.equal(scripts[index + 1].src, 'src/modules/accounts/presentation/account-form.js');
+  assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
   assert.doesNotMatch(scripts[index].attributes, /\b(?:async|defer|type="module")\b/i);
 });

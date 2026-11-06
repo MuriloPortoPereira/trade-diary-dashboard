@@ -24,10 +24,7 @@ function setup() {
     f2: value => Number(value).toFixed(2),
   });
   for (const name of [
-    'calculate-risk-limits.js',
-    'calculate-goal-cycle.js',
-    'calculate-balance-drawdown.js',
-    'calculate-risk-period-pnl.js',
+    'account-risk-calculations.js',
   ]) {
     const filename = path.join(root, 'src/modules/accounts/domain', name);
     vm.runInContext(fs.readFileSync(filename, 'utf8'), context, {filename: name});
@@ -130,10 +127,10 @@ test('risk workflows load once as classic globals after domains and before consu
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const workflowIndex = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(scripts.findIndex(script => script.src === 'src/modules/accounts/domain/calculate-risk-period-pnl.js') < workflowIndex);
+  assert.ok(scripts.findIndex(script => script.src === 'src/modules/accounts/domain/account-risk-calculations.js') < workflowIndex);
   for (const consumer of [
-    'src/modules/accounts/presentation/risk-board.js',
-    'src/modules/analytics/presentation/statistics-page.js',
+    'src/modules/accounts/presentation/accounts-workspace.js',
+    'src/modules/analytics/presentation/analytics-workspace.js',
     'app.js',
   ]) assert.ok(workflowIndex < scripts.findIndex(script => script.src === consumer));
 });

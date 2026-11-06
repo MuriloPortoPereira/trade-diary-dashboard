@@ -5,12 +5,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/app/presentation/navigation.js';
+const modulePath = 'src/app/presentation/app-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const names = ['refreshAll', 'toggleSidebar', 'showPage'];
 const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]);
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
-const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = legacy ?? ["refreshAll", "toggleSidebar", "showPage"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 const pageIds = ['dashboard', 'log', 'calendar', 'stats', 'psych', 'setup', 'premarket', 'strategyHub', 'studyHub', 'documents', 'notifications', 'accounts', 'partners', 'profile'];
 
 function classList(initial = []) {
@@ -131,7 +132,7 @@ test('unknown page clears active state and only closes the sidebar', () => {
   assert.deepEqual(calls, []);
 });
 
-test('navigation loads once as the final classic module before app.js', () => {
+test('navigation declarations load once in the synchronous workspace before app.js', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -143,6 +144,6 @@ test('navigation loads once as the final classic module before app.js', () => {
   const profileIndex = scripts.findIndex(script => script.src === 'src/modules/profile/presentation/profile-page.js');
   const navigationIndex = scripts.findIndex(script => script.src === modulePath);
   const appIndex = scripts.findIndex(script => script.src === 'app.js');
-  assert.ok(profileIndex < navigationIndex && navigationIndex < appIndex);
-  assert.equal(scripts[navigationIndex + 1].src, 'app.js');
+  assert.ok(navigationIndex < profileIndex && profileIndex < appIndex);
+  assert.ok(moduleSource.indexOf('function refreshAll(') < moduleSource.indexOf('function showPage('));
 });

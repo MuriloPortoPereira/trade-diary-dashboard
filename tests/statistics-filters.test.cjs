@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/analytics/presentation/statistics-page.js';
+const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyPeriod = appSource.match(/^function toggleCustomPeriod\([^]*?^\}/m)?.[0];
 const legacyAccount = appSource.match(/^function onStatsAccountChange\([^]*?^\}/m)?.[0];

@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/data-transfer/presentation/import-workflow.js';
+const modulePath = 'src/modules/data-transfer/presentation/data-transfer-page.js';
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const moduleFile = path.join(root, modulePath);
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : app;
@@ -280,6 +280,6 @@ test('import handlers remain classic globals and initialize without reading stat
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/application/restore-backup.js'));
+  assert.ok(index > scripts.findIndex(script => script.src === 'src/modules/data-transfer/application/transfer-workflows.js'));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });

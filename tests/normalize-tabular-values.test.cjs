@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/data-transfer/infrastructure/normalize-tabular-values.js';
+const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const moduleFile = path.join(root, modulePath);
 const names = ['parseMTNumber', 'normalizeDate', 'cleanMTCell', 'normalizeImportHeader'];
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : names.map(name => {
@@ -127,6 +127,6 @@ test('normalization APIs initialize and run without application state or IO as o
   assert.equal(matches.length, 1);
   assert.doesNotMatch(matches[0].attributes, /\b(?:type|async|defer|nomodule)\b/i);
   const index = scripts.findIndex(script => script.src === modulePath);
-  assert.ok(index < scripts.findIndex(script => script.src === 'src/modules/data-transfer/infrastructure/parse-tabular-trades.js'));
+  assert.ok(source.indexOf('function normalizeImportHeader(') < source.indexOf('function parseMT5Rows('));
   assert.ok(index < scripts.findIndex(script => script.src === 'app.js'));
 });

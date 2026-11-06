@@ -8,7 +8,7 @@ const functionNames = [
   'roundSimulationMoney',
   'calculateSimulationSizing',
 ];
-const domainPath = 'src/modules/simulation/domain/calculate-simulation-sizing.js';
+const domainPath = 'src/modules/simulation/domain/simulation-calculations.js';
 const domainSource = fs.readFileSync(`${__dirname}/../${domainPath}`, 'utf8');
 const forbiddenGlobals = [
   'window', 'document', 'localStorage', 'sessionStorage', 'fetch',
@@ -45,7 +45,7 @@ nodeTest('domain exposes one namespace without leaking helpers or accessing DOM/
   const context = loadDomainContext();
   assert.deepEqual(
     Object.getOwnPropertyNames(context).filter((name) => !forbiddenGlobals.includes(name)),
-    ['TradeDiarySimulationSizing'],
+    ['TradeDiarySimulationSizing', 'TradeDiarySimulationProjection'],
   );
   assert.deepEqual(Object.keys(context.TradeDiarySimulationSizing).sort(), [...functionNames].sort());
   for (const name of functionNames) assert.equal(context[name], undefined);

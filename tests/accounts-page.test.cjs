@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const accountsPath = 'src/modules/accounts/presentation/accounts-page.js';
+const accountsPath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacyDeclaration = appSource.match(/^function renderAccountsPage\([^]*?^\}/m)?.[0];
 const extracted = fs.existsSync(path.join(root, accountsPath));
@@ -98,6 +98,6 @@ test('extracted accounts renderer stays a synchronous classic script before app.
     .filter(script => script.src && !script.src.startsWith('https://'));
   assert.equal(scripts.filter(script => script.src === accountsPath).length, 1);
   const accountIndex = scripts.findIndex(script => script.src === accountsPath);
-  assert.equal(scripts[accountIndex + 1].src, 'src/modules/partners/presentation/partners-page.js');
+  assert.equal(scripts[accountIndex + 1].src, 'src/modules/analytics/presentation/analytics-workspace.js');
   assert.doesNotMatch(scripts[accountIndex].attributes, /\b(?:async|defer|type="module")\b/i);
 });

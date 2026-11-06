@@ -1060,6 +1060,13 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - CSS: 40 → 26 arquivos em seis grupos coesos/contíguos (shell, layout, painéis, controles, documentos e responsividade); mesmos bytes/cascata, maior grupo com 699 linhas.
 - Resultado: 29 arquivos de produção a menos, sem fundir camadas ou alterar comportamento. Próximos resíduos de `app.js` devem aproveitar os módulos consolidados; novos arquivos exigem responsabilidade própria.
 
+## Segunda consolidação por feature e camada
+
+- 80 → 48 scripts: contas/analytics por workspace; cálculos por domínio; transferência por UI, aplicação, formatos e IO; shell/widgets/calendário/psicologia/documentos completos; um catálogo por idioma.
+- Corpos e namespaces preservados. UI apenas declara funções; antecipação da definição não antecipa chamadas. IIFEs com dependência imediata mantêm ordem, incluindo Projection → Sizing.
+- Catálogos mantêm 585 chaves por idioma, ordem e valores. Fixtures de carga foram atualizadas; assertions comportamentais preservadas.
+- Contratos de prontidão antes de app substituem adjacências que deixaram de representar a composição real; fixture completa e smoke permanecem.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

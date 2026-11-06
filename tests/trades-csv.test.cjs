@@ -4,8 +4,8 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 
 const appSource = fs.readFileSync(`${__dirname}/../app.js`, 'utf8');
-const exportActionsSource = fs.readFileSync(`${__dirname}/../src/modules/data-transfer/presentation/export-downloads.js`, 'utf8');
-const serializerPath = 'src/modules/data-transfer/infrastructure/serialize-trades-csv.js';
+const exportActionsSource = fs.readFileSync(`${__dirname}/../src/modules/data-transfer/presentation/data-transfer-page.js`, 'utf8');
+const serializerPath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const serializerSource = fs.readFileSync(`${__dirname}/../${serializerPath}`, 'utf8');
 const forbiddenGlobals = [
   'window', 'document', 'localStorage', 'sessionStorage', 'fetch', 'XMLHttpRequest',
@@ -115,9 +115,13 @@ function characterize(label, api) {
 characterize('isolated CSV serializer', loadSerializerContext().TradeDiaryTradesCSV);
 characterize('legacy CSV wrappers', loadLegacyContext());
 
-nodeTest('serializer exposes one namespace without helper leaks or DOM/IO/global-state access', () => {
+nodeTest('format endpoint exposes existing globals and CSV namespace without helper leaks or initial IO', () => {
   const context = loadSerializerContext();
-  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbiddenGlobals.includes(name)), ['TradeDiaryTradesCSV']);
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbiddenGlobals.includes(name)).sort(), [
+    'TradeDiaryBackupFormat', 'TradeDiaryDelimitedRows', 'TradeDiaryTradesCSV',
+    'cleanMTCell', 'normalizeDate', 'normalizeImportHeader', 'parseGenericTradeRows',
+    'parseMT4Raw', 'parseMT5Rows', 'parseMTNumber', 'parseSpreadsheetRows',
+  ].sort());
   assert.deepEqual(Object.keys(context.TradeDiaryTradesCSV).sort(), ['TRADE_CSV_HEADERS', 'buildTradesCSV', 'csvCell']);
   assert.equal(context.TradeDiaryTradesCSV.buildTradesCSV(), header + '\n');
 });
@@ -135,7 +139,7 @@ nodeTest('HTML loads serializer once between sizing and app.js as synchronous cl
     src: match[1].match(/\bsrc\s*=\s*['"]([^'"]+)['"]/i)?.[1],
   }));
   const localScripts = scripts.filter(script => script.src && !script.src.startsWith('https://'));
-  const csvOrder = ['src/modules/simulation/domain/calculate-simulation-sizing.js', serializerPath, 'app.js'];
+  const csvOrder = ['src/modules/simulation/domain/simulation-calculations.js', serializerPath, 'app.js'];
   assert.deepEqual(localScripts.map(script => script.src).filter(src => csvOrder.includes(src)), csvOrder);
   for (const script of localScripts) {
     assert.doesNotMatch(script.attributes, /\b(?:async|defer|nomodule)\b/i);

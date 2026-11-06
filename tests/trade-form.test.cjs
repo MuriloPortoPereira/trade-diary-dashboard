@@ -160,7 +160,7 @@ test('calcRR preserves percentage and absolute calculations and directional fall
   assert.equal(absolute.elements.get('t-pnl-abs').value, '120.00');
 });
 
-test('trade form remains one synchronous classic script before its consumers and app.js', () => {
+test('trade form registers once as a synchronous classic script before app initialization', () => {
   if (legacySources.every(Boolean)) return;
   assert.equal(legacySources.filter(Boolean).length, 0);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -168,6 +168,6 @@ test('trade form remains one synchronous classic script before its consumers and
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(html.indexOf(modulePath) < html.indexOf('src/app/presentation/modal-controller.js'));
+  assert.ok(html.indexOf('src/app/presentation/app-workspace.js') < html.indexOf('src="app.js"'));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

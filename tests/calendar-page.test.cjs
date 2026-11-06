@@ -7,7 +7,8 @@ const root = path.resolve(__dirname, '..');
 const modulePath = 'src/modules/calendar/presentation/calendar-page.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderCalendar\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = ["renderCalendar"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 function harness(mode = 'month', rows = []) {
   const nodes = Object.fromEntries(['calStats', 'calTitle', 'calGridWrap'].map(id => [id, {innerHTML: '', textContent: ''}]));
