@@ -166,6 +166,8 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
+- G7d: 11 funções de rotina reunidas à página existente (183 linhas), sem novo script. Denominadores distintos, correlação por sessão, timestamps e ordem dos efeitos preservados. `app.js`: 1.932 → 1.809 linhas.
+- G7d validado: 565 testes Node e 113 checks no navegador no snapshot do índice; sintaxe/diff e revisão independente sem bloqueios.
 - G7c: 22 funções documentais reunidas nos dois módulos de apresentação existentes, com caracterização pré-corte das três origens de notas, CRUD e callbacks assíncronos. Corpos preservados byte a byte; nenhum script novo.
 - Projeções/normalização documentais continuam acopladas ao estado legado; não são domínio puro. A persistência e as APIs globais permanecem compatíveis.
 - G7c validado em snapshot do índice: 559 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios; `app.js`: 2.269 → 1.932 linhas.

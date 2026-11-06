@@ -1008,6 +1008,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização pré-corte: consultas, seleção, CRUD e mídia nas três origens, preservando trade/rotina ao excluir e a captura do documento original por callbacks.
 - `normalizeDocImages` também atende trades/importação; dependência transitória documentada, sem alegação de domínio puro. `triggerFileInput` genérico permanece na composição.
 
+## G7d: rotina e hábitos
+
+- Onze funções/123 linhas reunidas ao renderer existente em `premarket-page.js` (183 linhas), sem novo arquivo de produção.
+- Seis caracterizações pré-corte: navegação/ano, trim/splice/move, toggle e timestamps/efeitos, disciplina e correlação por sessão. Denominadores distintos e filtros legados mantidos.
+- `app.js`: 1.932 → 1.809 linhas; estado/storage e regras de produto preservados.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

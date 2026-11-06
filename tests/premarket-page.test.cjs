@@ -26,6 +26,9 @@ function harness({month = '2026-02', trades = [], habits = ['Plano', 'Revisão']
   });
   vm.runInContext(`let pmCurrentMonth=${JSON.stringify(month)};`, context);
   vm.runInContext(source, context, {filename: modulePath});
+  // Keep renderer isolation after the page registers its real controls.
+  context._updatePMStats = () => calls.push('stats');
+  context._renderPMHabitManager = () => calls.push('manager');
   return {context, nodes, calls};
 }
 
