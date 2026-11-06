@@ -1,3 +1,51 @@
+function selectAccount(id){
+  activeAccountId=id;
+  statsAccountPinned=false;
+  _incompleteBannerDismissed=false;
+  save();
+  updateTopbarStats();
+  closeModal('accountModal');
+  renderTopbarAccount();
+  refreshAll();
+}
+
+function saveAccount(){
+  const g=id=>document.getElementById(id)?.value||'';
+  const name=g('af-name').trim();
+  if(!name){showAppNotice('Campo obrigatório','Nome da conta é obrigatório.');return;}
+  const acct={
+    id:editingAccountId||('a'+Date.now()),
+    name,type:normalizeAccountType(g('af-type')),color:g('af-color')||'#22d5ed',
+    balance:parseFloat(g('af-balance'))||1000,
+    risk:parseFloat(g('af-risk'))||1,
+    mult:parseFloat(g('af-mult'))||1,
+    ddDaily:parseFloat(g('af-dd-daily'))||2,
+    ddWeekly:parseFloat(g('af-dd-weekly'))||5,
+    ddMonthly:parseFloat(g('af-dd-monthly'))||8,
+    ddTotal:parseFloat(g('af-dd-total'))||10,
+    goalPct:parseFloat(g('af-goal'))||10,
+    goalWeek:parseFloat(g('af-goal-week'))||0,
+    goalMonth:parseFloat(g('af-goal-month'))||0,
+    goalTotal:parseFloat(g('af-goal-total'))||0,
+    cashflows:accountFormCashflows.map(flow=>({...flow})),
+  };
+  const normalized=normalizeAccount(acct);
+  if(editingAccountId){const i=accounts.findIndex(a=>a.id===editingAccountId);if(i>=0)accounts[i]=normalized;} else{accounts.push(normalized);}
+  save();renderAccountList();document.getElementById('accountForm').style.display='none';
+  updateTopbarStats();renderTopbarAccount();
+  renderAccountsPage();
+  showAppNotice('Conta salva','✓ Conta salva!');
+}
+
+function deleteAccount(id){
+  if(accounts.length<=1){showAppNotice('Ação bloqueada','Mantenha pelo menos uma conta.');return;}
+  showAppConfirm('Excluir conta','Excluir esta conta?\n\nOs trades associados a ela serão mantidos.',()=>{
+    accounts=accounts.filter(a=>a.id!==id);
+    if(activeAccountId===id)activeAccountId=accounts[0].id;
+    save();renderAccountList();renderTopbarAccount();renderAccountsPage();
+  },{danger:true,confirmText:'Excluir'});
+}
+
 function newAccount(){
   editingAccountId=null;
   accountFormCashflows=[];

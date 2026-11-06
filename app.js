@@ -993,58 +993,13 @@ function acctTypeLabel(t){
   return{cfd_pct:'CFD %',futures_usd:'CFD %',prop_pct:'Prop Firm %',crypto:'Crypto'}[t]||t;
 }
 
-function selectAccount(id){
-  activeAccountId=id;
-  statsAccountPinned=false;
-  _incompleteBannerDismissed=false;
-  save();
-  updateTopbarStats();
-  closeModal('accountModal');
-  renderTopbarAccount();
-  refreshAll();
-}
 
 
 
 
 
 
-function saveAccount(){
-  const g=id=>document.getElementById(id)?.value||'';
-  const name=g('af-name').trim();
-  if(!name){showAppNotice('Campo obrigatório','Nome da conta é obrigatório.');return;}
-  const acct={
-    id:editingAccountId||('a'+Date.now()),
-    name,type:normalizeAccountType(g('af-type')),color:g('af-color')||'#22d5ed',
-    balance:parseFloat(g('af-balance'))||1000,
-    risk:parseFloat(g('af-risk'))||1,
-    mult:parseFloat(g('af-mult'))||1,
-    ddDaily:parseFloat(g('af-dd-daily'))||2,
-    ddWeekly:parseFloat(g('af-dd-weekly'))||5,
-    ddMonthly:parseFloat(g('af-dd-monthly'))||8,
-    ddTotal:parseFloat(g('af-dd-total'))||10,
-    goalPct:parseFloat(g('af-goal'))||10,
-    goalWeek:parseFloat(g('af-goal-week'))||0,
-    goalMonth:parseFloat(g('af-goal-month'))||0,
-    goalTotal:parseFloat(g('af-goal-total'))||0,
-    cashflows:accountFormCashflows.map(flow=>({...flow})),
-  };
-  const normalized=normalizeAccount(acct);
-  if(editingAccountId){const i=accounts.findIndex(a=>a.id===editingAccountId);if(i>=0)accounts[i]=normalized;} else{accounts.push(normalized);}
-  save();renderAccountList();document.getElementById('accountForm').style.display='none';
-  updateTopbarStats();renderTopbarAccount();
-  renderAccountsPage();
-  showAppNotice('Conta salva','✓ Conta salva!');
-}
 
-function deleteAccount(id){
-  if(accounts.length<=1){showAppNotice('Ação bloqueada','Mantenha pelo menos uma conta.');return;}
-  showAppConfirm('Excluir conta','Excluir esta conta?\n\nOs trades associados a ela serão mantidos.',()=>{
-    accounts=accounts.filter(a=>a.id!==id);
-    if(activeAccountId===id)activeAccountId=accounts[0].id;
-    save();renderAccountList();renderTopbarAccount();renderAccountsPage();
-  },{danger:true,confirmText:'Excluir'});
-}
 
 
 
@@ -1223,130 +1178,15 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();openModal('tradeModal');}
   if(e.key==='Delete'&&selectedTrades.size>0){bulkDelete();}
 });
-function setupRiskNumber(value,fallback){
-  const n=parseFloat(value);
-  return Number.isFinite(n)&&n>=0?n:fallback;
-}
 
-function readSetupRiskFormValues(){
-  const g=id=>document.getElementById(id)?.value||'';
-  return {
-    balance:g('cfg-balance'),
-    goalPct:g('cfg-goal'),
-    risk:g('cfg-risk'),
-    ddDaily:g('cfg-dd-daily'),
-    ddWeekly:g('cfg-dd-weekly'),
-    ddMonthly:g('cfg-dd-monthly'),
-    ddTotal:g('cfg-dd'),
-  };
-}
 
-function applySetupRiskToActiveAccount(values={}){
-  const acct=getActiveAccount();
-  const balance=setupRiskNumber(values.balance,acct?.balance??config.balance??1000);
-  const risk=setupRiskNumber(values.risk,acct?.risk??config.risk??1);
-  const ddDaily=setupRiskNumber(values.ddDaily,acct?.ddDaily??config.ddDaily??2);
-  const ddWeekly=setupRiskNumber(values.ddWeekly,acct?.ddWeekly??config.ddWeekly??5);
-  const ddMonthly=setupRiskNumber(values.ddMonthly,acct?.ddMonthly??config.ddMonthly??8);
-  const ddTotal=setupRiskNumber(values.ddTotal,acct?.ddTotal??config.dd??10);
-  const goalPct=setupRiskNumber(values.goalPct??values.goal,acct?.goalPct??config.goal??10);
-  config.balance=balance;
-  config.risk=risk;
-  config.ddDaily=ddDaily;
-  config.ddWeekly=ddWeekly;
-  config.ddMonthly=ddMonthly;
-  config.dd=ddTotal;
-  config.goal=goalPct;
-  if(acct){
-    acct.balance=balance;
-    acct.risk=risk;
-    acct.ddDaily=ddDaily;
-    acct.ddWeekly=ddWeekly;
-    acct.ddMonthly=ddMonthly;
-    acct.ddTotal=ddTotal;
-    acct.goalPct=goalPct;
-    return acct;
-  }
-  return {balance,risk,ddDaily,ddWeekly,ddMonthly,ddTotal,goalPct};
-}
 
-function previewSetupRiskFromForm(){
-  const acct=applySetupRiskToActiveAccount(readSetupRiskFormValues());
-  if(acct){
-    renderSetupRiskSummary();
-    syncAccountBalanceChrome(acct,getAccountTrades(acct.id));
-    updateTopbarStats({fit:false});
-  }
-}
 
-function addSetupCashflowToActiveAccount(flow){
-  const acct=getActiveAccount();
-  if(!acct)return null;
-  const entry=addAccountCashflow(acct.id,flow);
-  if(entry){renderSetupRiskSummary();renderSetupCashflowList();syncAccountBalanceChrome(acct,getAccountTrades(acct.id));updateTopbarStats();}
-  return entry;
-}
 
-function addSetupCashflowFromForm(){
-  const flow={
-    type:document.getElementById('setup-flow-type')?.value||'deposit',
-    date:document.getElementById('setup-flow-date')?.value||new Date().toISOString().split('T')[0],
-    amount:document.getElementById('setup-flow-amount')?.value||0,
-    note:document.getElementById('setup-flow-note')?.value||'',
-  };
-  const preview=sanitizeAccountCashflow(flow);
-  if(!preview){showAppNotice('Movimento inválido','Informe um valor maior que zero.');return;}
-  const label=preview.type==='withdrawal'?'Retirada':'Aporte';
-  showAppConfirm(`Adicionar ${label}`,`Confirmar ${label.toLowerCase()} de ${fR(preview.amount)} na conta ativa?\n\nData: ${fDate(preview.date)}${preview.note?`\nObservação: ${preview.note}`:''}`,()=>{
-    const entry=addSetupCashflowToActiveAccount(preview);
-    if(!entry){showAppNotice('Movimento inválido','Informe um valor maior que zero.');return;}
-    const amount=document.getElementById('setup-flow-amount');if(amount)amount.value='';
-    const note=document.getElementById('setup-flow-note');if(note)note.value='';
-    refreshAll();
-  },{confirmText:'Confirmar'});
-}
 
-function deleteSetupCashflow(flowId){
-  const acct=getActiveAccount();
-  if(!acct)return;
-  const flow=getAccountCashflows(acct).find(item=>item.id===flowId);
-  if(!flow)return;
-  const label=flow.type==='withdrawal'?'retirada':'aporte';
-  showAppConfirm('Excluir movimento',`Excluir ${label} de ${fR(flow.amount)}?\n\nEsta ação atualiza o saldo da conta.`,()=>{
-    if(deleteAccountCashflow(acct.id,flowId))refreshAll();
-  },{danger:true,confirmText:'Excluir'});
-}
 
-function addTag(type){
-  const inp=document.getElementById('new'+type.charAt(0).toUpperCase()+type.slice(1));
-  const val=inp?.value?.trim();if(!val)return;
-  if(type==='strategy')config=ensureDefaultStrategies(config);
-  const key=tagConfigKey(type);
-  if(!Array.isArray(config[key]))config[key]=[];
-  const exists=config[key].some(item=>type==='strategy'
-    ? normalizeStrategyName(item)===normalizeStrategyName(val)
-    : item===val);
-  if(exists){showAppNotice('Item duplicado','Já existe: '+val);return;}
-  config[key].push(val);
-  inp.value='';save();renderTags(type);
-}
 
-function removeTag(type,idx){
-  const key=tagConfigKey(type);
-  const name=config[key][idx];
-  showAppConfirm('Remover item',`Remover "${name}"?`,()=>{
-    config[key].splice(idx,1);save();renderTags(type);
-  },{danger:true,confirmText:'Remover'});
-}
 
-function saveConfig(){
-  const g=id=>document.getElementById(id)?.value||'';
-  applySetupRiskToActiveAccount(readSetupRiskFormValues());
-  config.tf=g('cfg-tf')||'5M';
-  config.mult=parseFloat(g('cfg-mult'))||config.mult||0.2;
-  config.symDefault=g('cfg-sym-default')||'';
-  save();refreshAll();showAppNotice('Configurações salvas','✓ Configurações salvas!');
-}
 
 function clearAll(){
   showAppPrompt('Limpar todos os dados',

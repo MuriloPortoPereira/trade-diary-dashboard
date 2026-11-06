@@ -1,3 +1,25 @@
+function addTag(type){
+  const inp=document.getElementById('new'+type.charAt(0).toUpperCase()+type.slice(1));
+  const val=inp?.value?.trim();if(!val)return;
+  if(type==='strategy')config=ensureDefaultStrategies(config);
+  const key=tagConfigKey(type);
+  if(!Array.isArray(config[key]))config[key]=[];
+  const exists=config[key].some(item=>type==='strategy'
+    ? normalizeStrategyName(item)===normalizeStrategyName(val)
+    : item===val);
+  if(exists){showAppNotice('Item duplicado','Já existe: '+val);return;}
+  config[key].push(val);
+  inp.value='';save();renderTags(type);
+}
+
+function removeTag(type,idx){
+  const key=tagConfigKey(type);
+  const name=config[key][idx];
+  showAppConfirm('Remover item',`Remover "${name}"?`,()=>{
+    config[key].splice(idx,1);save();renderTags(type);
+  },{danger:true,confirmText:'Remover'});
+}
+
 function renderTags(type){
   const el=document.getElementById(type+'Tags');if(!el)return;
   if(type==='strategy')config=ensureDefaultStrategies(config);

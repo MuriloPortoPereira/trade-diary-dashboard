@@ -19,7 +19,7 @@ HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` p
 | Inicialização/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js`: `showPage`, `refreshAll`, `toggleSidebar`; `index.html` |
 | Operação/diário | `src/modules/trades/application/trade-workflows.js`; `renderLog` e `tradeRow` em `src/modules/trades/presentation/trade-log.js` |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js`: seis APIs globais para gerar e carregar amostras e importação Tickmill |
-| Conta/saldo/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount` |
+| Conta/saldo/risco | `accounts/application/account-risk-workflows.js`: workflows; `presentation/account-form.js`: seleção/salvar/excluir; `risk-setup-page.js` e `risk-tags.js`: setup/controles; `normalizeAccount` permanece em `app.js` |
 | Dashboard/estratégia | `src/modules/analytics/application/strategy-analysis.js`: snapshots, equity, resultados e comparação; `calcMetrics` em `app.js`; apresentação em `dashboard-page.js`/`strategy-hub-page.js` |
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: página, navegação mensal, hábitos, disciplina e correlação; `preMarketData` permanece na composição |

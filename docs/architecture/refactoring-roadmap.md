@@ -1032,6 +1032,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização de normalização/identidade, guards, confirmação, fallback/erros de clipboard e FileReader; corpos preservados byte a byte.
 - `app.js`: 1.470 → 1.375 linhas; controller de apresentação com 142 linhas, estado global ainda transitório.
 
+## G7h: controles de contas, setup e tags
+
+- Treze funções para `account-form.js`, `risk-setup-page.js` e `risk-tags.js`, sem novo script ou antecipação de efeitos.
+- Dez caracterizações pré-corte cobrem validação/defaults, edição/exclusão sem apagar trades, risco/zero, projeções, cashflow e confirmações, tags e salvar configuração.
+- Corpos idênticos; exclusão de cashflow captura conta original, adição consulta a conta ativa na confirmação conforme legado. `app.js`: 1.375 → 1.215 linhas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
