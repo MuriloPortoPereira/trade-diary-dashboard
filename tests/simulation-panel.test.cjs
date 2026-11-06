@@ -70,7 +70,9 @@ function setup({accountValue = 'manual', optionCount = 2, rrrValue = '1', sizing
     mkChart: (id, config) => calls.push(['chart', id, config]),
     CHART_OPTS: {plugins: {}},
   });
+  const adapters = Object.fromEntries(['getSimulationAccountSnapshot','setSimulationInputValue','clampSimulationWinRatePct','setSimulationRrrInput','syncSimulationMoneyFromPercent','buildSimulationPlan'].map(name => [name, context[name]]));
   vm.runInContext(source, context, {filename: modulePath});
+  Object.assign(context, adapters);
   return {context, elements, calls};
 }
 

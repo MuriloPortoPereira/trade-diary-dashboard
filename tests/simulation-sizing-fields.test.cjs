@@ -5,11 +5,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const modulePath = 'src/modules/simulation/presentation/simulation-sizing-fields.js';
+const modulePath = 'src/modules/simulation/presentation/simulation-panel.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function syncSimulationMoneyFromPercent\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8').match(/^function syncSimulationMoneyFromPercent\([^]*?^\}/m)[0];
 
 function render({activeAccountId = 'active-1', values = {}, snapshot, sizing} = {}) {
   const calls = [];

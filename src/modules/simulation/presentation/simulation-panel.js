@@ -1,3 +1,132 @@
+function clampSimulationWinRatePct(value){
+  return TradeDiarySimulationProjection.clampWinRatePct(value);
+}
+
+function clampSimulationWinRateInput(){
+  const el=document.getElementById('simWR');
+  if(!el)return;
+  const raw=String(el.value||'').trim();
+  if(!raw)return;
+  const n=parseFloat(raw);
+  if(!Number.isFinite(n)){el.value='55';return;}
+  el.value=String(clamp(n,1,99));
+}
+
+function getSimulationEntryDefaults(input={}){
+  const opts=typeof input==='number'?{balance:input}:(input||{});
+  const balance=opts.balance??config.balance??1000;
+  return {
+    accountId:opts.accountId||'manual',
+    accountName:opts.accountName||'Manual',
+    winRatePct:clampSimulationWinRatePct(opts.winRatePct??55),
+    rrr:SIMULATION_ENTRY_DEFAULTS.rrr,
+    ...calculateSimulationSizing({
+      balance,
+      riskPct:SIMULATION_ENTRY_DEFAULTS.riskPct,
+      goalPct:SIMULATION_ENTRY_DEFAULTS.goalPct,
+      stopPct:SIMULATION_ENTRY_DEFAULTS.stopPct,
+    }),
+  };
+}
+
+function buildSimulationPlan({trades=20,winRatePct=55,rrr=1,riskUsd=0,goalPct=0,goalUsd=0,stopPct=0,stopUsd=0}={}){
+  const {cleanTrades,risk,goal,stop,expectancy,winsToGoal,lossesToStop,expectedTradesToGoal}=TradeDiarySimulationProjection.calculateSimulationPlan({trades,winRatePct,rrr,riskUsd,goalUsd,stopUsd});
+  let tone='safe';
+  let title='Plano favorece execução';
+  if(risk<=0||goal<=0||stop<=0){
+    tone='warn';
+    title='Preencha risco, meta e stop';
+  }else if(expectancy<=0){
+    tone='danger';
+    title='Matemática desfavorável';
+  }else if(expectedTradesToGoal>cleanTrades||lossesToStop<2){
+    tone='warn';
+    title='Plano exige cautela';
+  }
+  const expectedText=expectedTradesToGoal
+    ? `${expectedTradesToGoal} trades esperados até a meta`
+    : 'expectância negativa para meta';
+  return {
+    tone,
+    title,
+    winsToGoal,
+    lossesToStop,
+    expectedTradesToGoal,
+    expectancyUsd:roundSimulationMoney(expectancy),
+    summary:`${winsToGoal} wins até meta (${goalPct}% / ${fR(goal)}). Stop comporta ${lossesToStop} perdas cheias (${stopPct}% / ${fR(stop)}). ${expectedText}.`,
+  };
+}
+
+function getSimulationAccountSnapshot(accountId=activeAccountId){
+  const acct=(accountId&&accountId!=='manual')
+    ? accounts.find(a=>a.id===accountId)
+    : (accountId==='manual'?null:getActiveAccount());
+  if(!acct){
+    return getSimulationEntryDefaults({
+      accountId:'manual',
+      accountName:'Manual',
+      winRatePct:55,
+      balance:config.balance||1000,
+    });
+  }
+  const acctTrades=getAccountTrades(acct.id);
+  const riskState=calcAccountRiskState(acct,acctTrades);
+  const metrics=calcMetrics(acctTrades,acct.id);
+  return getSimulationEntryDefaults({
+    accountId:acct.id,
+    accountName:acct.name||'Conta',
+    winRatePct:metrics.closed.length?clampSimulationWinRatePct(roundSimulationMoney(metrics.wr*100)):55,
+    balance:riskState.currentBalance,
+  });
+}
+
+function setSimulationInputValue(id,value,decimals=2){
+  const el=document.getElementById(id);
+  if(!el||!Number.isFinite(Number(value)))return;
+  el.value=Number(value).toFixed(decimals);
+}
+
+function ensureSimulationSelectOption(select,value,label){
+  if(!select)return;
+  const target=String(value);
+  const options=Array.from(select.options||[]);
+  if(options.some(option=>String(option.value)===target))return;
+  const option=document.createElement('option');
+  option.value=target;
+  option.textContent=label||`${target}R`;
+  const customOption=options.find(option=>String(option.value)==='custom');
+  if(customOption&&typeof select.insertBefore==='function')select.insertBefore(option,customOption);
+  else if(typeof select.appendChild==='function')select.appendChild(option);
+}
+
+function setSimulationRrrInput(value=SIMULATION_ENTRY_DEFAULTS.rrr){
+  const rrrSel=document.getElementById('simRRR');
+  const rrrCustom=document.getElementById('simRRRCustom');
+  if(!rrrSel)return;
+  const raw=String(value);
+  ensureSimulationSelectOption(rrrSel,raw,`${raw}R`);
+  rrrSel.value=raw;
+  if(rrrCustom){
+    rrrCustom.value=raw;
+    rrrCustom.style.display=rrrSel.value==='custom'?'block':'none';
+  }
+}
+
+function syncSimulationMoneyFromPercent(){
+  const selected=document.getElementById('simAccount')?.value;
+  const fallback=getSimulationAccountSnapshot(selected||activeAccountId);
+  const sizing=calculateSimulationSizing({
+    balance:toSimulationNumber(document.getElementById('simBalance')?.value,fallback.balance),
+    riskPct:toSimulationNumber(document.getElementById('simRiskPct')?.value,fallback.riskPct),
+    goalPct:toSimulationNumber(document.getElementById('simGoalPct')?.value,fallback.goalPct),
+    stopPct:toSimulationNumber(document.getElementById('simStopPct')?.value,fallback.stopPct),
+  });
+  setSimulationInputValue('simRisk',sizing.riskUsd,2);
+  setSimulationInputValue('simGoalDay',sizing.goalUsd,2);
+  setSimulationInputValue('simStopDay',sizing.stopUsd,2);
+  return sizing;
+}
+
 function applySimulationAccountSnapshot(accountId){
   const snapshot=getSimulationAccountSnapshot(accountId);
   const balanceEl=document.getElementById('simBalance');

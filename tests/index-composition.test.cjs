@@ -8,10 +8,10 @@ const root = path.resolve(__dirname, '..');
 const index = fs.readFileSync(path.join(root, 'index.html'));
 
 test('published shell preserves every byte and its existing mixed line endings', () => {
-  // Baseline 953d990: protects scripts, styles, handlers, IDs and initial inline state together.
-  assert.equal(index.length, 107193);
+  // G7e: projection provider replaces the incorporated sizing-field script.
+  assert.equal(index.length, 107194);
   assert.equal(createHash('sha256').update(index).digest('hex'),
-    '84f31d4bf4603b41c3d588bac0be4770be5da56324341920cc2ad93f11705dac');
+    '68a312e0489e489d879888642dfb6a15899a40f8961eb3526abd3e5b78653c3e');
   assert.equal((index.toString().match(/\r\n/g) || []).length, 1420);
   assert.equal((index.toString().match(/\n/g) || []).length, 1568);
 });

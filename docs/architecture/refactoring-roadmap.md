@@ -1014,6 +1014,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Seis caracterizações pré-corte: navegação/ano, trim/splice/move, toggle e timestamps/efeitos, disciplina e correlação por sessão. Denominadores distintos e filtros legados mantidos.
 - `app.js`: 1.932 → 1.809 linhas; estado/storage e regras de produto preservados.
 
+## G7e: domínio de projeção e painel de simulação
+
+- `calculate-simulation-projection.js` recebe dados/RNG, sem DOM, estado ou formatação. Painel existente reúne defaults/snapshot/campos, mensagens e gráficos; sizing-fields incorporado.
+- Assinaturas, coerções, mediana superior, probabilidades como contagens e wrapper Monte Carlo preservados; 100 projeções + 100 planos diferenciais sem divergência.
+- Carga clássica sizing → projection → panel → app; somente duas tags de script mudam. `app.js`: 1.809 → 1.662 linhas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

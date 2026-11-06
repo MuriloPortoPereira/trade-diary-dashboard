@@ -30,6 +30,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
   const localScripts = scripts.filter(script => script.src && !script.src.startsWith('https://'));
   assert.deepEqual(localScripts.map(script => script.src), [
     'src/modules/simulation/domain/calculate-simulation-sizing.js',
+    'src/modules/simulation/domain/calculate-simulation-projection.js',
     'src/modules/trades/domain/trade-timing.js',
     'src/modules/analytics/domain/calculate-trade-metrics.js',
     'src/modules/accounts/domain/calculate-cashflow-totals.js',
@@ -41,7 +42,6 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/study-hub/domain/study-hub-calculations.js',
     'src/modules/study-hub/application/study-hub-state.js',
     'src/modules/study-hub/presentation/study-hub-page.js',
-    'src/modules/simulation/presentation/simulation-sizing-fields.js',
     'src/modules/data-transfer/infrastructure/normalize-tabular-values.js',
     'src/modules/data-transfer/infrastructure/serialize-trades-csv.js',
     'src/modules/data-transfer/infrastructure/split-delimited-rows.js',

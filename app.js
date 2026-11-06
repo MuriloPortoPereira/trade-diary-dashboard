@@ -1055,170 +1055,23 @@ function roundSimulationMoney(value){
   return TradeDiarySimulationSizing.roundSimulationMoney(value);
 }
 
-function clampSimulationWinRatePct(value){
-  return clamp(toSimulationNumber(value,55),1,99);
-}
 
-function clampSimulationWinRateInput(){
-  const el=document.getElementById('simWR');
-  if(!el)return;
-  const raw=String(el.value||'').trim();
-  if(!raw)return;
-  const n=parseFloat(raw);
-  if(!Number.isFinite(n)){el.value='55';return;}
-  el.value=String(clamp(n,1,99));
-}
 
 function calculateSimulationSizing({balance=0,riskPct=0,goalPct=0,stopPct=0}={}){
   return TradeDiarySimulationSizing.calculateSimulationSizing({balance,riskPct,goalPct,stopPct});
 }
 
-function getSimulationEntryDefaults(input={}){
-  const opts=typeof input==='number'?{balance:input}:(input||{});
-  const balance=opts.balance??config.balance??1000;
-  return {
-    accountId:opts.accountId||'manual',
-    accountName:opts.accountName||'Manual',
-    winRatePct:clampSimulationWinRatePct(opts.winRatePct??55),
-    rrr:SIMULATION_ENTRY_DEFAULTS.rrr,
-    ...calculateSimulationSizing({
-      balance,
-      riskPct:SIMULATION_ENTRY_DEFAULTS.riskPct,
-      goalPct:SIMULATION_ENTRY_DEFAULTS.goalPct,
-      stopPct:SIMULATION_ENTRY_DEFAULTS.stopPct,
-    }),
-  };
-}
 
-function buildSimulationPlan({trades=20,winRatePct=55,rrr=1,riskUsd=0,goalPct=0,goalUsd=0,stopPct=0,stopUsd=0}={}){
-  const cleanTrades=Math.max(1,parseInt(trades)||20);
-  const wr=clampSimulationWinRatePct(winRatePct)/100;
-  const cleanRrr=Math.max(0,toSimulationNumber(rrr,1));
-  const risk=Math.max(0,toSimulationNumber(riskUsd,0));
-  const goal=Math.max(0,toSimulationNumber(goalUsd,0));
-  const stop=Math.max(0,toSimulationNumber(stopUsd,0));
-  const winUsd=risk*cleanRrr;
-  const expectancy=wr*winUsd-(1-wr)*risk;
-  const winsToGoal=winUsd>0&&goal>0?Math.ceil(goal/winUsd):0;
-  const lossesToStop=risk>0&&stop>0?Math.floor(stop/risk):0;
-  const expectedTradesToGoal=expectancy>0&&goal>0?Math.ceil(goal/expectancy):0;
-  let tone='safe';
-  let title='Plano favorece execução';
-  if(risk<=0||goal<=0||stop<=0){
-    tone='warn';
-    title='Preencha risco, meta e stop';
-  }else if(expectancy<=0){
-    tone='danger';
-    title='Matemática desfavorável';
-  }else if(expectedTradesToGoal>cleanTrades||lossesToStop<2){
-    tone='warn';
-    title='Plano exige cautela';
-  }
-  const expectedText=expectedTradesToGoal
-    ? `${expectedTradesToGoal} trades esperados até a meta`
-    : 'expectância negativa para meta';
-  return {
-    tone,
-    title,
-    winsToGoal,
-    lossesToStop,
-    expectedTradesToGoal,
-    expectancyUsd:roundSimulationMoney(expectancy),
-    summary:`${winsToGoal} wins até meta (${goalPct}% / ${fR(goal)}). Stop comporta ${lossesToStop} perdas cheias (${stopPct}% / ${fR(stop)}). ${expectedText}.`,
-  };
-}
 
-function getSimulationAccountSnapshot(accountId=activeAccountId){
-  const acct=(accountId&&accountId!=='manual')
-    ? accounts.find(a=>a.id===accountId)
-    : (accountId==='manual'?null:getActiveAccount());
-  if(!acct){
-    return getSimulationEntryDefaults({
-      accountId:'manual',
-      accountName:'Manual',
-      winRatePct:55,
-      balance:config.balance||1000,
-    });
-  }
-  const acctTrades=getAccountTrades(acct.id);
-  const riskState=calcAccountRiskState(acct,acctTrades);
-  const metrics=calcMetrics(acctTrades,acct.id);
-  return getSimulationEntryDefaults({
-    accountId:acct.id,
-    accountName:acct.name||'Conta',
-    winRatePct:metrics.closed.length?clampSimulationWinRatePct(roundSimulationMoney(metrics.wr*100)):55,
-    balance:riskState.currentBalance,
-  });
-}
 
-function setSimulationInputValue(id,value,decimals=2){
-  const el=document.getElementById(id);
-  if(!el||!Number.isFinite(Number(value)))return;
-  el.value=Number(value).toFixed(decimals);
-}
 
-function ensureSimulationSelectOption(select,value,label){
-  if(!select)return;
-  const target=String(value);
-  const options=Array.from(select.options||[]);
-  if(options.some(option=>String(option.value)===target))return;
-  const option=document.createElement('option');
-  option.value=target;
-  option.textContent=label||`${target}R`;
-  const customOption=options.find(option=>String(option.value)==='custom');
-  if(customOption&&typeof select.insertBefore==='function')select.insertBefore(option,customOption);
-  else if(typeof select.appendChild==='function')select.appendChild(option);
-}
 
-function setSimulationRrrInput(value=SIMULATION_ENTRY_DEFAULTS.rrr){
-  const rrrSel=document.getElementById('simRRR');
-  const rrrCustom=document.getElementById('simRRRCustom');
-  if(!rrrSel)return;
-  const raw=String(value);
-  ensureSimulationSelectOption(rrrSel,raw,`${raw}R`);
-  rrrSel.value=raw;
-  if(rrrCustom){
-    rrrCustom.value=raw;
-    rrrCustom.style.display=rrrSel.value==='custom'?'block':'none';
-  }
-}
 
 
 
 
 function buildMonteCarloBalanceProjection({balance,trades,winRate,rrr,riskUsd,goalUsd,stopUsd,scenarioCount=100}){
-  const startBalance=roundSimulationMoney(balance);
-  const N=Math.max(parseInt(trades,10)||0,1);
-  const wr=clamp(toSimulationNumber(winRate,0.55),0.01,0.99);
-  const risk=toSimulationNumber(riskUsd,0);
-  const labels=[...Array(N+1)].map((_,i)=>i);
-  const scenarios=[];
-  for(let s=0;s<scenarioCount;s++){
-    let balanceNow=startBalance;
-    const line=[startBalance];
-    for(let i=0;i<N;i++){
-      balanceNow+=Math.random()<wr?rrr*risk:-risk;
-      line.push(roundSimulationMoney(balanceNow));
-    }
-    scenarios.push(line);
-  }
-  const results=scenarios.map(line=>line[N]).sort((a,b)=>a-b);
-  const medianLine=labels.map((_,i)=>{
-    const values=scenarios.map(line=>line[i]).sort((a,b)=>a-b);
-    return values[Math.floor(values.length/2)];
-  });
-  const goalBalance=roundSimulationMoney(startBalance+goalUsd);
-  const stopBalance=roundSimulationMoney(startBalance-stopUsd);
-  return{
-    labels,
-    scenarios,
-    medianLine,
-    goalBalance,
-    stopBalance,
-    probPositive:results.filter(value=>value>startBalance).length,
-    probGoal:results.filter(value=>value>=goalBalance).length,
-    probStop:results.filter(value=>value<=stopBalance).length,
-  };
+  return TradeDiarySimulationProjection.buildMonteCarloBalanceProjection({balance,trades,winRate,rrr,riskUsd,goalUsd,stopUsd,scenarioCount});
 }
 
 

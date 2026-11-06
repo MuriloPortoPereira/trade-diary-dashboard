@@ -24,7 +24,7 @@ HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` p
 | Análises/calendário | `src/modules/analytics/presentation/statistics-page.js`: `renderStats`; `renderStatsPsych` em `src/modules/psychology/presentation/psychology-statistics.js`; calendário em `src/modules/calendar/presentation/calendar-page.js` |
 | Rotina | `src/modules/routine/presentation/premarket-page.js`: página, navegação mensal, hábitos, disciplina e correlação; `preMarketData` permanece na composição |
 | Importação/exportação | `src/modules/data-transfer/infrastructure/parse-tabular-trades.js`; `buildTradesCSV`, `restoreBackupData` |
-| Simulação | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` |
+| Simulação | `domain/calculate-simulation-{sizing,projection}.js`: cálculos numéricos; `presentation/simulation-panel.js`: defaults, snapshot, plano formatado, campos e gráficos; wrappers sizing/Monte Carlo em `app.js` |
 | StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página nativa; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas privadas; `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
 | Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: workspace, consultas, seleção, CRUD e mídia; `document-rendering-helpers.js`: formatação e imagens |
