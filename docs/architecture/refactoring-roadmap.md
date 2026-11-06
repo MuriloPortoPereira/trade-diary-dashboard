@@ -1026,6 +1026,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização de BE, vazios, capital, ordenação, resultados, janelas, coerções e empates; preservado o desempate histórico de duas infinidades para o segundo nome.
 - Dependências transitórias de conta, métricas e formatação explícitas; sem DOM/storage/Chart e sem afirmar domínio puro. `app.js`: 1.662 → 1.470 linhas.
 
+## G7g: controller de parceiros
+
+- Dez funções reunidas ao renderer existente: configuração, afiliados, suporte, clipboard e QR. Sem execução antecipada ou novo script.
+- Caracterização de normalização/identidade, guards, confirmação, fallback/erros de clipboard e FileReader; corpos preservados byte a byte.
+- `app.js`: 1.470 → 1.375 linhas; controller de apresentação com 142 linhas, estado global ainda transitório.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

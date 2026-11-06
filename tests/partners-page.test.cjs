@@ -24,7 +24,9 @@ function createHarness(hub, absent = []) {
     escapeHtml(value) { calls.push(['escapeHtml', value]); return String(value)
       .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'); },
   });
+  const getHub=context.getPartnerHubConfig;
   vm.runInContext(source, context, {filename: extracted ? partnerPath : 'app.js (partners declaration)'});
+  context.getPartnerHubConfig=getHub;
   return {calls, nodes, context};
 }
 

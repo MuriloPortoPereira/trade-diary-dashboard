@@ -28,7 +28,7 @@ HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` p
 | StudyHub | `src/modules/study-hub/presentation/study-hub-page.js`: página nativa; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas privadas; `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `domain/study-hub-calculations.js`: regras puras; `infrastructure/study-hub-storage.js`: chaves privadas |
 | Intraday | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` |
 | Documentos | `src/modules/documents/presentation/documents-page.js`: workspace, consultas, seleção, CRUD e mídia; `document-rendering-helpers.js`: formatação e imagens |
-| Parceiros | `src/modules/partners/presentation/partners-page.js`: `renderPartnersPage`; `ensurePartnerHubConfig` em `app.js` |
+| Parceiros | `src/modules/partners/presentation/partners-page.js`: página, configuração, afiliados, clipboard e QR; controller clássico coeso |
 | Notificações | `src/modules/notifications/presentation/notifications-page.js`: `renderNotificationsPage`; `buildOperationalAlerts` em `app.js` |
 | Perfil | `src/modules/profile/presentation/profile-page.js`: `renderProfilePage` |
 | Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |

@@ -91,34 +91,8 @@ function normalizeAccount(acct={}){
   };
 }
 
-function normalizePartnerAffiliate(entry={}){
-  return {
-    id:entry.id||uid(),
-    name:String(entry.name||'').trim(),
-    url:String(entry.url||'').trim(),
-    code:String(entry.code||'').trim(),
-    note:String(entry.note||'').trim(),
-  };
-}
 
-function ensurePartnerHubConfig(base=config){
-  const next={...(base||{})};
-  const source=next.partnerHub&&typeof next.partnerHub==='object'&&!Array.isArray(next.partnerHub)
-    ? next.partnerHub
-    : {};
-  next.partnerHub={
-    affiliates:Array.isArray(source.affiliates)?source.affiliates.map(normalizePartnerAffiliate):[],
-    btcAddress:String(source.btcAddress||'').trim(),
-    btcQrImage:String(source.btcQrImage||''),
-    coffeeUrl:String(source.coffeeUrl||'').trim(),
-  };
-  return next;
-}
 
-function getPartnerHubConfig(){
-  config=ensurePartnerHubConfig(config);
-  return config.partnerHub;
-}
 
 const SIMULATION_ENTRY_DEFAULTS = Object.freeze({
   riskPct:1,
@@ -1218,81 +1192,12 @@ function triggerFileInput(id){
 
 
 
-function copyPartnerText(value,label='Conteúdo copiado'){
-  const text=String(value||'').trim();
-  if(!text){showAppNotice('Nada para copiar','Preencha este campo antes de copiar.');return;}
-  const done=()=>showAppNotice(label,text);
-  try{
-    const clip=globalThis?.navigator?.clipboard;
-    if(clip&&typeof clip.writeText==='function'){
-      Promise.resolve(clip.writeText(text)).then(done).catch(done);
-      return;
-    }
-  }catch(e){}
-  done();
-}
 
-function addPartnerAffiliate(){
-  const hub=getPartnerHubConfig();
-  hub.affiliates.push(normalizePartnerAffiliate({}));
-  save();
-  renderPartnersPage();
-}
 
-function updatePartnerAffiliateField(id,key,value){
-  const hub=getPartnerHubConfig();
-  const entry=hub.affiliates.find(item=>item.id===id);
-  if(!entry)return;
-  entry[key]=String(value||'').trim();
-  save();
-  renderPartnersPage();
-}
 
-function removePartnerAffiliate(id){
-  const hub=getPartnerHubConfig();
-  const entry=hub.affiliates.find(item=>item.id===id);
-  if(!entry)return;
-  showAppConfirm('Remover afiliado',`Remover ${entry.name||'este afiliado'} da lista?`,()=>{
-    hub.affiliates=hub.affiliates.filter(item=>item.id!==id);
-    config.partnerHub=hub;
-    save();
-    renderPartnersPage();
-  },{danger:true,confirmText:'Remover'});
-}
 
-function updatePartnerSupportField(key,value){
-  const hub=getPartnerHubConfig();
-  hub[key]=String(value||'').trim();
-  save();
-  renderPartnersPage();
-}
 
-function clearPartnerBtcQr(){
-  const hub=getPartnerHubConfig();
-  hub.btcQrImage='';
-  const input=document.getElementById('partnerBtcQrInput');
-  if(input)input.value='';
-  save();
-  renderPartnersPage();
-}
 
-function handlePartnerBtcQrUpload(event){
-  const file=Array.from(event?.target?.files||[])[0];
-  if(!file)return;
-  if(file.type&&!file.type.startsWith('image/')){
-    showAppNotice('QR Code BTC','Selecione uma imagem para o QR Code.');
-    return;
-  }
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const hub=getPartnerHubConfig();
-    hub.btcQrImage=String(ev?.target?.result||'');
-    save();
-    renderPartnersPage();
-  };
-  reader.readAsDataURL(file);
-  if(event?.target)event.target.value='';
-}
 
 
 
