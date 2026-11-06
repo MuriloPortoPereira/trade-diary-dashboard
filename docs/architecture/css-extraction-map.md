@@ -1,8 +1,25 @@
 # Mapa de extração do CSS
 
+## Autoria atual após consolidação
+
+40 → 26 arquivos, com os mesmos 162.576 bytes na ordem da cascata. A expectativa SHA-256 do teste original foi mantida, sem normalização ou reescrita de regras.
+
+| Grupo consolidado | Arquivo | Linhas |
+|---|---|---:|
+| Shell, tokens, navegação e widgets | `src/styles/app-shell.css` | 699 |
+| Superfícies, cabeçalhos e ações | `src/styles/page-layout.css` | 360 |
+| Cards, indicadores e layouts de análise | `src/styles/analysis-panels.css` | 461 |
+| Campos, modais e interação | `src/styles/workspace-controls.css` | 447 |
+| Browser, editor e mídia documental | `src/modules/documents/presentation/documents.css` | 365 |
+| Todos os breakpoints comuns | `src/styles/responsive.css` | 576 |
+
+Grupos originais eram contíguos; `open.html` explicita a sequência atual. Os controles pequenos específicos absorvidos pelo grupo comum mantêm a posição entre as regras anteriores/posteriores. Demais estilos de feature e os quatro CSS legados StudyHub preservam seu contexto. Nenhuma URL relativa foi movida; fontes usam HTTPS e máscaras usam data URLs.
+
+## Inventário histórico da extração inicial
+
 Análise de 2026-09-11 sobre `5c9859f`. Intervalos abaixo referem-se à baseline.
-G1 e G2a–G2ae executados: quatro `legacy-*.css` e trinta e seis destinos do prefixo 1–4879 existem.
-Não resta CSS em `styles.css`; o link anterior agora aponta para `responsive-mobile.css`.
+G1 e G2a–G2ae produziram quatro `legacy-*.css` e trinta e seis destinos do prefixo 1–4879; a consolidação atual substitui parte desses caminhos.
+Não resta CSS em `styles.css`; responsividade comum está agora em `responsive.css`.
 `styles.css`: 6.090 linhas; 1.189 regras qualificadas no nível superior, 1.312 incluindo media queries.
 Há 11 media queries, dois keyframes, um `@import`, 96 seletores exatos repetidos no nível superior
 e 21 ocorrências de `!important`. Parsing com `tinycss2` disponível no ambiente não encontrou

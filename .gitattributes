@@ -1,27 +1,10 @@
 # Preserve the legacy CSS bytes during incremental extraction (mixed LF/CRLF).
 # These blocks retain original blank separators at EOF; other whitespace checks stay enabled.
-src/styles/responsive-mobile.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/study-hub/presentation/legacy-*.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/foundation.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/shell-layout.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/preferences/presentation/preferences-widgets.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/navigation-and-account-summary.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/page-surfaces-and-headers.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/page-actions.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/metric-cards-and-risk-insights.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/dashboard-and-card-layout.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/accounts/presentation/account-risk-and-cashflow.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/analytics/presentation/strategy-comparison.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/calendar/presentation/calendar-grids.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/trade-tables.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/form-fields.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/modal-and-tabs.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/calendar/presentation/calendar-toolbar.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/upload-zone.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/trades/presentation/emotion-picker.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/tag-editor.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/alerts-and-utilities.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/trades/presentation/trade-actions.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/routine/presentation/premarket.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/trades/presentation/error-chips.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/data-transfer/presentation/data-transfer.css -text whitespace=-blank-at-eof,cr-at-eol
@@ -30,15 +13,20 @@ src/styles/navigation-footer.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/workspace-grids.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/study-hub/presentation/study-hub-native.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/workspace-summaries.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/documents/presentation/doc-browser-and-layout.css -text whitespace=-blank-at-eof,cr-at-eol
-src/modules/documents/presentation/doc-editor-and-media.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/accounts/presentation/account-overview.css -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/partners/presentation/partners.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/tag-cloud.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/page-motion.css -text whitespace=-blank-at-eof,cr-at-eol
-src/styles/responsive-desktop-tablet.css -text whitespace=-blank-at-eof,cr-at-eol
 
 # Authored shell/page fragments retain original mixed newlines and blank separators.
 src/app/presentation/shell/*.html -text whitespace=-blank-at-eof,cr-at-eol
 src/modules/*/presentation/*.html -text whitespace=-blank-at-eof,cr-at-eol
 index.html -text whitespace=cr-at-eol
+
+# Consolidated CSS retains every original byte and inherited separators.
+src/styles/app-shell.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/page-layout.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/analysis-panels.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/workspace-controls.css -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/documents/presentation/documents.css -text whitespace=-blank-at-eof,cr-at-eol
+src/styles/responsive.css -text whitespace=-blank-at-eof,cr-at-eol

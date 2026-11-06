@@ -8,12 +8,12 @@ const root = path.resolve(__dirname, '..');
 const index = fs.readFileSync(path.join(root, 'index.html'));
 
 test('published shell preserves every byte and its existing mixed line endings', () => {
-  // Workspace consolidation changes script registrations only.
-  assert.equal(index.length, 105999);
+  // Workspace consolidation changes script and stylesheet registrations only.
+  assert.equal(index.length, 104942);
   assert.equal(createHash('sha256').update(index).digest('hex'),
-    '66318009f47129086585a92d3719f11a71d38afe725ad9d2075130085d07e7f3');
+    'ff21c3c744832509c097fa89932ac107e3d184e125995d72ce7f59c907f6f656');
   assert.equal((index.toString().match(/\r\n/g) || []).length, 1418);
-  assert.equal((index.toString().match(/\n/g) || []).length, 1553);
+  assert.equal((index.toString().match(/\n/g) || []).length, 1539);
 });
 
 test('shell keeps all fifteen pages in order including psychology outside the sidebar', () => {

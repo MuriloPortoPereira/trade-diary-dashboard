@@ -93,8 +93,11 @@ Não editar somente `index.html`. Produção não executa o gerador; ver [ADR-00
 
 G7j acrescenta contrato central de carga: arquivos locais existentes/únicos, scripts clássicos síncronos,
 compilação individual/conjunta e providers/ordem crítica. Compilação não executa DOM/bootstrap; manter o smoke.
+Consolidação por workspace: JS 95 → 80, CSS 40 → 26. O teste de CSS manteve o SHA-256 original;
+somente o fingerprint HTML foi atualizado para os registros de assets consolidados. Papéis/caminhos atuais
+ficam no mapa compacto; o histórico detalhado foi reunido no mapa de módulos, sem criar outro arquivo.
 Consolidações atuais: `simulation-sizing-fields.js` está em `simulation-panel.js`; `trade-log-read-only-notice.js`
-está em `trade-log-controls.js`. Os nomes dos testes históricos permanecem válidos.
+está em `trade-log.js`. Os nomes dos testes históricos permanecem válidos.
 
 Retomada: `/tmp` foi limpo e processos auxiliares perderam artefatos. Usar checkout persistente, commitar e
 aplicar cada etapa validada imediatamente à branch original. O sandbox também restringiu subprocessos Node;

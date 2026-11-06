@@ -1057,7 +1057,8 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - JS de apresentação: diário/editor de trades, formulário/setup de contas e dashboard/estatísticas/comparação de analytics reunidos em arquivos coesos existentes.
 - 95 → 80 scripts locais, com 75 funções idênticas e contratos de carga/casos de teste preservados. Módulos de domínio/aplicação/IO não são fundidos à UI.
 - Não criar arquivo por função nem preencher cotas de linhas. Manter separação quando houver responsabilidade/consumidores próprios.
-- Próximo: CSS em grupos contíguos coesos, sem reordenar regras; depois revisar os resíduos de `app.js` usando os módulos consolidados.
+- CSS: 40 → 26 arquivos em seis grupos coesos/contíguos (shell, layout, painéis, controles, documentos e responsividade); mesmos bytes/cascata, maior grupo com 699 linhas.
+- Resultado: 29 arquivos de produção a menos, sem fundir camadas ou alterar comportamento. Próximos resíduos de `app.js` devem aproveitar os módulos consolidados; novos arquivos exigem responsabilidade própria.
 
 ## Ajuste de granularidade após G5k
 

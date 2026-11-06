@@ -180,18 +180,14 @@ Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e
 | G7i | Edição em lote, locks e aviso do diário consolidado | 1.114 | 603 |
 
 ## Current
-- Prioridade atual: consolidar arquivos por workspace antes de novas extrações de `app.js`, conforme pedido do usuário.
-- Apresentação JS: 95 → 80 scripts. Trades 8 → 2; contas 10 → 5; analytics 8 → 4. 75 declarações preservadas byte a byte; único inicializador do banner mantido sem observadores antecipados.
-- Validação da consolidação JS: 607 testes nos mesmos 100 arquivos, 113 checks no navegador, sintaxe de 43 scripts alterados, dois geradores e revisão independente sem bloqueios. `app.js` permanece com 1.114 linhas.
-- G7j: contrato central de scripts em `tests/classic-script-contract.test.cjs`: arquivos existentes/únicos, carga clássica síncrona, compilação individual/conjunta, providers e ordem crítica. Não substitui execução no navegador.
-- Fechamento G7j: 607 casos Node em 100 arquivos, 113 checks no navegador, sintaxe de 34 scripts alterados, dois geradores em --check, diff e revisão independente aprovados. HTML fora das tags de script idêntico à baseline `b2424b3`; CSS sem alterações.
-- Wrappers ativos preservados por consumidores reais e defaults; intraday acrescenta comportamento e não é alias removível. Decisão em [regras de dependência](dependency-rules.md).
-- `app.js`: 2.269 → 1.114 linhas neste conjunto; dois arquivos minúsculos incorporados a módulos existentes. Simulação tem domínio numérico; consultas/controllers ainda acoplados ao estado são dívida explícita.
-- Fontes HTML e distribuição sincronizadas; só quatro tags de script mudaram desde G7b, com DOM/estilos preservados. O template StudyHub mantém 151.521 bytes; runtime de 233 linhas.
-- A cópia de trabalho é persistente após limpeza de `/tmp`; commits validados são aplicados à cópia original a cada etapa. Alterações locais do usuário preservadas; a suíte limpa não valida a edição preexistente de `tests/calendar-controls.test.cjs`.
+- Prioridade atual: consolidação por workspace. JS local 95 → 80; CSS 40 → 26. Foram removidos 29 arquivos de produção líquidos, sem ampliar app.js (1.114 linhas).
+- Apresentação: trades 8 → 2 arquivos; contas 10 → 5; analytics 8 → 4. 75 funções preservadas byte a byte, sem efeitos antecipados; domínio/aplicação/IO mantêm seus limites.
+- CSS: seis grupos contíguos, maior com 699 linhas; mesmo fluxo de 162.576 bytes/SHA-256 e mesma cascata. O HTML mudou somente nos registros de assets.
+- Validação: 607 testes nos mesmos 100 arquivos, 113 checks no navegador, sintaxe de 43 scripts, dois geradores em --check, diff e revisão independente sem bloqueios.
+- Mapa do projeto agora compacto, com histórico preservado no mapa de módulos existente. Wrappers ativos e dívidas globais permanecem documentados; alterações locais originais preservadas. A suíte limpa não valida a edição preexistente de tests/calendar-controls.test.cjs.
 
 ## Next
-- Consolidar CSS por shell/layout/controles e workspace, preservando concatenação e ordem da cascata; atualizar o mapa de autoria para localizar cada responsabilidade.
+- Rever outros grupos somente quando compartilham responsabilidade; usar os arquivos consolidados ao tratar os resíduos abaixo, sem retornar a arquivos por função.
 - Helpers de demonstração/importação: caracterizar aleatoriedade derivada, enriquecimento e resolução de conta antes de consolidar por responsabilidade.
 - Resíduos de consultas/normalização de contas, datas/filtros do diário e estatísticas de psicologia/alertas: extrair entradas explícitas onde existir boundary real.
 - Apresentação comum em `app.js` (charts, formatadores, tooltips e topbar): reunir por consumidor sem criar arquivos por função. Estado único e bridges permanecem composição.
