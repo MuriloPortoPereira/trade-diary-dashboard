@@ -5,8 +5,18 @@
 **Tech Stack:** JavaScript, HTML/CSS, Chart.js CDN, Node.js apenas para ferramentas/testes.
 **Spec:** [Arquitetura alvo](target-architecture.md), [regras](dependency-rules.md) e `AGENTS.md`.
 
+## Fechamento da versão básica (concluído)
+
+1. Preparação, mapas, caracterização e extração por feature/camada: concluídos.
+2. Granularidade revista: 95 → 48 scripts e 40 → 22 CSS; reutilizar os módulos coesos existentes.
+3. Resíduos finais de contas, demos, filtros, psicologia/alertas e UI comum retirados de `app.js` (181 linhas); composição e APIs globais preservadas.
+4. Validação: 637 testes, 113 checks no navegador, 180 scripts com sintaxe válida, dois geradores, diff e revisão independente sem bloqueios.
+5. Escopo encerrado pelo [ADR-006](adr/006-basic-static-version-closure.md). Remover globals ativos ou migrar para framework exige novo plano; não é uma continuação automática de microextrações.
+
+As seções seguintes registram o planejamento e resultados históricos. Contagens e pendências de lotes antigos são substituídas pelo fechamento acima e pelo mapa atual.
+
 ## Restrições globais
-Sem reescrita, mudança de produto/API/storage, runtime dependency ou push.
+Sem reescrita, mudança de produto/API/storage ou runtime dependency. Push somente na branch autorizada; nunca integrar main/develop incidentalmente.
 Caracterizar antes de extrair; testar, verificar sintaxe e revisar diff depois.
 Não misturar arquitetura, nomenclatura e comportamento no mesmo lote.
 
@@ -1122,13 +1132,13 @@ de idioma formam um corte de baixo risco; métricas continuam como próximo lote
 - [x] Revisar independentemente a movimentação exata, globals, catálogos e ordem dos scripts.
 - `app.js`: 11.052 para 9.770 linhas (menos 1.282). Sem mudança de textos, runtime ou armazenamento.
 
-## Arquivos >1.000 linhas: exceções temporárias
+## Arquivos >1.000 linhas: registro histórico e exceções de distribuição
 `app.js`, `styles.css` e `index.html` permanecem grandes ao final do lote 2b.
 Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobertura ampla;
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
 A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. G7a eliminou a linha gigante de autoria: editar os quatro HTMLs em `presentation/templates/`. `study-hub-template.js` tem exceção como asset gerado de distribuição, sem lógica de negócio; fontes legíveis, gerador e --check são a interface de manutenção. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
-Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.
+No fechamento, fontes JS de produção ficam abaixo de 800 linhas; não há motivo para dividi-las por uma cota. `index.html` e template StudyHub permanecem gerados/versionados. Ver ADR-006.
 G7j: `app.js` permanece em 1.114 linhas como exceção temporária de composição/resíduos. Ownership e próximos blocos no topo de `project-map.md`; wrappers ativos e estado único podem permanecer. Os arquivos gerados de HTML continuam distribuição estática versionada.
 G7b tornou `index.html` uma distribuição gerada/versionada: manter seu tamanho preserva o deploy estático; autoria ocorre nas quinze views e dois fragmentos do shell. Não é necessário dividi-lo em runtime. `.gitattributes` preserva os bytes herdados das fontes e saída; gerador/teste garantem sincronização.

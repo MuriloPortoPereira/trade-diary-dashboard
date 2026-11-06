@@ -18,6 +18,7 @@ Comece pelo [mapa compacto](project-map.md). Abra somente a feature necessária.
 | [ADR-001](adr/001-incremental-classic-scripts.md) | Scripts clássicos durante transição |
 | [ADR-002](adr/002-characterization-tests.md) | Testes de caracterização |
 | [ADR-004](adr/004-study-hub-html-authoring.md) | HTML StudyHub de autoria, geração determinística e deploy estático |
+| [ADR-006](adr/006-basic-static-version-closure.md) | Fechamento básico, limites aceitos e próxima versão com framework |
 | [ADR-005](adr/005-static-shell-composition.md) | Páginas por feature, manifesto do shell e `index.html` versionado |
 
 Baseline histórico auditado: `ab0cb63`, preservado em `main` e na tag `v1.0.0`; trabalho incremental atual em `refactor`.

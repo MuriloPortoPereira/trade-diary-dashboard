@@ -1,7 +1,7 @@
 # Mapa de módulos
 
 Catálogo iniciado na baseline `ab0cb63`, atualizado com os limites físicos extraídos.
-Localizar símbolos com Serena antes de ler trechos; os resíduos legados permanecem em `app.js`.
+Localizar símbolos com Serena antes de ler trechos; o índice atual é `project-map.md`; `app.js` finaliza com composição/estado/wrappers em 181 linhas.
 
 HTML de autoria: `src/app/presentation/shell/index.fragments.json` lista, em ordem, duas fontes do shell
 e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `index.html` versionado;
@@ -12,7 +12,7 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 | Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/app-workspace.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
 | Operações | `src/modules/trades/application/trade-workflows.js`; `renderLog` | Formulário, `trades`, contas, persistência, seleção e métricas |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js` | Geração determinística, importação Tickmill, estratégias, confirmação e persistência |
-| Contas/risco | `accounts/application/account-risk-workflows.js`; `presentation/accounts-workspace.js`; `normalizeAccount` em `app.js` | `accounts`, trades, calendário atual, cashflows, formatação |
+| Contas/risco | `accounts/application/account-risk-workflows.js`; `presentation/accounts-workspace.js`; `normalizeAccount` no workflow de contas | `accounts`, trades, calendário atual, cashflows, formatação |
 | Dashboard | `renderDashboard`, `calcMetrics`, `renderRiskBoard` | Conta ativa, filtros, Chart.js, DOM |
 | Estratégias/análises | `analytics/application/strategy-analysis.js`; renderers em `analytics/presentation/` | Queries sem DOM; conta/métricas/formatação globais transitórias; Chart.js na apresentação |
 | Calendário/rotina | `calendar/presentation/calendar-page.js`; `routine/presentation/premarket-page.js` reúne renderer e controles | Trades, `preMarketData`, datas, save e helpers globais |
@@ -32,10 +32,18 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 ## Fronteiras de integração que devem permanecer compatíveis
 
 - `index.html`: estrutura e chamadas inline dos símbolos públicos.
-- `app.js`: ordem de bootstrap, globals de apresentação e estado ainda legado.
+- `app.js`: estado e wrappers de compatibilidade; inicializadores de tooltip/eventos mantêm a ordem.
 - CSS comum, de feature, responsivo e StudyHub: classes/IDs e ordem da cascata.
 - `window.sh_*`: ponte pública para funções privadas do IIFE legado.
 - JSON de backup e chaves localStorage: contrato de dados existente.
+
+## Fechamento básico
+
+- Regras de timing/mercado/imagens: `trades/domain/trade-rules.js`; namespace de timing preservado.
+- Sementes/enriquecimento em `trades/application/demo-data.js`; filtros/cronologia em `trade-workflows.js`; datas/ordenação visual em `presentation/trade-log.js`.
+- Métricas comportamentais puras em `analytics/domain/calculate-trade-metrics.js`; mensagens de alerta em `notifications/presentation/notifications-page.js`.
+- Charts/formatadores/tooltips em `shared/presentation/analysis-widgets.js`; topbar e eventos em `app/presentation/app-workspace.js`.
+- Contratos globais e limites aceitos no [ADR-006](adr/006-basic-static-version-closure.md).
 
 ## Fronteiras físicas extraídas
 

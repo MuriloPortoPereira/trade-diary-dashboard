@@ -24,9 +24,9 @@ Não crie `shared` sem reutilização comprovada.
 
 ## Important Entry Points
 - `index.html`: shell, páginas e handlers inline; ordem de scripts é contrato.
-- `app.js`: inicialização em `window.load`, `showPage`, estado global e wrappers.
-- `styles.css`: estilos e cascata atuais; preservar ordem ao separar.
-- `src/modules/simulation/domain/calculate-simulation-sizing.js`: primeiro domínio extraído.
+- `app.js`: estado/composição/wrappers; bootstrap em `src/app/application/bootstrap-app.js`; navegação em `src/app/presentation/app-workspace.js`.
+- `src/app/presentation/shell/open.html`: ordem dos CSS; fontes comuns em `src/styles/` e específicas junto das features.
+- `src/modules/simulation/domain/simulation-calculations.js`: sizing e projeção puros.
 
 ## Commands
 - Servir: `python3 -m http.server 8000 --bind 127.0.0.1`.
@@ -51,7 +51,7 @@ Documente cobertura real e limites; teste unitário não comprova toda a aplica�
 ## Refactoring Rules
 Verifique `git status` antes de alterar. Preserve mudanças preexistentes.
 Leia mapa, localize símbolos/referências, caracterize, extraia, valide, revise diff.
-Lotes pequenos; uma responsabilidade por lote. Commits conceituais, sem push automático.
+Lotes pequenos; uma responsabilidade por lote. Commits conceituais; push somente na branch autorizada pelo usuário.
 Investigue funções >40–60 linhas e arquivos >300; >500 fortes candidatos; >800 prioridade.
 Arquivos >1.000 linhas exigem justificativa temporária e estratégia registrada no roadmap.
 Não divida apenas por contagem. Atualize mapa/ADR/progresso quando houver mudança estrutural.
@@ -80,4 +80,5 @@ Não execute push sem autorização explícita.
 ## Architectural Decisions
 - `docs/architecture/adr/001-incremental-classic-scripts.md`: módulos e compatibilidade estática.
 - `docs/architecture/adr/002-characterization-tests.md`: proteção antes de extrações.
+- `docs/architecture/adr/006-basic-static-version-closure.md`: versão básica encerrada; globals ativos preservados e framework em etapa separada.
 - Estado dos lotes: `docs/architecture/refactoring-progress.md`.

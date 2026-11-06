@@ -1,5 +1,7 @@
 # Mapa de extração do JavaScript
 
+Versão básica concluída: 48 scripts; `app.js` com 181 linhas. Para editar, use [mapa atual](project-map.md) e [ADR-006](adr/006-basic-static-version-closure.md). Caminhos/pendências abaixo são registro histórico das extrações anteriores à consolidação, não instruções de criar novos arquivos.
+
 Análise de 2026-09-11 sobre `5c9859f`; intervalos base 1 de `app.js` antes dos próximos cortes.
 Serena fornece linhas base zero; localizar pelo símbolo após qualquer movimentação.
 O overview do nível superior lista 383 funções, 32 variáveis e 20 constantes; não inclui todas

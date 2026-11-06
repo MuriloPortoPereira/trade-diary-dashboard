@@ -1,12 +1,10 @@
 # Refactoring Progress
 
 ## Overall status
-- Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3, núcleo G4a–G4g, G5a–G5p e estrutura G6 concluídos; autoria HTML G7a–G7b e blocos coesos G7c–G7i implementados.
-- G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
-- G7j: composição estática e compatibilidade verificadas; wrappers ativos mantidos. Resíduos e acoplamentos globais ainda impedem declarar toda a migração concluída.
-- Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
-- Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
+- Versão básica estática encerrada no escopo acordado: preparação, G1–G7, consolidação e retirada dos resíduos de feature de `app.js`.
+- `app.js`: 11.068 → 181 linhas; 48 scripts/22 CSS, sem framework ou dependências de runtime novas.
+- Núcleo puro separado; estado e contratos globais continuam explícitos por compatibilidade. Isso não representa isolamento completo de todos os controllers.
+- Fechamento/limites: [ADR-006](adr/006-basic-static-version-closure.md). Histórico abaixo preserva os resultados de cada lote.
 
 ## Completed
 - Baseline `ab0cb63`, preservado em `main` e na tag `v1.0.0`, sem mudanças locais preexistentes.
@@ -180,24 +178,24 @@ Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e
 | G7i | Edição em lote, locks e aviso do diário consolidado | 1.114 | 603 |
 
 ## Current
-- Consolidação ampla: JavaScript local 80 → 48; CSS 26 → 22 nesta rodada, 36 arquivos de produção líquidos a menos. Desde o início da consolidação: 95 → 48 JS e 40 → 22 CSS (65 arquivos a menos).
-- Workspace UI único para contas, analytics, shell, psicologia e documentos; cálculos financeiros/simulação por domínio; transferência por camada; um catálogo por idioma. Arquivos UI maiores chegam a 636 linhas por feature, sem fundir domínio/IO à apresentação.
-- Identidade: 47 origens JS agrupadas em 15 destinos, nomes/closures/corpos preservados; idiomas mantêm 585 chaves, valores e ordem. CSS mantém os 162.576 bytes/SHA-256 e cascata; maior grupo com 703 linhas.
-- Validação: 607 casos/100 arquivos Node, 113 checks no navegador, sintaxe de 85 scripts, dois geradores, diff e revisões independentes. app.js permanece em 1.114 linhas; marcação fora dos assets inalterada.
-- Alterações locais preservadas na cópia original; a cópia isolada de validação não as contém. A edição do calendário foi mesclada em três vias sobre o novo caminho e continua somente no working tree original; AGENTS/Serena e arquivos não versionados intactos. A suíte limpa não valida essa edição local.
+- Versão básica organizada por feature/camada concluída; `app.js` contém composição, estado e bridges ativos.
+- Fechamento: 71 funções saíram de `app.js`; 67 mantêm corpos exatos e quatro viraram wrappers de agregações puras. Constantes, defaults, listeners e sua ordem preservados. Nenhum novo arquivo de produção.
+- Novas caracterizações cobrem contas/cashflows, seeds/importação, filtros/ordenação, estratégias, psicologia/alertas, charts/topbar e eventos. Fixtures antigas apontam às novas fontes, sem retirar expectativas.
+- Validação final: 637 casos em 104 arquivos Node; 113 checks de navegador; sintaxe dos 180 scripts JS/CJS; dois geradores; diff; revisão independente sem bloqueios.
+- CSS conserva os 162.576 bytes/SHA-256 e ordem. HTML/handlers iguais, exceto registro do arquivo de regras de trades renomeado.
+- Alterações locais originais preservadas; a suíte completa foi executada na cópia limpa. A edição local do teste de calendário não faz parte desta entrega.
 
 ## Next
-- Rever outros grupos somente quando compartilham responsabilidade; usar os arquivos consolidados ao tratar os resíduos abaixo, sem retornar a arquivos por função.
-- Helpers de demonstração/importação: caracterizar aleatoriedade derivada, enriquecimento e resolução de conta antes de consolidar por responsabilidade.
-- Resíduos de consultas/normalização de contas, datas/filtros do diário e estatísticas de psicologia/alertas: extrair entradas explícitas onde existir boundary real.
-- Apresentação comum em `app.js` (charts, formatadores, tooltips e topbar): reunir por consumidor sem criar arquivos por função. Estado único e bridges permanecem composição.
-- Encerrar com revisão dos acoplamentos/dependências e documentação consolidada; manter wrappers enquanto forem contrato ativo. Sem framework ou mudança de produto nesta etapa.
+- Nenhum lote obrigatório restante desta versão básica; parar de dividir arquivos sem motivo funcional.
+- Revisar a versão visualmente e decidir separadamente a integração de `refactor`. `main` e `develop` permanecem intocadas.
+- Próxima versão: escolher framework e planejar migração por feature a partir dos contratos/testes existentes; ainda não iniciada.
 
 ## Risks
+Limitações de cobertura e comportamentos legados abaixo permanecem registradas; não são novos lotes obrigatórios de fragmentação. Resultados antigos se referem ao lote citado, não à cobertura final acumulada.
 - `getTradeWeekKey` está protegido indiretamente pelo agrupamento semanal; entrada vazia, data inválida e fronteira domingo/sábado ainda não possuem casos diretos.
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
-- `app.js` ainda possui 1.114 linhas de composição e resíduos; exceção temporária e ownership no mapa/roadmap. Assets HTML gerados não são fontes de autoria.
+- Estado/adaptadores globais e factories privadas StudyHub continuam como limites aceitos da versão clássica (ADR-006); assets HTML gerados são distribuição, não autoria.
 - Persistência principal, seeds/bootstrap e cotação caracterizados; trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
 - Smoke cobre janela inicial e fluxos específicos, incluindo console.error com prefixo StudyHub Legacy desde G6a; demais erros silenciados e falhas assíncronas posteriores permanecem fora da cobertura.
 - Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).
@@ -238,6 +236,7 @@ Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e
 - CDN e cotação dependem de rede. Lint/typecheck/format/build inexistentes, não reportados como aprovados.
 
 ## Decisions
+- ADR-006: encerramento básico, poucos pontos de entrada por feature, globals ativos preservados; framework em versão separada.
 - ADR-001: scripts clássicos, namespace e globals temporários; preservar APIs/dados/cálculos.
 - ADR-002: caracterização antes das extrações; Node built-ins e Chrome isolado sem npm dependencies.
 - Memória Serena contém somente ponte para documentos canônicos, evitando duplicação de contexto.

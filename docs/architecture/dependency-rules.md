@@ -9,7 +9,7 @@
 | Composição (`app.js`) | Conectar as camadas e fornecer adaptadores | Criar novas responsabilidades no monólito |
 
 ## Transição
-- Legado ainda viola separações; não declarar migração concluída.
+- Organização básica concluída; a direção de camadas é aplicada ao núcleo puro. Controllers/adaptadores clássicos ainda compartilham estado; não declarar isolamento completo. Limites aceitos: ADR-006.
 - Novo script de domínio carrega antes de `app.js`, sem `async` ou troca para `type=module`.
 - Preservar globals usados por HTML, `window.sh_*`, defaults e ordem de inicialização.
 - Namespace global é adaptador de carregamento temporário, não acesso do domínio ao navegador.
@@ -19,16 +19,16 @@
 - G5g: domínio de importação recebe resolvedor de chave por parâmetro; não consulta conta/pendências globais. Preparação em application mantém adaptadores legados transitórios de estado, relógio e normalização, sem DOM/storage direto.
 - G5h: load em application usa readPersistedAppState (contrato de leitura bruta), sem storage direto. IO em app/infrastructure; save preserva acesso sequencial ao estado global como dívida transitória, sem snapshot antecipado.
 - G7e: projeção numérica recebe dados e RNG explícitos; mensagens e moeda ficam no painel. Wrappers clássicos de sizing/Monte Carlo preservam assinaturas.
-- G7c–G7i: controllers coesos por feature continuam com estado global legado; queries de estratégia em application usam métricas/formatadores globais como exceção transitória. `normalizeDocImages` ainda é consumido por trades/importação a partir da apresentação documental; inversão pendente, sem alegação de domínio puro.
+- G7c–G7i: controllers coesos por feature continuam com estado global legado; queries de estratégia em application usam métricas/formatadores globais como exceção transitória. `normalizeDocImages` saiu da apresentação documental para o arquivo puro `trades/domain/trade-rules.js`, usado por trades/documentos/importação. É compatibilidade de mídia do modelo legado; eventual novo modelo merece nova decisão.
 
-## Compatibilidade verificada (G7j)
+## Compatibilidade verificada (G7j e fechamento básico)
 - Manter wrappers que fornecem defaults/estado/tradução: timing, sizing, CSV, payload de backup e resumo. `buildTradesCSV(list=trades)` continua contrato público.
 - Pontes `window.sh_*` e wrappers intraday mantêm closures, retornos e efeitos; intraday agenda atualização e não é alias descartável.
 - Remover somente após migrar todos os consumidores e proteger seus contratos, com ganho real de manutenção. Permanência é decisão explícita nesta fase.
 - `tests/classic-script-contract.test.cjs` verifica arquivos/duplicatas, carga clássica síncrona, compilação e ordem de providers. Referências por regex são heurísticas; inicialização/DOM continuam cobertos pelo smoke.
 
 ## Ciclos e duplicação
-Consolidação por feature: cálculos de contas/simulação permanecem em domínio; formatos e IO de transferência são adaptadores distintos; fluxos ficam em aplicação; cada workspace UI agrupa apresentação. Os nomes globais existentes são preservados. UI somente declara funções durante a carga; providers IIFE com leitura imediata mantêm ordem interna. Catálogos executam os mesmos Object.assign antes do seletor. Não criar arquivos por função nem fundir camadas para reduzir contagem.
+Consolidação por feature: cálculos de contas/simulação permanecem em domínio; formatos e IO de transferência são adaptadores distintos; fluxos ficam em aplicação; cada workspace UI agrupa apresentação. Os nomes globais existentes são preservados. UI declara funções e inicializa constantes/caches literais; os inicializadores com DOM continuam chamados nos pontos anteriores de app.js. Providers IIFE com leitura imediata mantêm ordem interna. Catálogos executam os mesmos Object.assign antes do seletor. Não criar arquivos por função nem fundir camadas para reduzir contagem.
 
 Baseline não tem imports/exports: não há grafo de imports com ciclos a resolver.
 Grafo real inclui globals, DOM, handlers em strings e wrappers; procurar referências antes de mover.

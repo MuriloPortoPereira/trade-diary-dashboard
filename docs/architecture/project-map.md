@@ -28,9 +28,9 @@ Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as cama
 
 | Responsabilidade | Onde procurar em `src/modules/` |
 |---|---|
-| Cálculos financeiros e risco | `accounts/domain/account-risk-calculations.js`; fluxo em `accounts/application/account-risk-workflows.js` |
+| Cálculos financeiros e risco; consultas/normalização de contas | `accounts/domain/account-risk-calculations.js`; fluxo em `accounts/application/account-risk-workflows.js` |
 | Sizing, expectativa e projeção | `simulation/domain/simulation-calculations.js`; UI em `simulation/presentation/simulation-panel.js` |
-| Métricas e estratégias | `analytics/domain/calculate-trade-metrics.js`; queries em `analytics/application/strategy-analysis.js` |
+| Métricas comportamentais, financeiras e estratégias | `analytics/domain/calculate-trade-metrics.js`; queries em `analytics/application/strategy-analysis.js` |
 | Importação/exportação: casos de uso | `data-transfer/application/transfer-workflows.js` |
 | CSV, backup, normalização e parsing | `data-transfer/infrastructure/trade-file-formats.js` |
 | Leitura de relatórios e download | `data-transfer/infrastructure/browser-file-io.js` |
@@ -62,18 +62,18 @@ Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as cama
 
 ## Integrações e estado
 
-- `app.js`: estado único, inicializadores de adaptadores e wrappers públicos, incluindo `buildTradesCSV(list=trades)`; ver os resíduos abaixo.
+- `app.js`: estado único, inicializadores de adaptadores e wrappers públicos, incluindo `buildTradesCSV(list=trades)`; ver composição abaixo.
 - `src/app/application/bootstrap-app.js` e `load-app-state.js`: bootstrap/carga. Persistência bruta em `src/app/infrastructure/app-state-storage.js`.
-- Trades: workflows/amostras em `src/modules/trades/application/`; timing puro em `domain/trade-timing.js`.
+- Trades: workflows/amostras em `src/modules/trades/application/`; timing, mercado e normalização de mídia puros em `domain/trade-rules.js`.
 - StudyHub: `presentation/study-hub-page.js`, quatro ferramentas privadas `study-hub-{propfirm,plan,tradesim,mental}.js`, runtime/intraday; domínio, estado e storage próprios.
 - Câmbio: `src/modules/preferences/infrastructure/exchange-rate.js`.
 
-## Resíduos de app.js após G7j
+## Composição final da versão básica
 
-- Composição: estado global, inicializadores de adaptadores, listeners transversais e wrappers ativos; manter enquanto houver consumidores.
-- Demonstrações/importação: `createSeededRandom`, enriquecimento de disciplina/confiança/timing e resolução de contas (`ensureAccountByName`, `ensureTickmillAccount`).
-- Consultas/normalização de contas e datas/filtros do diário; `normalizeAccount`, capital/cashflows, ordenação e range de datas.
-- Apresentação comum: charts/datasets, formatadores, `TIPS`/tooltips, densidade/topbar e rótulos de risco; sem divisão por função.
-- Estatísticas de psicologia e alertas: `buildHesitationStats`, `buildDisciplineBuckets`, `buildOperationalAlerts`. Caracterizar antes de escolher entradas explícitas e destino.
-
-Histórico detalhado e resultados por lote: [mapa de módulos](module-map.md#histórico-detalhado-de-extrações-por-lote).
+- `app.js` (181 linhas): estado/defaults, fábrica de timing, wrappers públicos de métricas/sizing/CSV/backup/parsing e chamadas dos inicializadores de tooltip e eventos. Bootstrap é registrado em `app/application/bootstrap-app.js`.
+- Contas: consultas/normalização/cashflow em `accounts/application/account-risk-workflows.js`; formulário, formatação e modos em `accounts/presentation/accounts-workspace.js`.
+- Trades: seeds/enriquecimento/resolução de conta em `trades/application/demo-data.js`; filtros e ordenação temporal em `trade-workflows.js`; datas/ordenação visual em `presentation/trade-log.js`.
+- Configuração de estratégias em `app/application/load-app-state.js`; edição e consultas de período na UI de analytics.
+- Psicologia: quatro agregações puras em `analytics/domain/calculate-trade-metrics.js`, wrappers em `psychology-page.js`; alertas/mensagens em `notifications-page.js`.
+- Charts/formatadores/tooltips compartilhados em `shared/presentation/analysis-widgets.js`; topbar e atalhos/drag-drop em `app-workspace.js`. Os inicializadores continuam chamados nos pontos anteriores de `app.js`.
+- Nenhum arquivo de produção adicional nesta conclusão; 48 scripts e 22 CSS. Limites aceitos e próxima versão: [ADR-006](adr/006-basic-static-version-closure.md).

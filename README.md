@@ -4,7 +4,7 @@ Aplicação web estática para registrar operações de trading, acompanhar cont
 
 [Versão pública informada pelo projeto](https://trade-diary-dashboard.vercel.app/) · [Repositório](https://github.com/MuriloPortoPereira/trade-diary-dashboard) · [Licença MIT](LICENSE)
 
-> **Branch `refactor`:** versão em reorganização arquitetural. A versão estável original permanece em `main` e está marcada por `v1.0.0`. Esta branch ainda não representa uma nova versão publicada.
+> **Branch `refactor`:** versão básica com reorganização arquitetural concluída. A versão estável original permanece em `main` e está marcada por `v1.0.0`. Esta branch ainda não representa uma nova versão publicada.
 
 > Os dados ficam no `localStorage` do navegador e da origem usada para abrir a aplicação. Não há sincronização entre dispositivos ou contas de usuário. Exporte backups antes de limpar os dados do navegador ou mudar de origem.
 
@@ -42,7 +42,7 @@ A branch `refactor` contém o trabalho incremental de refatoração. A aplicaç�
 |---|---|
 | `main` | Versão estável. Atualmente representa a versão inicial `v1.0.0` e permanece sem alterações durante a refatoração. |
 | `develop` | Integração de funcionalidades. Por enquanto é uma cópia da `main`; receberá a refatoração somente após a conclusão e validação desta branch. |
-| `refactor` | Trabalho arquitetural em andamento, com histórico completo dos lotes seguros e verificáveis. |
+| `refactor` | Versão básica refatorada, com histórico completo dos lotes e fechamento documentado. |
 | `feature/*` | Funcionalidades futuras criadas a partir da `develop` e integradas novamente nela após revisão. |
 | `hotfix/*` | Correções urgentes criadas a partir da `main`, devolvidas à `main` e à `develop`. |
 
@@ -59,7 +59,7 @@ Depois da versão 2, o fluxo normal será `develop` → `feature/*` → `develop
 
 ```text
 index.html                  Distribuição HTML gerada e versionada
-app.js                      Estado, bootstrap e fluxos ainda legados
+app.js                      Estado, composição e wrappers de compatibilidade
 src/app/presentation/shell/  Manifesto e fontes da navegação/modais/scripts
 src/styles/                 CSS comum e responsividade
 src/modules/                Código e CSS organizados por feature
@@ -71,7 +71,7 @@ src/modules/                Código e CSS organizados por feature
   data-transfer/infrastructure/ Serialização CSV
   data-transfer/presentation/ Resumo de backup e filtro de exportação
   trades/presentation/        Operação e apresentação do diário
-  ...                       Demais módulos extraídos gradualmente
+  ...                       Demais módulos organizados por feature
 tests/                      Testes Node de caracterização
 scripts/                    Smoke e comparação visual no navegador
 docs/architecture/          Mapas, arquitetura, roadmap e progresso
@@ -117,18 +117,18 @@ Para editar HTML, localize a página no [manifesto de composição](src/app/pres
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
 | G1–G2: CSS | Extração concluída; consolidados de 40 para 22 arquivos mantendo bytes/cascata |
 | G3: JavaScript por feature | Concluído para apresentação; renderers, shell, formulários e controles principais separados |
-| G4: regras de domínio | Núcleo planejado extraído; resíduos/acoplamentos seguem para revisão final |
+| G4: regras de domínio | Núcleo puro e métricas comportamentais extraídos; limites globais aceitos documentados |
 | G5: persistência/importação | Formatos, coordenação, IO, bootstrap e workflows extraídos em G5a–G5p |
 | G6: StudyHub | Estrutura concluída: quatro ferramentas privadas, domínio, estado, storage e runtime de montagem |
-| G7: HTML e compatibilidade | Autoria concluída, controllers consolidados e contrato clássico verificado em G7a–G7j; resíduos/acoplamentos ainda pendentes |
+| G7: HTML e compatibilidade | Autoria, controllers, composição e revisão de compatibilidade concluídos |
 
-O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 1.114 linhas; ainda contém estado, integração e resíduos a revisar. Documentos, rotina, simulação, estratégias, parceiros, contas e controles do diário possuem módulos coesos; dois arquivos pequenos foram incorporados aos módulos responsáveis.
+O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 181 linhas; contém estado, composição e wrappers públicos. Documentos, rotina, simulação, estratégias, parceiros, contas e controles do diário possuem módulos coesos; dois arquivos pequenos foram incorporados aos módulos responsáveis.
 
 Após G7j, a prioridade passou à consolidação: scripts locais de 95 para 48 e CSS de 40 para 22, com 65 arquivos de produção a menos no acumulado. Nesta segunda rodada, foram 36 arquivos a menos. Cada feature tem poucos pontos de entrada: contas e análises possuem um workspace UI, cálculos ficam no domínio, e transferência separa página, fluxos, formatos e IO. O [mapa compacto](docs/architecture/project-map.md) mostra os caminhos atuais.
 
-Validação: 607 testes Node nos mesmos 100 arquivos, 113 verificações no navegador, dois geradores, sintaxe dos 85 scripts alterados e revisões independentes, em cópia limpa. Corpos e namespaces JS foram preservados; catálogos mantêm 585 chaves por idioma. Marcação da interface e os 162.576 bytes CSS na mesma ordem permaneceram intactos. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada.
+Validação final: 637 testes Node em 104 arquivos, 113 verificações no navegador, dois geradores, sintaxe dos 180 scripts JS/CJS e revisão independente sem bloqueios, em cópia limpa. Corpos e namespaces JS foram preservados; catálogos mantêm 585 chaves por idioma. Marcação da interface e os 162.576 bytes CSS na mesma ordem permaneceram intactos. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada.
 
-Faltam os resíduos de importação/demonstração, consultas/normalização, estatísticas/alertas e apresentação comum de app.js, seguidos do fechamento das dependências globais documentadas. Os próximos cortes devem aproveitar os módulos existentes.
+A versão básica está encerrada: os resíduos finais foram incorporados aos módulos existentes, sem novos arquivos de produção. Estado/adaptadores globais, handlers inline e ferramentas privadas do StudyHub permanecem por compatibilidade, conforme [ADR-006](docs/architecture/adr/006-basic-static-version-closure.md). Isso não é isolamento completo de todas as camadas. A próxima versão poderá adotar um framework em um plano separado; esta etapa preserva o percurso inicial → refatoração estática → framework.
 
 ## Deploy e dados
 

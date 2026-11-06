@@ -3,6 +3,8 @@
 Clean Architecture proporcional a uma aplicação estática. Manter JavaScript e deploy sem build.
 Criar pastas somente quando houver código para ocupar cada responsabilidade.
 
+Escopo básico encerrado: [ADR-006](adr/006-basic-static-version-closure.md). A tabela descreve direção conceitual, sem exigir uma pasta por célula. Estado/adaptadores globais mantidos são limites explícitos; framework e isolamento adicional ficam para a próxima versão.
+
 ```mermaid
 flowchart LR
   Composition[app.js / composição] --> Presentation
@@ -33,7 +35,7 @@ Essas fronteiras foram revisadas na [análise global](modularization-analysis.md
 Não mover calendário, rotina, documentos ou perfil para StudyHub apenas por conveniência.
 Destinos e dependências concretas: [mapa JS](javascript-extraction-map.md).
 
-Primeiro boundary concreto: `src/modules/simulation/domain/calculate-simulation-sizing.js`.
+Primeiro boundary histórico: sizing, hoje consolidado em `src/modules/simulation/domain/simulation-calculations.js`.
 Demais células descrevem destino, não camadas já implementadas.
 O domínio publica temporariamente um namespace; wrappers em `app.js` preservam funções globais.
 Não introduzir classes/repositories/DTOs abstratos para funções que já recebem dados simples.

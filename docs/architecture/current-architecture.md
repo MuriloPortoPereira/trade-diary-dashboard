@@ -3,6 +3,10 @@
 Baseline auditada: `ab0cb63`. Linhas e contagens abaixo referem-se à baseline;
 após extrações, localizar pelos símbolos. Auditoria estrutural, sem afirmar cobertura funcional completa.
 
+## Versão básica após refatoração
+
+Organização concluída: 48 scripts clássicos, 22 CSS e quinze views de autoria por feature. `app.js` tem 181 linhas de estado/composição/wrappers; regras numéricas puras e IO possuem limites próprios. Controllers ainda usam estado/adaptadores globais por compatibilidade. O [mapa atual](project-map.md) e o [ADR-006](adr/006-basic-static-version-closure.md) orientam manutenção; o inventário abaixo é histórico.
+
 ## Stack e execução
 
 | Aspecto | Encontrado |
