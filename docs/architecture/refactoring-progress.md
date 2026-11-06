@@ -180,14 +180,11 @@ Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e
 | G7i | Edição em lote, locks e aviso do diário consolidado | 1.114 | 603 |
 
 ## Current
-- Segunda consolidação: 80 → 48 scripts, por feature/camada. 47 fontes foram reunidas em 15 destinos; nomes públicos, corpos e ordem interna preservados.
-- Contas e analytics têm um workspace UI cada; domínios de contas/simulação agrupados; transferência tem quatro arquivos de camada, além do domínio. UI comum e catálogos por idioma também consolidados.
-- Validação desta rodada: mesmos 607 testes/100 arquivos, 113 checks no navegador, sintaxe de 85 scripts, dois geradores e duas revisões independentes sem bloqueios. app.js permanece em 1.114 linhas.
-- Prioridade atual: consolidação por workspace. JS local 95 → 80; CSS 40 → 26. Foram removidos 29 arquivos de produção líquidos, sem ampliar app.js (1.114 linhas).
-- Apresentação: trades 8 → 2 arquivos; contas 10 → 5; analytics 8 → 4. 75 funções preservadas byte a byte, sem efeitos antecipados; domínio/aplicação/IO mantêm seus limites.
-- CSS: seis grupos contíguos, maior com 699 linhas; mesmo fluxo de 162.576 bytes/SHA-256 e mesma cascata. O HTML mudou somente nos registros de assets.
-- Validação: 607 testes nos mesmos 100 arquivos, 113 checks no navegador, sintaxe de 43 scripts, dois geradores em --check, diff e revisão independente sem bloqueios.
-- Mapa do projeto agora compacto, com histórico preservado no mapa de módulos existente. Wrappers ativos e dívidas globais permanecem documentados; alterações locais originais preservadas. A suíte limpa não valida a edição preexistente de tests/calendar-controls.test.cjs.
+- Consolidação ampla: JavaScript local 80 → 48; CSS 26 → 22 nesta rodada, 36 arquivos de produção líquidos a menos. Desde o início da consolidação: 95 → 48 JS e 40 → 22 CSS (65 arquivos a menos).
+- Workspace UI único para contas, analytics, shell, psicologia e documentos; cálculos financeiros/simulação por domínio; transferência por camada; um catálogo por idioma. Arquivos UI maiores chegam a 636 linhas por feature, sem fundir domínio/IO à apresentação.
+- Identidade: 47 origens JS agrupadas em 15 destinos, nomes/closures/corpos preservados; idiomas mantêm 585 chaves, valores e ordem. CSS mantém os 162.576 bytes/SHA-256 e cascata; maior grupo com 703 linhas.
+- Validação: 607 casos/100 arquivos Node, 113 checks no navegador, sintaxe de 85 scripts, dois geradores, diff e revisões independentes. app.js permanece em 1.114 linhas; marcação fora dos assets inalterada.
+- Alterações locais preservadas na cópia original; a cópia isolada de validação não as contém. A edição do calendário foi mesclada em três vias sobre o novo caminho e continua somente no working tree original; AGENTS/Serena e arquivos não versionados intactos. A suíte limpa não valida essa edição local.
 
 ## Next
 - Rever outros grupos somente quando compartilham responsabilidade; usar os arquivos consolidados ao tratar os resíduos abaixo, sem retornar a arquivos por função.

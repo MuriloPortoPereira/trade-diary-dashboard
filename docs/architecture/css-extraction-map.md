@@ -2,7 +2,7 @@
 
 ## Autoria atual após consolidação
 
-40 → 26 arquivos, com os mesmos 162.576 bytes na ordem da cascata. A expectativa SHA-256 do teste original foi mantida, sem normalização ou reescrita de regras.
+40 → 22 arquivos em duas rodadas, com os mesmos 162.576 bytes na ordem da cascata. A expectativa SHA-256 do teste original foi mantida, sem normalização ou reescrita de regras.
 
 | Grupo consolidado | Arquivo | Linhas |
 |---|---|---:|
@@ -12,8 +12,11 @@
 | Campos, modais e interação | `src/styles/workspace-controls.css` | 447 |
 | Browser, editor e mídia documental | `src/modules/documents/presentation/documents.css` | 365 |
 | Todos os breakpoints comuns | `src/styles/responsive.css` | 576 |
+| Integração tardia de diálogo, navegação e grids | `src/styles/workspace-integration.css` | 72 |
+| StudyHub legado: controles e sequência | `src/modules/study-hub/presentation/legacy-controls.css` | 703 |
+| StudyHub legado: painéis e integração | `src/modules/study-hub/presentation/legacy-panels.css` | 508 |
 
-Grupos originais eram contíguos; `open.html` explicita a sequência atual. Os controles pequenos específicos absorvidos pelo grupo comum mantêm a posição entre as regras anteriores/posteriores. Demais estilos de feature e os quatro CSS legados StudyHub preservam seu contexto. Nenhuma URL relativa foi movida; fontes usam HTTPS e máscaras usam data URLs.
+Grupos originais eram contíguos; `open.html` explicita a sequência atual. Controles específicos e integração tardia mantêm a posição entre regras anteriores/posteriores. Demais estilos de feature preservam seu contexto; os quatro blocos StudyHub foram reunidos em dois por função no workspace. Nenhuma URL relativa foi movida; fontes usam HTTPS e máscaras usam data URLs.
 
 ## Inventário histórico da extração inicial
 

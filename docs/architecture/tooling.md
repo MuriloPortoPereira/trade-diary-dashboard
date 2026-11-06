@@ -70,8 +70,8 @@ node tests/classic-script-contract.test.cjs
 node scripts/build-index.cjs --check
 node scripts/build-study-hub-template.cjs --check
 node --check app.js
-node --check src/modules/simulation/domain/calculate-simulation-sizing.js
-node --check src/modules/data-transfer/infrastructure/serialize-trades-csv.js
+node --check src/modules/simulation/domain/simulation-calculations.js
+node --check src/modules/data-transfer/infrastructure/trade-file-formats.js
 node --check tests/trades-csv.test.cjs
 node --check tests/language-selector.test.cjs
 node --check scripts/browser-smoke.cjs
@@ -93,11 +93,13 @@ Não editar somente `index.html`. Produção não executa o gerador; ver [ADR-00
 
 G7j acrescenta contrato central de carga: arquivos locais existentes/únicos, scripts clássicos síncronos,
 compilação individual/conjunta e providers/ordem crítica. Compilação não executa DOM/bootstrap; manter o smoke.
-Consolidação por workspace: JS 95 → 80, CSS 40 → 26. O teste de CSS manteve o SHA-256 original;
+Consolidação por workspace: JS 95 → 48, CSS 40 → 22. O teste de CSS manteve o SHA-256 original;
 somente o fingerprint HTML foi atualizado para os registros de assets consolidados. Papéis/caminhos atuais
 ficam no mapa compacto; o histórico detalhado foi reunido no mapa de módulos, sem criar outro arquivo.
 Consolidações atuais: `simulation-sizing-fields.js` está em `simulation-panel.js`; `trade-log-read-only-notice.js`
 está em `trade-log.js`. Os nomes dos testes históricos permanecem válidos.
+
+Na segunda rodada, providers por feature e workspaces substituíram mais endpoints: paths atuais no mapa compacto. As definições UI podem aparecer antes de outras funções, pois só são invocadas após a inicialização; providers que executam na carga preservam precedência. O teste completo de sequência, a compilação, os testes comportamentais e o smoke cobrem essas condições.
 
 Retomada: `/tmp` foi limpo e processos auxiliares perderam artefatos. Usar checkout persistente, commitar e
 aplicar cada etapa validada imediatamente à branch original. O sandbox também restringiu subprocessos Node;

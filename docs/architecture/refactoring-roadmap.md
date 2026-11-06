@@ -1066,6 +1066,8 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Corpos e namespaces preservados. UI apenas declara funções; antecipação da definição não antecipa chamadas. IIFEs com dependência imediata mantêm ordem, incluindo Projection → Sizing.
 - Catálogos mantêm 585 chaves por idioma, ordem e valores. Fixtures de carga foram atualizadas; assertions comportamentais preservadas.
 - Contratos de prontidão antes de app substituem adjacências que deixaram de representar a composição real; fixture completa e smoke permanecem.
+- CSS 26 → 22: integração comum tardia em um arquivo; controles/sequência e painéis/integração StudyHub em dois. Grupos contíguos e fluxo CSS idêntico, máximo de 703 linhas.
+- Resultado desta rodada: 36 arquivos de produção a menos; acumulado da consolidação: 65. Próximas mudanças devem reutilizar os endpoints por feature/camada já definidos.
 
 ## Ajuste de granularidade após G5k
 

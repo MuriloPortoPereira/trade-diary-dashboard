@@ -4,8 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const sizingPath = 'src/modules/simulation/domain/simulation-calculations.js';
-const projectionPath = 'src/modules/simulation/domain/simulation-calculations.js';
+const domainPath = 'src/modules/simulation/domain/simulation-calculations.js';
 const panelPath = 'src/modules/simulation/presentation/simulation-panel.js';
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const declaration = name => app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0];
@@ -13,8 +12,7 @@ function setup(random = () => 0) {
   const math = Object.create(Math);
   math.random = random;
   const context = vm.createContext({Math: math, clamp: (v,min,max) => Math.min(max,Math.max(min,v)), fR: String});
-  vm.runInContext(fs.readFileSync(path.join(root,sizingPath),'utf8'),context);
-  if(fs.existsSync(path.join(root,projectionPath))) vm.runInContext(fs.readFileSync(path.join(root,projectionPath),'utf8'),context);
+  vm.runInContext(fs.readFileSync(path.join(root,domainPath),'utf8'),context);
   vm.runInContext(fs.readFileSync(path.join(root,panelPath),'utf8'),context);
   for(const name of ['toSimulationNumber','roundSimulationMoney','calculateSimulationSizing','buildMonteCarloBalanceProjection']) {
     if(declaration(name)) vm.runInContext(declaration(name),context);
@@ -52,8 +50,7 @@ test('default scenario count remains 100 and result probabilities remain absolut
 });
 test('pure domain accepts injected RNG without DOM, storage or application globals', () => {
   const c=vm.createContext({});
-  vm.runInContext(fs.readFileSync(path.join(root,sizingPath),'utf8'),c);
-  vm.runInContext(fs.readFileSync(path.join(root,projectionPath),'utf8'),c);
+  vm.runInContext(fs.readFileSync(path.join(root,domainPath),'utf8'),c);
   let calls=0;
   const input={balance:100,trades:2,winRate:.5,rrr:1,riskUsd:10,goalUsd:20,stopUsd:10,scenarioCount:2};
   const before=JSON.stringify(input);
@@ -70,11 +67,10 @@ test('projection shares the sizing script and loads before panel and app', () =>
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const scripts=[...html.matchAll(/<script\b([^>]*)\bsrc="([^"]+)"[^>]*>/g)];
   const paths=scripts.map(match=>match[2]);
-  assert.equal(paths.filter(value=>value===projectionPath).length,1);
-  assert.ok(paths.indexOf(sizingPath)===paths.indexOf(projectionPath));
-  assert.ok(paths.indexOf(projectionPath)<paths.indexOf(panelPath));
+  assert.equal(paths.filter(value=>value===domainPath).length,1);
+  assert.ok(paths.indexOf(domainPath)<paths.indexOf(panelPath));
   assert.ok(paths.indexOf(panelPath)<paths.indexOf('app.js'));
-  assert.doesNotMatch(scripts.find(match=>match[2]===projectionPath)[0],/\b(?:async|defer|type="module")\b/);
+  assert.doesNotMatch(scripts.find(match=>match[2]===domainPath)[0],/\b(?:async|defer|type="module")\b/);
 });
 test('panel retains defaults, account context and field adapters', () => {
   const c=setup();

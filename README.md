@@ -115,7 +115,7 @@ Para editar HTML, localize a página no [manifesto de composição](src/app/pres
 |---|---|
 | Preparação, auditoria e mapas | Concluídos |
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
-| G1–G2: CSS | Extração concluída; consolidados de 40 para 26 arquivos mantendo bytes/cascata |
+| G1–G2: CSS | Extração concluída; consolidados de 40 para 22 arquivos mantendo bytes/cascata |
 | G3: JavaScript por feature | Concluído para apresentação; renderers, shell, formulários e controles principais separados |
 | G4: regras de domínio | Núcleo planejado extraído; resíduos/acoplamentos seguem para revisão final |
 | G5: persistência/importação | Formatos, coordenação, IO, bootstrap e workflows extraídos em G5a–G5p |
@@ -124,9 +124,11 @@ Para editar HTML, localize a página no [manifesto de composição](src/app/pres
 
 O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 1.114 linhas; ainda contém estado, integração e resíduos a revisar. Documentos, rotina, simulação, estratégias, parceiros, contas e controles do diário possuem módulos coesos; dois arquivos pequenos foram incorporados aos módulos responsáveis.
 
-Após G7j, a prioridade passou à consolidação: scripts locais de 95 para 80 e CSS de 40 para 26, com 29 arquivos de produção a menos. Diário/editor, contas/setup e análise agora possuem arquivos de apresentação mais completos; shell, controles e layouts comuns têm grupos CSS claros. O [mapa compacto](docs/architecture/project-map.md) mostra onde editar cada responsabilidade. Wrappers e camadas de domínio/aplicação/IO permanecem separados da apresentação.
+Após G7j, a prioridade passou à consolidação: scripts locais de 95 para 48 e CSS de 40 para 22, com 65 arquivos de produção a menos no acumulado. Nesta segunda rodada, foram 36 arquivos a menos. Cada feature tem poucos pontos de entrada: contas e análises possuem um workspace UI, cálculos ficam no domínio, e transferência separa página, fluxos, formatos e IO. O [mapa compacto](docs/architecture/project-map.md) mostra os caminhos atuais.
 
-Validação da consolidação: 607 testes Node nos mesmos 100 arquivos, 113 verificações no navegador, dois geradores, sintaxe dos 43 scripts alterados e revisão independente, em cópia limpa. Marcação da interface e os 162.576 bytes CSS na mesma ordem foram preservados. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. Faltam os resíduos de importação/demonstração, consultas/normalização, estatísticas/alertas e apresentação comum, seguidos do fechamento das dependências globais documentadas.
+Validação: 607 testes Node nos mesmos 100 arquivos, 113 verificações no navegador, dois geradores, sintaxe dos 85 scripts alterados e revisões independentes, em cópia limpa. Corpos e namespaces JS foram preservados; catálogos mantêm 585 chaves por idioma. Marcação da interface e os 162.576 bytes CSS na mesma ordem permaneceram intactos. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada.
+
+Faltam os resíduos de importação/demonstração, consultas/normalização, estatísticas/alertas e apresentação comum de app.js, seguidos do fechamento das dependências globais documentadas. Os próximos cortes devem aproveitar os módulos existentes.
 
 ## Deploy e dados
 

@@ -48,8 +48,10 @@ Caminhos abaixo relativos a `src/`. Um workspace reúne a UI da feature; as cama
 | Campos, modais e controles de interação | `src/styles/workspace-controls.css` |
 | Workspace de documentos completo | `src/modules/documents/presentation/documents.css` |
 | Breakpoints comuns de desktop, tablet e mobile | `src/styles/responsive.css` |
+| Integração tardia: diálogos, navegação e grids compartilhados | `src/styles/workspace-integration.css` |
+| StudyHub legado: controles/sequência e painéis/integração | `src/modules/study-hub/presentation/legacy-controls.css` e `legacy-panels.css` |
 
-26 folhas no total; estilos específicos restantes ficam junto das features. Ordem completa em `src/app/presentation/shell/open.html`; mapa CSS distingue autoria atual de intervalos históricos.
+22 folhas no total; estilos específicos restantes ficam junto das features. Ordem completa em `src/app/presentation/shell/open.html`; mapa CSS distingue autoria atual de intervalos históricos.
 
 ## Shell e páginas: composição estática (G7b)
 

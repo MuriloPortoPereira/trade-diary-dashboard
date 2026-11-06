@@ -1,0 +1,72 @@
+.app-dialog {
+  max-width: 460px;
+}
+
+.app-dialog-copy {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.app-dialog-input {
+  margin-top: 14px;
+}
+
+.app-dialog-error {
+  min-height: 16px;
+  margin-top: 6px;
+  color: var(--red);
+  font-size: 11px;
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-meta-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item-meta {
+  min-height: 50px;
+  margin-bottom: 0;
+  padding-inline: 14px;
+  font-size: 12px;
+}
+
+.strategy-hub-layout,
+.profile-grid,
+.partner-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.partner-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.strategy-hub-layout {
+  grid-template-columns: 1.25fr 0.85fr;
+}
+
+.profile-grid {
+  grid-template-columns: 1.2fr 0.8fr;
+}
+
+.profile-grid-secondary {
+  grid-template-columns: 1.05fr 0.95fr;
+}
+
+.partner-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+

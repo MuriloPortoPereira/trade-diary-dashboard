@@ -9,21 +9,21 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 
 | Feature | Entradas/símbolos | Dependências atuais |
 |---|---|---|
-| Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
+| Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/app-workspace.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
 | Operações | `src/modules/trades/application/trade-workflows.js`; `renderLog` | Formulário, `trades`, contas, persistência, seleção e métricas |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js` | Geração determinística, importação Tickmill, estratégias, confirmação e persistência |
-| Contas/risco | `accounts/application/account-risk-workflows.js`; `presentation/{account-form,risk-setup-page}.js`; `normalizeAccount` em `app.js` | `accounts`, trades, calendário atual, cashflows, formatação |
+| Contas/risco | `accounts/application/account-risk-workflows.js`; `presentation/accounts-workspace.js`; `normalizeAccount` em `app.js` | `accounts`, trades, calendário atual, cashflows, formatação |
 | Dashboard | `renderDashboard`, `calcMetrics`, `renderRiskBoard` | Conta ativa, filtros, Chart.js, DOM |
 | Estratégias/análises | `analytics/application/strategy-analysis.js`; renderers em `analytics/presentation/` | Queries sem DOM; conta/métricas/formatação globais transitórias; Chart.js na apresentação |
 | Calendário/rotina | `calendar/presentation/calendar-page.js`; `routine/presentation/premarket-page.js` reúne renderer e controles | Trades, `preMarketData`, datas, save e helpers globais |
 | Psicologia | `renderPsych`, `renderStatsPsych`, `buildHesitationStats` | Campos subjetivos das operações e gráficos |
-| Simulação principal | `simulation/domain/calculate-simulation-{sizing,projection}.js`; `presentation/simulation-panel.js` | Domínio numérico/RNG; painel consulta conta/configuração e formata/renderiza; wrappers mantidos |
+| Simulação principal | `simulation/domain/simulation-calculations.js`; `presentation/simulation-panel.js` | Domínio numérico/RNG; painel consulta conta/configuração e formata/renderiza; wrappers mantidos |
 | Importação | `parseMT5Rows`, `parseGenericTradeRows`, `parseMT5HTML`, `confirmImport` | FileReader, datas, IDs, normalizadores, contas e `save` |
 | Backup/exportação | `createBackupPayload`, `restoreBackupData`, `exportJSON`, `buildTradesCSV` | Estado global, JSON, CSV, Blob, confirmação e storage |
 | StudyHub nativo | `src/modules/study-hub/presentation/study-hub-page.js`: `renderStudyHub`, wrappers de cálculo, `syncStudyHubLegacyInputs` | Estado `studyHubState`, conta, risco, domínio nativo, DOM legado e `window.sh_*` |
 | StudyHub legado | `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas isoladas | Estado privado por ferramenta, Chart.js, helpers puros no domínio e storage em infrastructure |
 | Intraday adicional | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
-| Documentos/imagens | `documents/presentation/{documents-page,document-rendering-helpers}.js`: workspace e mídia | Trades, rotina, `config.generalDocs`, FileReader, DOM; dependências globais transitórias |
+| Documentos/imagens | `documents/presentation/documents-page.js`: workspace e mídia | Trades, rotina, `config.generalDocs`, FileReader, DOM; dependências globais transitórias |
 | Parceiros | `partners/presentation/partners-page.js`: controller completo | `config.partnerHub`, links, imagens, clipboard |
 | Perfil/notificações | `renderProfilePage`, `renderNotificationsPage`, `buildOperationalAlerts` | Conta ativa, risco e histórico; sem autenticação |
 | Configuração/storage | `renderSetup`, `saveConfig`, `save`, `load` | Globals, normalização, localStorage |
@@ -33,7 +33,7 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 
 - `index.html`: estrutura e chamadas inline dos símbolos públicos.
 - `app.js`: ordem de bootstrap, globals de apresentação e estado ainda legado.
-- CSS base/shell/preferências, superfícies/cabeçalhos, ações, CSS responsivos e quatro CSS StudyHub: classes/IDs e ordem da cascata.
+- CSS comum, de feature, responsivo e StudyHub: classes/IDs e ordem da cascata.
 - `window.sh_*`: ponte pública para funções privadas do IIFE legado.
 - JSON de backup e chaves localStorage: contrato de dados existente.
 

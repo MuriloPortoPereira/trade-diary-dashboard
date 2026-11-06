@@ -15,7 +15,7 @@
 - Namespace global é adaptador de carregamento temporário, não acesso do domínio ao navegador.
 - Não usar `../../../../`; caminhos de scripts partem do shell. Aliases somente com suporte verificado.
 - Criar contratos por parâmetro quando houver IO a inverter; dispensar interfaces sem consumidor real.
-- G5d: `application/restore-backup.js` mantém estado/adaptadores globais como exceção transitória documentada; inversão pendente. Corpo intacto preserva alterações parciais nas falhas, sem DOM/storage direto.
+- G5d: restauração hoje em `data-transfer/application/transfer-workflows.js` (antes `restore-backup.js`) mantém estado/adaptadores globais como exceção transitória documentada; inversão pendente. Corpo intacto preserva alterações parciais nas falhas, sem DOM/storage direto.
 - G5g: domínio de importação recebe resolvedor de chave por parâmetro; não consulta conta/pendências globais. Preparação em application mantém adaptadores legados transitórios de estado, relógio e normalização, sem DOM/storage direto.
 - G5h: load em application usa readPersistedAppState (contrato de leitura bruta), sem storage direto. IO em app/infrastructure; save preserva acesso sequencial ao estado global como dívida transitória, sem snapshot antecipado.
 - G7e: projeção numérica recebe dados e RNG explícitos; mensagens e moeda ficam no painel. Wrappers clássicos de sizing/Monte Carlo preservam assinaturas.
@@ -28,6 +28,8 @@
 - `tests/classic-script-contract.test.cjs` verifica arquivos/duplicatas, carga clássica síncrona, compilação e ordem de providers. Referências por regex são heurísticas; inicialização/DOM continuam cobertos pelo smoke.
 
 ## Ciclos e duplicação
+Consolidação por feature: cálculos de contas/simulação permanecem em domínio; formatos e IO de transferência são adaptadores distintos; fluxos ficam em aplicação; cada workspace UI agrupa apresentação. Os nomes globais existentes são preservados. UI somente declara funções durante a carga; providers IIFE com leitura imediata mantêm ordem interna. Catálogos executam os mesmos Object.assign antes do seletor. Não criar arquivos por função nem fundir camadas para reduzir contagem.
+
 Baseline não tem imports/exports: não há grafo de imports com ciclos a resolver.
 Grafo real inclui globals, DOM, handlers em strings e wrappers; procurar referências antes de mover.
 Novo fluxo de sizing: HTML carrega domínio; wrappers chamam domínio; domínio não chama legado.
