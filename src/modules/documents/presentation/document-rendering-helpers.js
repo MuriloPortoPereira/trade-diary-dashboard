@@ -1,3 +1,66 @@
+function formatDocDate(date){
+  return date ? new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) : 'Sem data';
+}
+
+function normalizeDocImages(images){
+  if(!Array.isArray(images))return[];
+  return images
+    .filter(img=>img&&img.dataUrl)
+    .map(img=>({name:img.name||'imagem',dataUrl:img.dataUrl}));
+}
+
+function formatDocumentSelection(type){
+  const editor=document.getElementById('docEditorBody');
+  if(!editor||editor.disabled)return;
+  const start=editor.selectionStart??editor.value.length;
+  const end=editor.selectionEnd??editor.value.length;
+  const selected=editor.value.slice(start,end);
+  const fallback={
+    bold:'texto em negrito',
+    italic:'texto em italico',
+    underline:'texto sublinhado',
+    h1:'Titulo',
+    h2:'Subtitulo',
+    list:'item da lista',
+    quote:'citacao',
+  }[type]||'texto';
+  const text=selected||fallback;
+  let replacement=text;
+  let caretStart=start;
+  let caretEnd=start+replacement.length;
+  const prefixLines=prefix=>text.split(/\r?\n/).map(line=>`${prefix}${line}`).join('\n');
+
+  if(type==='bold'){
+    replacement=`**${text}**`;
+    caretStart=start+2;
+    caretEnd=caretStart+text.length;
+  } else if(type==='italic'){
+    replacement=`_${text}_`;
+    caretStart=start+1;
+    caretEnd=caretStart+text.length;
+  } else if(type==='underline'){
+    replacement=`<u>${text}</u>`;
+    caretStart=start+3;
+    caretEnd=caretStart+text.length;
+  } else if(type==='h1'){
+    replacement=prefixLines('# ');
+  } else if(type==='h2'){
+    replacement=prefixLines('## ');
+  } else if(type==='list'){
+    replacement=prefixLines('- ');
+  } else if(type==='quote'){
+    replacement=prefixLines('> ');
+  }
+
+  editor.setRangeText(replacement,start,end,'end');
+  if(!selected&&['bold','italic','underline'].includes(type))editor.setSelectionRange(caretStart,caretEnd);
+  editor.focus();
+}
+
+function getDocumentEntryImages(entry){
+  return normalizeDocImages(entry?.images);
+}
+
 function renderDocumentMedia(entry){
   const images=getDocumentEntryImages(entry);
   if(!images.length){

@@ -1002,6 +1002,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - 92 arquivos Node e 113 checks no navegador aprovados. Nenhum código de runtime alterado; `app.js` continua com 2.269 linhas.
 - Próximo: revisão de compatibilidade/consumidores e resíduos de `app.js`, seguida da consolidação justificada e fechamento dos critérios arquiteturais. Não remover wrappers por tamanho.
 
+## G7c: workspace de documentos
+
+- 22 funções preservadas byte a byte em `documents-page.js` e `document-rendering-helpers.js`; workspace coeso nos módulos existentes, sem nova camada para código com DOM.
+- Caracterização pré-corte: consultas, seleção, CRUD e mídia nas três origens, preservando trade/rotina ao excluir e a captura do documento original por callbacks.
+- `normalizeDocImages` também atende trades/importação; dependência transitória documentada, sem alegação de domínio puro. `triggerFileInput` genérico permanece na composição.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

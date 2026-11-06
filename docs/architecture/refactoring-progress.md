@@ -166,6 +166,10 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
+- G7c: 22 funções documentais reunidas nos dois módulos de apresentação existentes, com caracterização pré-corte das três origens de notas, CRUD e callbacks assíncronos. Corpos preservados byte a byte; nenhum script novo.
+- Projeções/normalização documentais continuam acopladas ao estado legado; não são domínio puro. A persistência e as APIs globais permanecem compatíveis.
+- G7c validado em snapshot do índice: 559 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios; `app.js`: 2.269 → 1.932 linhas.
+- A cópia de trabalho passou a ser persistente após limpeza de `/tmp` na retomada; commits validados são aplicados à cópia original a cada etapa. Alterações locais do usuário continuam preservadas.
 - G7b: quinze páginas HTML de autoria nas features e dois fragmentos do shell; manifesto explícito e gerador por concatenação de buffers, conforme ADR-005.
 - `index.html` continua versionado, com os mesmos 107.193 bytes da baseline `953d990`; nenhum DOM, estilo, handler, asset ou script de runtime foi alterado.
 - G7a preserva os 151.521 bytes montados do StudyHub; runtime com 233 linhas/11.187 bytes. `app.js` permanece em 2.269 linhas.

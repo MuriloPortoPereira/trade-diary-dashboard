@@ -28,7 +28,9 @@ function render(entry, images) {
         .replaceAll("'", '&#039;');
     },
   });
+  const lookup = context.getDocumentEntryImages;
   vm.runInContext(source, context, {filename: legacy ? 'app.js#renderDocumentMedia' : modulePath});
+  context.getDocumentEntryImages = lookup;
   return {html: vm.runInContext('renderDocumentMedia(entry)', context, {filename: 'renderDocumentMedia()'}), calls};
 }
 
@@ -63,7 +65,9 @@ test('media propagates image lookup and text conversion failures', () => {
     getDocumentEntryImages() { throw new Error('lookup failed'); },
     escapeHtml: String,
   });
+  const lookup = lookupContext.getDocumentEntryImages;
   vm.runInContext(source, lookupContext);
+  lookupContext.getDocumentEntryImages = lookup;
   assert.throws(() => vm.runInContext('renderDocumentMedia({})', lookupContext), /lookup failed/);
 
   assert.throws(

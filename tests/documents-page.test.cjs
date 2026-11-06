@@ -37,7 +37,9 @@ function harness({folder = 'generalNotes', selected = null, entries = [], folder
     escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;'); },
   });
   vm.runInContext(`let activeDocFolder=${JSON.stringify(folder)}; let activeDocId=${JSON.stringify(selected)};`, context);
+  const mocks = Object.fromEntries(['getDocumentFolders', 'getDocumentEntries', 'getCurrentDocumentEntry', 'getDocumentCreateLabel', 'getDocumentCreateDesc'].map(name => [name, context[name]]));
   vm.runInContext(source, context, {filename: modulePath});
+  Object.assign(context, mocks);
   return {context, nodes, calls};
 }
 
