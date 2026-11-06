@@ -2,9 +2,9 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3 e núcleo G4a–G4g concluídos; G5a–G5k registrados abaixo.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3, núcleo G4a–G4g, G5a–G5p e estrutura G6 concluídos; HTML de autoria G7a–G7b implementado.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
-- G7 depende da migração dos consumidores e de decisão sobre composição estática do HTML.
+- G7: composição estática decidida nos ADRs 004/005; revisão dos consumidores, compatibilidade e resíduos ainda pendente.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
 
@@ -166,13 +166,15 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G7a: template StudyHub com quatro fontes HTML de autoria e geração determinística em script clássico versionado; ADR-004 registra contrato e custos.
-- A montagem recebe exatamente os mesmos 151.521 bytes; IDs, handlers, guardas, carga síncrona e deploy sem build preservados.
-- Runtime: 170.565 → 11.187 bytes; 233 linhas, sem linha gigante. Fontes HTML com 352/580/310/167 linhas. `app.js` permanece em 2.269 linhas.
-- Caracterização pré-corte, sincronização do asset e escaping do gerador protegidos; 91 arquivos Node, 113 checks no navegador, sintaxe/diff e --check do gerador aprovados. Revisão independente sem achados ou bloqueios.
+- G7b: quinze páginas HTML de autoria nas features e dois fragmentos do shell; manifesto explícito e gerador por concatenação de buffers, conforme ADR-005.
+- `index.html` continua versionado, com os mesmos 107.193 bytes da baseline `953d990`; nenhum DOM, estilo, handler, asset ou script de runtime foi alterado.
+- G7a preserva os 151.521 bytes montados do StudyHub; runtime com 233 linhas/11.187 bytes. `app.js` permanece em 2.269 linhas.
+- Caracterização executada antes do corte; 92 arquivos Node, 113 checks no navegador, sintaxe/diff e os dois geradores em --check aprovados na cópia limpa de validação.
+- Revisão independente somente leitura: sem bloqueios; concatenação, fingerprint, boundary por página, atributos Git e fluxo de autoria/deploy conferidos.
+- Alterações locais do usuário preservadas; a suíte integral da cópia limpa não valida a edição preexistente em `tests/calendar-controls.test.cjs`.
 
 ## Next
-- G7b: avaliar composição do shell `index.html` e compatibilidade dos scripts clássicos; wrappers só podem ser removidos com todos os consumidores protegidos.
+- Revisar compatibilidade dos scripts clássicos e consumidores; wrappers só podem ser removidos com todos os consumidores protegidos e ganho real de manutenção.
 - Depois: revisar acoplamentos/resíduos ainda em `app.js`, documentação e critérios de fechamento arquitetural; não confundir redução de linhas com conclusão de toda a refatoração.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.

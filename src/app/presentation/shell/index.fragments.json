@@ -1,0 +1,19 @@
+[
+  "src/app/presentation/shell/open.html",
+  "src/modules/analytics/presentation/dashboard.html",
+  "src/modules/trades/presentation/trade-log.html",
+  "src/modules/calendar/presentation/calendar.html",
+  "src/modules/analytics/presentation/statistics.html",
+  "src/modules/routine/presentation/premarket.html",
+  "src/modules/psychology/presentation/psychology.html",
+  "src/modules/analytics/presentation/strategy-hub.html",
+  "src/modules/study-hub/presentation/study-hub.html",
+  "src/modules/data-transfer/presentation/data-transfer.html",
+  "src/modules/documents/presentation/documents.html",
+  "src/modules/accounts/presentation/setup.html",
+  "src/modules/notifications/presentation/notifications.html",
+  "src/modules/accounts/presentation/accounts.html",
+  "src/modules/partners/presentation/partners.html",
+  "src/modules/profile/presentation/profile.html",
+  "src/app/presentation/shell/close.html"
+]

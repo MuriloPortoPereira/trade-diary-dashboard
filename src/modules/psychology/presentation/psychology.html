@@ -1,0 +1,35 @@
+<!-- ════ PSICOLÓGICO ════ -->
+<div class="page" id="page-psych">
+  <div class="page-header">
+    <div class="page-kicker" data-i18n="psych.kicker">Psicologia</div>
+    <div class="page-title" data-i18n="psych.title">Psicológico</div>
+    <div class="page-sub" data-i18n="psych.sub">Comportamento, disciplina e qualidade emocional por trade</div>
+  </div>
+
+  <div class="metrics-row" style="margin-bottom:20px">
+    <div class="metric-card c-green"><div class="m-label" data-i18n="psych.bestEmo">Melhor Emoção</div><div class="m-value green" id="bestEmotion">—</div><div class="m-sub" id="bestEmotionWR">—</div></div>
+    <div class="metric-card c-red"><div class="m-label" data-i18n="psych.worstEmo">Pior Emoção</div><div class="m-value red" id="worstEmotion">—</div><div class="m-sub" id="worstEmotionWR">—</div></div>
+    <div class="metric-card c-blue"><div class="m-label" data-i18n="psych.followedPlan">Seguiu Plano</div><div class="m-value blue" id="followedPlanRate">—</div><div class="m-sub" data-i18n="psych.ofTrades">dos trades</div></div>
+    <div class="metric-card c-yellow"><div class="m-label" data-i18n="psych.avgDisc">Disc. Médio</div><div class="m-value yellow" id="avgDisc">—</div><div class="m-sub" data-i18n="psych.pts">/ 5 pontos</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="psych.emoWR">Win Rate por Emoção</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="emotionChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="psych.discScore">Score de Disciplina</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="discChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title" data-i18n="psych.emoAnalysis">Análise por Emoção</div></div>
+    <table class="tbl">
+      <thead><tr><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.followedPlan">Seguiu Plano</th><th data-i18n="th.avgDisc">Disc. Médio</th></tr></thead>
+      <tbody id="psychTbody"></tbody>
+    </table>
+  </div>
+</div>
+

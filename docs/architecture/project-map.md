@@ -3,6 +3,16 @@
 Índice de navegação. Ler este mapa antes de procurar uma feature; buscar símbolos com Serena.
 Fallback: `rg -n 'function NOME' app.js`; abrir apenas o trecho necessário.
 HTML StudyHub: editar `src/modules/study-hub/presentation/templates/*.html`; não abrir integralmente o asset gerado `study-hub-template.js` para análise. Usar símbolos e trechos localizados nas fontes de autoria.
+HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` para localizar a fonte na feature. Editar o fragmento e executar `node scripts/build-index.cjs`; `index.html` é a distribuição versionada.
+
+## Shell e páginas: composição estática (G7b)
+
+- Quinze views completas em `src/modules/<feature>/presentation/*.html`; abertura/navegação e fechamento/modais/scripts em `src/app/presentation/shell/{open,close}.html`.
+- O manifesto ordenado é a fonte dos caminhos; não há fragmentação por campo ou widget nem montagem assíncrona.
+- `node scripts/build-index.cjs --check` verifica sincronização sem escrever. Teste: `tests/index-composition.test.cjs`; decisão: [ADR-005](adr/005-static-shell-composition.md).
+- `index.html` mantém os mesmos 107.193 bytes, incluindo LF/CRLF mistos, IDs, handlers, estilos e ordem dos scripts. Deploy continua sem build.
+
+## Localização por responsabilidade
 
 | Trabalho | Procurar primeiro |
 |---|---|

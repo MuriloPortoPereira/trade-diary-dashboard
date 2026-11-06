@@ -1,5 +1,14 @@
 # Páginas e contratos HTML
 
+## Autoria atual (G7b)
+
+- Localizar a view no manifesto `src/app/presentation/shell/index.fragments.json`: quinze páginas completas nas features, abertura/navegação e fechamento/modais/scripts no shell.
+- Editar essas fontes e executar `node scripts/build-index.cjs`; conferir sincronização com `--check`. `index.html` é a distribuição versionada, sem composição no navegador.
+- Concatenação preservou os 107.193 bytes da baseline `953d990`, inclusive ordem, IDs, handlers, estilos inline e LF/CRLF. Caracterização: `tests/index-composition.test.cjs`; decisão: [ADR-005](adr/005-static-shell-composition.md).
+- StudyHub possui quatro fontes adicionais em `presentation/templates/`, geradas pelo helper próprio descrito no [ADR-004](adr/004-study-hub-html-authoring.md).
+
+## Inventário histórico
+
 Referência `5c9859f`, análise de 2026-09-11. `index.html`: 1.445 linhas, 15 páginas,
 quatro modais, 364 IDs estáticos únicos, 172 handlers inline e 191 atributos `style`.
 Handlers: 112 onclick, 33 onchange, 27 oninput; 74 nomes globais chamados.
@@ -67,16 +76,15 @@ Análises concentra 54 inline styles; modal trade 38; rotina 21; modal conta 15;
 Decoração pode ser extraída com teste de especificidade; não remover todos os estilos inline em massa.
 Também há seletores CSS que dependem do próprio atributo `style`.
 
-## Por que não dividir imediatamente o HTML em arquivos
+## Restrição da baseline e solução adotada
 
 HTML estático não inclui fragmentos externos sozinho. `fetch`, strings JS ou montagem com template
 mudam disponibilidade de IDs, tradução, listeners, gráficos e inicialização do StudyHub.
-Primeiro modularizar JS/CSS mantendo o shell. Uma alternativa posterior é composição determinística
-de fragmentos de autoria que gere o mesmo `index.html`; isso adiciona uma etapa de geração e requer ADR próprio.
+JS/CSS foram modularizados mantendo o shell. G7b adotou composição determinística
+de fontes de autoria que gera o mesmo `index.html`, com geração somente na manutenção e ADR próprio.
 
-README 165–180 descreve Vercel com preset Other, build vazio e saída na raiz. Nenhuma configuração
-remota foi consultada; preservar esse contrato estático. A árvore do README em 114 está desatualizada
-e deve refletir a organização conforme os lotes forem implementados.
+O deploy preserva o contrato estático: preset Other, build vazio e saída na raiz.
+Nenhuma configuração remota foi consultada. Os números de linhas deste inventário são históricos.
 
 ## Cobertura necessária
 
@@ -84,8 +92,8 @@ G7a executado: HTML StudyHub agora possui quatro fontes de autoria em
 `src/modules/study-hub/presentation/templates/`, geradas em um asset clássico versionado.
 [ADR-004](adr/004-study-hub-html-authoring.md) preserva deploy sem build, carga síncrona e os mesmos
 151.521 bytes montados. O shell `index.html` e seus estilos/handlers permanecem inalterados neste corte;
-apenas uma tag de script foi adicionada antes do consumidor. A composição do shell continua em avaliação G7b.
+apenas uma tag de script foi adicionada antes do consumidor. G7b concluiu a autoria do shell sem alterar sua distribuição.
 
 Além dos fluxos por página: primeira carga e recarga com dados sintéticos, PT/EN, desktop/mobile,
 sidebar, todos os modais, ausência de erros/404 e comparação do storage antes/depois de navegação.
-Os 18 checks existentes cobrem um subconjunto; a análise não afirma que esse smoke completo já exista.
+O smoke atual tem 113 checks e cobre fluxos específicos; não representa cobertura integral de todos os estados.

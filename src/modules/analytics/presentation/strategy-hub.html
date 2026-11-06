@@ -1,0 +1,38 @@
+<!-- ════ ESTRATÉGIAS ════ -->
+<div class="page" id="page-strategyHub">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="strat.kicker">Playbook</div>
+      <div class="page-title" data-i18n="strat.title">Estratégias</div>
+      <div class="page-sub" data-i18n="strat.sub">Quais setups estão pagando, onde a execução está falhando e como defender o risco.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('stats')" data-i18n="strat.openAnalytics">Abrir análises</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('setup')" data-i18n="strat.editLibrary">Editar biblioteca</button>
+    </div>
+  </div>
+
+  <div class="metrics-row metrics-row-compact" id="strategyHubMetrics"></div>
+
+  <div class="strategy-hub-layout">
+    <div class="chart-card">
+      <div class="table-header"><div class="table-title" data-i18n="strat.map">Mapa de estratégias</div></div>
+      <div id="strategyHubBoard" class="strategy-board strategy-board-large"></div>
+    </div>
+    <div class="chart-card">
+      <div class="table-header"><div class="table-title" data-i18n="strat.focus">Foco operacional</div></div>
+      <div id="strategyHubFocus" class="status-list"></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title" data-i18n="strat.detailed">Comparativo detalhado</div></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.sharpe">Sharpe</th><th data-i18n="th.sortino">Sortino</th><th data-i18n="th.calmar">Calmar</th><th data-i18n="th.recFactor">Fator Rec.</th><th data-i18n="th.best">Melhor</th><th data-i18n="th.lastUsed">Último uso</th></tr></thead>
+        <tbody id="strategyHubTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

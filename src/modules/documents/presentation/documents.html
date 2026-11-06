@@ -1,0 +1,60 @@
+<!-- ════ DOCUMENTOS ════ -->
+<div class="page" id="page-documents">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="docs.kicker">Conhecimento</div>
+      <div class="page-title" data-i18n="docs.title">Documentos</div>
+      <div class="page-sub" data-i18n="docs.sub">Observações de trades, notas do dia e documentos do seu processo operacional.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" id="docCreateBtn" onclick="createDocumentFromActiveFolder()" data-i18n="docs.newNote">+ Nova anotação geral</button>
+      <button class="btn btn-danger btn-sm" id="docDeleteBtn" onclick="deleteCurrentDocument()" style="display:none" data-i18n="docs.delete">Excluir</button>
+      <button class="btn btn-primary btn-sm" onclick="saveCurrentDocument()" data-i18n="docs.save">Salvar</button>
+    </div>
+  </div>
+
+  <div class="doc-shell">
+    <div class="chart-card doc-nav-card">
+      <div id="docFolders" class="doc-folder-list" style="padding:12px"></div>
+    </div>
+
+    <div class="chart-card doc-list-card">
+      <div class="table-header">
+        <div class="table-title" id="docListTitle">Notas</div>
+        <span class="text-muted text-mono" id="docListCount" style="font-size:10px">0 itens</span>
+      </div>
+      <div id="docEntries" class="doc-entry-list"></div>
+    </div>
+
+    <div class="chart-card doc-editor-card">
+      <div class="doc-editor-header">
+        <div>
+          <div class="table-title" id="docEditorHeading" data-i18n="docs.selectNote">Selecione uma nota</div>
+          <div class="doc-editor-meta" id="docEditorMeta" data-i18n="docs.selectNoteHint">Escolha um item na coluna central para editar.</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="docOpenTradeBtn" onclick="openDocumentTrade()" style="display:none" data-i18n="docs.viewTrade">Ver trade ↗</button>
+      </div>
+      <div id="docTradeContext" class="doc-trade-context" style="display:none"></div>
+      <div class="field-group" style="margin-bottom:12px">
+        <label data-i18n="docs.titleLabel">Título</label>
+        <input type="text" id="docEditorTitle" data-i18n-ph="docs.titlePlaceholder" placeholder="Título do documento">
+      </div>
+      <div class="doc-toolbar">
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('bold')" title="Negrito">B</button>
+        <button type="button" class="doc-toolbar-btn doc-toolbar-italic" onclick="formatDocumentSelection('italic')" title="Itálico">I</button>
+        <button type="button" class="doc-toolbar-btn doc-toolbar-underline" onclick="formatDocumentSelection('underline')" title="Sublinhado">U</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('h1')" title="Título 1">H1</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('h2')" title="Título 2">H2</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('list')" title="Lista">•</button>
+        <button type="button" class="doc-toolbar-btn" onclick="formatDocumentSelection('quote')" title="Citação">"</button>
+        <button type="button" class="doc-toolbar-btn" onclick="triggerDocumentImageUpload()" title="Adicionar imagem" aria-label="Adicionar imagem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+        <input type="file" id="docImageInput" class="doc-image-input" accept="image/*,image/jpeg,image/png,image/gif,image/webp" multiple onchange="addDocumentImages(event)">
+      </div>
+      <textarea id="docEditorBody" class="doc-editor-body" data-i18n-ph="docs.bodyPlaceholder" placeholder="Escreva aqui suas observações, lições e contexto da operação..."></textarea>
+      <div id="docMedia" class="doc-media-panel"></div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,91 @@
+<!-- ════ IMPORT/EXPORT ════ -->
+<div class="page" id="page-import">
+  <div class="page-header">
+    <div class="page-kicker" data-i18n="import.kicker">Sistema</div>
+    <div class="page-title" data-i18n="import.title">Importações & Backup</div>
+    <div class="page-sub" data-i18n="import.sub">Importe relatório, restaure backup e exporte recortes personalizados</div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchImportTab('csv')" data-i18n="import.tabImport">Importar Operações</button>
+    <button class="tab-btn" onclick="switchImportTab('export')" data-i18n="import.tabExport">Exportar / Backup</button>
+  </div>
+
+  <div id="importTab-csv">
+    <div class="import-entry-grid">
+      <div class="setup-card import-primary-card">
+        <div class="setup-card-title" data-i18n="import.cardTitle">Importar Operações</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.cardInfo">Envie o ReportHistory em XLSX, HTML ou CSV. O diário detecta colunas, abre prévia e só salva depois da confirmação.</div>
+        <input id="importReportInput" type="file" accept=".csv,.xlsx,.html,.htm,.txt" onchange="handleReportUpload(event)" style="display:none">
+        <div class="import-dropzone">
+          <div class="import-dropzone-body">
+            <div class="import-dropzone-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="import-dropzone-title" data-i18n="import.dropTitle">Selecione arquivo para importar</div>
+            <div class="import-dropzone-sub" data-i18n="import.dropSub">XLSX, HTML ou CSV</div>
+            <div class="import-dropzone-actions"><button class="btn btn-ghost btn-sm" onclick="triggerFileInput('importReportInput')" data-i18n="import.selectFile">Selecionar arquivo</button></div>
+          </div>
+        </div>
+        <div id="csvPreview" class="import-preview-shell"></div>
+      </div>
+
+      <div class="import-side-stack">
+        <div class="setup-card test-data-card">
+          <div class="setup-card-title" data-i18n="import.testData">Dados de teste</div>
+          <div class="alert alert-info test-data-card-copy" style="margin-bottom:12px" data-i18n="import.testInfo">Para fins de teste e apresentação, você pode carregar uma base demonstrativa com trades simulados. Isso ajuda a validar dashboard, análises e filtros sem depender de uma importação real.</div>
+          <div class="test-data-card-actions">
+            <button class="btn btn-ghost" onclick="loadTickmillDemoImport()" data-i18n="import.loadTest">Carregar dados de teste</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="importTab-export" style="display:none">
+    <div class="import-export-grid">
+      <div class="setup-card import-backup-card">
+        <div class="setup-card-title" data-i18n="import.backupTitle">Backup completo</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.backupInfo">Use backup completo para trocar de máquina ou voltar versões com tudo preservado.</div>
+        <div class="backup-action-grid">
+          <button class="btn btn-ghost" onclick="exportJSON()" data-i18n="import.exportBackup">↓ Exportar backup completo</button>
+          <input id="importBackupInput" type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+          <button class="btn btn-ghost" onclick="triggerFileInput('importBackupInput')" data-i18n="import.importBackup">↑ Importar backup completo</button>
+        </div>
+        <div id="backupSummary" class="alert alert-info import-backup-summary" style="margin:0" data-i18n="import.backupSummary">Resumo aparece aqui antes de restaurar ou após exportar.</div>
+      </div>
+
+      <div class="setup-card import-csv-move-card">
+        <div class="setup-card-title" data-i18n="import.moveTitle">Movimentação de Trades</div>
+        <div class="alert alert-info import-card-copy" style="margin-bottom:12px" data-i18n="import.moveInfo">Importe arquivo de trades ou exporte recortes personalizados em CSV para análise e troca de dados.</div>
+        <div class="import-move-actions">
+          <input id="importTradesInput" type="file" accept=".csv,.xlsx,.html,.htm,.txt" onchange="handleReportUpload(event)" style="display:none">
+          <button class="btn btn-ghost" onclick="triggerFileInput('importTradesInput')" data-i18n="import.importTrades">↑ Importar arquivo de trades</button>
+        </div>
+        <div class="sep"></div>
+        <div class="setup-card-title import-subsection-title" data-i18n="import.exportCustomTitle">Exportar CSV personalizado</div>
+        <div class="export-filter-grid">
+          <div class="field-group">
+            <label data-i18n="import.startDate">Data inicial</label>
+            <input type="date" id="exportStartDate">
+          </div>
+          <div class="field-group">
+            <label data-i18n="import.endDate">Data final</label>
+            <input type="date" id="exportEndDate">
+          </div>
+          <div class="field-group">
+            <label data-i18n="import.account">Conta</label>
+            <select id="exportAccount">
+              <option value="" data-i18n="import.all">Todas</option>
+            </select>
+          </div>
+        </div>
+        <div class="export-action-row">
+          <button class="btn btn-primary" onclick="exportCSVCustom()" data-i18n="import.exportCustomBtn">↓ Exportar CSV personalizado</button>
+          <button class="btn btn-ghost" onclick="exportCSV()" data-i18n="import.exportAllBtn">↓ Exportar todos os trades</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

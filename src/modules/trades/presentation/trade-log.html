@@ -1,0 +1,78 @@
+<!-- ════ LOG ════ -->
+<div class="page" id="page-log">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="log.kicker">Operações</div>
+      <div class="page-title" data-i18n="log.title">Histórico de Operações</div>
+      <div class="page-sub" data-i18n="log.sub">Gerencie, filtre e revise todas as suas operações</div>
+    </div>
+    <div class="page-actions">
+      <select id="filterAccount" class="btn btn-ghost btn-sm" onchange="renderLog()">
+        <option value="active" data-i18n="log.currentAccount">Conta atual</option>
+        <option value="all" data-i18n="log.allAccounts">Todas contas</option>
+      </select>
+      <select id="filterStrategy" class="btn btn-ghost btn-sm" onchange="renderLog()">
+        <option value="" data-i18n="log.allStrategies">Todas estratégias</option>
+      </select>
+      <div class="log-date-range">
+        <input type="date" id="filterDateStart" class="log-date-input" aria-label="Data inicial" onchange="renderLog()">
+        <span data-i18n="log.dateUntil">até</span>
+        <input type="date" id="filterDateEnd" class="log-date-input" aria-label="Data final" onchange="renderLog()">
+        <button class="log-date-clear" onclick="clearLogDateRange()" data-i18n="log.clearPeriod">Limpar período</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('tradeModal')" data-i18n="log.newTrade">+ Novo Trade</button>
+    </div>
+  </div>
+
+  <div id="logReadOnlyNotice" style="display:none;margin-bottom:12px"></div>
+
+  <div class="metrics-row metrics-row-compact" id="logMetrics"></div>
+
+  <div id="incompleteAlert" style="display:none" class="alert alert-warn incomplete-alert">
+    ⚠ <strong><span id="incompleteCount">0</span> trade(s) com dados incompletos</strong> — <button class="btn-link-warn" onclick="completeAllIncompleteTrades()">completar agora</button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header trade-log-header">
+      <div class="table-title" data-i18n="log.allTrades">Todos os Trades</div>
+      <div class="table-actions trade-log-actions">
+        <span class="text-muted text-mono" id="logCount" style="font-size:11px">0 <span data-i18n="log.records">registros</span></span>
+        <div id="bulkHint" class="bulk-hint" data-i18n="log.hint">Selecione trades para editar, completar incompletos, duplicar ou excluir.</div>
+        <div id="bulkBar">
+          <span id="bulkCount" style="font-size:12px;color:var(--muted)">0 <span data-i18n="log.selected">selecionados</span></span>
+          <button class="btn btn-ghost btn-sm" id="bulkEditBtn" onclick="editSelectedTrades()" data-i18n="log.edit">✏ Editar</button>
+          <button class="btn btn-ghost btn-sm" id="bulkCompleteBtn" onclick="completeSelectedIncompleteTrades()" data-i18n="log.complete">✓ Completar incompletos</button>
+          <button class="btn btn-ghost btn-sm" onclick="duplicateSelectedTrades()" data-i18n="log.duplicate">⧉ Duplicar</button>
+          <button class="btn btn-danger btn-sm" onclick="bulkDelete()" data-i18n="log.delete">🗑 Excluir</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearSelection()" data-i18n="log.cancel">✕ Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="logTable">
+        <thead>
+          <tr id="logThead" style="position:sticky;top:0;background:var(--bg1);z-index:10">
+            <th class="td-chk"><input type="checkbox" id="chkAll" onchange="toggleSelectAll(this)" style="accent-color:var(--accent)"></th>
+            <th class="sortable" onclick="sortLog('idx')"># <span class="sort-ind" id="si-idx"></span></th>
+            <th class="sortable" onclick="sortLog('date')"><span data-i18n="th.date">Data</span> <span class="sort-ind" id="si-date">↓</span></th>
+            <th class="sortable" onclick="sortLog('symbol')"><span data-i18n="th.symbol">Símbolo</span> <span class="sort-ind" id="si-symbol"></span></th>
+            <th data-i18n="th.market">Mercado</th>
+            <th class="sortable" onclick="sortLog('direction')"><span data-i18n="th.type">Tipo</span> <span class="sort-ind" id="si-direction"></span></th>
+            <th data-i18n="th.entry">Entrada</th><th data-i18n="th.stop">Stop</th><th data-i18n="th.tp">Alvo</th><th data-i18n="th.exit">Saída</th>
+            <th data-i18n="th.qty">Qtd</th><th data-i18n="th.riskUsd">Risco $</th>
+            <th class="sortable" onclick="sortLog('r')"><span data-i18n="th.r">R</span> <span class="sort-ind" id="si-r"></span></th>
+            <th class="sortable" onclick="sortLog('pnl')"><span data-i18n="th.pnl">P/L</span> <span class="sort-ind" id="si-pnl"></span></th>
+            <th data-i18n="th.pnlPct">P/L%</th>
+            <th class="sortable" onclick="sortLog('strategy')"><span data-i18n="th.strategy">Estratégia</span> <span class="sort-ind" id="si-strategy"></span></th>
+            <th class="sortable" onclick="sortLog('emotion')"><span data-i18n="th.emotion">Emoção</span> <span class="sort-ind" id="si-emotion"></span></th>
+            <th data-i18n="th.plan">Plano</th><th data-i18n="th.disc">Disc</th>
+            <th class="sortable" onclick="sortLog('status')"><span data-i18n="th.status">Status</span> <span class="sort-ind" id="si-status"></span></th>
+            <th data-i18n="th.actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="logTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

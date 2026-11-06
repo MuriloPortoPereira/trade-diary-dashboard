@@ -66,6 +66,7 @@ Não foram adicionados hooks globais nem alterados modelos, permissões ou orça
 
 ```bash
 node --test tests/*.test.cjs
+node scripts/build-index.cjs --check
 node scripts/build-study-hub-template.cjs --check
 node --check app.js
 node --check src/modules/simulation/domain/calculate-simulation-sizing.js
@@ -83,6 +84,11 @@ Lint, typecheck, formatador e build não existem no baseline; não foram simulad
 Desde G7a, após editar `src/modules/study-hub/presentation/templates/*.html`, executar
 `node scripts/build-study-hub-template.cjs`. O asset é commitado; produção continua servindo arquivos estáticos
 sem executar build. `--check` e a suíte validam sincronização. Contrato em [ADR-004](adr/004-study-hub-html-authoring.md).
+
+Desde G7b, localizar a página HTML pelo manifesto `src/app/presentation/shell/index.fragments.json`.
+Após editar a fonte da feature ou `shell/{open,close}.html`, executar `node scripts/build-index.cjs`
+e versionar fonte e saída. O gerador preserva bytes/ordem; `--check` detecta saída desatualizada.
+Não editar somente `index.html`. Produção não executa o gerador; ver [ADR-005](adr/005-static-shell-composition.md).
 
 Smoke requer Chrome/Chromium instalado. Por padrão usa `google-chrome`;
 para outro binário: `CHROME_BIN=/caminho/chromium node scripts/browser-smoke.cjs`.

@@ -1,0 +1,90 @@
+<!-- ════ SETUP ════ -->
+<div class="page" id="page-setup">
+  <div class="page-header flex gap-12" style="align-items:flex-start">
+    <div><div class="page-kicker" data-i18n="setup.kicker">Risco</div><div class="page-title" data-i18n="setup.title">Conta e Setup</div><div class="page-sub" data-i18n="setup.sub">Parâmetros da conta, limites de risco e biblioteca operacional</div></div>
+    <div class="ml-auto"><button class="btn btn-primary btn-sm" onclick="saveConfig()" data-i18n="setup.save">💾 Salvar</button></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="setup.accountRisk">Conta e Risco</div>
+      <div class="form-grid fg-2">
+        <div class="field-group"><label data-i18n="setup.initialBalance">Saldo Inicial ($)</label><input type="number" id="cfg-balance" placeholder="1000" step="0.01" oninput="previewSetupRiskFromForm()"></div>
+        <div class="field-group"><label data-i18n="setup.goalPct">Meta da Conta (%)</label><div class="iu"><input type="number" id="cfg-goal" placeholder="10" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.riskPerTrade">Risco por Trade (%)</label><div class="iu"><input type="number" id="cfg-risk" placeholder="1" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddDaily">DD Diário (%)</label><div class="iu"><input type="number" id="cfg-dd-daily" placeholder="2" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddWeekly">DD Semanal (%)</label><div class="iu"><input type="number" id="cfg-dd-weekly" placeholder="5" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddMonthly">DD Mensal (%)</label><div class="iu"><input type="number" id="cfg-dd-monthly" placeholder="8" step="0.1" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.ddMax">DD Máximo (%)</label><div class="iu"><input type="number" id="cfg-dd" placeholder="10" step="0.5" oninput="previewSetupRiskFromForm()"><span class="u">%</span></div></div>
+        <div class="field-group"><label data-i18n="setup.defaultTf">Timeframe Padrão</label><select id="cfg-tf"><option>1M</option><option>2M</option><option>5M</option><option>15M</option><option>30M</option><option>1H</option><option>4H</option><option>1D</option></select></div>
+        <div class="field-group"><label data-i18n="setup.defaultSymbol">Símbolo Padrão</label><input type="text" id="cfg-sym-default" placeholder="US30, EURUSD..."></div>
+      </div>
+    </div>
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="setup.calcTitle">Cálculos da Conta Ativa</div>
+      <div class="account-calc-grid">
+        <div><span data-i18n="setup.calcInitial">Saldo inicial</span><strong id="setupInitialBalance">—</strong></div>
+        <div><span data-i18n="setup.calcCashflow">Aportes líquidos</span><strong id="setupCashflowNet">—</strong></div>
+        <div><span data-i18n="setup.calcCurrent">Saldo atual</span><strong id="setupCurrentBalance">—</strong></div>
+        <div><span data-i18n="setup.calcRisk">Risco por trade</span><strong id="setupRiskPerTrade">—</strong></div>
+        <div><span data-i18n="setup.calcDdDaily">DD diário</span><strong id="setupDailyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdWeekly">DD semanal</span><strong id="setupWeeklyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdMonthly">DD mensal</span><strong id="setupMonthlyDdLimit">—</strong></div>
+        <div><span data-i18n="setup.calcDdMax">DD máximo</span><strong id="setupMaxDdLimit">—</strong></div>
+      </div>
+      <div class="alert alert-info" style="margin-top:12px" data-i18n="setup.calcInfo">Saldo atual = saldo inicial + aportes − retiradas + P/L dos trades. Risco, DD diário, semanal, mensal e máximo usam o capital ajustado da conta ativa.</div>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.cashflow">Aportes e Retiradas</div>
+    <div class="form-grid fg-4" style="margin-bottom:10px">
+      <div class="field-group"><label data-i18n="setup.flowType">Tipo</label><select id="setup-flow-type"><option value="deposit" data-i18n="setup.deposit">Aporte</option><option value="withdrawal" data-i18n="setup.withdrawal">Retirada</option></select></div>
+      <div class="field-group"><label data-i18n="setup.flowDate">Data</label><input type="date" id="setup-flow-date"></div>
+      <div class="field-group"><label data-i18n="setup.flowAmount">Valor ($)</label><input type="number" id="setup-flow-amount" placeholder="100" step="0.01"></div>
+      <div class="field-group"><label data-i18n="setup.flowNote">Observação</label><input type="text" id="setup-flow-note" data-i18n-ph="setup.optional" placeholder="Opcional"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="addSetupCashflowFromForm()" data-i18n="setup.addFlow">+ Adicionar movimento</button>
+    </div>
+    <div id="setupCashflowList" class="account-cashflow-list"></div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.strategies">Estratégias <span style="font-size:10px;color:var(--muted);font-weight:400">— editar, remover e adicionar</span></div>
+    <div class="tag-list" id="strategyTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newStrategy" data-i18n-ph="setup.newStrategy" placeholder="Nova estratégia...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('strategy')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.emotions">Emoções</div>
+    <div class="tag-list" id="emotionTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newEmotion" data-i18n-ph="setup.newEmotion" placeholder="Nova emoção...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('emotion')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-card-title" data-i18n="setup.markets">Mercados</div>
+    <div class="tag-list" id="marketTags"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-end">
+      <div class="field-group" style="flex:1">
+        <input type="text" id="newMarket" data-i18n-ph="setup.newMarket" placeholder="Novo mercado...">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addTag('market')" data-i18n="setup.addTag">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div style="margin-top:6px">
+    <button class="btn btn-danger btn-sm" onclick="clearAll()" data-i18n="setup.clearAll">⚠ Limpar todos os dados</button>
+  </div>
+</div>
+

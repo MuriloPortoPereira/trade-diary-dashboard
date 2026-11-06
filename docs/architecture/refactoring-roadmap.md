@@ -994,6 +994,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Runtime: 170.565 → 11.187 bytes, 233 linhas; `app.js` continua com 2.269. Caracterização pré-corte, 91 arquivos Node e smoke com 113 checks.
 - Próximo G7b: avaliar composição do shell/compatibilidade, seguido da revisão de acoplamentos e fechamento arquitetural.
 
+## G7b: HTML de autoria do shell e páginas
+
+- Quinze views completas nas respectivas features e dois fragmentos do shell; ordem explícita em `src/app/presentation/shell/index.fragments.json`.
+- `scripts/build-index.cjs` concatena buffers em `index.html` versionado, sem montagem no navegador ou build no deploy; [ADR-005](adr/005-static-shell-composition.md).
+- Caracterização pré-corte e resultado protegem os mesmos 107.193 bytes, inclusive LF/CRLF, IDs, handlers, estilos e ordem dos scripts. `--check` protege sincronização.
+- 92 arquivos Node e 113 checks no navegador aprovados. Nenhum código de runtime alterado; `app.js` continua com 2.269 linhas.
+- Próximo: revisão de compatibilidade/consumidores e resíduos de `app.js`, seguida da consolidação justificada e fechamento dos critérios arquiteturais. Não remover wrappers por tamanho.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1055,3 +1063,4 @@ Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS;
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
 A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. G7a eliminou a linha gigante de autoria: editar os quatro HTMLs em `presentation/templates/`. `study-hub-template.js` tem exceção como asset gerado de distribuição, sem lógica de negócio; fontes legíveis, gerador e --check são a interface de manutenção. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.
+G7b tornou `index.html` uma distribuição gerada/versionada: manter seu tamanho preserva o deploy estático; autoria ocorre nas quinze views e dois fragmentos do shell. Não é necessário dividi-lo em runtime. `.gitattributes` preserva os bytes herdados das fontes e saída; gerador/teste garantem sincronização.

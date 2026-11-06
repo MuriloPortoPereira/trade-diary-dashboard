@@ -1,7 +1,11 @@
 # Mapa de módulos
 
-Catálogo funcional da baseline `ab0cb63`. Os módulos são responsabilidades existentes dentro
-de `app.js`, não diretórios já separados. Localizar símbolos com Serena antes de ler trechos.
+Catálogo iniciado na baseline `ab0cb63`, atualizado com os limites físicos extraídos.
+Localizar símbolos com Serena antes de ler trechos; os resíduos legados permanecem em `app.js`.
+
+HTML de autoria: `src/app/presentation/shell/index.fragments.json` lista, em ordem, duas fontes do shell
+e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `index.html` versionado;
+`tests/index-composition.test.cjs` protege sincronização, bytes e páginas. Ver [ADR-005](adr/005-static-shell-composition.md).
 
 | Feature | Entradas/símbolos | Dependências atuais |
 |---|---|---|

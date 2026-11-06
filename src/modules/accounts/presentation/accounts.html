@@ -1,0 +1,18 @@
+<!-- ════ CONTAS ════ -->
+<div class="page" id="page-accounts">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="accounts.kicker">Estrutura</div>
+      <div class="page-title" data-i18n="accounts.title">Contas</div>
+      <div class="page-sub" data-i18n="accounts.sub">Painel consolidado das contas, limites de risco e performance por carteira.</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('setup')" data-i18n="accounts.riskSetup">Risco & setup</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('accountModal')" data-i18n="accounts.manage">Gerenciar contas</button>
+    </div>
+  </div>
+
+  <div class="metrics-row metrics-row-compact" id="accountsMetrics"></div>
+  <div id="accountsOverview" class="account-overview-grid"></div>
+</div>
+

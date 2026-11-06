@@ -1,0 +1,228 @@
+<!-- ════ STATS ════ -->
+<div class="page" id="page-stats">
+  <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
+    <div><div class="page-kicker" data-i18n="stats.kicker">Insights</div><div class="page-title" data-i18n="stats.title">Análises</div><div class="page-sub" data-i18n="stats.sub">Leitura completa da performance, consistência e contexto operacional</div></div>
+    <div class="flex gap-8 ml-auto" style="flex-wrap:wrap;align-items:center">
+      <select class="btn btn-ghost btn-sm stats-filter-select" id="statAccount" onchange="onStatsAccountChange()">
+        <option value="all" data-i18n="stats.allAccounts">Todas as contas</option>
+      </select>
+      <select class="btn btn-ghost btn-sm stats-filter-select" id="statPeriod" onchange="toggleCustomPeriod()">
+        <option value="custom" selected data-i18n="stats.custom">Personalizado</option>
+        <option value="week" data-i18n="stats.thisWeek">Esta semana</option>
+        <option value="month" data-i18n="stats.thisMonth">Este mês</option>
+        <option value="year" data-i18n="stats.thisYear">Este ano</option>
+      </select>
+      <div id="customPeriodBar" style="display:flex;gap:6px;align-items:center" class="flex">
+        <input type="date" id="statDateFrom" onchange="renderStats()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:5px 9px;font-size:11px">
+        <span style="color:var(--muted);font-size:11px" data-i18n="stats.until">até</span>
+        <input type="date" id="statDateTo" onchange="renderStats()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:5px 9px;font-size:11px">
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-nav" id="statTabNav">
+    <button class="tab-btn active" onclick="switchStatTab('overview',this)" data-i18n="stats.tab.overview">Visão Geral</button>
+    <button class="tab-btn" onclick="switchStatTab('strategy',this)" data-i18n="stats.tab.strategy">Por Estratégia</button>
+    <button class="tab-btn" onclick="switchStatTab('time',this)" data-i18n="stats.tab.time">Por Tempo</button>
+    <button class="tab-btn" onclick="switchStatTab('psych',this)" data-i18n="stats.tab.psych">Psicológico</button>
+    <button class="tab-btn" onclick="switchStatTab('simulation',this)" data-i18n="stats.tab.simulation">Simulação</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="statTab-overview">
+    <div class="metrics-row" id="statsMetrics"></div>
+    <div class="chart-card">
+      <div class="chart-title" data-i18n="stats.riskTitle">Risco, Stops e Taxas</div>
+      <div id="statsRiskLeakageRows" class="risk-insight-grid"></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.equityChart">Curva de Equity</div><div class="chart-wrap" style="height:180px"><canvas id="stEqChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wlChart">Distribuição W/L</div><div class="chart-wrap" style="height:180px"><canvas id="stWLChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.rChart">R-Múltiplos</div><div class="chart-wrap" style="height:140px"><canvas id="stRChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wdChart">P/L por Dia da Semana</div><div class="chart-wrap" style="height:140px"><canvas id="stWdChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.monthChart">Evolução Mensal</div><div class="chart-wrap" style="height:140px"><canvas id="stMonthChart"></canvas></div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.ddChart">Equity × Drawdown</div><div class="chart-wrap" style="height:150px"><canvas id="stDdChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.histChart">Histograma P/L</div><div class="chart-wrap" style="height:150px"><canvas id="stHistChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card">
+        <div class="chart-title" data-i18n="stats.metricsTable">Tabela de Métricas</div>
+        <div id="statsMetTable"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title" data-i18n="stats.streak">Streak & Sequências</div>
+        <div id="statsStreakRows"></div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)"></div>
+        <div id="stSymRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BY STRATEGY -->
+  <div id="statTab-strategy" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.stratPnl">P/L por Estratégia</div><div class="chart-wrap" style="height:180px"><canvas id="stStratPnlChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.stratWR">Win Rate por Estratégia</div><div class="chart-wrap" style="height:180px"><canvas id="stStratWRChart"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="stats.stratCompare">Comparativo de Estratégias</div>
+        <div class="strategy-compare-toolbar">
+          <label class="strategy-compare-toolbar-label" data-i18n="stats.compareLabel">Comparar:</label>
+          <div class="strategy-compare-toolbar-controls">
+            <select id="stStratA" class="strategy-compare-select" onchange="renderStats()"><option value="" data-i18n="stats.stratA">Estratégia A</option></select>
+            <span class="strategy-compare-toolbar-vs" data-i18n="stats.vs">vs</span>
+            <select id="stStratB" class="strategy-compare-select" onchange="renderStats()"><option value="" data-i18n="stats.stratB">Estratégia B</option></select>
+          </div>
+        </div>
+      </div>
+      <table class="tbl"><thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.wins">Wins</th><th data-i18n="th.wr">WR%</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.pf">PF</th><th data-i18n="th.exp">Expectância</th><th data-i18n="th.sharpe">Sharpe</th><th data-i18n="th.sortino">Sortino</th><th data-i18n="th.calmar">Calmar</th><th data-i18n="th.recFactor">Fator Rec.</th></tr></thead><tbody id="stStratBody"></tbody></table>
+    </div>
+    <div id="stStratCompare" class="strategy-compare-shell" style="display:none;margin-top:14px">
+      <div id="stCmpEmpty" class="chart-card strategy-compare-empty" style="display:none"></div>
+      <div id="stCmpFull" class="strategy-compare-full" style="display:none">
+        <div class="chart-card strategy-compare-hero">
+          <div class="table-header">
+            <div class="table-title" data-i18n="stats.compPanel">Painel da Comparação</div>
+            <div class="text-muted text-mono" id="stCmpInsights"></div>
+          </div>
+          <div class="chart-wrap" style="height:240px"><canvas id="stCmpEquityChart"></canvas></div>
+        </div>
+        <div class="strategy-compare-cards" id="stCmpCards"></div>
+        <div class="strategy-compare-grid">
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compBars">Barras comparativas</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpMetricBarsChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpMetricExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpMetricSummary"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compDist">Distribuição dos resultados</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpOutcomeChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpOutcomeExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpOutcomeSummary"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" data-i18n="stats.compTiming">Timing médio</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="stCmpTimingChart"></canvas></div>
+            <div class="strategy-compare-note strategy-compare-chart-note" id="stCmpTimingExplain"></div>
+            <div class="analysis-summary-grid" id="stCmpTimingSummary"></div>
+          </div>
+        </div>
+        <div class="strategy-compare-cards">
+          <div class="chart-card" id="stCmpA"></div>
+          <div class="chart-card" id="stCmpB"></div>
+        </div>
+        <div class="table-card">
+          <div class="table-header"><div class="table-title" data-i18n="stats.compSummary">Resumo final</div></div>
+          <table class="tbl">
+            <thead><tr><th data-i18n="th.metric">Métrica</th><th data-i18n="th.stratA">Estratégia A</th><th data-i18n="th.stratB">Estratégia B</th><th data-i18n="th.leads">Lidera</th></tr></thead>
+            <tbody id="stCmpSummaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BY TIME -->
+  <div id="statTab-time" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.monthPnl">P/L por Mês</div><div class="chart-wrap" style="height:180px"><canvas id="stMonthPnlChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.wdWR">Win Rate por Dia da Semana</div><div class="chart-wrap" style="height:180px"><canvas id="stWdWRChart"></canvas></div></div>
+    </div>
+    <div class="metrics-row" id="stTimeCards"></div>
+    <div class="chart-card"><div class="chart-title" data-i18n="stats.hourHeatmap">Trades por Horário (acionamento)</div><div id="stHourHeatmap" style="padding:10px"></div></div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.wdPerf">Desempenho por Dia da Semana</div></div>
+      <table class="tbl"><thead><tr><th data-i18n="th.period">Período</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.avgR">Avg R</th></tr></thead><tbody id="stTimeBody"></tbody></table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.timingStrat">Timing por Estratégia</div></div>
+      <table class="tbl"><thead><tr><th data-i18n="th.strategy">Estratégia</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.placedTime">Hora colocada</th><th data-i18n="th.trigTime">Hora acionada</th><th data-i18n="th.exitTime">Hora saída</th><th data-i18n="th.avgDuration">Duração média</th></tr></thead><tbody id="stTimeStrategyBody"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SIMULATION -->
+  <div id="statTab-simulation" style="display:none">
+    <div class="setup-card">
+      <div class="setup-card-title" data-i18n="stats.monteCarlo">Simulação Monte Carlo — Próximas N Trades</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px">
+        <div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simAccount">Conta</label>
+              <select id="simAccount" onchange="loadSimFromAccount()">
+                <option value="manual" data-i18n="stats.simManual">Manual</option>
+              </select>
+            </div>
+            <div class="field-group"><label data-i18n="stats.simTrades">Número de trades</label><input type="number" id="simN" value="20" min="5" max="200" oninput="renderSimulation()"></div>
+          </div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simWR">Win Rate (%)</label><div class="iu"><input type="number" id="simWR" value="55" min="1" max="99" step="0.1" oninput="renderSimulation()" onchange="clampSimulationWinRateInput();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simBalance">Saldo atual da conta</label><input type="number" id="simBalance" value="1000" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"></div>
+          </div>
+          <div class="form-grid fg-2" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="stats.simRiskPct">Risco por trade (%)</label><div class="iu"><input type="number" id="simRiskPct" value="1" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simRiskUsd">Risco por trade ($)</label><input type="number" id="simRisk" value="10" min="0" step="0.01" readonly></div>
+          </div>
+          <div class="field-group" style="margin-bottom:10px">
+            <label data-i18n="stats.simRRR">RRR Alvo (personalizado)</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select id="simRRR" onchange="renderSimulation()" style="flex:1">
+                <option value="0.618">0.618R</option>
+                <option value="1">1R (1:1)</option>
+                <option value="1.1" selected>1.1R</option>
+                <option value="1.141">1.141R</option>
+                <option value="1.618">1.618R</option>
+                <option value="2">2R (1:2)</option>
+                <option value="3">3R (1:3)</option>
+                <option value="custom" data-i18n="stats.simCustom">Personalizado</option>
+              </select>
+              <input type="number" id="simRRRCustom" value="1.1" step="0.001" min="0.1" style="width:80px;display:none" oninput="renderSimulation()">
+            </div>
+          </div>
+          <div class="form-grid fg-2">
+            <div class="field-group"><label data-i18n="stats.simGoalPct">Meta (%)</label><div class="iu"><input type="number" id="simGoalPct" value="10" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simGoalUsd">Meta ($)</label><input type="number" id="simGoalDay" value="100" step="0.01" readonly></div>
+            <div class="field-group"><label data-i18n="stats.simStopPct">Stop (%)</label><div class="iu"><input type="number" id="simStopPct" value="2" min="0" step="0.01" oninput="syncSimulationMoneyFromPercent();renderSimulation()"><span class="u">%</span></div></div>
+            <div class="field-group"><label data-i18n="stats.simStopUsd">Stop ($)</label><input type="number" id="simStopDay" value="20" step="0.01" readonly></div>
+          </div>
+        </div>
+        <div>
+          <div class="metrics-row" id="simCards" style="margin-bottom:12px;grid-template-columns:1fr 1fr"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px" id="simSummary"></div>
+          <div id="simPlan" class="status-list compact"></div>
+        </div>
+      </div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.simChartTitle">Monte Carlo — 100 cenários de curva de equity</div><div class="chart-wrap" style="height:200px"><canvas id="simChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- PSICOLÓGICO NAS STATS -->
+  <div id="statTab-psych" style="display:none">
+    <div class="metrics-row" id="statPsychCards"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.emoWR">Win Rate por Emoção (durante)</div><div class="chart-wrap" style="height:180px"><canvas id="statEmoWRChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.emoPnl">P/L médio por Emoção</div><div class="chart-wrap" style="height:180px"><canvas id="statEmoPnlChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.discWR">Disciplina × Win Rate</div><div class="chart-wrap" style="height:180px"><canvas id="statDiscWRChart"></canvas></div><div class="analysis-summary-grid" id="statDiscSummary"></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.errors">Erros mais frequentes</div><div class="chart-wrap" style="height:160px"><canvas id="statErrorsChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.hesitation">Trades por hesitação (perdidos)</div><div id="statHesitationWrap" style="padding:10px"></div></div>
+      <div class="chart-card"><div class="chart-title" data-i18n="stats.planChart">P/L por status de plano seguido</div><div class="chart-wrap" style="height:180px"><canvas id="statPlanChart"></canvas></div><div class="analysis-summary-grid" id="statPlanSummary"></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title" data-i18n="stats.emoAnalysis">Análise por Emoção</div></div>
+      <table class="tbl">
+        <thead><tr><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.trades">Trades</th><th data-i18n="th.winRate">Win Rate</th><th data-i18n="th.avgPnl">P/L médio</th><th data-i18n="th.avgR">Avg R</th><th data-i18n="th.followedPlan">Seguiu plano</th><th data-i18n="th.avgDisc">Disciplina média</th></tr></thead>
+        <tbody id="statEmoBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

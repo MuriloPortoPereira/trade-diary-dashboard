@@ -1,0 +1,97 @@
+<!-- ════ DASHBOARD ════ -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="dash.kicker">Command Center</div>
+      <div class="page-title" data-i18n="dash.title">Dashboard</div>
+      <div class="page-sub" id="dashSub" data-i18n="dash.sub">Visão geral da performance, risco e consistência.</div>
+    </div>
+    <div class="page-actions">
+      <select class="btn btn-ghost btn-sm" id="dashPeriod" onchange="renderDashboard()">
+        <option value="all" data-i18n="dash.period.all">Todo período</option>
+        <option value="today" data-i18n="dash.period.today">Hoje</option>
+        <option value="month" data-i18n="dash.period.month">Este mês</option>
+        <option value="week" data-i18n="dash.period.week">Esta semana</option>
+        <option value="year" data-i18n="dash.period.year">Este ano</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('log')" data-i18n="dash.openTrades">Abrir trades</button>
+    </div>
+  </div>
+  <div class="metrics-row metrics-row-hero" id="dashMetrics"></div>
+
+  <div class="dashboard-command-grid">
+    <div class="chart-card board-card board-card-xl">
+      <div class="board-header">
+        <div>
+          <div class="chart-title" data-i18n="dash.riskCenter">Centro de Risco</div>
+          <div class="board-title" data-i18n="dash.riskSub">Proteção da conta e exposição operacional</div>
+        </div>
+      </div>
+      <div class="risk-command-grid">
+        <div class="risk-highlight-panel">
+          <div class="risk-highlight-label" id="riskIdealLabel" data-i18n="dash.riskIdeal">Risco ideal por trade</div>
+          <div class="risk-highlight-value" id="riskIdealTrade">—</div>
+          <div class="risk-highlight-sub" id="riskIdealTradeSub">—</div>
+        </div>
+        <div class="risk-progress-stack" id="riskProgress"></div>
+      </div>
+      <div class="risk-alert-list" id="riskSignals"></div>
+    </div>
+
+    <div class="chart-card board-card">
+      <div class="board-header">
+        <div>
+          <div class="chart-title" data-i18n="dash.stratRadar">Radar de Estratégias</div>
+          <div class="board-title" data-i18n="dash.stratSub">O que mais está pagando agora</div>
+        </div>
+      </div>
+      <div id="dashStrategyBoard" class="strategy-board"></div>
+    </div>
+  </div>
+
+  <div class="dashboard-chart-stack">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center"><span id="equityChartTitle" data-i18n="dash.equityChart">Curva de Equity</span><button class="btn btn-ghost btn-sm" id="eqModeBtn" onclick="toggleEqMode()" style="font-size:10px;padding:2px 8px" data-i18n="dash.equityPct">% retorno</button></div>
+        <div class="chart-wrap" style="height:220px"><canvas id="equityChart"></canvas></div>
+      </div>
+      <div class="chart-card"><div class="chart-title" id="wlChartTitle" data-i18n="dash.wlChart">Distribuição W/L</div><div class="chart-wrap" style="height:220px"><canvas id="wlChart"></canvas></div></div>
+    </div>
+
+    <div class="chart-grid-3">
+      <div class="chart-card"><div class="chart-title" id="rBarChartTitle" data-i18n="dash.rChart">R-Múltiplos</div><div class="chart-wrap" style="height:150px"><canvas id="rBarChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="wdayChartTitle" data-i18n="dash.wdayChart">P/L por Dia da Semana</div><div class="chart-wrap" style="height:150px"><canvas id="wdayChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="monthEvChartTitle" data-i18n="dash.monthChart">Evolução Mensal</div><div class="chart-wrap" style="height:150px"><canvas id="monthEvChart"></canvas></div></div>
+    </div>
+
+    <div class="chart-grid-2">
+      <div class="chart-card"><div class="chart-title" id="stratDashChartTitle" data-i18n="dash.stratChart">P/L por Estratégia</div><div class="chart-wrap" style="height:160px"><canvas id="stratDashChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title" id="emoDashChartTitle" data-i18n="dash.emoChart">Win Rate por Emoção</div><div class="chart-wrap" style="height:160px"><canvas id="emoDashChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="dashboard-lower-grid">
+    <div class="table-card dashboard-recent-trades">
+      <div class="table-header"><div class="table-title" data-i18n="dash.recentTrades">Trades Recentes</div><button class="btn btn-ghost btn-sm" onclick="showPage('log')" data-i18n="dash.viewAll">Ver todos</button></div>
+      <div class="dashboard-table-scroll">
+        <table class="tbl"><thead><tr><th data-i18n="th.date">Data</th><th data-i18n="th.symbol">Símbolo</th><th data-i18n="th.type">Tipo</th><th>Modo</th><th data-i18n="th.entry">Entrada</th><th data-i18n="th.exit">Saída</th><th data-i18n="th.r">R</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.status">Status</th></tr></thead>
+        <tbody id="recentTrades"></tbody></table>
+      </div>
+    </div>
+
+    <aside class="dashboard-side-column">
+      <div class="chart-card board-card">
+        <div class="board-header">
+          <div>
+            <div class="chart-title" data-i18n="dash.visualDiary">Diário Visual</div>
+            <div class="board-title" id="dashCalendarMonth">—</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('calendar')" data-i18n="dash.openCalendar">Abrir</button>
+        </div>
+        <div id="dashCalendarMini" class="dash-calendar-mini"></div>
+        <div id="dashWeekBreakdown" class="week-breakdown"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+

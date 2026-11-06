@@ -37,3 +37,8 @@ src/modules/partners/presentation/partners.css -text whitespace=-blank-at-eof,cr
 src/styles/tag-cloud.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/page-motion.css -text whitespace=-blank-at-eof,cr-at-eol
 src/styles/responsive-desktop-tablet.css -text whitespace=-blank-at-eof,cr-at-eol
+
+# Authored shell/page fragments retain original mixed newlines and blank separators.
+src/app/presentation/shell/*.html -text whitespace=-blank-at-eof,cr-at-eol
+src/modules/*/presentation/*.html -text whitespace=-blank-at-eof,cr-at-eol
+index.html -text whitespace=cr-at-eol

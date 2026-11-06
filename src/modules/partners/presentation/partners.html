@@ -1,0 +1,41 @@
+<!-- ════ PARCEIROS ════ -->
+<div class="page" id="page-partners">
+  <div class="page-header app-page-header">
+    <div>
+      <div class="page-kicker" data-i18n="partners.kicker">Ecossistema</div>
+      <div class="page-title" data-i18n="partners.title">Parceiros</div>
+      <div class="page-sub" data-i18n="partners.sub">Cadastre afiliados de prop firms, apoio por BTC e links de suporte quando quiser ativar esta área.</div>
+    </div>
+  </div>
+
+  <div class="partner-config-grid">
+    <div class="setup-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="partners.affiliates">Afiliados de Prop Firms</div>
+        <button class="btn btn-ghost btn-sm" id="partnerAddAffiliateBtn" type="button" onclick="addPartnerAffiliate()" data-i18n="partners.addAffiliate">Adicionar afiliado</button>
+      </div>
+      <div id="partnerAffiliatesEditor" class="partner-affiliates-editor"></div>
+    </div>
+
+    <div class="setup-card">
+      <div class="table-header">
+        <div class="table-title" data-i18n="partners.support">Apoio / Doação</div>
+      </div>
+      <div class="partner-support-form">
+        <div class="field-group">
+          <label data-i18n="partners.btcAddress">Endereço BTC</label>
+          <input type="text" id="partnerBtcAddress" data-i18n-ph="partners.btcPlaceholder" placeholder="Cole aqui o endereço BTC" onchange="updatePartnerSupportField('btcAddress',this.value)">
+        </div>
+        <div class="field-group">
+          <label data-i18n="partners.coffeeLink">Link Buy Me a Coffee / apoio</label>
+          <input type="url" id="partnerCoffeeUrl" placeholder="https://buymeacoffee.com/..." onchange="updatePartnerSupportField('coffeeUrl',this.value)">
+        </div>
+        <input id="partnerBtcQrInput" type="file" accept="image/*" onchange="handlePartnerBtcQrUpload(event)" style="display:none">
+        <div id="partnerBtcQrPreview"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="partnersGrid" class="partner-grid"></div>
+</div>
+

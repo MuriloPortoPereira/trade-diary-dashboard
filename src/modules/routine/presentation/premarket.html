@@ -1,0 +1,58 @@
+<!-- ════ PRÉ-MARKET ════ -->
+<div class="page" id="page-premarket">
+  <div class="page-header flex gap-12" style="align-items:flex-start">
+    <div>
+      <div class="page-kicker" data-i18n="pm.kicker">Rotina</div>
+      <div class="page-title" data-i18n="pm.title">Rotina do Trade</div>
+      <div class="page-sub" data-i18n="pm.sub">Disciplina diária e planos de trading por conta</div>
+    </div>
+    <div class="flex gap-8 ml-auto" style="align-items:center">
+      <button class="btn btn-ghost btn-sm" onclick="shiftPMMonth(-1)" style="padding:4px 10px;font-size:16px;line-height:1">‹</button>
+      <span id="pmMonthLabel" style="font-size:13px;font-weight:600;min-width:120px;text-align:center;color:var(--text)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="shiftPMMonth(1)" style="padding:4px 10px;font-size:16px;line-height:1">›</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:14px">
+    <div class="chart-card">
+      <div class="chart-title" style="display:flex;align-items:center;gap:8px">
+        <span data-i18n="pm.disciplineMonth">Disciplina no mês</span>
+        <span id="pmDisciplinePct" style="color:var(--cyan);font-weight:700;font-size:13px"></span>
+      </div>
+      <div class="chart-wrap" style="height:160px"><canvas id="pmDisciplineChart"></canvas></div>
+    </div>
+    <div class="setup-card" style="padding:14px 16px">
+      <div class="setup-card-title" style="margin-bottom:4px" data-i18n="pm.resultPeriod">Resultado no período</div>
+      <div id="pmResultStats"></div>
+    </div>
+  </div>
+
+  <div class="metrics-row" id="pmCorrelCards"></div>
+
+  <div class="setup-card" style="overflow-x:auto;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="setup-card-title" data-i18n="pm.checklist">Checklist do mês</div>
+      <div style="font-size:11px;color:var(--muted)">
+        <span data-i18n="pm.accumulated">Disciplina acumulada:</span> <span id="pmMetaMes" style="color:var(--cyan);font-weight:700">0%</span>
+      </div>
+    </div>
+    <div id="pmHabitGrid"></div>
+  </div>
+
+  <div class="setup-card" style="padding:16px;margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="setup-card-title" data-i18n="pm.manageHabits">Gerenciar hábitos</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pmHabitMgr').style.display=document.getElementById('pmHabitMgr').style.display==='none'?'block':'none'" data-i18n="pm.editBtn">Editar ▾</button>
+    </div>
+    <div id="pmHabitMgr" style="display:none">
+      <div id="pmHabitList" style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div class="field-group" style="flex:1">
+          <input id="pmNewHabit" type="text" placeholder="Novo hábito…" data-i18n-ph="pm.newHabit">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addPMHabit()" data-i18n="pm.addHabit">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+</div>
+

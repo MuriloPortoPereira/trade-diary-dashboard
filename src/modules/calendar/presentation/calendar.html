@@ -1,0 +1,36 @@
+<!-- ════ CALENDÁRIO ════ -->
+<div class="page" id="page-calendar">
+  <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
+    <div><div class="page-kicker" data-i18n="cal.kicker">Diário</div><div class="page-title" data-i18n="cal.title">Diário de Performance</div><div class="page-sub" data-i18n="cal.sub">Sua evolução operacional por sessão, semana e mês</div></div>
+    <div class="calendar-toolbar flex gap-8 ml-auto" style="flex-shrink:0;flex-wrap:wrap;align-items:center">
+      <!-- Date picker rápido -->
+      <div class="calendar-month-control" style="display:flex;gap:4px;align-items:center;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px 10px">
+        <input type="month" id="calMonthPicker" class="calendar-month-input" onchange="calGoToMonth(this.value)" style="background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace">
+      </div>
+      <!-- Modo -->
+      <div class="calendar-view-toggle" style="display:flex;gap:2px;background:var(--bg2);border-radius:8px;padding:3px">
+        <button class="tab-btn calendar-mode-btn active" id="calBtnWeek" onclick="setCalView('week')" data-i18n="cal.monthly">Mensal</button>
+        <button class="tab-btn calendar-mode-btn" id="calBtnBiweek" onclick="setCalView('biweek')" data-i18n="cal.biweekly">Quinzenal</button>
+      </div>
+    </div>
+  </div>
+  <div class="metrics-row" id="calStats"></div>
+  <div class="calendar-card">
+    <div class="calendar-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="cal-nav-btn" onclick="calNav(-1)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center">‹</button>
+        <div class="cal-title" id="calTitle">Abril 2026</div>
+        <button class="cal-nav-btn" onclick="calNav(1)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+    </div>
+    <div id="calGridWrap"></div>
+  </div>
+  <div class="table-card" id="calDayDetail" style="display:none">
+    <div class="table-header"><div class="table-title" id="calDayTitle" data-i18n="cal.dayTrades">Trades do dia</div></div>
+    <table class="tbl">
+      <thead><tr><th data-i18n="th.symbol">Símbolo</th><th data-i18n="th.dir">Dir</th><th data-i18n="th.entry">Entrada</th><th data-i18n="th.exit">Saída</th><th data-i18n="th.r">R</th><th data-i18n="th.pnl">P/L</th><th data-i18n="th.emotion">Emoção</th><th data-i18n="th.status">Status</th></tr></thead>
+      <tbody id="calDayTbody"></tbody>
+    </table>
+  </div>
+</div>
+

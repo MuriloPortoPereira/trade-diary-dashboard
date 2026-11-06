@@ -1,0 +1,429 @@
+</main>
+</div>
+
+<!-- ════ MODAL: NOVO TRADE ════ -->
+<div class="modal-overlay" id="tradeModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="tradeModalTitle" data-i18n="modal.trade.register">Registrar Trade</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('tradeModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Linha 0: conta -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;background:var(--bg2);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">
+        <div class="field-group" style="margin-bottom:0;flex:1">
+          <label style="font-size:10px" data-i18n="modal.trade.account">Conta</label>
+          <select id="t-account" onchange="onAccountChange()" style="background:transparent;border:none;color:var(--text);font-size:12px;font-weight:600;padding:0"></select>
+        </div>
+        <div id="t-acct-info" style="font-size:10px;color:var(--muted);text-align:right"></div>
+      </div>
+      <!-- Linha 1: ativo + data + mercado + tipo -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.symbol">Símbolo <span class="required">*</span></label>
+          <div style="position:relative">
+            <input type="text" id="t-symbol" placeholder="US30, EURUSD..." list="symbolsList" oninput="this.value=this.value.toUpperCase();updateMarketFromSymbol()">
+            <datalist id="symbolsList"></datalist>
+          </div>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.entryDate">Data de Entrada <span class="required">*</span></label>
+          <input type="date" id="t-date" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.market">Mercado</label>
+          <select id="t-market"></select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.direction">Direção <span class="required">*</span></label>
+          <select id="t-direction">
+            <option value="Long">Long ▲</option>
+            <option value="Short">Short ▼</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Linha 2: preços -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.entryPrice">Preço de Entrada <span class="required">*</span></label>
+          <input type="number" id="t-entry" step="0.01">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.stopLoss">Stop Loss <span class="required">*</span></label>
+          <input type="number" id="t-stop" step="0.01" oninput="calcRR()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.takeProfit">Take Profit</label>
+          <input type="number" id="t-tp" step="0.01" oninput="calcRR()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.exitPrice">Preço de Saída</label>
+          <input type="number" id="t-exit" step="0.01" oninput="calcRR()">
+        </div>
+      </div>
+
+      <!-- Linha 3: risco e resultado — MODO % -->
+      <div id="modePercentFields">
+        <div class="form-grid fg-4" style="margin-bottom:12px">
+          <div class="field-group">
+            <label data-i18n="modal.trade.riskPct">Risco % da conta</label>
+            <div class="iu"><input type="number" id="t-riskpct" step="0.01" placeholder="Ex: 1.0" oninput="calcRR()"><span class="u">%</span></div>
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.riskUsd">Risco em $ (auto)</label>
+            <input type="number" id="t-riskusd" step="0.01" placeholder="Auto" readonly style="background:var(--bg3);color:var(--teal,#00d68f)">
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.rRealized">R Realizado (auto)</label>
+            <input type="number" id="t-r" step="0.01" placeholder="Auto" readonly style="background:var(--bg3)">
+          </div>
+          <div class="field-group">
+            <label data-i18n="modal.trade.pnl">P/L $ (auto ou manual)</label>
+            <input type="number" id="t-pnl" step="0.01" placeholder="Auto" oninput="calcRR()">
+          </div>
+        </div>
+      </div>
+      <!-- Linha 4: estratégia + datas/horários -->
+      <div class="form-grid fg-4" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.strategy">Estratégia</label>
+          <select id="t-strategy"></select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.exitDate">Data de Saída</label>
+          <input type="date" id="t-exitdate" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.timePlaced">Hora colocada</label>
+          <input type="time" id="t-placedtime">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.timeOpen">Hora acionada</label>
+          <input type="time" id="t-opentime" oninput="updateTradeDurationField()">
+        </div>
+      </div>
+      <div class="form-grid fg-3" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.timeExit">Hora de Saída</label>
+          <input type="time" id="t-exittime" oninput="updateTradeDurationField()">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.duration">Duração (auto)</label>
+          <input type="text" id="t-duration" readonly style="background:var(--bg3);color:var(--muted)">
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.fees">Fees / Comissão ($)</label>
+          <input type="number" id="t-fees" step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- PSICOLÓGICO EXPANDIDO -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px" data-i18n="modal.trade.psych">🧠 Psicológico</div>
+
+      <!-- Emoções -->
+      <div class="form-grid fg-3" style="margin-bottom:12px">
+        <div class="field-group"><label data-i18n="modal.trade.emoBefore">Emoção ANTES</label><select id="t-emo-before" onchange="autoDisc()"></select></div>
+        <div class="field-group"><label data-i18n="modal.trade.emoDuring">Emoção DURANTE</label><select id="t-emotion" onchange="autoDisc()"></select></div>
+        <div class="field-group"><label data-i18n="modal.trade.emoAfter">Emoção APÓS</label><select id="t-emo-after" onchange="autoDisc()"></select></div>
+      </div>
+
+      <!-- Seguiu o plano + desvio (sempre visível) -->
+      <div class="form-grid fg-2" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.followedPlan">Seguiu o Plano?</label>
+          <select id="t-followedplan" onchange="togglePlanDeviation()">
+            <option value="">—</option>
+            <option value="sim" data-i18n="modal.trade.planYes">✓ Sim — seguiu 100%</option>
+            <option value="nao" data-i18n="modal.trade.planNo">✗ Não seguiu</option>
+            <option value="parcial" data-i18n="modal.trade.planPartial">~ Parcial</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.planDeviation">O que fez diferente do plano?</label>
+          <input type="text" id="t-plan-deviation" data-i18n-ph="modal.trade.planDeviationPh" placeholder="O que mudou na execução, entrada, saída ou gestão?">
+        </div>
+      </div>
+
+      <!-- Confiança (0-100%) + Disciplina auto -->
+      <div class="form-grid fg-2" style="margin-bottom:12px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.confidence">Confiança antes do trade (0–100%)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="range" id="t-confidence" min="0" max="100" step="5" value="60" oninput="document.getElementById('t-conf-val').textContent=this.value+'%';autoDisc()" style="flex:1;accent-color:var(--blue)">
+            <span id="t-conf-val" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--blue)">60%</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.discipline">Disciplina (0–100%, auto-calculado)</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="range" id="t-discipline" min="0" max="100" step="5" value="70" oninput="this.dataset.manual='1';document.getElementById('t-disc-val').textContent=this.value+'%'" style="flex:1;accent-color:var(--purple)">
+            <span id="t-disc-val" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--purple)">70%</span>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="autoDisc(true)" title="Recalcular automático">↺</button>
+          </div>
+          <div style="font-size:9px;color:var(--dim);margin-top:2px" id="discExplain"></div>
+        </div>
+      </div>
+
+      <!-- Erros predefinidos -->
+      <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px" data-i18n-html="modal.trade.errorsLabel">
+        Erros cometidos <span style="color:var(--dim);font-weight:400;text-transform:none">— clique para marcar</span>
+      </div>
+      <div id="errorChips" class="error-chip-grid"></div>
+
+      <!-- Breakeven -->
+      <div class="form-grid fg-3" style="margin-bottom:10px">
+        <div class="field-group">
+          <label data-i18n="modal.trade.result">Resultado</label>
+          <select id="t-result-type" onchange="autoDisc()">
+            <option value="" data-i18n="modal.trade.resultAuto">Auto (por P/L)</option>
+            <option value="WIN">WIN ✓</option>
+            <option value="LOSS">LOSS ✗</option>
+            <option value="BE">Breakeven ≈</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label data-i18n="modal.trade.mistakeDetail">Detalhe do erro cometido</label>
+          <input type="text" id="t-mistake" data-i18n-ph="modal.trade.mistakePh" placeholder="O que aconteceu, o que senti..." oninput="autoDisc()">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg3);border-radius:7px;padding:8px 10px;border:1px solid var(--border);width:100%">
+            <input type="checkbox" id="t-hesitation" onchange="autoDisc()" style="accent-color:var(--yellow);width:14px;height:14px">
+            <span data-i18n-html="modal.trade.hesitation">⚠ <strong style="color:var(--yellow)">Hesitei</strong> — não executei o trade</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label data-i18n="modal.trade.remarks">Observações / Análise</label>
+        <textarea id="t-remarks" data-i18n-ph="modal.trade.remarksPh" placeholder="Contexto, setup, lições aprendidas, análise pós-trade..."></textarea>
+      </div>
+      <!-- Upload de imagens -->
+      <div style="margin-top:10px">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📎 Imagens do Trade</div>
+        <input type="file" id="t-images" accept="image/*,image/jpeg,image/png,image/gif,image/webp" multiple onchange="previewTradeImages(event)" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px dashed var(--border2);border-radius:7px;padding:8px 12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="font-size:11px;color:var(--muted);flex:1" data-i18n="modal.trade.addImages">Adicionar imagens (JPEG, PNG, GIF, WEBP)</span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="triggerFileInput('t-images')" data-i18n="modal.trade.selectImages">Selecionar</button>
+        </div>
+        <div id="t-images-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div id="tradeModalFlow" class="trade-modal-flow">
+        <span id="tradeModalFlowLabel" class="trade-modal-flow-label"></span>
+        <div class="trade-modal-flow-actions">
+          <button class="btn btn-ghost btn-sm" id="tradeModalPrevBtn" onclick="openPreviousBulkIncompleteTrade()" disabled data-i18n="modal.trade.prev">Anterior</button>
+          <button class="btn btn-ghost btn-sm" id="tradeModalNextBtn" onclick="openNextBulkIncompleteTrade()" disabled data-i18n="modal.trade.next">Próximo</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeModal('tradeModal')" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="tradeModalSaveBtn" onclick="saveTrade()" data-i18n="modal.trade.save">Salvar Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: CONTA ════ -->
+<div class="modal-overlay" id="accountModal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-hdr">
+      <div class="modal-title" data-i18n="modal.account.title">Gerenciar Contas</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('accountModal')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:80vh;overflow-y:auto">
+      <div id="accountList" style="margin-bottom:16px"></div>
+      <button class="btn btn-primary btn-sm" onclick="newAccount()" data-i18n="modal.account.newAccount">+ Nova Conta</button>
+      <div id="accountForm" style="display:none;margin-top:14px;background:var(--bg2);border-radius:10px;padding:16px">
+        <div class="setup-card-title" style="margin-bottom:12px" id="acctFormTitle" data-i18n="modal.account.newAccount">Nova Conta</div>
+        <div class="form-grid fg-3" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.name">Nome da conta <span class="required">*</span></label><input type="text" id="af-name" data-i18n-ph="modal.account.namePh" placeholder="Ex: Pessoal CFD, Prop FTMO..."></div>
+          <div class="field-group"><label data-i18n="modal.account.type">Tipo</label>
+            <select id="af-type" onchange="onAcctTypeChange()">
+              <option value="cfd_pct" data-i18n="modal.account.typeCfd">CFD / % (Forex, Índices CFD)</option>
+              <option value="prop_pct" data-i18n="modal.account.typeProp">Prop Firm % (FTMO, 5ers...)</option>
+              <option value="crypto" data-i18n="modal.account.typeCrypto">Crypto</option>
+            </select>
+          </div>
+          <div class="field-group"><label data-i18n="modal.account.color">Cor</label>
+            <input type="color" id="af-color" value="#4d7cfe" style="width:100%;height:36px;border-radius:7px;border:1px solid var(--border2);background:var(--bg2)">
+          </div>
+        </div>
+        <div class="form-grid fg-3" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.initialBalance">Saldo inicial ($)</label><input type="number" id="af-balance" placeholder="1000" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.defaultRisk">Risco padrão por trade</label>
+            <div class="iu"><input type="number" id="af-risk" placeholder="1" step="0.1"><span class="u" id="af-risk-unit">%</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px" data-i18n="modal.account.riskRules">Regras de Risco</div>
+        <div class="form-grid fg-4" style="margin-bottom:10px">
+          <div class="field-group"><label data-i18n="modal.account.ddDaily">DD máx diário</label><div class="iu"><input type="number" id="af-dd-daily" placeholder="2" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddWeekly">DD máx semanal</label><div class="iu"><input type="number" id="af-dd-weekly" placeholder="5" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddMonthly">DD máx mensal</label><div class="iu"><input type="number" id="af-dd-monthly" placeholder="8" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.ddTotal">DD máx total</label><div class="iu"><input type="number" id="af-dd-total" placeholder="10" step="0.1"><span class="u">%</span></div></div>
+          <div class="field-group"><label data-i18n="modal.account.goalPct">Meta lucro</label><div class="iu"><input type="number" id="af-goal" placeholder="10" step="0.1"><span class="u">%</span></div></div>
+        </div>
+        <div class="form-grid fg-3" style="margin-bottom:12px">
+          <div class="field-group"><label data-i18n="modal.account.goalWeek">Meta semanal ($)</label><input type="number" id="af-goal-week" placeholder="200" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.goalMonth">Meta mensal ($)</label><input type="number" id="af-goal-month" placeholder="500" step="0.01"></div>
+          <div class="field-group"><label data-i18n="modal.account.goalTotal">Meta total ($)</label><input type="number" id="af-goal-total" placeholder="2000" step="0.01"></div>
+        </div>
+        <div class="account-cashflow-panel">
+          <div class="setup-card-title" style="margin-bottom:10px" data-i18n="setup.cashflow">Aportes e Retiradas</div>
+          <div class="form-grid fg-4" style="margin-bottom:10px">
+            <div class="field-group"><label data-i18n="setup.flowType">Tipo</label><select id="af-flow-type"><option value="deposit" data-i18n="setup.deposit">Aporte</option><option value="withdrawal" data-i18n="setup.withdrawal">Retirada</option></select></div>
+            <div class="field-group"><label data-i18n="setup.flowDate">Data</label><input type="date" id="af-flow-date"></div>
+            <div class="field-group"><label data-i18n="setup.flowAmount">Valor ($)</label><input type="number" id="af-flow-amount" placeholder="100" step="0.01"></div>
+            <div class="field-group"><label data-i18n="setup.flowNote">Observação</label><input type="text" id="af-flow-note" data-i18n-ph="setup.optional" placeholder="Opcional"></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <button class="btn btn-ghost btn-sm" onclick="addAccountCashflowFromForm()" data-i18n="setup.addFlow">+ Adicionar movimento</button>
+          </div>
+          <div id="accountCashflowList" class="account-cashflow-list"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="saveAccount()" data-i18n="modal.account.save">💾 Salvar conta</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('accountForm').style.display='none'" data-i18n="modal.cancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="csvConfirmModal">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-hdr">
+      <div class="modal-title" data-i18n="modal.import.title">Confirmar Importação</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal('csvConfirmModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="csvConfirmPreview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('csvConfirmModal')" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmImport()" id="confirmImportBtn" data-i18n="modal.import.confirmBtn">Importar <span id="importCount">0</span> trades</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="appDialogModal">
+  <div class="modal app-dialog">
+    <div class="modal-hdr">
+      <div class="modal-title" id="appDialogTitle" data-i18n="modal.dialog.title">Confirmar ação</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeAppDialog()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="app-dialog-copy" id="appDialogBody"></div>
+      <div class="field-group app-dialog-input" id="appDialogInputWrap" style="display:none">
+        <label id="appDialogInputLabel" data-i18n="modal.dialog.inputLabel">Valor</label>
+        <input type="text" id="appDialogInput">
+        <div class="app-dialog-error" id="appDialogError"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAppDialog()" data-i18n="modal.cancel">Cancelar</button>
+      <button class="btn btn-primary" id="appDialogConfirmBtn" onclick="confirmAppDialog()" data-i18n="modal.dialog.confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="src/modules/simulation/domain/calculate-simulation-sizing.js"></script>
+<script src="src/modules/trades/domain/trade-timing.js"></script>
+<script src="src/modules/analytics/domain/calculate-trade-metrics.js"></script>
+<script src="src/modules/accounts/domain/calculate-cashflow-totals.js"></script>
+<script src="src/modules/accounts/domain/calculate-risk-limits.js"></script>
+<script src="src/modules/accounts/domain/calculate-goal-cycle.js"></script>
+<script src="src/modules/accounts/domain/calculate-balance-drawdown.js"></script>
+<script src="src/modules/accounts/domain/calculate-risk-period-pnl.js"></script>
+<script src="src/modules/accounts/application/account-risk-workflows.js"></script>
+<script src="src/modules/study-hub/domain/study-hub-calculations.js"></script>
+<script src="src/modules/study-hub/application/study-hub-state.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-page.js"></script>
+<script src="src/modules/simulation/presentation/simulation-sizing-fields.js"></script>
+<script src="src/modules/data-transfer/infrastructure/normalize-tabular-values.js"></script>
+<script src="src/modules/data-transfer/infrastructure/serialize-trades-csv.js"></script>
+<script src="src/modules/data-transfer/infrastructure/split-delimited-rows.js"></script>
+<script src="src/modules/data-transfer/infrastructure/parse-tabular-trades.js"></script>
+<script src="src/modules/data-transfer/infrastructure/read-trade-report.js"></script>
+<script src="src/modules/data-transfer/infrastructure/backup-format.js"></script>
+<script src="src/modules/data-transfer/domain/import-trade-rules.js"></script>
+<script src="src/modules/data-transfer/application/restore-backup.js"></script>
+<script src="src/modules/data-transfer/application/prepare-trade-import.js"></script>
+<script src="src/modules/data-transfer/infrastructure/download-text-file.js"></script>
+<script src="src/modules/data-transfer/application/select-export-trades.js"></script>
+<script src="src/modules/data-transfer/presentation/export-downloads.js"></script>
+<script src="src/modules/data-transfer/presentation/import-workflow.js"></script>
+<script src="src/modules/data-transfer/presentation/data-transfer-controls.js"></script>
+<script src="src/modules/preferences/presentation/translation-catalog.js"></script>
+<script src="src/modules/preferences/presentation/locales/pt-BR/trading.js"></script>
+<script src="src/modules/preferences/presentation/locales/pt-BR/workspace.js"></script>
+<script src="src/modules/preferences/presentation/locales/pt-BR/dialogs-and-labels.js"></script>
+<script src="src/modules/preferences/presentation/locales/en-US/trading.js"></script>
+<script src="src/modules/preferences/presentation/locales/en-US/workspace.js"></script>
+<script src="src/modules/preferences/presentation/locales/en-US/dialogs-and-labels.js"></script>
+<script src="src/modules/preferences/presentation/language-selector.js"></script>
+<script src="src/app/presentation/app-dialog.js"></script>
+<script src="src/shared/presentation/analysis-summary.js"></script>
+<script src="src/shared/presentation/status-list.js"></script>
+<script src="src/modules/trades/application/trade-workflows.js"></script>
+<script src="src/modules/trades/presentation/incomplete-trade-flow.js"></script>
+<script src="src/modules/trades/presentation/incomplete-trade-banner.js"></script>
+<script src="src/modules/trades/presentation/trade-error-chips.js"></script>
+<script src="src/modules/trades/presentation/trade-form.js"></script>
+<script src="src/modules/trades/presentation/trade-log-read-only-notice.js"></script>
+<script src="src/modules/trades/presentation/trade-log-metrics.js"></script>
+<script src="src/modules/trades/presentation/trade-log-selection.js"></script>
+<script src="src/modules/trades/presentation/trade-log.js"></script>
+<script src="src/modules/trades/presentation/trade-log-controls.js"></script>
+<script src="src/modules/psychology/presentation/psychology-statistics.js"></script>
+<script src="src/modules/simulation/presentation/simulation-panel.js"></script>
+<script src="src/modules/analytics/presentation/statistics-controls.js"></script>
+<script src="src/modules/calendar/presentation/calendar-controls.js"></script>
+<script src="src/modules/accounts/presentation/account-balance-chrome.js"></script>
+<script src="src/modules/accounts/presentation/risk-board.js"></script>
+<script src="src/modules/analytics/presentation/dashboard-page.js"></script>
+<script src="src/modules/analytics/presentation/dashboard-equity-mode.js"></script>
+<script src="src/modules/analytics/presentation/strategy-rows.js"></script>
+<script src="src/modules/analytics/presentation/strategy-comparison.js"></script>
+<script src="src/modules/analytics/presentation/statistics-page.js"></script>
+<script src="src/modules/calendar/presentation/dashboard-calendar.js"></script>
+<script src="src/modules/analytics/presentation/stop-fee-analysis.js"></script>
+<script src="src/modules/calendar/presentation/calendar-page.js"></script>
+<script src="src/modules/notifications/presentation/notifications-page.js"></script>
+<script src="src/modules/psychology/presentation/psychology-page.js"></script>
+<script src="src/modules/analytics/presentation/strategy-hub-page.js"></script>
+<script src="src/modules/routine/presentation/premarket-page.js"></script>
+<script src="src/modules/documents/presentation/document-rendering-helpers.js"></script>
+<script src="src/modules/documents/presentation/documents-page.js"></script>
+<script src="src/modules/accounts/presentation/account-cashflow-form.js"></script>
+<script src="src/modules/accounts/presentation/account-form.js"></script>
+<script src="src/modules/accounts/presentation/setup-risk-summary.js"></script>
+<script src="src/modules/accounts/presentation/setup-cashflow-list.js"></script>
+<script src="src/modules/accounts/presentation/risk-tags.js"></script>
+<script src="src/modules/accounts/presentation/risk-setup-page.js"></script>
+<script src="src/modules/accounts/presentation/account-list.js"></script>
+<script src="src/app/presentation/topbar.js"></script>
+<script src="src/modules/accounts/presentation/accounts-page.js"></script>
+<script src="src/modules/partners/presentation/partners-page.js"></script>
+<script src="src/modules/profile/presentation/profile-page.js"></script>
+<script src="src/app/presentation/modal-controller.js"></script>
+<script src="src/app/infrastructure/app-state-storage.js"></script>
+<script src="src/app/application/load-app-state.js"></script>
+<script src="src/modules/preferences/infrastructure/exchange-rate.js"></script>
+<script src="src/modules/trades/application/demo-data.js"></script>
+<script src="src/app/application/bootstrap-app.js"></script>
+<script src="src/app/presentation/navigation.js"></script>
+<script src="app.js"></script>
+<script src="src/modules/study-hub/infrastructure/study-hub-storage.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-propfirm.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-plan.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-tradesim.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-mental.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-template.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-legacy-runtime.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-intraday.js"></script>
+</body>
+</html>

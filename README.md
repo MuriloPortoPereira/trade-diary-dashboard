@@ -58,8 +58,9 @@ Depois da versão 2, o fluxo normal será `develop` → `feature/*` → `develop
 ## Estrutura do repositório
 
 ```text
-index.html                  HTML, páginas, modais e ordem dos assets
+index.html                  Distribuição HTML gerada e versionada
 app.js                      Estado, bootstrap e fluxos ainda legados
+src/app/presentation/shell/  Manifesto e fontes da navegação/modais/scripts
 src/styles/                 CSS comum e responsividade
 src/modules/                Código e CSS organizados por feature
   accounts/presentation/    Visão de contas
@@ -97,12 +98,16 @@ Requer Node.js para os testes. O smoke também requer Chrome ou Chromium instala
 
 ```bash
 node --test tests/*.test.cjs
+node scripts/build-index.cjs --check
+node scripts/build-study-hub-template.cjs --check
 node scripts/browser-smoke.cjs
 node --check app.js
 git diff --check
 ```
 
 Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` em cada um. O smoke usa um perfil isolado do navegador, verifica navegação e assets locais e não usa os dados do seu navegador habitual. A comparação visual por estados, geometria e imagens é descrita em [ferramentas e verificações](docs/architecture/tooling.md). A cobertura caracteriza fluxos específicos; ela não equivale a uma prova de todos os cálculos ou estados possíveis.
+
+Para editar HTML, localize a página no [manifesto de composição](src/app/presentation/shell/index.fragments.json), altere sua fonte em `src/modules/<feature>/presentation/` e execute `node scripts/build-index.cjs`. O shell fica em `src/app/presentation/shell/`. Para as quatro ferramentas StudyHub, edite `presentation/templates/*.html` da feature e execute `node scripts/build-study-hub-template.cjs`. Versione fontes e saídas geradas; o deploy continua servindo os arquivos prontos, sem executar build.
 
 ## Estado da refatoração
 
@@ -112,14 +117,14 @@ Para verificar scripts alterados, execute `node --check caminho/do/arquivo.js` e
 | Sizing, CSV e idiomas | Extrações iniciais concluídas, com compatibilidade |
 | G1–G2: CSS | Concluídos; 40 arquivos CSS carregados na ordem original |
 | G3: JavaScript por feature | Concluído para apresentação; renderers, shell, formulários e controles principais separados |
-| G4: regras de domínio | Em andamento; timing, métricas, cashflow e primeiros limites de risco extraídos |
-| G5: persistência/importação | Pendente por formato, coordenação e IO |
-| G6: StudyHub | Pendente; runtime legado exige isolamento gradual |
-| G7: HTML e compatibilidade | Pendente, após migrar consumidores relevantes |
+| G4: regras de domínio | Núcleo planejado extraído; resíduos/acoplamentos seguem para revisão final |
+| G5: persistência/importação | Formatos, coordenação, IO, bootstrap e workflows extraídos em G5a–G5p |
+| G6: StudyHub | Estrutura concluída: quatro ferramentas privadas, domínio, estado, storage e runtime de montagem |
+| G7: HTML e compatibilidade | Autoria HTML concluída em G7a–G7b; revisão de compatibilidade e fechamento pendentes |
 
-O trabalho avança em commits pequenos, sem reescrever a aplicação de uma vez. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define a ordem e as verificações seguintes. O `app.js` permanece grande durante a transição porque mistura responsabilidades e contém um template legado StudyHub extenso em uma única linha; não abra o arquivo inteiro para localizar uma função.
+O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 2.269 linhas; ainda contém estado, integração e resíduos a revisar. O template StudyHub já tem fontes HTML legíveis; consulte o mapa antes de abrir arquivos extensos.
 
-O estágio atual é G4d, limites e consumo de risco. A última validação passou com 379 testes Node e 96 verificações no navegador. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. O próximo lote planejado é G4e, próximo cálculo puro do risco.
+O estágio atual é G7b: quinze páginas de autoria por feature e dois fragmentos do shell geram os mesmos 107.193 bytes de `index.html`. A validação deste lote passou em 92 arquivos de teste Node e 113 verificações no navegador, em cópia limpa. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada; neste lote, os bytes publicados permaneceram idênticos. Falta revisar compatibilidade, resíduos e acoplamentos, consolidar apenas onde houver ganho e fechar os critérios arquiteturais.
 
 ## Deploy e dados
 
