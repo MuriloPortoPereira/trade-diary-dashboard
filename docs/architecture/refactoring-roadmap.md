@@ -986,6 +986,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Caracterização pré-corte protege restauração, cotação, falhas, bindings, timers, resize, histórico/exportação, compounding e ruína. Suite com 90 arquivos e smoke com 113 checks.
 - Runtime: 1.672 → 233 linhas; `app.js` permanece em 2.269. G6 estrutural encerrado; próximo G7, seguido da revisão de acoplamentos e fechamento arquitetural.
 
+## G7a: HTML de autoria StudyHub
+
+- Quatro fragmentos HTML por ferramenta em `presentation/templates/` (352/580/310/167 linhas), compostos por `scripts/build-study-hub-template.cjs` em asset clássico versionado.
+- ADR-004: sem fetch/ESM/bundler; deploy continua sem build. Fonte e distribuição coexistem para preservar hospedagem estática; editar fontes e gerar, nunca editar o asset manualmente.
+- Montagem e carga síncrona mantêm os mesmos 151.521 bytes, IDs, handlers e guardas. O teste --check/suíte detecta asset desatualizado.
+- Runtime: 170.565 → 11.187 bytes, 233 linhas; `app.js` continua com 2.269. Caracterização pré-corte, 91 arquivos Node e smoke com 113 checks.
+- Próximo G7b: avaliar composição do shell/compatibilidade, seguido da revisão de acoplamentos e fechamento arquitetural.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1045,5 +1053,5 @@ Justificativa: bootstrap, globals/handlers, DOM e cascata ainda não têm cobert
 um corte por tamanho causaria mudança simultânea de vários contratos.
 Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS; G7 avalia a composição do HTML.
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
-A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. O template gigante permanece intacto junto da montagem até a avaliação de composição HTML G7. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
+A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. G7a eliminou a linha gigante de autoria: editar os quatro HTMLs em `presentation/templates/`. `study-hub-template.js` tem exceção como asset gerado de distribuição, sem lógica de negócio; fontes legíveis, gerador e --check são a interface de manutenção. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.

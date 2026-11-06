@@ -66,6 +66,7 @@ Não foram adicionados hooks globais nem alterados modelos, permissões ou orça
 
 ```bash
 node --test tests/*.test.cjs
+node scripts/build-study-hub-template.cjs --check
 node --check app.js
 node --check src/modules/simulation/domain/calculate-simulation-sizing.js
 node --check src/modules/data-transfer/infrastructure/serialize-trades-csv.js
@@ -78,6 +79,10 @@ git diff --check
 
 Domínio extraído no lote 1. Resultado efetivo: [progresso](refactoring-progress.md).
 Lint, typecheck, formatador e build não existem no baseline; não foram simulados ou marcados como aprovados.
+
+Desde G7a, após editar `src/modules/study-hub/presentation/templates/*.html`, executar
+`node scripts/build-study-hub-template.cjs`. O asset é commitado; produção continua servindo arquivos estáticos
+sem executar build. `--check` e a suíte validam sincronização. Contrato em [ADR-004](adr/004-study-hub-html-authoring.md).
 
 Smoke requer Chrome/Chromium instalado. Por padrão usa `google-chrome`;
 para outro binário: `CHROME_BIN=/caminho/chromium node scripts/browser-smoke.cjs`.

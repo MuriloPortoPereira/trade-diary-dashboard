@@ -1,0 +1,352 @@
+<!-- ──────────── MÓDULO 0: PROPFIRM ──────────── -->
+<div class="hub-module active" id="mod-propfirm">
+<input type="hidden" id="gCot" value="5.80"><span id="cotBadge" style="display:none">R$ 5,80</span>
+<div id="pf-app">
+
+<!-- TABS -->
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="sh_pfTab(0)">📊 Simulador</button>
+  <button class="tab-btn" onclick="sh_pfTab(1)">📋 Multi-Payout</button>
+  <button class="tab-btn" onclick="sh_pfTab(2)">🧮 Calculadora</button>
+  <button class="tab-btn" onclick="sh_pfTab(3)">💼 Grandes Contas</button>
+  <button class="tab-btn" onclick="sh_pfTab(4)">🎯 2 Fases</button>
+  <button class="tab-btn" onclick="sh_pfTab(5)">🎯 1 Fase</button>
+  <button class="tab-btn" onclick="sh_pfTab(6)">🎯 Instant</button>
+  <button class="tab-btn" onclick="sh_pfTab(7)">📅 RRR Unificado</button>
+</div>
+
+<!-- ══════════════════════ ABA 0: SIMULADOR ══════════════════════ -->
+<div class="tab-panel active" id="pf-tab0">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">🏆 Simulador de Payouts — Prop Firms</div>
+      <button class="btn primary" onclick="sh_calcSimulador()">▶ Calcular</button>
+    </div>
+    <div class="sec-body">
+      <!-- Parâmetros principais -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital total da conta prop. Base de cálculo para todos os limites e metas em percentual.</p></span></span></label><div class="iu"><input type="number" id="s_conta" value="100000" oninput="sh_calcSimulador()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro bruto que a prop repassa ao trader. Ex: 80% significa que de cada $100 de lucro, você recebe $80 antes de IR e taxas.</p></span></span></label><div class="iu"><input type="number" id="s_payout" value="80" step="1" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>DD Máximo %</b><p>Limite máximo de drawdown da conta em percentual do capital. Ao atingir, a conta é encerrada pela prop.</p><div class="tr"><span>5%</span><span>Regra conservadora</span></div><div class="tr"><span>10%</span><span>Padrão do mercado</span></div></span></span></label><div class="iu"><input type="number" id="s_ddmax" value="10" step="0.5" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>DD Diário %</b><p>Limite de perda máxima em uma única sessão, em percentual do capital. Resetado a cada dia.</p><p>Ao atingir, você deve parar de operar no dia.</p></span></span></label><div class="iu"><input type="number" id="s_dddaily" value="5" step="0.5" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR aplicada sobre o lucro líquido recebido. Varia conforme regime tributário e residência fiscal.</p><div class="tr"><span>Brasil (DARF)</span><span>15% a 22,5%</span></div><div class="tr"><span>Ganho mensal &lt; R$20k</span><span>Isento (B3)</span></div></span></span></label><div class="iu"><input type="number" id="s_ir" value="6" step="1" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Percentual cobrado pela prop ou corretora sobre o payout bruto como taxa de serviço ou gestão.</p></span></span></label><div class="iu"><input type="number" id="s_taxa" value="2" step="0.5" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>RRR Alvo <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Quantas vezes o alvo é maior que o stop. RRR 2 significa que para cada $1 arriscado, o alvo é $2.</p><div class="tr"><span>0.618</span><span>Setup agressivo (alta WR)</span></div><div class="tr"><span>1.5 – 2</span><span>Equilíbrio saudável</span></div><div class="tr"><span>3+</span><span>Setup de tendência / swing</span></div></span></span></label><select id="s_rrr" onchange="sh_calcSimulador()"><option value="0.618">0.618</option><option value="1" selected>1:1</option><option value="1.141">1.141</option><option value="1.618">1.618</option><option value="2">1:2</option></select></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Número de stops cheios consecutivos até bater o DD Máximo. Quanto maior, mais margem para sequências negativas sem encerrar a conta.</p><div class="tr"><span>Menos de 10</span><span>Alta fragilidade</span></div><div class="tr"><span>20 ou mais</span><span>Gestão confortável</span></div></span></span></label><input type="number" id="s_stops" value="40" min="1" oninput="sh_calcSimulador()"></div>
+      </div>
+      <!-- Intervalo personalizado -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Intervalo de Metas — começa em 0, Intervalo = seu Risco por trade</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Intervalo % (= Risco por trade) <span class="tip">?<span class="tip-box"><b>Intervalo de Metas</b><p>Cada linha da tabela avança este percentual de lucro. Use o mesmo valor do seu risco por trade — assim cada linha representa exatamente 1R ganho.</p></span></span></label><div class="iu"><input type="number" id="s_step" value="0.25" step="0.05" min="0.01" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Fim % <span class="tip">?<span class="tip-box"><b>Fim da Tabela</b><p>Até qual percentual de lucro a tabela é gerada. Defina como a meta total de lucro da conta para ver o payout esperado no alvo.</p></span></span></label><div class="iu"><input type="number" id="s_fim" value="10" step="0.25" min="0.01" oninput="sh_calcSimulador()"><span class="u">%</span></div></div>
+        </div>
+      </div>
+      <!-- Outputs rápidos — agora 6 cards: risco + DD Max + DD Diário com stops -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Risco por Entrada % <span class="tip">?<span class="tip-box"><b>Risco por Entrada %</b><p>Percentual da conta arriscado em cada operação, calculado a partir do DD Máximo dividido pelo número de stops configurado.</p></span></span></div><div class="out-big cb" id="s_risco_ent" style="font-size:15px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Risco USD / trade <span class="tip">?<span class="tip-box"><b>Risco USD por Trade</b><p>Valor em dólares arriscado por operação. É o percentual de risco aplicado sobre o capital da conta.</p></span></span></div><div class="out-big cy" id="s_risco_usd" style="font-size:15px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Alvo USD / trade <span class="tip">?<span class="tip-box"><b>Alvo USD por Trade</b><p>Lucro em dólares por operação vencedora, calculado como Risco USD × RRR configurado.</p></span></span></div><div class="out-big cg" id="s_alvo_usd" style="font-size:15px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">DD Máximo (USD) <span class="tip">?<span class="tip-box"><b>DD Máximo em USD</b><p>Valor absoluto do drawdown máximo permitido. Ao atingir este valor de perda acumulada, a conta é encerrada pela prop. O sub-valor mostra quantos stops cheios cabem.</p></span></span></div><div class="out-big cr" id="s_ddmax_usd" style="font-size:15px">—</div><div class="out-sub" id="s_stops_max">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">DD Diário (USD) <span class="tip">?<span class="tip-box"><b>DD Diário em USD</b><p>Limite de perda por sessão em valor absoluto. O sub-valor mostra quantos stops cheios cabem dentro deste limite antes de encerrar o dia.</p></span></span></div><div class="out-big co" id="s_dd_usd" style="font-size:15px">—</div><div class="out-sub" id="s_stops_dia">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Entradas p/ bater meta <span class="tip">?<span class="tip-box"><b>Entradas para Bater a Meta</b><p>Número de trades vencedores consecutivos necessários para atingir o lucro percentual de cada linha da tabela, considerando o RRR configurado.</p></span></span></div><div class="out-big cp" id="s_meta_trades" style="font-size:15px">—</div></div>
+      </div>
+      <!-- Tabela sem scroll -->
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="al">Lucro %</th>
+            <th>Lucro USD</th>
+            <th>Payout Bruto USD</th>
+            <th>Payout Bruto BRL</th>
+            <th>Após IR (BRL)</th>
+            <th>Líquido Final BRL</th>
+            <th>Trades p/ Meta</th>
+            <th>Líquido / Trade BRL</th>
+          </tr></thead>
+          <tbody id="simTbody"></tbody>
+        </table>
+      </div>
+      <div class="chart-wrap" style="height:180px;margin-top:12px"><canvas id="pfSimChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 1: MULTI-PAYOUT ══════════════════════ -->
+<div class="tab-panel" id="pf-tab1">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">📋 Comparativo Multi-Payout USD &amp; BRL</div>
+      <button class="btn primary" onclick="sh_calcMulti()">▶ Calcular</button>
+    </div>
+    <div class="sec-body">
+      <div style="display:flex;justify-content:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+        <div class="field" style="margin:0;width:220px"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital base para converter os percentuais de lucro em valores absolutos em USD e BRL.</p></span></span></label><div class="iu"><input type="number" id="m_conta" value="100000" oninput="sh_calcMulti()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0;width:180px"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR aplicada sobre cada célula de payout da tabela comparativa.</p></span></span></label><div class="iu"><input type="number" id="m_ir" value="6" oninput="sh_calcMulti()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0;width:200px"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo de serviço descontado do payout bruto antes do repasse ao trader.</p></span></span></label><div class="iu"><input type="number" id="m_taxa" value="2" oninput="sh_calcMulti()"><span class="u">%</span></div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Intervalo — começa em 0, Intervalo = Risco por trade</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Intervalo % (= Risco) <span class="tip">?<span class="tip-box"><b>Intervalo de Lucro</b><p>Incremento entre as linhas da tabela, equivalente ao seu risco por trade. Cada linha representa 1R a mais de lucro acumulado.</p></span></span></label><div class="iu"><input type="number" id="m_step" value="0.25" step="0.05" min="0.01" oninput="sh_calcMulti()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Fim % <span class="tip">?<span class="tip-box"><b>Fim da Tabela</b><p>Limite superior da tabela comparativa. Defina como a meta total de lucro da conta para ver o payout líquido no alvo.</p></span></span></label><div class="iu"><input type="number" id="m_fim" value="10" step="0.25" oninput="sh_calcMulti()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Payout Custom % <span class="tip">?<span class="tip-box"><b>Payout Personalizado</b><p>Coluna extra da tabela com o percentual de payout que você negociou ou pretende negociar com a prop. Útil para comparar com os percentuais padrão.</p></span></span></label><div class="iu"><input type="number" id="m_custom" value="88" step="1" min="1" max="100" oninput="sh_calcMulti()"><span class="u">%</span></div></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="al">Lucro %</th>
+            <th>Lucro USD</th>
+            <th class="cy">50%</th><th class="cy">55%</th><th class="cy">60%</th><th class="cy">65%</th>
+            <th class="cg">70%</th><th class="cg">75%</th><th class="cg">80%</th><th class="cg">85%</th><th class="cg">90%</th>
+            <th class="cp">Custom</th>
+          </tr></thead>
+          <tbody id="multiTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 2: CALCULADORA ══════════════════════ -->
+<div class="tab-panel" id="pf-tab2">
+  <div class="sec">
+    <div class="sec-hdr"><div class="sec-title">🧮 Prop Firm — Calculadora Completa</div></div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital total da conta prop. Base de cálculo para todos os limites, metas e riscos em percentual.</p></span></span></label><div class="iu"><input type="number" id="pf_conta" value="100000" oninput="sh_calcPropFirm()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>DD Máximo %</b><p>Limite máximo de drawdown da conta. Ao atingir este percentual de queda, a conta é encerrada.</p><div class="tr"><span>Calculado sobre</span><span>capital inicial</span></div></span></span></label><div class="iu"><input type="number" id="pf_ddmax" value="10" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>DD Diário %</b><p>Perda máxima permitida em uma única sessão. Resetada a cada dia. Ao atingir, encerre o dia imediatamente.</p></span></span></label><div class="iu"><input type="number" id="pf_dddaily" value="5" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Meta de Lucro % <span class="tip">?<span class="tip-box"><b>Meta de Lucro %</b><p>Percentual de lucro sobre o capital necessário para ser aprovado na fase de avaliação ou para solicitar o payout.</p></span></span></label><div class="iu"><input type="number" id="pf_meta" value="8" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Quantidade de stops cheios seguidos que a conta suporta antes de bater o DD Máximo. Quanto maior, mais segura é a operação.</p></span></span></label><input type="number" id="pf_stops" value="20" oninput="sh_calcPropFirm()"></div>
+        <div class="field" style="margin:0"><label>Entradas/Dia <span class="tip">?<span class="tip-box"><b>Entradas por Dia</b><p>Número de trades que você planeja executar por sessão. Usado para calcular o número estimado de dias até atingir a meta.</p></span></span></label><input type="number" id="pf_entradas" value="4" oninput="sh_calcPropFirm()"></div>
+        <div class="field" style="margin:0"><label>RRR Alvo <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Proporção entre o alvo de ganho e o stop de perda por trade. RRR 2 significa alvo = 2× o risco.</p><div class="tr"><span>1:1</span><span>Precisa de WR &gt; 50%</span></div><div class="tr"><span>2:1</span><span>Breakeven com WR 33%</span></div></span></span></label><select id="pf_rrr" onchange="sh_calcPropFirm()"><option value="0.618">0.618</option><option value="1" selected>1:1</option><option value="1.141">1.141</option><option value="1.618">1.618</option><option value="2">1:2</option></select></div>
+        <div class="field" style="margin:0"><label>Assertividade % <span class="tip">?<span class="tip-box"><b>Assertividade (Win Rate)</b><p>Percentual de trades encerrados como WIN. Combinado com o RRR, determina a expectância do setup.</p><div class="tr"><span>WR mínimo 1:1</span><span>50%</span></div><div class="tr"><span>WR mínimo 2:1</span><span>34%</span></div></span></span></label><div class="iu"><input type="number" id="pf_assert" value="60" step="1" min="1" max="100" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro bruto que a prop repassa ao trader. Calculado antes de IR e taxas de intermediação.</p></span></span></label><div class="iu"><input type="number" id="pf_payout" value="80" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR aplicada sobre o valor recebido após payout e taxa de intermediação.</p></span></span></label><div class="iu"><input type="number" id="pf_ir" value="15" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo cobrado pela prop ou corretora sobre o payout bruto, antes do repasse ao trader.</p></span></span></label><div class="iu"><input type="number" id="pf_taxa" value="2" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+        <div></div>
+      </div>
+      <!-- Metas do Dia -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Metas do Dia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Stop Loss diário % <span class="tip">?<span class="tip-box"><b>Stop Loss Diário %</b><p>Percentual da conta que você se propõe a perder como máximo por sessão. Diferente do DD Diário da prop — este é o seu limite pessoal de gestão.</p></span></span></label><div class="iu"><input type="number" id="pf_sl_dia" value="1" step="0.1" min="0.01" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Meta de Gain diária % <span class="tip">?<span class="tip-box"><b>Meta de Gain Diária %</b><p>Alvo de lucro por sessão em percentual da conta. Ao atingir, considere encerrar o dia para proteger o resultado.</p></span></span></label><div class="iu"><input type="number" id="pf_gain_dia" value="2" step="0.1" min="0.01" oninput="sh_calcPropFirm()"><span class="u">%</span></div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Stop Loss USD <span class="tip">?<span class="tip-box"><b>Stop Loss em USD</b><p>Valor absoluto do seu stop pessoal diário convertido para dólares. É quanto você aceita perder no máximo em uma sessão.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--red)" id="pf_sl_usd">—</div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Meta Gain USD <span class="tip">?<span class="tip-box"><b>Meta de Gain em USD</b><p>Valor absoluto do seu alvo de lucro diário. Ao atingir este valor no dia, considere encerrar a sessão.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--green)" id="pf_gain_usd">—</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Risco/Entrada % <span class="tip">?<span class="tip-box"><b>Risco por Entrada %</b><p>Percentual da conta arriscado por operação, calculado a partir do DD Máximo dividido pelo número de stops configurado.</p></span></span></div><div class="out-big cy" id="pf_r1" style="font-size:16px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Risco/Entrada USD <span class="tip">?<span class="tip-box"><b>Risco em USD por Trade</b><p>Valor em dólares arriscado por operação — o percentual de risco aplicado sobre o capital da conta.</p></span></span></div><div class="out-big co" id="pf_r2" style="font-size:16px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center">
+          <div class="out-lbl">DD Máximo (USD) <span class="tip">?<span class="tip-box"><b>DD Máximo em USD</b><p>Limite absoluto de drawdown da conta. Ao atingir, a conta é encerrada pela prop. Sub-valor: quantos stops cheios cabem antes de bater este limite.</p></span></span></div>
+          <div class="out-big cr" id="pf_ddmax_usd" style="font-size:16px">—</div>
+          <div class="out-sub" id="pf_stops_max">—</div>
+        </div>
+        <div class="out-box" style="padding:8px;text-align:center">
+          <div class="out-lbl">DD Diário (USD) <span class="tip">?<span class="tip-box"><b>DD Diário em USD</b><p>Limite de perda por sessão em valor absoluto. Sub-valor: quantos stops cheios cabem dentro deste limite antes de encerrar o dia.</p></span></span></div>
+          <div class="out-big co" id="pf_dddaily_usd" style="font-size:16px">—</div>
+          <div class="out-sub" id="pf_r3">—</div>
+        </div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Meta USD <span class="tip">?<span class="tip-box"><b>Meta em USD</b><p>Valor absoluto da meta de lucro da conta para aprovação ou saque, calculado sobre o capital configurado.</p></span></span></div><div class="out-big cb" id="pf_r4" style="font-size:16px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Trades p/ Meta <span class="tip">?<span class="tip-box"><b>Trades para Bater a Meta</b><p>Número de trades vencedores necessários para atingir a meta de lucro, considerando o RRR e o risco por trade configurados.</p></span></span></div><div class="out-big cp" id="pf_r5" style="font-size:16px">—</div><div class="out-sub" id="pf_r5sub"></div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Dias Estimados <span class="tip">?<span class="tip-box"><b>Dias Estimados</b><p>Estimativa de dias úteis para atingir a meta, considerando o número de entradas por dia configurado e os trades necessários. É uma projeção otimista — assume win rate suficiente.</p></span></span></div><div class="out-big cm" id="pf_r6" style="font-size:16px">—</div></div>
+        <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Alvo/trade (USD) <span class="tip">?<span class="tip-box"><b>Alvo por Trade em USD</b><p>Lucro esperado por operação vencedora em dólares: Risco USD × RRR configurado.</p></span></span></div><div class="out-big cg" id="pf_alvo_usd" style="font-size:16px">—</div></div>
+      </div>
+      <div class="out-box" style="background:rgba(63,185,80,.06);border-color:rgba(63,185,80,.3);padding:14px">
+        <div class="out-lbl">✅ Líquido Final BRL <span class="tip">?<span class="tip-box"><b>Líquido Final em BRL</b><p>Valor líquido que você recebe ao atingir a meta — após payout, taxa de intermediação, IR e conversão para reais pela cotação atual do dólar.</p></span></span></div>
+        <div class="out-big cg" id="pf_r7" style="font-size:28px">—</div>
+        <div class="out-sub" id="pf_r7sub"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 3: GRANDES CONTAS ══════════════════════ -->
+<div class="tab-panel" id="pf-tab3">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">💼 Simulação — Grandes Contas até $400k</div>
+      <button class="btn primary" onclick="sh_calcGrandes()">▶ Calcular</button>
+    </div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro bruto repassado pela prop ao trader, antes de IR e taxa de intermediação.</p></span></span></label><div class="iu"><input type="number" id="gc_payout" value="80" oninput="sh_calcGrandes()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR aplicada sobre o valor recebido após payout e taxa de intermediação.</p></span></span></label><div class="iu"><input type="number" id="gc_ir" value="6" oninput="sh_calcGrandes()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo de serviço descontado do payout bruto antes do repasse ao trader.</p></span></span></label><div class="iu"><input type="number" id="gc_taxa" value="2" oninput="sh_calcGrandes()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Alvo Líquido (R$) <span class="tip">?<span class="tip-box"><b>Alvo Líquido em BRL</b><p>Valor em reais que você quer receber no final, já descontados IR e taxas. A tabela mostra qual tamanho de conta e risco por trade são necessários para atingi-lo.</p></span></span></label><div class="iu"><input type="number" id="gc_alvo" value="5000" oninput="sh_calcGrandes()"><span class="u">R$</span></div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Intervalo — começa em 0, Intervalo = Risco por trade</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Intervalo % (= Risco) <span class="tip">?<span class="tip-box"><b>Intervalo de Risco</b><p>Cada linha da tabela avança esse percentual — equivale ao risco por trade. Cada linha = 1R de lucro acumulado.</p></span></span></label><div class="iu"><input type="number" id="gc_step" value="0.25" step="0.05" min="0.01" oninput="sh_calcGrandes()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Fim % <span class="tip">?<span class="tip-box"><b>Fim da Tabela</b><p>Limite superior do risco simulado. Defina como a meta total de lucro para ver o payout líquido esperado no alvo.</p></span></span></label><div class="iu"><input type="number" id="gc_fim" value="10" step="0.25" oninput="sh_calcGrandes()"><span class="u">%</span></div></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="al">Lucro %</th>
+            <th>$1k</th><th>$2k</th><th>$5k</th><th>$10k</th><th>$25k</th>
+            <th>$50k</th><th>$75k</th><th>$100k</th><th>$150k</th><th>$200k</th>
+            <th>$300k</th><th>$400k</th>
+          </tr></thead>
+          <tbody id="grandesTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 4: 2 FASES ══════════════════════ -->
+<div class="tab-panel" id="pf-tab4">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">🎯 Gerenciamento — 2 Fases</div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="sh_calc2Fases()">▶ Calcular</button>
+        <label class="btn success" style="cursor:pointer">↑ Importar JSON/CSV<input type="file" accept=".csv,.json" style="display:none" onchange="sh_importFase(event,'2f')"></label>
+        <button class="btn" onclick="sh_exportFase('2f')">↓ Exportar</button>
+      </div>
+    </div>
+    <div class="sec-body">
+      <!-- Parâmetros -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital da conta de avaliação 2 fases. Base para todos os cálculos de risco, metas e payout.</p></span></span></label><div class="iu"><input type="number" id="f2_conta" value="100000" oninput="sh_calc2Fases()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>DD Máximo %</b><p>Drawdown máximo permitido pela prop. Ao atingir em qualquer ponto da avaliação ou na conta funded, ela é encerrada.</p></span></span></label><div class="iu"><input type="number" id="f2_ddmax" value="10" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>DD Diário %</b><p>Limite de perda por sessão estabelecido pela prop. Diferente do seu stop pessoal — este é o limite regulatório da conta.</p></span></span></label><div class="iu"><input type="number" id="f2_dddaily" value="5" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder Conta <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Quantos stops cheios seguidos cabem antes de bater o DD Máximo. Indica a margem de erro da gestão de risco.</p></span></span></label><input type="number" id="f2_stops" value="40" oninput="sh_calc2Fases()"></div>
+        <div class="field" style="margin:0"><label>Meta Fase 1 % <span class="tip">?<span class="tip-box"><b>Meta Fase 1 %</b><p>Lucro percentual necessário para ser aprovado na primeira fase da avaliação e avançar para a Fase 2.</p></span></span></label><div class="iu"><input type="number" id="f2_meta1" value="8" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Meta Fase 2 % <span class="tip">?<span class="tip-box"><b>Meta Fase 2 %</b><p>Lucro percentual necessário para ser aprovado na segunda fase e receber a conta funded.</p></span></span></label><div class="iu"><input type="number" id="f2_meta2" value="5" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Meta Funded Mensal % <span class="tip">?<span class="tip-box"><b>Meta Funded Mensal %</b><p>Lucro mensal alvo na conta funded para solicitar o payout. Geralmente não obrigatório — é o seu objetivo de renda.</p></span></span></label><div class="iu"><input type="number" id="f2_metaf" value="5" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Entradas/Dia <span class="tip">?<span class="tip-box"><b>Entradas por Dia</b><p>Número médio de trades por sessão. Usado para estimar o número de dias necessários para atingir as metas de cada fase.</p></span></span></label><input type="number" id="f2_entradas" value="4" oninput="sh_calc2Fases()"></div>
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro que a prop repassa ao trader. Incide sobre o lucro bruto da conta funded.</p></span></span></label><div class="iu"><input type="number" id="f2_payout" value="80" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR sobre o valor recebido após payout. Consulte seu regime tributário para o valor correto.</p></span></span></label><div class="iu"><input type="number" id="f2_ir" value="15" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo de serviço cobrado antes do repasse ao trader, sobre o payout bruto.</p></span></span></label><div class="iu"><input type="number" id="f2_taxa" value="2" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+        <div></div>
+      </div>
+      <!-- Metas operacionais do dia -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Metas Operacionais do Dia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Meta Stop Loss % / dia <span class="tip">?<span class="tip-box"><b>Stop Pessoal Diário</b><p>Seu limite de perda por sessão — diferente do DD Diário da prop. Serve como proteção proativa antes de chegar no limite regulatório.</p></span></span></label><div class="iu"><input type="number" id="f2_sl" value="1" step="0.1" min="0.01" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Meta Gain % / dia <span class="tip">?<span class="tip-box"><b>Alvo de Gain Diário</b><p>Meta de lucro por sessão. Ao atingir, considere encerrar o dia para proteger o resultado e evitar overtrading.</p></span></span></label><div class="iu"><input type="number" id="f2_gain" value="2" step="0.1" min="0.01" oninput="sh_calc2Fases()"><span class="u">%</span></div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Stop Loss USD <span class="tip">?<span class="tip-box"><b>Stop Pessoal em USD</b><p>Valor absoluto do seu stop pessoal diário. Ao atingir esta perda em uma sessão, encerre o dia — mesmo que o DD Diário da prop ainda não tenha sido atingido.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)" id="f2_sl_usd">—</div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Gain USD <span class="tip">?<span class="tip-box"><b>Alvo de Gain em USD</b><p>Valor absoluto do seu alvo de lucro diário. Ao atingir, considere encerrar a sessão para proteger o resultado.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)" id="f2_gain_usd">—</div></div>
+        </div>
+      </div>
+      <div id="f2Results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 5: 1 FASE ══════════════════════ -->
+<div class="tab-panel" id="pf-tab5">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">🎯 Gerenciamento — 1 Fase</div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="sh_calc1Fase()">▶ Calcular</button>
+        <label class="btn success" style="cursor:pointer">↑ Importar JSON/CSV<input type="file" accept=".csv,.json" style="display:none" onchange="sh_importFase(event,'1f')"></label>
+        <button class="btn" onclick="sh_exportFase('1f')">↓ Exportar</button>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital da conta de avaliação 1 fase. Base para todos os cálculos de risco, metas e payout.</p></span></span></label><div class="iu"><input type="number" id="f1_conta" value="50000" oninput="sh_calc1Fase()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>DD Máximo %</b><p>Drawdown máximo permitido pela prop. Ao atingir em qualquer momento da avaliação ou conta funded, ela é encerrada.</p></span></span></label><div class="iu"><input type="number" id="f1_ddmax" value="6" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>DD Diário %</b><p>Limite de perda por sessão da prop. Resetado diariamente. Ao atingir, encerre imediatamente o dia operacional.</p></span></span></label><div class="iu"><input type="number" id="f1_dddaily" value="3" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Quantidade de stops consecutivos suportados antes de bater o DD Máximo. Quanto mais, maior a margem para drawdowns naturais do setup.</p></span></span></label><input type="number" id="f1_stops" value="20" oninput="sh_calc1Fase()"></div>
+        <div class="field" style="margin:0"><label>Meta Prova % <span class="tip">?<span class="tip-box"><b>Meta de Prova %</b><p>Lucro percentual necessário para passar na avaliação 1 fase e receber a conta funded.</p></span></span></label><div class="iu"><input type="number" id="f1_metap" value="10" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Meta Funded Mensal % <span class="tip">?<span class="tip-box"><b>Meta Funded Mensal %</b><p>Alvo de lucro mensal na conta funded para solicitar payout. Defina com base na sua capacidade de execução sem forçar frequência.</p></span></span></label><div class="iu"><input type="number" id="f1_metaf" value="5" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Entradas/Dia <span class="tip">?<span class="tip-box"><b>Entradas por Dia</b><p>Número médio de trades por sessão. Usado para calcular estimativa de dias para atingir a meta da prova.</p></span></span></label><input type="number" id="f1_entradas" value="4" oninput="sh_calc1Fase()"></div>
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro repassado pela prop ao trader na conta funded.</p></span></span></label><div class="iu"><input type="number" id="f1_payout" value="80" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR sobre o payout recebido. Consulte seu regime tributário.</p></span></span></label><div class="iu"><input type="number" id="f1_ir" value="15" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo de serviço da prop ou corretora sobre o payout bruto, descontado antes do repasse.</p></span></span></label><div class="iu"><input type="number" id="f1_taxa" value="2" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+        <div></div><div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Metas Operacionais do Dia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Meta Stop Loss % / dia <span class="tip">?<span class="tip-box"><b>Stop Pessoal Diário</b><p>Seu limite de perda por sessão — proteção antes de atingir o DD Diário da prop. Boa prática: metade do DD Diário da conta.</p></span></span></label><div class="iu"><input type="number" id="f1_sl" value="1" step="0.1" min="0.01" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Meta Gain % / dia <span class="tip">?<span class="tip-box"><b>Alvo de Gain Diário</b><p>Meta de lucro por sessão. Ao atingir, considere encerrar o dia — dias positivos protegidos são mais valiosos do que ganhos extras com risco de reversão.</p></span></span></label><div class="iu"><input type="number" id="f1_gain" value="2" step="0.1" min="0.01" oninput="sh_calc1Fase()"><span class="u">%</span></div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Stop Loss USD <span class="tip">?<span class="tip-box"><b>Stop Pessoal em USD</b><p>Valor absoluto do seu stop pessoal diário. Ao atingir esta perda em uma sessão, encerre o dia imediatamente.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)" id="f1_sl_usd">—</div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Gain USD <span class="tip">?<span class="tip-box"><b>Alvo de Gain em USD</b><p>Valor absoluto do seu alvo de lucro diário. Ao atingir, considere encerrar a sessão para proteger o resultado.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)" id="f1_gain_usd">—</div></div>
+        </div>
+      </div>
+      <div id="f1Results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 6: INSTANT ══════════════════════ -->
+<div class="tab-panel" id="pf-tab6">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">🎯 Gerenciamento — Instant</div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="sh_calcInstant()">▶ Calcular</button>
+        <label class="btn success" style="cursor:pointer">↑ Importar JSON/CSV<input type="file" accept=".csv,.json" style="display:none" onchange="sh_importFase(event,'inst')"></label>
+        <button class="btn" onclick="sh_exportFase('inst')">↓ Exportar</button>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital da conta instant funded — sem fase de avaliação, começa operando imediatamente. Base para todos os cálculos de risco e payout.</p></span></span></label><div class="iu"><input type="number" id="in_conta" value="50000" oninput="sh_calcInstant()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>Drawdown Máximo %</b><p>Limite total de queda da conta. Instant fundings tendem a ter DD máximo mais restritivo que contas com avaliação — maior risco para a prop.</p></span></span></label><div class="iu"><input type="number" id="in_ddmax" value="5" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>Drawdown Diário %</b><p>Limite de perda por sessão. Resetado diariamente. Contas instant costumam ter DD diário mais apertado — atenção redobrada na gestão de risco.</p></span></span></label><div class="iu"><input type="number" id="in_dddaily" value="3" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Quantos stops cheios consecutivos cabem antes de bater o DD Máximo. Indica a margem de erro da gestão de risco.</p><div class="tr"><span>Menos de 10</span><span>Alta fragilidade</span></div><div class="tr"><span>20 ou mais</span><span>Gestão confortável</span></div></span></span></label><input type="number" id="in_stops" value="20" oninput="sh_calcInstant()"></div>
+        <div class="field" style="margin:0"><label>Meta Funded Mensal % <span class="tip">?<span class="tip-box"><b>Meta Funded Mensal</b><p>Seu alvo de lucro mensal para solicitar payout. Em contas instant geralmente não há meta obrigatória — use como objetivo de renda pessoal.</p></span></span></label><div class="iu"><input type="number" id="in_metaf" value="5" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Entradas/Dia <span class="tip">?<span class="tip-box"><b>Entradas por Dia</b><p>Número médio de trades por sessão. Usado para estimar o tempo necessário para atingir a meta mensal.</p></span></span></label><input type="number" id="in_entradas" value="4" oninput="sh_calcInstant()"></div>
+        <div class="field" style="margin:0"><label>Payout % <span class="tip">?<span class="tip-box"><b>Payout %</b><p>Percentual do lucro bruto repassado pela prop. Instant fundings costumam oferecer payout mais alto (90–95%) como compensação pela ausência de avaliação.</p></span></span></label><div class="iu"><input type="number" id="in_payout" value="95" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>IR % <span class="tip">?<span class="tip-box"><b>Imposto de Renda %</b><p>Alíquota de IR sobre o payout recebido. Consulte seu regime tributário.</p></span></span></label><div class="iu"><input type="number" id="in_ir" value="15" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Taxa Intermediação % <span class="tip">?<span class="tip-box"><b>Taxa de Intermediação %</b><p>Custo de serviço descontado do payout bruto antes do repasse ao trader.</p></span></span></label><div class="iu"><input type="number" id="in_taxa" value="2" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+        <div></div><div></div><div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Metas Operacionais do Dia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+          <div class="field" style="margin:0"><label>Meta Stop Loss % / dia <span class="tip">?<span class="tip-box"><b>Stop Pessoal Diário</b><p>Seu limite de perda por sessão — mais conservador que o DD Diário da prop. Acionar antes protege a conta de chegar no limite regulatório.</p></span></span></label><div class="iu"><input type="number" id="in_sl" value="1" step="0.1" min="0.01" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>Meta Gain % / dia <span class="tip">?<span class="tip-box"><b>Alvo de Gain Diário</b><p>Meta de lucro por sessão. Atingiu? Considere encerrar o dia. Dias verdes protegidos valem mais que ganhos extras com risco de reversão.</p></span></span></label><div class="iu"><input type="number" id="in_gain" value="2" step="0.1" min="0.01" oninput="sh_calcInstant()"><span class="u">%</span></div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Stop Loss USD <span class="tip">?<span class="tip-box"><b>Stop Pessoal em USD</b><p>Valor absoluto do seu stop pessoal diário. Em contas instant o DD diário é mais restritivo — seu stop pessoal deve ser ainda mais conservador.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)" id="in_sl_usd">—</div></div>
+          <div class="out-box" style="padding:6px;text-align:center;margin:0"><div class="out-lbl">Gain USD <span class="tip">?<span class="tip-box"><b>Alvo de Gain em USD</b><p>Valor absoluto do alvo diário. Ao atingir, proteja o resultado encerrando a sessão.</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)" id="in_gain_usd">—</div></div>
+        </div>
+      </div>
+      <div id="inResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ABA 7: RRR UNIFICADO ══════════════════════ -->
+<div class="tab-panel" id="pf-tab7">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">📅 Simulador de Cenários — RRR Unificado</div>
+      <button class="btn primary" onclick="sh_calcRRR()">▶ Calcular</button>
+    </div>
+    <div class="sec-body">
+      <!-- Parâmetros da conta -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label>Conta (USD) <span class="tip">?<span class="tip-box"><b>Conta (USD)</b><p>Capital base da conta. Usado para converter percentuais de risco, metas e DD em valores absolutos em dólar.</p></span></span></label><div class="iu"><input type="number" id="r_conta" value="50000" oninput="sh_calcRRR()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>DD Máximo % <span class="tip">?<span class="tip-box"><b>DD Máximo %</b><p>Limite total de drawdown da conta. Ao atingir, a conta é encerrada pela prop ou deve ser pausada por gestão.</p></span></span></label><div class="iu"><input type="number" id="r_ddmax" value="10" oninput="sh_calcRRR()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>DD Diário % <span class="tip">?<span class="tip-box"><b>DD Diário %</b><p>Limite de perda por sessão estabelecido pela prop. Ao atingir, encerre o dia imediatamente.</p></span></span></label><div class="iu"><input type="number" id="r_dddaily" value="5" oninput="sh_calcRRR()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Stops p/ Perder <span class="tip">?<span class="tip-box"><b>Stops para Perder a Conta</b><p>Quantos stops cheios a conta suporta antes de bater o DD Máximo. Determina o risco máximo por trade.</p></span></span></label><input type="number" id="r_stops" value="20" oninput="sh_calcRRR()"></div>
+        <div class="field" style="margin:0"><label>Meta Stop Loss % / dia <span class="tip">?<span class="tip-box"><b>Stop Pessoal Diário</b><p>Seu limite de perda por sessão — mais conservador que o DD Diário da prop. Acionar antes protege a conta de atingir o limite regulatório.</p></span></span></label><div class="iu"><input type="number" id="r_sl" value="1" step="0.1" min="0.01" oninput="sh_calcRRR()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Meta Gain % / dia <span class="tip">?<span class="tip-box"><b>Alvo de Gain Diário</b><p>Meta de lucro por sessão. Atingiu? Considere encerrar o dia. Consistência de dias verdes vale mais do que maximizar cada sessão.</p></span></span></label><div class="iu"><input type="number" id="r_gain" value="2" step="0.1" min="0.01" oninput="sh_calcRRR()"><span class="u">%</span></div></div>
+        <div></div><div></div>
+      </div>
+
+      <!-- Info geral: risco por nível + metas do dia -->
+      <div id="rrrInfo" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px"></div>
+      <div id="rrrDayInfo" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px"></div>
+
+      <!-- 5 colunas RRR -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="rrrGrid"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app --></div><!-- /mod-propfirm -->

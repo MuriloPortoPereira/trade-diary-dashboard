@@ -1,0 +1,167 @@
+<!-- ──────────── MÓDULO 3: FERRAMENTAS MENTAIS ──────────── -->
+<div class="hub-module" id="mod-mental">
+<span id="tinfo" style="display:none"></span>
+  <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:11px;color:var(--muted)">Simulação de Blocos de Risco · Análise de Ruína</span>
+    <button class="run-btn" onclick="sh_fmSimular()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5l10 5.5-10 5.5V2.5z"/></svg>
+      Simular
+    </button>
+  </div>
+<div id="fm-app">
+<div class="fm-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="fm-sidebar">
+  <div class="fm-sidebar-inner">
+
+    <div class="sg">
+      <div class="sgl">Configuração</div>
+      <div class="field">
+        <label>Capital Inicial ($) <span class="tip">?<span class="tip-box"><b>Capital Inicial</b><p>Saldo de partida para as colunas de simulação por bloco de risco. Cada coluna aplica um percentual diferente do capital como risco por trade, mostrando como o resultado varia conforme o tamanho da posição.</p></span></span></label>
+        <div class="iu"><input type="number" id="fm-capital" value="1000" min="100" step="100" oninput="sh_atualizarTabelaRec()"><span class="u">$</span></div>
+      </div>
+      <div class="field">
+        <label>Nº de Trades <span class="tip">?<span class="tip-box"><b>Número de Trades</b><p>Total de operações por simulação. Cada clique em "Simular" roda N trades aleatórios com os parâmetros definidos e registra o resultado no histórico.</p></span></span></label>
+        <div class="iu"><input type="number" id="nTrades" value="20" min="5" max="500" step="5" oninput="sh_atualizarTopbar()"><span class="u">#</span></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="sbtn" onclick="sh_setN(20)">20</button>
+          <button class="sbtn" onclick="sh_setN(50)">50</button>
+          <button class="sbtn" onclick="sh_setN(100)">100</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>RRR — Risk:Reward <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Proporção entre o alvo e o stop. Junto com o Win Rate define a expectância matemática do setup. Expectância = WR × RRR − (1 − WR).</p><div class="tr"><span>Expectância zero</span><span>WR = 1 ÷ (1 + RRR)</span></div></span></span></label>
+        <div class="iu"><input type="number" id="rrr" value="1" min="0.1" max="10" step="0.1" oninput="sh_atualizarTabelaRec()"><span class="u">R</span></div>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sgl">Assertividade</div>
+      <div class="fr">
+        <div class="field">
+          <label>Ganha (%) <span class="tip">?<span class="tip-box"><b>Win Rate</b><p>Percentual de trades vencedores. Deve somar 100% com Perde%. Alterar aqui atualiza Perde% automaticamente.</p></span></span></label>
+          <div class="iu"><input type="number" id="winRate" value="55" min="1" max="99" step="1" oninput="sh_syncLoss();sh_atualizarTabelaRec()"><span class="u">%</span></div>
+        </div>
+        <div class="field">
+          <label>Perde (%) <span class="tip">?<span class="tip-box"><b>Loss Rate</b><p>Percentual de trades perdedores. Calculado automaticamente como 100% − Win Rate. Edite diretamente se quiser um valor com decimal diferente.</p></span></span></label>
+          <div class="iu"><input type="number" id="lossRate" value="45" min="1" max="99" step="1" oninput="sh_syncWin()"><span class="u">%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sgl">
+        Zona de Perigo
+        <span class="tip">?<span class="tip-box"><b>Zona de Perigo</b><p>Se o saldo cair abaixo deste percentual do capital inicial, a coluna entra em Zona de Perigo (vermelho). Ex: 20% = saldo abaixo de $200 numa banca de $1000.</p><p>A recuperação a partir daí exige ganhos proporcionalmente muito maiores — é a matemática assimétrica das perdas.</p><div class="tr"><span>10%</span><span>Muito agressivo</span></div><div class="tr"><span>20%</span><span>Padrão</span></div><div class="tr"><span>30%+</span><span>Conservador</span></div></span></span>
+      </div>
+      <div class="field">
+        <label>Saldo abaixo de (% do capital) <span class="tip">?<span class="tip-box"><b>Limite da Zona de Perigo</b><p>Percentual mínimo do capital inicial que define a entrada na zona crítica. Abaixo disso, a recuperação exige ganhos cada vez mais desproporcionais.</p></span></span></label>
+        <div class="iu"><input type="number" id="perigoPct" value="20" min="5" max="80" step="5" oninput="sh_atualizarTopbar();sh_atualizarTabelaRec()"><span class="u">%</span></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="sbtn" onclick="sh_setRP(10)">10%</button>
+          <button class="sbtn" onclick="sh_setRP(20)">20%</button>
+          <button class="sbtn" onclick="sh_setRP(30)">30%</button>
+          <button class="sbtn" onclick="sh_setRP(50)">50%</button>
+        </div>
+      </div>
+
+      <!-- Tabela de recuperação -->
+      <div style="margin-top:2px">
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Quanto precisa recuperar <span class="tip" style="font-size:8px;text-transform:none">?<span class="tip-box"><b>Tabela de Recuperação</b><p>Quanto você precisa ganhar para recuperar cada nível de perda. A assimetria matemática: perder 50% exige ganhar 100%. Quanto maior a perda, mais difícil a recuperação — por isso controlar o risco por trade é mais importante que maximizar ganhos.</p></span></span></div>
+        <table class="recov-table" id="recovTable"></table>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sgl">Blocos de Risco</div>
+      <div class="binfo"><div class="bname"><span class="dot" style="background:var(--blue)"></span>Bloco 1 — Ultra-Baixo</div><div class="brange">0.25% → 4.25%</div></div>
+      <div class="binfo"><div class="bname"><span class="dot" style="background:var(--green)"></span>Bloco 2 — Baixo-Moderado</div><div class="brange">2.5% → 10%</div></div>
+      <div class="binfo"><div class="bname"><span class="dot" style="background:var(--yellow)"></span>Bloco 3 — Elevado</div><div class="brange">5% → 20%</div></div>
+      <div class="binfo"><div class="bname"><span class="dot" style="background:var(--red)"></span>Bloco 4 — Extremo</div><div class="brange">25% → 50%</div></div>
+    </div>
+
+    <div class="sg">
+      <div class="sgl">Legenda de Cores</div>
+      <div class="lrow"><div class="lswatch" style="background:rgba(63,185,80,.10);border:1px solid rgba(95,216,126,.3)"></div><span style="color:var(--muted);font-size:11px">Acima do capital inicial</span></div>
+      <div class="lrow"><div class="lswatch" style="background:rgba(227,179,65,.10);border:1px solid rgba(212,168,74,.3)"></div><span style="color:var(--muted);font-size:11px">Negativo — ainda vivo</span></div>
+      <div class="lrow"><div class="lswatch" style="background:rgba(248,81,73,.20);border:1px solid rgba(248,81,73,.45)"></div><span style="color:var(--red);font-size:11px">Zona de Perigo</span></div>
+      <div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:6px;line-height:1.5">
+        Zona de Perigo = saldo tão baixo que a recuperação exige ganhos absurdos. Equivale à ruína na prática.
+      </div>
+    </div>
+
+  </div><!-- end fm-sidebar-inner -->
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="fm-main">
+
+    <!-- MÉTRICAS -->
+    <div class="mrow">
+      <div class="metric mb"><div class="mlabel">Capital</div><div class="mval cb" id="m-cap">$1.000</div><div class="msub">banca inicial</div></div>
+      <div class="metric mg"><div class="mlabel">Win Rate</div><div class="mval cg" id="m-wr">55%</div><div class="msub" id="m-wr-sub">RRR 1:1.00</div></div>
+      <div class="metric my"><div class="mlabel">Trades</div><div class="mval cy" id="m-trades">20</div><div class="msub">por simulação</div></div>
+      <div class="metric mo"><div class="mlabel">Zona de Perigo</div><div class="mval co" id="m-perigo">20%</div><div class="msub" id="m-perigo-sub">saldo &lt; $200</div></div>
+      <div class="metric mp"><div class="mlabel">Simulações</div><div class="mval cp" id="m-sims">0</div><div class="msub">no histórico</div></div>
+    </div>
+
+    <div class="warn" id="warnBox">⚠ Assertividade não fecha 100%! Corrija Ganha% + Perde%.</div>
+
+    <!-- BLOCOS -->
+    <div class="bgrid-outer">
+      <div class="bgrid" id="blocosGrid"></div>
+    </div>
+
+    <!-- ANALYTICS ACUMULADO -->
+    <div class="analytics-wrap" id="analyticsWrap">
+      <div class="sep-label">Analytics Acumulado — Histórico de Simulações</div>
+
+      <div id="analyticsEmpty" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">
+        Rode ao menos 2 simulações para ver os analytics acumulados.
+      </div>
+
+      <div id="analyticsPanel" style="display:none">
+        <!-- Totais gerais (inclui Total Sims) -->
+        <div class="a-totals" id="analyticsTotals"></div>
+        <!-- Por bloco -->
+        <div class="analytics-grid" id="analyticsGrid"></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="logwrap">
+      <div class="loghdr" onclick="sh_toggleLog()">
+        <div class="logtit">Histórico de Simulações <span class="logcnt" id="logcnt">0 registros</span></div>
+        <div class="logacts" onclick="event.stopPropagation()">
+          <button class="lbtn" onclick="sh_exportLog()">Exportar CSV</button>
+          <button class="lbtn" onclick="sh_clearLog()">Limpar</button>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:5px 6px" id="logchev">▼</span>
+        </div>
+      </div>
+      <div class="logbody">
+        <div class="logscroll" id="logscroll">
+          <div class="logempty" id="logempty">Nenhuma simulação registrada. Clique em Simular para começar.</div>
+          <table class="ltable" id="logtable" style="display:none">
+            <thead><tr>
+              <th style="width:32px">#</th>
+              <th style="width:68px">Hora</th>
+              <th style="width:52px">Trades</th>
+              <th style="width:68px">Capital</th>
+              <th style="width:48px">WR%</th>
+              <th style="width:52px">RRR</th>
+              <th style="width:62px">Perigo%</th>
+              <th>Resultado por Bloco (✓pos ~neg ⬛perigo 🔴zero)</th>
+              <th style="width:80px">Status</th>
+            </tr></thead>
+            <tbody id="logtbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</div><!-- #app --></div><!-- /mod-mental -->

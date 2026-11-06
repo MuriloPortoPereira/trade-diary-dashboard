@@ -166,13 +166,13 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
-- G6d: plano, TradeSim e mental isolados em três factories coesos, mantendo criação na sequência original e as 36 funções internas exigidas pelas pontes existentes.
-- Cinco helpers puros incorporados ao domínio existente. Estado, callbacks load/input/resize, IO, histórico, UI e exportações preservados.
-- Runtime: 1.672 → 233 linhas; módulos com 394/627/423 linhas; domínio com 127. `app.js` permanece em 2.269 linhas.
-- Cinco caracterizações pré-corte, teste de definição inerte, 90 arquivos Node, 113 checks no navegador, sintaxe e diff aprovados. Revisão independente sem achados ou bloqueios. G6 estrutural encerrado; template gigante permanece preservado para G7.
+- G7a: template StudyHub com quatro fontes HTML de autoria e geração determinística em script clássico versionado; ADR-004 registra contrato e custos.
+- A montagem recebe exatamente os mesmos 151.521 bytes; IDs, handlers, guardas, carga síncrona e deploy sem build preservados.
+- Runtime: 170.565 → 11.187 bytes; 233 linhas, sem linha gigante. Fontes HTML com 352/580/310/167 linhas. `app.js` permanece em 2.269 linhas.
+- Caracterização pré-corte, sincronização do asset e escaping do gerador protegidos; 91 arquivos Node, 113 checks no navegador, sintaxe/diff e --check do gerador aprovados. Revisão independente sem achados ou bloqueios.
 
 ## Next
-- G7: avaliar composição HTML/template e compatibilidade dos scripts clássicos, sem introduzir framework ou dependências de runtime.
+- G7b: avaliar composição do shell `index.html` e compatibilidade dos scripts clássicos; wrappers só podem ser removidos com todos os consumidores protegidos.
 - Depois: revisar acoplamentos/resíduos ainda em `app.js`, documentação e critérios de fechamento arquitetural; não confundir redução de linhas com conclusão de toda a refatoração.
 - Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
 - Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.

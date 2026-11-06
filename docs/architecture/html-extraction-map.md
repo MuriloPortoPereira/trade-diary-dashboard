@@ -80,6 +80,12 @@ e deve refletir a organização conforme os lotes forem implementados.
 
 ## Cobertura necessária
 
+G7a executado: HTML StudyHub agora possui quatro fontes de autoria em
+`src/modules/study-hub/presentation/templates/`, geradas em um asset clássico versionado.
+[ADR-004](adr/004-study-hub-html-authoring.md) preserva deploy sem build, carga síncrona e os mesmos
+151.521 bytes montados. O shell `index.html` e seus estilos/handlers permanecem inalterados neste corte;
+apenas uma tag de script foi adicionada antes do consumidor. A composição do shell continua em avaliação G7b.
+
 Além dos fluxos por página: primeira carga e recarga com dados sintéticos, PT/EN, desktop/mobile,
 sidebar, todos os modais, ausência de erros/404 e comparação do storage antes/depois de navegação.
 Os 18 checks existentes cobrem um subconjunto; a análise não afirma que esse smoke completo já exista.

@@ -41,7 +41,11 @@ de `app.js`, não diretórios já separados. Localizar símbolos com Serena ante
 | `src/modules/study-hub/domain/study-hub-calculations.js` | Checklist, RNG, snapshots, simulação, helpers PropFirm/plano/mental puros; namespace/127 linhas |
 | `src/modules/study-hub/presentation/study-hub-page.js` | Página nativa coesa: metadata, formulários, markup, renderers, pontes e wrappers globais; 759 linhas |
 | `tests/study-hub-native.test.cjs` | Estado/backups parciais, parsing, persistência real, refresh, eventos, abas, cálculo, seed e isolamento/carga |
-| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem/template, shell, tooltips e pontes; 233 linhas, com template em linha gigante preservado até composição HTML G7 |
+| `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` | Montagem, shell, tooltips e pontes; 233 linhas/11.187 bytes; consome template clássico pré-carregado |
+| `src/modules/study-hub/presentation/templates/{propfirm,plan,tradesim,mental}.html` | HTML de autoria por ferramenta; 352/580/310/167 linhas, ordem e texto preservados |
+| `src/modules/study-hub/presentation/study-hub-template.js` | Asset gerado/versionado de distribuição; dados clássicos síncronos, não editar diretamente |
+| `scripts/build-study-hub-template.cjs` | Geração determinística sem dependências; --check detecta divergência sem escrever |
+| `tests/study-hub-template.test.cjs` | Montagem com fingerprint, módulos/handlers, sincronização do asset e escaping do gerador |
 | `src/modules/study-hub/presentation/study-hub-propfirm.js` | Factory PropFirm privado, callbacks e 12 funções para as pontes do runtime; 703 linhas |
 | `src/modules/study-hub/presentation/study-hub-plan.js` | Factory plano privado, ciclos, diário, projeções, cotação e callbacks; 394 linhas/21 funções para pontes |
 | `src/modules/study-hub/presentation/study-hub-tradesim.js` | Factory TradeSim privado, cenários, Monte Carlo, bindings e resize; 627 linhas/cinco funções para pontes |

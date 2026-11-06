@@ -1,0 +1,310 @@
+<!-- ──────────── MÓDULO 2: TRADE SIMULATOR ──────────── -->
+<div class="hub-module" id="mod-tradesim">
+  <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:11px;color:var(--muted)">Monte Carlo · Sequências · Distribuição de Resultados</span>
+    <button class="run-btn" onclick="sh_tsRunAll()">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 3l10 5-10 5V3z"/></svg>
+      Simular
+    </button>
+  </div>
+<div class="ts-layout">
+
+<!-- ─── SIDEBAR ─── -->
+<div class="ts-sidebar">
+<div class="ts-sidebar-inner">
+
+  <div class="ts-sidebar-group">
+    <div class="ts-sidebar-group-label">// Capital & Risco</div>
+    <div class="field">
+      <label>Capital Inicial <span class="tip">?<span class="tip-box"><b>Capital Inicial</b><p>Saldo de partida do simulador. Todas as simulações partem deste valor. Com juros compostos ativos, o risco em $ por trade muda conforme o saldo evolui a cada operação.</p></span></span></label>
+      <div class="input-unit">
+        <input type="number" id="ts-capital" value="10000" min="100" step="100">
+        <span class="unit">$</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Risco por Trade <span class="tip">?<span class="tip-box"><b>Risco por Trade %</b><p>Percentual do capital arriscado por operação. Com juros compostos, o valor em $ muda a cada trade conforme o saldo cresce ou diminui.</p></span></span></label>
+      <div class="range-row">
+        <input type="range" id="riskRange" min="0.1" max="5" step="0.1" value="1" oninput="sh_syncRange('risk','riskRange',this.value,'%')">
+        <span class="range-val" id="riskRangeVal">1.0%</span>
+      </div>
+      <div class="input-unit" style="margin-top:6px">
+        <input type="number" id="risk" value="1" min="0.1" max="10" step="0.1" oninput="sh_syncInput('risk','riskRange',this.value,'%')">
+        <span class="unit">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ts-sidebar-group">
+    <div class="ts-sidebar-group-label">// Limites Diários</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Stop Diário <span class="tip">?<span class="tip-box"><b>Stop Diário %</b><p>Limite de perda total no dia. Se o saldo cair abaixo deste percentual do capital inicial, o dia encerra automaticamente na simulação — prevenindo overtrading em dias ruins.</p></span></span></label>
+        <div class="input-unit">
+          <input type="number" id="dailyStop" value="2" min="0.1" max="20" step="0.1">
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Meta Diária <span class="tip">?<span class="tip-box"><b>Meta Diária %</b><p>Alvo de lucro por dia simulado. Se atingido antes do máximo de trades, o dia encerra automaticamente — modelando uma gestão de encerrar quando o alvo é batido.</p></span></span></label>
+        <div class="input-unit">
+          <input type="number" id="dailyTarget" value="1" min="0.1" max="20" step="0.1">
+          <span class="unit">%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ts-sidebar-group">
+    <div class="ts-sidebar-group-label">// Por Operação (RRR)</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Stop/Trade <span class="tip">?<span class="tip-box"><b>Stop por Trade %</b><p>Percentual do capital que representa o stop loss desta operação. Junto com o Alvo, define o RRR calculado abaixo. Valores em % do capital — não em pips.</p></span></span></label>
+        <div class="input-unit">
+          <input type="number" id="sl" value="1" min="0.01" max="10" step="0.01">
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Alvo/Trade <span class="tip">?<span class="tip-box"><b>Alvo por Trade %</b><p>Percentual do capital que representa o take profit. RRR = Alvo ÷ Stop. Ex: Stop 1% e Alvo 2% = RRR 2:1.</p></span></span></label>
+        <div class="input-unit">
+          <input type="number" id="tp" value="1" min="0.01" max="10" step="0.01">
+          <span class="unit">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>RRR calculado <span class="tip">?<span class="tip-box"><b>RRR Calculado</b><p>Relação risco:retorno resultante dos valores de Stop e Alvo definidos. Exibido em tempo real conforme você altera os campos acima.</p></span></span></label>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)" id="rrrDisplay">1 : 1.00</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;">
+      Risco/Retorno calculado a partir de Stop e Alvo acima.<br>
+      <span style="color:var(--dim)">Estes valores são % do capital em conta (não pips).</span>
+    </div>
+  </div>
+
+  <div class="ts-sidebar-group">
+    <div class="ts-sidebar-group-label">// Operações & Win Rate</div>
+    <div class="field">
+      <label>Max Trades/Dia <span class="tip">?<span class="tip-box"><b>Máximo de Trades por Dia</b><p>Limite de operações por sessão simulada. Controla a frequência e modela uma gestão anti-overtrading. O dia encerra quando o stop diário, a meta diária ou este limite é atingido.</p></span></span></label>
+      <div class="range-row">
+        <input type="range" id="tradesRange" min="1" max="20" step="1" value="10" oninput="sh_syncRange('trades','tradesRange',this.value,'')">
+        <span class="range-val" id="tradesRangeVal">10</span>
+      </div>
+      <input type="number" id="trades" value="10" min="1" max="50" step="1" oninput="sh_syncInput('trades','tradesRange',this.value,'')">
+    </div>
+    <div class="field">
+      <label>Win Rate Estimado <span class="tip">?<span class="tip-box"><b>Win Rate Estimado</b><p>Probabilidade de cada trade ser vencedor. A simulação usa esse percentual aleatoriamente para resolver cada trade. Use o win rate histórico do seu setup para resultados mais realistas.</p></span></span></label>
+      <div class="range-row">
+        <input type="range" id="wrRange" min="10" max="90" step="1" value="55" oninput="sh_syncRange('wr','wrRange',this.value,'%')">
+        <span class="range-val" id="wrRangeVal">55%</span>
+      </div>
+      <div class="input-unit">
+        <input type="number" id="wr" value="55" min="0" max="100" step="1" oninput="sh_syncInput('wr','wrRange',this.value,'%')">
+        <span class="unit">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ts-sidebar-group">
+    <div class="ts-sidebar-group-label">// Simulação</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dias Úteis <span class="tip">?<span class="tip-box"><b>Dias Úteis</b><p>Horizonte de tempo da simulação. Representa o número de sessões de trading simuladas. Use 20–22 para um mês, 60 para um trimestre, 252 para o ano completo.</p></span></span></label>
+        <input type="number" id="days" value="60" min="5" max="500" step="5">
+      </div>
+      <div class="field">
+        <label>Ciclos (MC) <span class="tip">?<span class="tip-box"><b>Ciclos Monte Carlo</b><p>Quantidade de simulações independentes executadas para gerar a distribuição de resultados. Mais ciclos = maior precisão estatística. 200 já é suficiente; acima de 500 o ganho marginal é mínimo.</p></span></span></label>
+        <input type="number" id="cycles" value="200" min="10" max="1000" step="10">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Seq. de Trades <span class="tip">?<span class="tip-box"><b>Sequência de Trades</b><p>Total de operações simuladas no gráfico de Sequência Aleatória. Permite visualizar como wins e losses se distribuem numa série de N trades com o win rate configurado.</p></span></span></label>
+        <input type="number" id="seqTrades" value="40" min="5" max="200" step="5">
+      </div>
+      <div class="field">
+        <label>Trades/Ciclo <span class="tip">?<span class="tip-box"><b>Trades por Ciclo</b><p>Número de operações por ciclo no gráfico de Ciclos Fixos. Define o tamanho de cada período — ex.: 10 trades/ciclo em 60 dias gera múltiplos ciclos e mostra o crescimento composto ciclo a ciclo.</p></span></span></label>
+        <input type="number" id="tradesPerCycle" value="10" min="1" max="50" step="1">
+      </div>
+    </div>
+  </div>
+
+</div><!-- end ts-sidebar-inner -->
+</div>
+<!-- end sidebar -->
+
+<!-- ─── MAIN ─── -->
+<div class="ts-main">
+
+  <!-- WARNING -->
+  <div class="warning-box" id="warningBox">
+    <div class="icon">⚠️</div>
+    <p id="warningText">Carregando análise...</p>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metrics-row">
+    <div class="ts-metric m-blue">
+      <div class="ts-metric-label">Breakeven WR <span class="tip">?<span class="tip-box"><b>Win Rate de Breakeven</b><p>Percentual mínimo de acertos necessário para o setup não perder dinheiro no longo prazo, dado o RRR configurado. Fórmula: 1 ÷ (1 + RRR). Com WR abaixo disso, o setup é matematicamente destruidor.</p></span></span></div>
+      <div class="ts-metric-value col-blue" id="mBeWR">—</div>
+      <div class="ts-metric-sub">win rate mínimo</div>
+    </div>
+    <div class="ts-metric m-yellow">
+      <div class="ts-metric-label">Expectativa/Trade <span class="tip">?<span class="tip-box"><b>Expectativa por Trade</b><p>Retorno médio esperado por operação em dólares, considerando WR × ganho − (1−WR) × perda. Positivo = setup lucrativo no longo prazo. Negativo = setup destrutivo.</p></span></span></div>
+      <div class="ts-metric-value" id="mEV">—</div>
+      <div class="ts-metric-sub">valor esperado</div>
+    </div>
+    <div class="ts-metric m-green">
+      <div class="ts-metric-label">Espect. Diária <span class="tip">?<span class="tip-box"><b>Expectativa Diária</b><p>Retorno médio esperado por dia útil: Expectativa/Trade × Max Trades/Dia. Representa o ganho esperado se você executar o setup com consistência todos os dias.</p></span></span></div>
+      <div class="ts-metric-value" id="mDailyEV">—</div>
+      <div class="ts-metric-sub">por dia útil</div>
+    </div>
+    <div class="ts-metric m-red">
+      <div class="ts-metric-label">Max SL Consec. <span class="tip">?<span class="tip-box"><b>Máximo de Stops Consecutivos</b><p>Número máximo de losses seguidos antes de atingir o Stop Diário configurado. Use para se preparar psicologicamente: saber que pode levar X stops seguidos sem quebrar o dia ajuda a manter a disciplina.</p></span></span></div>
+      <div class="ts-metric-value col-red" id="mMaxSL">—</div>
+      <div class="ts-metric-sub">antes de stop diário</div>
+    </div>
+    <div class="ts-metric m-purple">
+      <div class="ts-metric-label">Proj. 20 dias <span class="tip">?<span class="tip-box"><b>Projeção em 20 Dias</b><p>Estimativa de resultado acumulado em 20 dias úteis (~1 mês), calculada com a expectativa diária. É uma projeção matemática — não considera variância. O Monte Carlo abaixo mostra a distribuição real de cenários.</p></span></span></div>
+      <div class="ts-metric-value col-purple" id="mProj20">—</div>
+      <div class="ts-metric-sub">com WR atual</div>
+    </div>
+  </div>
+
+  <!-- MONTE CARLO EQUITY CURVE -->
+  <div class="ts-panel ts-panel-full">
+    <div class="ts-panel-header">
+      <div class="ts-panel-title"><span class="icon">📈</span> Curva de Equity — Monte Carlo <span class="tip">?<span class="tip-box"><b>Curva de Equity — Monte Carlo</b><p>Simulação de múltiplos cenários aleatórios com os parâmetros configurados. Cada linha representa uma sequência possível de trades. A dispersão mostra a variância do setup — quanto mais espalhadas as curvas, maior a instabilidade dos resultados mesmo com edge positivo.</p></span></span></div>
+      <div style="font-size:10px;color:var(--muted)" id="mcInfo">—</div>
+    </div>
+    <div class="ts-panel-body">
+      <div class="legend" id="mcLegend"></div>
+      <div class="chart-container" style="height:240px">
+        <canvas id="mcCanvas" height="240"></canvas>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px" id="mcStats"></div>
+    </div>
+  </div>
+
+  <!-- TWO PANELS -->
+  <div class="panels-grid">
+
+    <!-- CENÁRIOS -->
+    <div class="ts-panel">
+      <div class="ts-panel-header">
+        <div class="ts-panel-title"><span class="icon">📊</span> Cenários — N dias úteis <span class="tip">?<span class="tip-box"><b>Cenários Simulados</b><p>Cada linha é um período simulado com trades aleatórios. Mostra a distribuição de resultados possíveis: alguns dias terminam no stop, outros na meta, outros no meio do caminho. Use para entender a variância real do setup no prazo configurado.</p></span></span></div>
+      </div>
+      <div class="ts-panel-body" style="padding:0">
+        <table class="data-table" id="scenarioTable">
+          <thead>
+            <tr>
+              <th>Cenário</th><th>WR</th><th>Gains</th><th>Stops</th><th>Result %</th><th>$Capital</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECUPERAÇÃO -->
+    <div class="ts-panel">
+      <div class="ts-panel-header">
+        <div class="ts-panel-title"><span class="icon">🔁</span> Análise de Recuperação <span class="tip">?<span class="tip-box"><b>Análise de Recuperação</b><p>Para cada nível de perda sofrida, mostra quantos dias são necessários para recuperar o capital com o setup configurado, e qual win rate mínimo seria necessário para recuperar em tempo razoável.</p></span></span></div>
+      </div>
+      <div class="ts-panel-body" style="padding:0">
+        <table class="data-table" id="recoveryTable">
+          <thead>
+            <tr>
+              <th>Situação</th><th>Perda</th><th>Dias p/ recuperar</th><th>WR necessário</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SEQUENCE + CYCLE -->
+  <div class="panels-grid">
+
+    <!-- SEQUÊNCIA DE TRADES -->
+    <div class="ts-panel">
+      <div class="ts-tab-bar">
+        <button class="ts-tab-btn active" onclick="sh_tsTab(this,'seqRandom')">Sequência Aleatória <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Sequência Aleatória</b><p>Simula uma sequência de N trades com o win rate configurado, resolvendo cada operação aleatoriamente. Útil para visualizar como sequências de loss/win se distribuem na prática — e por que o drawdown médio é inevitável mesmo em setups lucrativos.</p></span></span></button>
+        <button class="ts-tab-btn" onclick="sh_tsTab(this,'seqFixed')">Ciclos Fixos <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Ciclos Fixos</b><p>Divide o total de dias em ciclos de N trades cada e mostra como o capital evolui ciclo a ciclo. Útil para planejar metas por período e entender o crescimento composto ao longo do tempo.</p></span></span></button>
+      </div>
+      <div class="ts-tab-content active" id="seqRandom">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--muted)">Simulação de <span id="seqN" class="mono col-blue">40</span> trades com win rate configurado</div>
+          <button onclick="sh_tsRunAll()" style="background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:4px 12px;border-radius:5px;cursor:pointer;font-size:11px">↺ Novo</button>
+        </div>
+        <div class="trade-seq" id="tradeSeqViz"></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px" id="seqStats"></div>
+      </div>
+      <div class="ts-tab-content" id="seqFixed">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Ciclos de <span id="cycleN" class="mono col-blue">10</span> trades — progressão do capital</div>
+        <div class="chart-container" style="height:180px">
+          <canvas id="cycleCanvas" height="180"></canvas>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px" id="cycleStats"></div>
+      </div>
+    </div>
+
+    <!-- IMPACTO POR DIA -->
+    <div class="ts-panel">
+      <div class="ts-panel-header">
+        <div class="ts-panel-title"><span class="icon">🎯</span> Impacto Intraday <span class="tip">?<span class="tip-box"><b>Impacto Intraday</b><p>Simule cenários do dia com SL e Stop Diário independentes. O RRR é calculado a partir do SL local e do RRR configurado na sidebar. Win Rate necessário é o breakeven para o setup atual.</p></span></span></div>
+      </div>
+      <div class="ts-panel-body">
+        <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+          <div class="field" style="margin:0;flex:0 0 auto">
+            <label style="font-size:10px;color:var(--muted);margin-bottom:4px;display:block">SL/Trade</label>
+            <div class="input-unit" style="width:90px">
+              <input type="number" id="id-sl" value="1" min="0.01" max="10" step="0.01" oninput="sh_buildIntraday()">
+              <span class="unit">%</span>
+            </div>
+          </div>
+          <div class="field" style="margin:0;flex:0 0 auto">
+            <label style="font-size:10px;color:var(--muted);margin-bottom:4px;display:block">Stop do Dia</label>
+            <div class="input-unit" style="width:90px">
+              <input type="number" id="id-dailyStop" value="2" min="0.1" max="20" step="0.1" oninput="sh_buildIntraday()">
+              <span class="unit">%</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:10px;color:var(--muted)">RRR calculado</span>
+            <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue);white-space:nowrap" id="id-rrrDisplay">1 : 1.00</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:10px;color:var(--muted)">Alvo/Trade</span>
+            <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green);white-space:nowrap" id="id-tpDisplay">1.00%</div>
+          </div>
+        </div>
+        <table class="data-table" id="intradayTable">
+          <thead>
+            <tr><th>#Trades</th><th>Todos Win</th><th>50% Acerto</th><th>Todos Loss</th><th>Stop Diário em</th><th>WR Necessário</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DISTRIBUIÇÃO DE RESULTADOS -->
+  <div class="ts-panel ts-panel-full">
+    <div class="ts-panel-header">
+      <div class="ts-panel-title"><span class="icon">📉</span> Distribuição de Resultados Finais (Monte Carlo) <span class="tip">?<span class="tip-box"><b>Distribuição de Resultados Finais</b><p>Histograma dos resultados finais de todas as simulações Monte Carlo. Mostra com que frequência o setup termina em cada faixa de resultado. Curva deslocada para a direita = setup com edge positivo. Cauda esquerda longa = risco de drawdown severo em alguns cenários.</p></span></span></div>
+    </div>
+    <div class="ts-panel-body">
+      <div class="chart-container" style="height:180px">
+        <canvas id="distCanvas" height="180"></canvas>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px" id="distStats"></div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+</div><!-- end layout --></div><!-- /mod-tradesim -->

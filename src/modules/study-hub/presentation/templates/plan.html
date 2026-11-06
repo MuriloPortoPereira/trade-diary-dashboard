@@ -1,0 +1,580 @@
+<!-- ──────────── MÓDULO 1: PLANO DE TRADE ──────────── -->
+<div class="hub-module" id="mod-plano">
+<input type="hidden" id="cotInput" value="5.80"><span id="cotDisp" style="display:none"></span>
+<div id="pt-app">
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="sh_ptTab(0)">📋 Plano de Trade</button>
+  <button class="tab-btn" onclick="sh_ptTab(1)">📉 Loss Contínuo &amp; Alternado</button>
+  <button class="tab-btn" onclick="sh_ptTab(2)">📊 Cálculos Day Trade</button>
+</div>
+
+<!-- ═══════ ABA 1: PLANO DE TRADE ═══════ -->
+<div class="tab-panel active" id="pt-tab0">
+
+  <!-- CICLOS -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">🔄 Simulador de Ciclos</div>
+      <div class="btn-row">
+        <button class="btn success" onclick="sh_addCiclo()">+ Ciclo</button>
+        <button class="btn primary" onclick="sh_calcCiclos()">▶ Calcular</button>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="fr5" style="margin-bottom:14px;gap:8px">
+        <div class="field" style="margin:0"><label>Capital Inicial ($) <span class="tip">?<span class="tip-box"><b>Capital Inicial</b><p>Saldo de partida do Ciclo 1. Os ciclos seguintes herdam automaticamente o capital final do ciclo anterior.</p></span></span></label><div class="iu"><input type="number" id="cicCap" value="1000" step="1" oninput="sh_calcCiclos()"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>Risco inicial (%) <span class="tip">?<span class="tip-box"><b>Risco Inicial %</b><p>Percentual do capital arriscado por operação no Ciclo 1. Com juros compostos, o valor em USD cresce a cada ciclo conforme o capital aumenta.</p></span></span></label><div class="iu"><input type="number" id="cicRisco" value="1" step="0.1" min="0.01" oninput="sh_calcCiclos()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>Redução risco (%/cic) <span class="tip">?<span class="tip-box"><b>Redução de Risco por Ciclo</b><p>Quanto o risco percentual diminui a cada ciclo. Permite simular uma gestão mais conservadora à medida que o capital cresce.</p><div class="tr"><span>0</span><span>Risco fixo em todos os ciclos</span></div><div class="tr"><span>0.25</span><span>Reduz 0.25% a cada ciclo</span></div></span></span></label><div class="iu"><input type="number" id="cicRedRisco" value="0.25" step="0.05" min="0" oninput="sh_calcCiclos()"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>RRR inicial <span class="tip">?<span class="tip-box"><b>RRR Inicial</b><p>Relação Risco:Retorno do Ciclo 1. Define quanto o alvo é maior que o stop. RRR 2 = alvo 2× o risco.</p></span></span></label><input type="number" id="cicRRR" value="1" step="0.001" min="0.1" oninput="sh_calcCiclos()"></div>
+        <div class="field" style="margin:0"><label>Δ RRR por ciclo <span class="tip">?<span class="tip-box"><b>Variação de RRR por Ciclo</b><p>Quanto o RRR aumenta ou diminui a cada ciclo. Use positivo para simular evolução do setup, negativo para conservadorismo, 0 para manter fixo.</p></span></span></label><input type="number" id="cicDeltaRRR" value="0" step="0.001" oninput="sh_calcCiclos()"></div>
+      </div>
+      <div class="fr3" style="margin-bottom:14px;gap:8px">
+        <div class="field" style="margin:0"><label>Intervalo redução risco (ciclos) <span class="tip">?<span class="tip-box"><b>Intervalo de Redução de Risco</b><p>A cada quantos ciclos a redução de risco é aplicada. Ex: 2 = reduz o risco a cada 2 ciclos.</p></span></span></label><div class="iu"><input type="number" id="cicIntRisco" value="1" step="1" min="1" oninput="sh_calcCiclos()"><span class="u">#</span></div></div>
+        <div class="field" style="margin:0"><label>Intervalo Δ RRR (ciclos) <span class="tip">?<span class="tip-box"><b>Intervalo de Variação de RRR</b><p>A cada quantos ciclos o delta de RRR é aplicado. Permite progressão gradual do RRR ao longo dos ciclos.</p></span></span></label><div class="iu"><input type="number" id="cicIntRRR" value="1" step="1" min="1" oninput="sh_calcCiclos()"><span class="u">#</span></div></div>
+        <div class="field" style="margin:0"><label>N operações por ciclo <span class="tip">?<span class="tip-box"><b>Operações por Ciclo</b><p>Número de trades executados em cada ciclo. O ganho final de cada ciclo usa juros compostos com esse volume de trades e a expectância do setup.</p></span></span></label><div class="iu"><input type="number" id="cicNOps" value="200" step="1" min="1" oninput="sh_calcCiclos()"><span class="u">ops</span></div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th class="al">Ciclo</th><th>Capital ($)</th><th>Risco%</th><th>RRR</th><th>Ops</th><th>Cap. Final ($)</th><th>Ganho/Op ($)</th><th>Ganho Total ($)</th><th>Em R$</th><th></th></tr></thead>
+          <tbody id="ciclosTbody"></tbody>
+        </table>
+      </div>
+      <div class="chart-wrap" style="height:180px"><canvas id="ciclosChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- PARCIAIS + SIMULAÇÃO BR + METAS -->
+  <div class="g3" style="margin-bottom:16px">
+
+    <!-- PARCIAIS -->
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr"><div class="sec-title">🎯 Parciais — RRR Efetivo</div></div>
+      <div class="sec-body">
+        <div class="fr3" style="margin-bottom:10px">
+          <div>
+            <div class="field"><label>Alvo 1 (%) <span class="tip">?<span class="tip-box"><b>Parcial 1 — % da Posição</b><p>Percentual do tamanho total da posição encerrado neste primeiro alvo. A soma dos três alvos deve ser 100%.</p></span></span></label><div class="iu"><input type="number" id="p1p" value="50" min="0" max="100" step="5" oninput="sh_calcParciais()"><span class="u">%</span></div></div>
+            <div class="field"><label>RRR 1 <span class="tip">?<span class="tip-box"><b>RRR desta Parcial</b><p>Relação risco:retorno específica deste alvo. O RRR Médio resultante é a média ponderada dos três alvos pelo percentual de posição encerrado em cada um.</p></span></span></label><input type="number" id="p1r" value="0.618" step="0.001" oninput="sh_calcParciais()"></div>
+          </div>
+          <div>
+            <div class="field"><label>Alvo 2 (%) <span class="tip">?<span class="tip-box"><b>Parcial 2 — % da Posição</b><p>Percentual da posição encerrado no segundo alvo.</p></span></span></label><div class="iu"><input type="number" id="p2p" value="25" min="0" max="100" step="5" oninput="sh_calcParciais()"><span class="u">%</span></div></div>
+            <div class="field"><label>RRR 2 <span class="tip">?<span class="tip-box"><b>RRR desta Parcial</b><p>Relação risco:retorno do segundo alvo.</p></span></span></label><input type="number" id="p2r" value="1.000" step="0.001" oninput="sh_calcParciais()"></div>
+          </div>
+          <div>
+            <div class="field"><label>Alvo 3 (%) <span class="tip">?<span class="tip-box"><b>Parcial 3 — % da Posição</b><p>Percentual da posição encerrado no terceiro alvo. O restante não encerrado representa a parcial de tendência ou runner.</p></span></span></label><div class="iu"><input type="number" id="p3p" value="25" min="0" max="100" step="5" oninput="sh_calcParciais()"><span class="u">%</span></div></div>
+            <div class="field"><label>RRR 3 <span class="tip">?<span class="tip-box"><b>RRR desta Parcial</b><p>Relação risco:retorno do terceiro alvo. Quanto maior, mais o setup aproveitou o movimento.</p></span></span></label><input type="number" id="p3r" value="1.141" step="0.001" oninput="sh_calcParciais()"></div>
+          </div>
+        </div>
+        <div class="fr3" style="gap:8px;margin-bottom:10px">
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">RRR Médio <span class="tip">?<span class="tip-box"><b>RRR Efetivo Médio</b><p>Relação risco:retorno resultante ao fechar os três alvos parciais com os pesos definidos. É a média ponderada de RRR1×%1 + RRR2×%2 + RRR3×%3. Use este valor para calcular a expectância real do setup.</p></span></span></div><div class="out-big cb" id="pRRR">—</div></div>
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Soma % <span class="tip">?<span class="tip-box"><b>Soma dos Percentuais</b><p>Total dos percentuais distribuídos entre os três alvos. Deve ser exatamente 100% para que o cálculo do RRR Médio seja válido.</p></span></span></div><div class="out-big" id="pSoma">—</div></div>
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Excedente <span class="tip">?<span class="tip-box"><b>Excedente</b><p>Diferença entre a soma dos percentuais e 100%. Se positivo, você está distribuindo mais que a posição inteira. Se negativo, há posição não alocada (runner sem alvo definido).</p></span></span></div><div class="out-big" id="pExc">—</div></div>
+        </div>
+        <div class="sep"></div>
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Referência</div>
+        <div class="tbl-wrap tbl-scroll" style="max-height:200px">
+          <table class="tbl"><thead><tr><th class="al">Combinação</th><th>RRR</th></tr></thead><tbody id="parcRefTbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIMULAÇÃO MERCADO BR (WDO/WIN) -->
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr"><div class="sec-title">🇧🇷 Simulação Mercado BR</div></div>
+      <div class="sec-body">
+        <div class="fr3" style="margin-bottom:10px;gap:6px">
+          <div class="field" style="margin:0">
+            <label>Mercado <span class="tip">?<span class="tip-box"><b>Mercado</b><p>WDO = Mini Dólar — cada ponto vale R$10. WIN = Mini Índice — cada ponto vale R$0,20. Define o valor monetário de cada ponto na simulação.</p></span></span></label>
+            <select id="brMercado" onchange="sh_calcBR()">
+              <option value="WDO">WDO (Mini Dólar)</option>
+              <option value="WIN">WIN (Mini Índice)</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0"><label>Total de Contratos <span class="tip">?<span class="tip-box"><b>Total de Contratos</b><p>Número de contratos da posição completa, a ser distribuído entre os alvos parciais definidos abaixo.</p></span></span></label><div class="iu"><input type="number" id="brContratos" value="3" min="1" step="1" oninput="sh_calcBR()"><span class="u">ctt</span></div></div>
+          <div class="field" style="margin:0"><label>Valor do STOP (pts) <span class="tip">?<span class="tip-box"><b>Stop em Pontos</b><p>Distância em pontos do seu stop loss em relação à entrada. Usado para calcular o risco financeiro total da operação em reais.</p></span></span></label><div class="iu"><input type="number" id="brStop" value="12" step="1" oninput="sh_calcBR()"><span class="u">pts</span></div></div>
+        </div>
+        <div class="fr4" style="gap:6px;margin-bottom:10px">
+          <div class="field" style="margin:0"><label>Ctt Alvo 1 (61,8%) <span class="tip">?<span class="tip-box"><b>Contratos no Alvo 1</b><p>Quantos contratos encerrar no alvo de 61,8% do stop (nível de Fibonacci). Parcial conservadora para garantir parte do lucro cedo.</p></span></span></label><input type="number" id="brA1" value="1" min="0" step="1" oninput="sh_calcBR()"></div>
+          <div class="field" style="margin:0"><label>Ctt Alvo 2 (100%) <span class="tip">?<span class="tip-box"><b>Contratos no Alvo 2</b><p>Quantos contratos encerrar no alvo de 100% do stop (RRR 1:1). Equilíbrio entre realização e continuidade do trade.</p></span></span></label><input type="number" id="brA2" value="1" min="0" step="1" oninput="sh_calcBR()"></div>
+          <div class="field" style="margin:0"><label>Ctt Alvo 3 (161,8%) <span class="tip">?<span class="tip-box"><b>Contratos no Alvo 3</b><p>Quantos contratos encerrar no alvo de 161,8% do stop (extensão de Fibonacci). Maximiza o lucro em movimentos mais amplos.</p></span></span></label><input type="number" id="brA3" value="1" min="0" step="1" oninput="sh_calcBR()"></div>
+          <div class="field" style="margin:0"><label>Ctt Alvo 4 (200%) <span class="tip">?<span class="tip-box"><b>Contratos no Alvo 4</b><p>Quantos contratos encerrar no alvo de 200% do stop (RRR 2:1). Runner para trades de tendência forte.</p></span></span></label><input type="number" id="brA4" value="0" min="0" step="1" oninput="sh_calcBR()"></div>
+        </div>
+        <div class="tbl-wrap" style="margin-bottom:8px">
+          <table class="tbl" id="brAlvosTbl">
+            <thead><tr><th>Alvo</th><th>Mult.</th><th>Pts</th><th>Stop (R$)</th><th>Lucro/Ctt (R$)</th><th>Contratos</th><th>Lucro Total (R$)</th><th>% Total</th></tr></thead>
+            <tbody id="brAlvosTbody"></tbody>
+          </table>
+        </div>
+        <div style="background:var(--bg1);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+          <div class="fr3" style="gap:8px">
+            <div style="text-align:center"><div class="out-lbl">Stop Total (R$) <span class="tip">?<span class="tip-box"><b>Stop Total em R$</b><p>Risco financeiro total da operação: Stop em pontos × Valor do ponto × Total de contratos. É quanto você perde se o stop for atingido antes de qualquer parcial.</p></span></span></div><div class="out-big cr" id="brStopTotal">—</div></div>
+            <div style="text-align:center"><div class="out-lbl">Lucro Total (R$) <span class="tip">?<span class="tip-box"><b>Lucro Total em R$</b><p>Ganho financeiro total somando todos os alvos parciais com os contratos alocados em cada um. É o resultado se todos os alvos forem atingidos.</p></span></span></div><div class="out-big cg" id="brLucroTotal">—</div></div>
+            <div style="text-align:center"><div class="out-lbl">Lucro Médio/Ctt (R$) <span class="tip">?<span class="tip-box"><b>Lucro Médio por Contrato</b><p>Média do lucro por contrato considerando a distribuição entre os alvos parciais. Útil para comparar setups com diferentes números de contratos.</p></span></span></div><div class="out-big cy" id="brLucroMedio">—</div></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px;align-items:center;justify-content:center;font-size:11px">
+            <span style="color:var(--muted)">Status:</span>
+            <span id="brStatus" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- METAS -->
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr">
+        <div class="sec-title">🏆 Calculadora de Metas</div>
+        <button class="btn primary" onclick="sh_calcMetas()">▶ Calcular</button>
+      </div>
+      <div class="sec-body">
+        <div class="fr2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>Capital atual ($) <span class="tip">?<span class="tip-box"><b>Capital Atual</b><p>Saldo disponível para trading. Base para calcular o valor em dólar do risco e do lucro por trade.</p></span></span></label><div class="iu"><input type="number" id="mCapUSD" value="1000"><span class="u">$</span></div></div>
+          <div class="field" style="margin:0"><label>Risco por trade (%) <span class="tip">?<span class="tip-box"><b>Risco por Trade %</b><p>Percentual do capital arriscado em cada operação. Combinado com o RRR, determina o lucro esperado por trade vencedor.</p></span></span></label><div class="iu"><input type="number" id="mRisco" value="1" step="0.1"><span class="u">%</span></div></div>
+        </div>
+        <div class="fr2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>RRR <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Proporção entre o alvo e o stop. Determina o lucro em dólar por trade vencedor.</p></span></span></label><input type="number" id="mRRR" value="1.141" step="0.001"></div>
+          <div class="field" style="margin:0"><label>Meta total ($) <span class="tip">?<span class="tip-box"><b>Meta Total</b><p>Valor em dólar que você quer acumular. A tabela calcula quantos acertos são necessários em diferentes prazos (1 semana, 1 mês, 3 meses, etc.).</p></span></span></label><div class="iu"><input type="number" id="mMeta" value="1000"><span class="u">$</span></div></div>
+        </div>
+        <div class="fr2" style="gap:8px;margin-bottom:10px">
+          <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Risco/trade ($) <span class="tip">?<span class="tip-box"><b>Risco por Trade em USD</b><p>Valor em dólares arriscado por operação: Capital × Risco%. Quanto maior, menos trades são necessários para atingir a meta — mas o drawdown em sequências de loss também é maior.</p></span></span></div><div class="out-big co" id="mRiscoU">—</div></div>
+          <div class="out-box" style="padding:8px;text-align:center"><div class="out-lbl">Lucro/trade via RRR ($) <span class="tip">?<span class="tip-box"><b>Lucro por Trade via RRR</b><p>Ganho em dólares por operação vencedora: Risco/trade × RRR. É o valor que entra no saldo a cada WIN. A tabela abaixo usa este valor para calcular quantos acertos são necessários por prazo.</p></span></span></div><div class="out-big cg" id="mLucroU">—</div></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl"><thead><tr><th>Período</th><th>Dias úteis</th><th>Acertos</th><th>Acertos/sem</th><th>Acertos/dia</th></tr></thead><tbody id="metasTbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECUPERAÇÃO + LOSSES CONSECUTIVOS -->
+  <div class="g2" style="margin-bottom:16px">
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr">
+        <div class="sec-title">🩹 Recuperação de Perdas <span class="tip" style="font-size:10px">?<span class="tip-box"><b>Recuperação de Perdas</b><p>Mostra o quanto você precisa ganhar para recuperar cada nível de perda. Perdas são matematicamente assimétricas: perder 30% exige ganhar 43% para voltar ao ponto inicial.</p><div class="tr"><span>Perda 10%</span><span>Precisa ganhar 11%</span></div><div class="tr"><span>Perda 25%</span><span>Precisa ganhar 33%</span></div><div class="tr"><span>Perda 50%</span><span>Precisa ganhar 100%</span></div></span></span></div>
+        <div class="iu" style="width:120px"><input type="number" id="recovCap" value="1000" min="1" step="100" oninput="sh_calcRecov()"><span class="u">$</span></div>
+      </div>
+      <div class="sec-body" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl"><thead><tr><th class="al">Perda</th><th>Saldo ($)</th><th>Perda ($)</th><th>Ganho p/ recuperar</th></tr></thead><tbody id="recovTbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr">
+        <div class="sec-title">🎲 Possibilidades de Losses Consecutivos <span class="tip" style="font-size:10px">?<span class="tip-box"><b>Losses Consecutivos</b><p>Probabilidade estatística de sofrer N losses seguidos em 100 trades com o win rate definido. Use para se preparar psicologicamente para o drawdown esperado — sequências de losses são normais em qualquer setup lucrativo.</p></span></span></div>
+        <span class="tbadge">100 trades</span>
+      </div>
+      <div class="sec-body">
+        <div class="field" style="margin-bottom:12px">
+          <label>Win Rate: <span id="wrLbl" class="cb">55%</span> <span class="tip">?<span class="tip-box"><b>Win Rate</b><p>Percentual de trades vencedores do seu setup. Quanto menor o win rate, maior a probabilidade de sequências longas de losses consecutivos — planeje seu risco por trade considerando isso.</p></span></span></label>
+          <input type="range" id="wrSlider" min="10" max="90" step="1" value="55" oninput="document.getElementById('wrLbl').textContent=this.value+'%';sh_calcLosses()">
+        </div>
+        <div class="tbl-wrap" style="margin-bottom:10px">
+          <table class="tbl"><thead><tr><th>Sequência</th><th>P(ao menos X consec.)</th><th>Visual</th></tr></thead><tbody id="lossTbody"></tbody></table>
+        </div>
+        <div class="chart-wrap" style="height:160px"><canvas id="lossChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEATMAP + DD -->
+  <div class="g2" style="margin-bottom:16px">
+    <div class="sec" style="margin:0;overflow:hidden">
+      <div class="sec-hdr"><div class="sec-title">🗺️ Mapa de Expectância (WR × RRR) <span class="tip">?<span class="tip-box"><b>Mapa de Expectância</b><p>Heatmap que cruza Win Rate (linhas) com RRR (colunas) e classifica cada combinação em expectativa positiva (verde), breakeven (amarelo) ou negativa (vermelho). Use para identificar quais setups são matematicamente viáveis antes de operar.</p></span></span></div></div>
+      <div class="sec-body" style="padding:10px">
+        <div class="tbl-wrap" style="overflow-x:auto">
+          <table class="tbl" id="heatTbl" style="font-size:9px;min-width:0"></table>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:8px;font-size:10px;justify-content:center">
+          <span><span style="display:inline-block;width:10px;height:10px;background:rgba(63,185,80,.18);border-radius:2px;margin-right:4px"></span>Positiva</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:rgba(227,179,65,.18);border-radius:2px;margin-right:4px"></span>Breakeven</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:rgba(248,81,73,.18);border-radius:2px;margin-right:4px"></span>Negativa</span>
+        </div>
+      </div>
+    </div>
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr">
+        <div class="sec-title">📈 Drawdown Recovery <span class="tip">?<span class="tip-box"><b>Drawdown Recovery</b><p>Simulação Monte Carlo que estima quantos trades são necessários para recuperar um drawdown sofrido. Insira a conta atual, o alvo e o setup de recuperação — o gráfico mostra a distribuição de cenários possíveis.</p></span></span></div>
+        <div class="btn-row">
+          <button class="btn primary" onclick="sh_calcDD()">▶ Simular</button>
+          <button class="btn danger" onclick="sh_clearDDHist()">Limpar</button>
+        </div>
+      </div>
+      <div class="sec-body">
+        <!-- modo: perda em $ ou % -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <label style="font-size:11px;color:var(--muted);font-weight:500">Calcular por:</label>
+          <select id="ddModo" onchange="sh_calcDDModo()" style="width:120px">
+            <option value="alvo">Alvo direto ($)</option>
+            <option value="pct">Perda em %</option>
+            <option value="usd">Perda em $</option>
+          </select>
+        </div>
+        <div class="fr2" style="margin-bottom:8px" id="ddInputsAlvo">
+          <div class="field" style="margin:0"><label>Conta atual ($) <span class="tip">?<span class="tip-box"><b>Conta Atual</b><p>Saldo atual após o drawdown sofrido. A simulação projeta quantos trades são necessários para recuperar o capital.</p></span></span></label><div class="iu"><input type="number" id="ddAtual" value="700" oninput="sh_calcDD()"><span class="u">$</span></div></div>
+          <div class="field" style="margin:0"><label>Alvo ($) <span class="tip">?<span class="tip-box"><b>Alvo de Recuperação</b><p>Capital que você quer atingir. Pode ser o capital original (recuperação total) ou um valor intermediário.</p></span></span></label><div class="iu"><input type="number" id="ddAlvo" value="1000" oninput="sh_calcDD()"><span class="u">$</span></div></div>
+        </div>
+        <div id="ddInputsPct" style="display:none;margin-bottom:8px">
+          <div class="fr2">
+            <div class="field" style="margin:0"><label>Capital original ($)</label><div class="iu"><input type="number" id="ddCapOrig" value="1000" oninput="sh_calcDDFromPct()"><span class="u">$</span></div></div>
+            <div class="field" style="margin:0"><label>Perda sofrida (%)</label><div class="iu"><input type="number" id="ddPerdaPct" value="30" step="1" oninput="sh_calcDDFromPct()"><span class="u">%</span></div></div>
+          </div>
+        </div>
+        <div id="ddInputsUSD" style="display:none;margin-bottom:8px">
+          <div class="fr2">
+            <div class="field" style="margin:0"><label>Capital original ($)</label><div class="iu"><input type="number" id="ddCapOrig2" value="1000" oninput="sh_calcDDFromUSD()"><span class="u">$</span></div></div>
+            <div class="field" style="margin:0"><label>Perda sofrida ($)</label><div class="iu"><input type="number" id="ddPerdaUSD" value="300" step="10" oninput="sh_calcDDFromUSD()"><span class="u">$</span></div></div>
+          </div>
+        </div>
+        <div class="fr2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>Win Rate % <span class="tip">?<span class="tip-box"><b>Win Rate</b><p>Percentual de trades vencedores do setup usado para a recuperação. Afeta diretamente a velocidade e probabilidade de recuperação.</p></span></span></label><div class="iu"><input type="number" id="ddWR" value="55" min="1" max="99" oninput="sh_calcDD()"><span class="u">%</span></div></div>
+          <div class="field" style="margin:0"><label>RRR <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Proporção entre alvo e stop do setup de recuperação. RRR maior reduz o número de trades necessários para recuperar.</p></span></span></label><input type="number" id="ddRRR" value="1.141" step="0.001" oninput="sh_calcDD()"></div>
+        </div>
+        <div class="fr2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>Risco % / trade <span class="tip">?<span class="tip-box"><b>Risco por Trade %</b><p>Percentual do capital arriscado por operação durante a fase de recuperação. Evite aumentar o risco para "recuperar mais rápido" — isso tende a aprofundar o drawdown.</p></span></span></label><div class="iu"><input type="number" id="ddRisco" value="1" step="0.1" oninput="sh_calcDD()"><span class="u">%</span></div></div>
+          <div></div>
+        </div>
+        <div class="fr2" style="gap:8px;margin-bottom:8px">
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">DD Atual <span class="tip">?<span class="tip-box"><b>Drawdown Atual %</b><p>Percentual de queda do capital atual em relação ao capital original. Quanto maior, mais trades são necessários para a recuperação completa.</p></span></span></div><div class="out-big cr" id="ddPctOut">—</div></div>
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Mediana (trades) <span class="tip">?<span class="tip-box"><b>Mediana de Trades para Recuperar</b><p>Em 50% das simulações Monte Carlo, o capital se recupera em até este número de trades com o setup configurado. É a estimativa mais realista — metade dos cenários termina antes, metade depois.</p></span></span></div><div class="out-big cy" id="ddMedOut">—</div></div>
+        </div>
+        <div class="out-box" style="padding:8px;margin-bottom:8px;text-align:center"><div class="out-lbl">Range P10–P90 <span class="tip">?<span class="tip-box"><b>Intervalo de Confiança P10–P90</b><p>Em 80% dos cenários simulados, a recuperação acontece dentro deste intervalo de trades. P10 = cenário adverso (10% dos casos ficam abaixo). P90 = cenário favorável (90% dos casos terminam antes).</p></span></span></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--muted)" id="ddRangeOut">—</div></div>
+        <div id="ddHistBox" style="display:none;background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:8px">
+          <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Histórico (<span id="ddHistCount">0</span> simulações)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="ddHistChips"></div>
+        </div>
+        <div class="chart-wrap" style="height:150px"><canvas id="ddChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESSÃO + DIÁRIO -->
+  <div class="sec" style="margin-bottom:16px">
+    <div class="sec-hdr">
+      <div class="sec-title">📊 Progressão de Capital</div>
+      <button class="btn primary" onclick="sh_renderPlanilha()">▶ Calcular</button>
+    </div>
+    <div class="sec-body">
+      <div class="fr4" style="margin-bottom:12px">
+        <div class="field" style="margin:0"><label>Capital Inicial ($) <span class="tip">?<span class="tip-box"><b>Capital Inicial</b><p>Ponto de partida da progressão. Cada linha da tabela representa 1 trade vencedor com juros compostos aplicados sobre o saldo acumulado.</p></span></span></label><div class="iu"><input type="number" id="plCap" value="1000" step="1"><span class="u">$</span></div></div>
+        <div class="field" style="margin:0"><label>Risco (%) <span class="tip">?<span class="tip-box"><b>Risco por Trade %</b><p>Percentual arriscado por operação. Com juros compostos, cada trade vencedor aplica esse ganho sobre o saldo acumulado — não sobre o capital inicial.</p></span></span></label><div class="iu"><input type="number" id="plRisco" value="1" step="0.1" min="0.01"><span class="u">%</span></div></div>
+        <div class="field" style="margin:0"><label>RRR <span class="tip">?<span class="tip-box"><b>RRR — Relação Risco:Retorno</b><p>Relação entre alvo e stop. Determina o ganho percentual por trade vencedor. Ex: risco 1% com RRR 2 = ganho 2% por trade.</p></span></span></label><input type="number" id="plRRR" value="1.141" step="0.001"></div>
+        <div class="field" style="margin:0"><label>USD/BRL <span class="tip">?<span class="tip-box"><b>Câmbio USD/BRL</b><p>Taxa de câmbio usada para converter os valores de dólar para reais na coluna BRL da tabela. Atualize conforme a cotação atual.</p></span></span></label><div class="iu"><input type="number" id="plCot" value="5.80" step="0.01"><span class="u">R$</span></div></div>
+      </div>
+      <div class="g2">
+        <div class="tbl-wrap tbl-scroll" style="max-height:340px">
+          <table class="tbl">
+            <thead><tr><th class="al">#</th><th>Capital ($)</th><th>Diferença ($)</th><th>Gain</th><th>Valor (R$)</th><th>Banca (R$)</th></tr></thead>
+            <tbody id="planilhaTbody"></tbody>
+          </table>
+        </div>
+        <div class="chart-wrap" style="height:340px;margin-top:0"><canvas id="planilhaChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div><!-- /tab0 -->
+
+<!-- ═══════ ABA 2: LOSS ═══════ -->
+<div class="tab-panel" id="pt-tab1">
+  <div class="sec">
+    <div class="sec-hdr">
+      <div class="sec-title">⚙️ Parâmetros</div>
+      <button class="btn primary" onclick="sh_runSim()">▶ Simular</button>
+    </div>
+    <div class="sec-body">
+      <div class="fr4">
+        <div class="field"><label>Capital Inicial (R$) <span class="tip">?<span class="tip-box"><b>Capital Inicial</b><p>Saldo de partida para as duas simulações. O Contínuo aplica −1R por trade (pior cenário). O Alternado simula L→W→L→W com o RRR definido.</p></span></span></label><div class="iu"><input type="number" id="sCap" value="5000" step="100"><span class="u">R$</span></div></div>
+        <div class="field"><label>Risco por trade (%) <span class="tip">?<span class="tip-box"><b>Risco por Trade %</b><p>Percentual do saldo arriscado por operação. No modo contínuo, cada loss reduz o saldo nesse percentual cumulativamente.</p></span></span></label><div class="iu"><input type="number" id="sRisco" value="2" step="0.1" min="0.01"><span class="u">%</span></div></div>
+        <div class="field"><label>RRR <span style="font-size:9px;color:var(--dim)">(alternado)</span> <span class="tip">?<span class="tip-box"><b>RRR — modo alternado</b><p>Relação risco:retorno usada no modo L→W→L→W. Não afeta o modo contínuo — que aplica −1R fixo por trade independentemente do RRR.</p></span></span></label><input type="number" id="sRRR" value="1" step="0.001"></div>
+        <div class="field"><label>N trades <span class="tip">?<span class="tip-box"><b>Número de Trades</b><p>Quantidade de operações simuladas. Contínuo = N losses seguidos. Alternado = N pares Loss/Win intercalados.</p></span></span></label><input type="number" id="sN" value="100" min="5" max="500" step="5"></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--muted);margin-top:4px">
+        <strong style="color:var(--text)">Modo Contínuo:</strong> perdas consecutivas de <strong style="color:var(--red)">−1R</strong> (pior cenário) &nbsp;|&nbsp;
+        <strong style="color:var(--text)">Modo Alternado:</strong> L→W→L→W… | Loss = −risco%, Win = +risco%×RRR
+      </div>
+    </div>
+  </div>
+  <div class="g2" id="simResults">
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr"><div class="sec-title">📉 Loss Contínuo</div><span style="font-size:9px;color:var(--red);font-family:'JetBrains Mono',monospace">−1R por trade</span></div>
+      <div class="sec-body" style="padding:10px">
+        <div class="fr2" style="gap:8px;margin-bottom:10px">
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Saldo Final <span class="tip">?<span class="tip-box"><b>Saldo Final — Loss Contínuo</b><p>Capital restante após N losses consecutivos de −1R cada. Mostra o pior cenário possível: quanto sobra se você perder todos os trades seguidos.</p></span></span></div><div class="out-big cr" id="cFinal">—</div></div>
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Drawdown Total <span class="tip">?<span class="tip-box"><b>Drawdown Total — Loss Contínuo</b><p>Percentual de queda do capital inicial após todos os losses consecutivos. Quanto maior o risco por trade, mais devastador é o drawdown em sequências longas.</p></span></span></div><div class="out-big cr" id="cDD">—</div></div>
+        </div>
+        <div class="chart-wrap" style="height:200px;margin-bottom:10px"><canvas id="cChart"></canvas></div>
+        <div class="tbl-wrap tbl-scroll" style="max-height:280px"><table class="tbl"><thead><tr><th>#</th><th>Res</th><th>P&L (R$)</th><th>Saldo (R$)</th><th>DD%</th></tr></thead><tbody id="cTbody"></tbody></table></div>
+      </div>
+    </div>
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr"><div class="sec-title">🔀 Loss/Win Alternado</div><span style="font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace">L→W→L→W</span></div>
+      <div class="sec-body" style="padding:10px">
+        <div class="fr2" style="gap:8px;margin-bottom:10px">
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Saldo Final <span class="tip">?<span class="tip-box"><b>Saldo Final — Alternado</b><p>Capital após N pares L→W alternados. Mostra o efeito do RRR no longo prazo: com RRR &gt; 1 o saldo cresce mesmo com 50% de acerto; com RRR &lt; 1 deteriora progressivamente.</p></span></span></div><div class="out-big" id="aFinal">—</div></div>
+          <div class="out-box" style="text-align:center;padding:8px"><div class="out-lbl">Drawdown <span class="tip">?<span class="tip-box"><b>Drawdown — Alternado</b><p>Maior queda acumulada registrada durante a sequência L→W. Mesmo com resultado final positivo, o drawdown mostra o pior momento que você passou no caminho.</p></span></span></div><div class="out-big cr" id="aRet">—</div></div>
+        </div>
+        <div class="chart-wrap" style="height:200px;margin-bottom:10px"><canvas id="aChart"></canvas></div>
+        <div class="tbl-wrap tbl-scroll" style="max-height:280px"><table class="tbl"><thead><tr><th>#</th><th>Res</th><th>P&L (R$)</th><th>Saldo (R$)</th><th>Acum%</th></tr></thead><tbody id="aTbody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ ABA 3: CÁLCULOS DT ═══════ -->
+<div class="tab-panel" id="pt-tab2">
+
+  <!-- CÁLCULO RÁPIDO DT: Futuros EUA -->
+  <div class="sec" style="margin-bottom:16px">
+    <div class="sec-hdr"><div class="sec-title">🇺🇸 Cálculo Rápido — Futuros EUA</div></div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <!-- SP500 -->
+        <div class="dt-card">
+          <div class="dt-card-hdr">SP-500 <span class="tip" style="font-size:9px;vertical-align:middle">?<span class="tip-box"><b>SP-500 (ES/MES)</b><p>Mini S&P 500. ES = contrato cheio ($50/pt) | MES = micro ($5/pt). Mínimo de variação: 0.25 pts. Negocia de domingo a sexta, ~23h/dia.</p></span></span></div>
+          <div class="dt-card-body">
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Entrada <span class="tip">?<span class="tip-box"><b>Preço de Entrada</b><p>Preço do acionamento da ordem. Para futuros EUA, cada 0.25 pts = 1 tick = $12,50 no ES ou $1,25 no MES.</p></span></span></label><input type="number" id="spEntrada" value="4100" step="0.25" oninput="sh_calcDT('sp')"></div>
+              <div class="field" style="margin:0"><label>Stop <span class="tip">?<span class="tip-box"><b>Preço de Stop Loss</b><p>Nível de preço onde a perda máxima é atingida e a posição é encerrada automaticamente.</p></span></span></label><input type="number" id="spStop" value="4099.75" step="0.25" oninput="sh_calcDT('sp')"></div>
+            </div>
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Alvo <span class="tip">?<span class="tip-box"><b>Preço de Alvo (Take Profit)</b><p>Nível de preço do seu take profit. O RRR é calculado automaticamente a partir da distância relativa entre Entrada, Stop e Alvo.</p></span></span></label><input type="number" id="spAlvo" value="4101" step="0.25" oninput="sh_calcDT('sp')"></div>
+              <div class="field" style="margin:0"><label>QTD <span class="tip">?<span class="tip-box"><b>Quantidade de Contratos</b><p>Número de contratos operados. O risco e lucro totais são multiplicados por este valor.</p></span></span></label><input type="number" id="spQtd" value="1" min="1" step="1" oninput="sh_calcDT('sp')"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Risco ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)" id="spRisco">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Lucro ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)" id="spLucro">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">RRR</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)" id="spRRRout">—</div></div>
+            </div>
+            <div class="vol-strip">
+              <div class="vol-cell"><div class="vc-lbl">Último <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Último Preço</b><p>Cotação atual do ativo. Usada com Vol% para calcular a volatilidade diária em pontos e sugerir stops baseados em volatilidade.</p></span></span></div><input type="number" id="spUlt" value="6000" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('sp')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol% <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Volatilidade Diária %</b><p>Variação percentual média diária do ativo. Multiplicada pelo Último Preço para obter Vol pts. Stop sugerido = 20% da volatilidade diária em pontos.</p></span></span></div><input type="number" id="spVolPct" value="0.44" step="0.01" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('sp')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol pts</div><div class="vc-val" id="spVolPts">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">20% vol</div><div class="vc-val cy" id="spVol20">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco/lote</div><div class="vc-val co" id="spRiscoLote">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">QTD vol</div><input type="number" id="spVolQtd" value="1" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('sp')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco Tot</div><div class="vc-val cr" id="spRiscoTot">—</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- NASDAQ -->
+        <div class="dt-card">
+          <div class="dt-card-hdr">NASDAQ <span class="tip" style="font-size:9px;vertical-align:middle">?<span class="tip-box"><b>NASDAQ (NQ/MNQ)</b><p>Futuros do índice Nasdaq-100. NQ = contrato cheio ($20/pt) | MNQ = micro ($2/pt). Mínimo: 0.25 pts. Alta volatilidade — stop em pts vale mais em $ que no SP500.</p></span></span></div>
+          <div class="dt-card-body">
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Entrada</label><input type="number" id="nqEntrada" value="18260" step="0.25" oninput="sh_calcDT('nq')"></div>
+              <div class="field" style="margin:0"><label>Stop</label><input type="number" id="nqStop" value="14999.75" step="0.25" oninput="sh_calcDT('nq')"></div>
+            </div>
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Alvo</label><input type="number" id="nqAlvo" value="15001" step="0.25" oninput="sh_calcDT('nq')"></div>
+              <div class="field" style="margin:0"><label>QTD</label><input type="number" id="nqQtd" value="1" min="1" step="1" oninput="sh_calcDT('nq')"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Risco ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)" id="nqRisco">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Lucro ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)" id="nqLucro">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">RRR</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)" id="nqRRRout">—</div></div>
+            </div>
+            <div class="vol-strip">
+              <div class="vol-cell"><div class="vc-lbl">Último <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Último Preço</b><p>Cotação atual do ativo. Usada com Vol% para calcular a volatilidade diária em pontos e sugerir stops baseados em volatilidade.</p></span></span></div><input type="number" id="nqUlt" value="21000" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('nq')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol% <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Volatilidade Diária %</b><p>Variação percentual média diária do ativo. Multiplicada pelo Último Preço para obter Vol pts. Stop sugerido = 20% da volatilidade diária em pontos.</p></span></span></div><input type="number" id="nqVolPct" value="0.60" step="0.01" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('nq')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol pts</div><div class="vc-val" id="nqVolPts">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">20% vol</div><div class="vc-val cy" id="nqVol20">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco/lote</div><div class="vc-val co" id="nqRiscoLote">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">QTD vol</div><input type="number" id="nqVolQtd" value="1" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('nq')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco Tot</div><div class="vc-val cr" id="nqRiscoTot">—</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- OIL CL -->
+        <div class="dt-card">
+          <div class="dt-card-hdr">OIL (CL) <span class="tip" style="font-size:9px;vertical-align:middle">?<span class="tip-box"><b>Petróleo Bruto (CL/MCL)</b><p>Futuro do WTI Crude Oil. CL = contrato cheio ($1.000/pt) | MCL = micro ($100/pt). Mínimo: 0.01 pts. Alta reatividade a notícias geopolíticas e estoques semanais.</p></span></span></div>
+          <div class="dt-card-body">
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Entrada</label><input type="number" id="clEntrada" value="63" step="0.01" oninput="sh_calcDT('cl')"></div>
+              <div class="field" style="margin:0"><label>Stop</label><input type="number" id="clStop" value="62" step="0.01" oninput="sh_calcDT('cl')"></div>
+            </div>
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Alvo</label><input type="number" id="clAlvo" value="64" step="0.01" oninput="sh_calcDT('cl')"></div>
+              <div class="field" style="margin:0"><label>QTD</label><input type="number" id="clQtd" value="1" min="1" step="1" oninput="sh_calcDT('cl')"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Risco ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)" id="clRisco">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Lucro ($)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)" id="clLucro">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">RRR</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)" id="clRRRout">—</div></div>
+            </div>
+            <div class="vol-strip">
+              <div class="vol-cell"><div class="vc-lbl">Último <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Último Preço</b><p>Cotação atual do ativo. Usada com Vol% para calcular a volatilidade diária em pontos e sugerir stops baseados em volatilidade.</p></span></span></div><input type="number" id="clUlt" value="69" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('cl')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol% <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Volatilidade Diária %</b><p>Variação percentual média diária do ativo. Multiplicada pelo Último Preço para obter Vol pts. Stop sugerido = 20% da volatilidade diária em pontos.</p></span></span></div><input type="number" id="clVolPct" value="2.70" step="0.01" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('cl')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol pts</div><div class="vc-val" id="clVolPts">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">20% vol</div><div class="vc-val cy" id="clVol20">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco/lote</div><div class="vc-val co" id="clRiscoLote">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">QTD vol</div><input type="number" id="clVolQtd" value="1" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('cl')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco Tot</div><div class="vc-val cr" id="clRiscoTot">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Futuros BR -->
+  <div class="sec" style="margin-bottom:16px">
+    <div class="sec-hdr"><div class="sec-title">🇧🇷 Cálculo Rápido — Futuros Brasileiros</div></div>
+    <div class="sec-body">
+      <div class="g2">
+        <!-- WDO -->
+        <div class="dt-card">
+          <div class="dt-card-hdr">WDOFUT — Mini Dólar <span class="tip" style="font-size:9px;vertical-align:middle">?<span class="tip-box"><b>WDO — Mini Dólar</b><p>Futuro do dólar comercial na B3. Cada ponto = R$10 por contrato. Liquidado financeiramente no vencimento. Negocia das 9h às 18h (horário de Brasília).</p></span></span></div>
+          <div class="dt-card-body">
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Entrada</label><input type="number" id="wdEntrada" value="5000" step="0.5" oninput="sh_calcDT('wd')"></div>
+              <div class="field" style="margin:0"><label>Stop</label><input type="number" id="wdStop" value="5017" step="0.5" oninput="sh_calcDT('wd')"></div>
+            </div>
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Alvo</label><input type="number" id="wdAlvo" value="5007" step="0.5" oninput="sh_calcDT('wd')"></div>
+              <div class="field" style="margin:0"><label>QTD</label><input type="number" id="wdQtd" value="2" min="1" step="1" oninput="sh_calcDT('wd')"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Risco (R$)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)" id="wdRisco">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Lucro (R$)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)" id="wdLucro">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">RRR</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)" id="wdRRRout">—</div></div>
+            </div>
+            <div class="vol-strip">
+              <div class="vol-cell"><div class="vc-lbl">Último <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Último Preço</b><p>Cotação atual do ativo. Usada com Vol% para calcular a volatilidade diária em pontos e sugerir stops baseados em volatilidade.</p></span></span></div><input type="number" id="wdUlt" value="5700" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wd')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol% <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Volatilidade Diária %</b><p>Variação percentual média diária do ativo. Multiplicada pelo Último Preço para obter Vol pts. Stop sugerido = 20% da volatilidade diária em pontos.</p></span></span></div><input type="number" id="wdVolPct" value="1.10" step="0.01" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wd')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol pts</div><div class="vc-val" id="wdVolPts">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">20% vol</div><div class="vc-val cy" id="wdVol20">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">R$/lote</div><div class="vc-val co" id="wdRiscoLote">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">QTD vol</div><input type="number" id="wdVolQtd" value="2" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wd')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco R$</div><div class="vc-val cr" id="wdRiscoTot">—</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- WIN -->
+        <div class="dt-card">
+          <div class="dt-card-hdr">WINFUT — Mini Índice <span class="tip" style="font-size:9px;vertical-align:middle">?<span class="tip-box"><b>WIN — Mini Índice Bovespa</b><p>Futuro do Ibovespa na B3. Cada ponto = R$0,20 por contrato. Negocia das 9h às 18h55 (horário de Brasília). Requer mais contratos para o mesmo risco em R$ em comparação ao WDO.</p></span></span></div>
+          <div class="dt-card-body">
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Entrada</label><input type="number" id="wiEntrada" value="136660" step="10" oninput="sh_calcDT('wi')"></div>
+              <div class="field" style="margin:0"><label>Stop</label><input type="number" id="wiStop" value="136000" step="10" oninput="sh_calcDT('wi')"></div>
+            </div>
+            <div class="fr2" style="gap:6px;margin-bottom:6px">
+              <div class="field" style="margin:0"><label>Alvo</label><input type="number" id="wiAlvo" value="138460" step="10" oninput="sh_calcDT('wi')"></div>
+              <div class="field" style="margin:0"><label>QTD</label><input type="number" id="wiQtd" value="7" min="1" step="1" oninput="sh_calcDT('wi')"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Risco (R$)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)" id="wiRisco">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">Lucro (R$)</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)" id="wiLucro">—</div></div>
+              <div class="out-box" style="padding:5px;text-align:center"><div class="out-lbl">RRR</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)" id="wiRRRout">—</div></div>
+            </div>
+            <div class="vol-strip">
+              <div class="vol-cell"><div class="vc-lbl">Último <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Último Preço</b><p>Cotação atual do ativo. Usada com Vol% para calcular a volatilidade diária em pontos e sugerir stops baseados em volatilidade.</p></span></span></div><input type="number" id="wiUlt" value="137400" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wi')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol% <span class="tip" style="font-size:8px">?<span class="tip-box"><b>Volatilidade Diária %</b><p>Variação percentual média diária do ativo. Multiplicada pelo Último Preço para obter Vol pts. Stop sugerido = 20% da volatilidade diária em pontos.</p></span></span></div><input type="number" id="wiVolPct" value="1.60" step="0.01" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wi')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Vol pts</div><div class="vc-val" id="wiVolPts">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">20% vol</div><div class="vc-val cy" id="wiVol20">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">R$/lote</div><div class="vc-val co" id="wiRiscoLote">—</div></div>
+              <div class="vol-cell"><div class="vc-lbl">QTD vol</div><input type="number" id="wiVolQtd" value="2" style="width:100%;font-size:9px;padding:2px;text-align:center;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:3px" oninput="sh_calcDTVol('wi')"></div>
+              <div class="vol-cell"><div class="vc-lbl">Risco R$</div><div class="vc-val cr" id="wiRiscoTot">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO UNIFICADO: Gerenciamento + Cálculo de Ações lado a lado -->
+  <div class="g2" style="gap:16px">
+
+    <!-- ESQUERDA: Gerenciamento WIN & WDO -->
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr">
+        <div class="sec-title">📈 Gerenciamento de Risco — WIN &amp; WDO</div>
+        <button class="btn primary" onclick="sh_calcAcoesFull()">▶ Atualizar</button>
+      </div>
+      <div class="sec-body">
+
+        <!-- VOLATILIDADE — topo -->
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:14px">
+          <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+            Volatilidade Histórica — Máximo de Risco por Trade
+            <span style="color:var(--dim);text-transform:none;letter-spacing:0;font-size:9px"> · Preencha abaixo ou use vol-strip dos futuros BR</span>
+          </div>
+          <div class="fr2" style="gap:8px;margin-bottom:8px">
+            <div class="field" style="margin:0"><label>Vol WIN — 20% da VH (pts)</label><input type="number" id="winVolStop" value="175.87" step="0.01" oninput="sh_calcAcoes()"></div>
+            <div class="field" style="margin:0"><label>Vol DOL — 20% da VH (pts)</label><input type="number" id="dolVolStop" value="248.52" step="0.01" oninput="sh_calcAcoes()"></div>
+          </div>
+          <table class="tbl">
+            <thead><tr><th></th><th>Máx Risco/Trade</th><th>Diário ×3</th><th>Semanal ×6</th><th style="color:var(--yellow)">Mensal ×12</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="al" style="color:var(--green);font-weight:700">WIN</td>
+                <td class="co" id="winMRT">—</td><td class="cb" id="winDia">—</td><td class="cb" id="winSem">—</td><td class="cy" id="winMes">—</td>
+              </tr>
+              <tr>
+                <td class="al" style="color:var(--blue);font-weight:700">DOL</td>
+                <td class="co" id="dolMRT">—</td><td class="cb" id="dolDia">—</td><td class="cb" id="dolSem">—</td><td class="cy" id="dolMes">—</td>
+              </tr>
+              <tr><td class="al cm">Nº Stops</td><td class="cm">—</td><td class="cm">3</td><td class="cm">6</td><td class="cm">12</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Por Pontos -->
+        <div style="font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">
+          Por Pontos de Risco <span style="text-transform:none;letter-spacing:0">— WIN: pts × R$0,20/pt · DOL: pts × R$10/pt</span>
+        </div>
+        <table class="tbl" style="margin-bottom:14px">
+          <thead><tr><th></th><th>Risco (R$)</th><th>Pts de Risco</th><th>R$/Ponto</th><th>N Contratos</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="al" style="color:var(--green);font-weight:700">WIN</td>
+              <td><input type="number" id="winRiscoRef" value="250" min="1" oninput="sh_calcGerRisco()" style="width:65px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center"></td>
+              <td><input type="number" id="winPts" value="150" min="1" oninput="sh_calcGerRisco()" style="width:65px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center"></td>
+              <td class="cy" id="winPorPto">—</td><td class="cb" id="winNctt">—</td>
+            </tr>
+            <tr>
+              <td class="al" style="color:var(--blue);font-weight:700">DOL</td>
+              <td><input type="number" id="dolRiscoRef" value="250" min="1" oninput="sh_calcGerRisco()" style="width:65px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center"></td>
+              <td><input type="number" id="dolPts" value="10" min="1" oninput="sh_calcGerRisco()" style="width:65px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center"></td>
+              <td class="cy" id="dolPorPto">—</td><td class="cb" id="dolNctt">—</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Como calcular VH -->
+        <div style="background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11px;color:var(--muted);line-height:1.6">
+          <div style="color:var(--text);font-weight:600;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em">Como calcular a Volatilidade Histórica (VH)</div>
+          <ol style="padding-left:16px;font-size:10px">
+            <li>Insira no gráfico o <strong>VH Aritmético de 20 períodos</strong>.</li>
+            <li>Adicione uma <strong>Média Móvel de 200 períodos</strong> na janela do VH.</li>
+            <li>No gráfico intraday (5 min), observe onde a média está posicionada e trace uma linha.</li>
+            <li>Busque os valores da média de 200, considerando os <strong>últimos 3 meses</strong>.</li>
+            <li>No gráfico diário, utilize o valor das <strong>Bandas de Pisani</strong> e a média dos candles.</li>
+          </ol>
+          <div class="sep"></div>
+          <div style="font-size:10px;color:var(--dim)">Ao configurar corretamente a volatilidade e o nível de risco, o número de operações permitidas é calculado automaticamente.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIREITA: Cálculo de Trading em Ações -->
+    <div class="sec" style="margin:0">
+      <div class="sec-hdr"><div class="sec-title">📋 Cálculo de Trading em Ações</div></div>
+      <div class="sec-body">
+        <div class="fr2" style="gap:8px;margin-bottom:10px">
+          <div class="field" style="margin:0"><label>Risco Financeiro (R$)</label><div class="iu"><input type="number" id="acRisco" value="250" oninput="sh_calcAcoes()"><span class="u">R$</span></div></div>
+          <div class="field" style="margin:0"><label>Dif. Compra/Venda (R$)</label><div class="iu"><input type="number" id="acDif" value="0.45" step="0.01" oninput="sh_calcAcoes()"><span class="u">R$</span></div></div>
+        </div>
+        <div class="field" style="margin-bottom:12px"><label>Tx. Corretagem (R$)</label><div class="iu"><input type="number" id="acCorr" value="0" step="0.01" oninput="sh_calcAcoes()"><span class="u">R$</span></div></div>
+        <div style="background:var(--bg1);border:1px solid var(--border);border-radius:6px;padding:12px 14px">
+          <div class="out-lbl" style="margin-bottom:4px">Quantidade Permitida (Ações)</div>
+          <div class="out-big cb" id="acQtd">—</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:4px">Acima de 75 pode arredondar pra cima</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /g2 -->
+
+</div><!-- /tab2 -->
+</div><!-- #app --></div><!-- /mod-plano -->

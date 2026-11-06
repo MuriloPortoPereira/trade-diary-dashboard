@@ -2,7 +2,7 @@
 
 Índice de navegação. Ler este mapa antes de procurar uma feature; buscar símbolos com Serena.
 Fallback: `rg -n 'function NOME' app.js`; abrir apenas o trecho necessário.
-Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/presentation/study-hub-legacy-runtime.js`; usar símbolos e trechos filtrados por tamanho.
+HTML StudyHub: editar `src/modules/study-hub/presentation/templates/*.html`; não abrir integralmente o asset gerado `study-hub-template.js` para análise. Usar símbolos e trechos localizados nas fontes de autoria.
 
 | Trabalho | Procurar primeiro |
 |---|---|
@@ -60,6 +60,15 @@ Não imprimir a linha gigante `host.innerHTML` de `src/modules/study-hub/present
 - `tests/study-hub-tools.test.cjs`: caracterização pré-corte de restauração, cotação, falhas de storage, bindings, execução adiada, resize, histórico/exportação e fórmulas.
 - Carga clássica após `app.js`: storage → definição das quatro ferramentas → runtime → intraday. 90 arquivos Node e 113 checks no navegador aprovados.
 - G6 estrutural encerrado; seguir para G7: composição HTML e compatibilidade, revisão dos acoplamentos restantes e fechamento arquitetural.
+
+## StudyHub: HTML de autoria e distribuição estática (G7a)
+
+- Fontes: `src/modules/study-hub/presentation/templates/{propfirm,plan,tradesim,mental}.html`, respectivamente 352/580/310/167 linhas; uma responsabilidade por ferramenta.
+- Gerar após editar: `node scripts/build-study-hub-template.cjs`; conferir sem escrever: `node scripts/build-study-hub-template.cjs --check`.
+- Distribuição versionada: `presentation/study-hub-template.js`, script clássico de dados, carregado após a definição das ferramentas e antes do runtime. O deploy continua sem build e sem fetch de fragmentos.
+- Montagem preservada: mesmo `host.innerHTML`, guardas, IDs, handlers e 151.521 bytes de texto; SHA-256 protegido em `tests/study-hub-template.test.cjs`.
+- Runtime: 170.565 → 11.187 bytes, mantendo 233 linhas; a linha gigante de autoria foi eliminada. `app.js` permanece em 2.269 linhas.
+- Decisão/custos: [ADR-004](adr/004-study-hub-html-authoring.md). Próximo G7b: avaliar autoria do shell `index.html` e compatibilidade antes do fechamento arquitetural.
 
 ## Simulação: primeiro domínio extraído
 

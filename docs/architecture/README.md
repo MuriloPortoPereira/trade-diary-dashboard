@@ -17,6 +17,7 @@ Comece pelo [mapa compacto](project-map.md). Abra somente a feature necessária.
 | [Ferramentas](tooling.md) | Instalação, verificação e comandos |
 | [ADR-001](adr/001-incremental-classic-scripts.md) | Scripts clássicos durante transição |
 | [ADR-002](adr/002-characterization-tests.md) | Testes de caracterização |
+| [ADR-004](adr/004-study-hub-html-authoring.md) | HTML StudyHub de autoria, geração determinística e deploy estático |
 
 Baseline histórico auditado: `ab0cb63`, preservado em `main` e na tag `v1.0.0`; trabalho incremental atual em `refactor`.
 Linhas do baseline são referências históricas; localize símbolos após cada extração.

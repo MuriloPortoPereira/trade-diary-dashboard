@@ -259,7 +259,7 @@ não transferir centenas de linhas mistas para um novo monólito por página.
 
 | Bloco / baseline | Destino atual ou proposto | Condição |
 |---|---|---|
-| Montagem 7075–7082; template na linha 7080; G6a executado | `modules/study-hub/presentation/study-hub-legacy-runtime.js` | Texto, host.innerHTML e dataset.loaded intactos; template permanece junto do consumidor durante a transição |
+| Montagem 7075–7082; template na linha 7080; G6a/G7a executados | Montagem em `presentation/study-hub-legacy-runtime.js`; autoria em `presentation/templates/*.html`; distribuição em `presentation/study-hub-template.js` | Gerador Node determinístico e asset versionado mantêm mesmos bytes, host.innerHTML, dataset.loaded e carga síncrona; ver ADR-004 |
 | IIFE legado 7084–9461; G6a–G6d executados | Runtime central com 233 linhas; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`; `infrastructure/study-hub-storage.js`; helpers em `domain/study-hub-calculations.js` | Quatro factories instanciados nos pontos originais, preservando estado privado e sequência de load/input/resize; shell, tooltips e pontes permanecem no runtime |
 | Intraday 9465–9770; G6a executado | `modules/study-hub/presentation/study-hub-intraday.js`, 306 linhas | IIFE e wrappers sh_buildIntraday/sh_tsRunAll intactos; sequência síncrona app.js → runtime → intraday |
 | Integração nativa, símbolos buildStudyHub*/renderStudy*/syncStudyHubLegacyInputs; G6b executado | `modules/study-hub/presentation/study-hub-page.js` (759 linhas); `application/study-hub-state.js` (61); `domain/study-hub-calculations.js` (76) | Estado/defaults e UI preservados; cinco APIs globais delegam ao domínio puro com entradas explícitas; IDs, pontes window.sh_* e save mantidos |
