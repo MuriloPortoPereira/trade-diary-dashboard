@@ -9,7 +9,8 @@ const modulePath = 'src/modules/notifications/presentation/notifications-page.js
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8')
   .match(/^function renderNotificationsPage\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8')
+  .match(/^function renderNotificationsPage\([^]*?^\}/m)[0];
 
 function harness(alerts) {
   const account = {id: 'a'};

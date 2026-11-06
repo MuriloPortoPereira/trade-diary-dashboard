@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-const modulePath = 'src/modules/trades/domain/trade-timing.js';
+const modulePath = 'src/modules/trades/domain/trade-rules.js';
 const moduleFile = path.join(root, modulePath);
 const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/trade-file-formats.js');
 
@@ -22,16 +22,16 @@ function loadTiming() {
   if (fs.existsSync(moduleFile)) {
     vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
   }
-  const padClock = appSource.match(/^const padClock = .*;$/m)?.[0] ?? '';
-  if (!fs.existsSync(moduleFile)) assert.ok(padClock, 'legacy timing requires padClock');
-  const timingStart = appSource.includes('const tradeTimingDomain=')
-    ? 'const tradeTimingDomain='
-    : 'function normalizeClockTime(';
-  const hasNormalizerModule = fs.existsSync(normalizerFile);
-  const timing = between(appSource, timingStart, hasNormalizerModule ? '\nfunction mtTradeStatus(' : '\nfunction parseMTNumber(');
-  const normalizers = hasNormalizerModule ? fs.readFileSync(normalizerFile, 'utf8')
-    : between(appSource, 'function parseMTNumber(', '\nfunction mtTradeStatus(');
-  vm.runInContext(`${padClock}\n${normalizers}\n${timing}`, context, {filename: 'app.js#trade-timing'});
+  const names = ['normalizeClockTime', 'clockToMinutes', 'formatClockMinutes', 'formatDurationMinutes',
+    'buildTradeDateTime', 'getTradeDurationMinutes', 'averageMinutes', 'summarizeTradeTimingGroup', 'getTradeTimingStats'];
+  const initializer = appSource.match(/^const tradeTimingDomain=.*;$/m)?.[0];
+  assert.ok(initializer, 'timing domain initializer must remain available');
+  const wrappers = names.map(name => {
+    const match = appSource.match(new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'));
+    assert.ok(match, `missing timing wrapper ${name}`);
+    return match[0];
+  });
+  vm.runInContext([fs.readFileSync(normalizerFile, 'utf8'), initializer, ...wrappers].join('\n'), context, {filename: 'app.js#trade-timing'});
   return context;
 }
 
@@ -111,7 +111,7 @@ test('isolated timing domain exposes one factory without UI, storage or IO acces
   for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`timing domain accessed ${name}`); }});
   const context = vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
-  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryTradeTiming']);
+  assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['getMarket', 'normalizeDocImages', 'TradeDiaryTradeTiming']);
   assert.deepEqual(Object.keys(context.TradeDiaryTradeTiming), ['createTradeTiming']);
   const api = context.TradeDiaryTradeTiming.createTradeTiming({normalizeDate: value => String(value || '').slice(0, 10)});
   assert.deepEqual(Object.keys(api).sort(), [

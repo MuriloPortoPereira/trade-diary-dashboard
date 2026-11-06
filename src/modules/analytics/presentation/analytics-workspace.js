@@ -634,3 +634,69 @@ function renderStrategyHub(){
     </tr>`).join(''):'<tr><td colspan="11" class="text-muted">Sem dados suficientes para montar o comparativo.</td></tr>';
   }
 }
+
+function getStatsPeriodTrades(){
+  const period=document.getElementById('statPeriod')?.value||'all';
+  const acctFilter=document.getElementById('statAccount')?.value||activeAccountId;
+  let arr=acctFilter==='all'?accounts.flatMap(a=>getAccountTrades(a.id)):getAccountTrades(acctFilter);
+  if(period==='custom'){
+    const from=document.getElementById('statDateFrom')?.value;
+    const to=document.getElementById('statDateTo')?.value;
+    if(from||to){arr=arr.filter(t=>{if(!t.date)return false;return(!from||t.date>=from)&&(!to||t.date<=to);});}
+  } else {arr=filterByPeriod(arr,period);}
+  return arr;
+}
+
+function deleteStrategy(idx){
+  const name=config.strategies[idx];if(!name)return;
+  const count=strategyUsageCount(name);
+  const msg=count
+    ? `Excluir "${name}" da lista de estratégias?\n\nEla aparece em ${count} trade(s). Os trades antigos continuam com esse nome no histórico.`
+    : `Excluir "${name}" da lista de estratégias?`;
+  showAppConfirm('Excluir estratégia',msg,()=>{
+    rememberDeletedDefaultStrategy(name);
+    config.strategies.splice(idx,1);
+    config.strategyDefaultsSeeded=true;
+    save();renderSetup();
+  },{danger:true,confirmText:'Excluir'});
+}
+
+function rememberDeletedDefaultStrategy(name){
+  const defaultMatch=DEFAULT_STRATEGIES.find(s=>normalizeStrategyName(s)===normalizeStrategyName(name));
+  if(defaultMatch){
+    if(!Array.isArray(config.deletedDefaultStrategies))config.deletedDefaultStrategies=[];
+    if(!config.deletedDefaultStrategies.some(s=>normalizeStrategyName(s)===normalizeStrategyName(defaultMatch))){
+      config.deletedDefaultStrategies.push(defaultMatch);
+    }
+  }
+}
+
+function renameStrategy(idx,newName){
+  const oldName=config.strategies?.[idx];if(!oldName)return false;
+  const next=cleanMTCell(newName);
+  if(!next)return false;
+  const nextKey=normalizeStrategyName(next);
+  const oldKey=normalizeStrategyName(oldName);
+  if(!nextKey||nextKey===oldKey)return false;
+  const exists=config.strategies.some((name,i)=>i!==idx&&normalizeStrategyName(name)===nextKey);
+  if(exists){showAppNotice('Estratégia duplicada','Já existe: '+next);return false;}
+  rememberDeletedDefaultStrategy(oldName);
+  config.strategies[idx]=next;
+  trades.forEach(t=>{if(t.strategy===oldName)t.strategy=next;});
+  config.strategyDefaultsSeeded=true;
+  save();renderSetup();
+  return true;
+}
+
+function editStrategy(idx){
+  const name=config.strategies?.[idx];if(!name)return;
+  showAppPrompt('Editar estratégia','Renomear estratégia:',name,next=>renameStrategy(idx,next),{confirmText:'Salvar'});
+}
+
+function strategyUsageCount(name){
+  return getAccountTrades(activeAccountId).filter(t=>t.strategy===name).length;
+}
+
+function renderDashStrategyBoard(arr){
+  renderStrategyRows('dashStrategyBoard',getStrategySnapshots(arr),5);
+}

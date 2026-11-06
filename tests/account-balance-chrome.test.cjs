@@ -9,7 +9,7 @@ const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function syncAccountBalanceChrome\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = fs.readFileSync(path.join(root, modulePath), 'utf8').match(/^function syncAccountBalanceChrome\([^]*?^\}/m)[0];
 
 function render({account = {id: 'acct-1'}, trades = [{id: 'trade-1'}], risk, elements = {}, useDefaults = false} = {}) {
   const calls = [];

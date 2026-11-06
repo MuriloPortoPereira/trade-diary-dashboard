@@ -189,3 +189,20 @@ function switchImportTab(id){
   });
   if(id==='export'){renderBackupSummary(createBackupPayload());renderExportAccountFilter();}
 }
+
+
+function triggerFileInput(id){
+  document.getElementById(id)?.click();
+}
+
+function clearAll(){
+  showAppPrompt('Limpar todos os dados',
+    `Isso apagará TODOS os ${trades.length} trades e dados de pré-mercado.\n\nPara confirmar, digite exatamente: APAGAR TUDO`,
+    '',
+    ()=>{
+      trades=[];preMarketData={};
+      save();refreshAll();showAppNotice('Dados apagados','Todos os dados foram apagados.');
+    },
+    {danger:true,confirmText:'Limpar tudo',inputLabel:'Confirmação',requiredValue:'APAGAR TUDO',errorText:'Digite APAGAR TUDO para confirmar.'}
+  );
+}

@@ -25,7 +25,7 @@ function balance({initial = 1000, trades = [], cashflow = {deposits: 0, withdraw
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(workflowSource, context, {filename: workflowPath});
+  vm.runInContext(workflowSource.match(/^function calcAccountRiskState\([^]*?^\}/m)[0], context, {filename: workflowPath});
   const state = context.calcAccountRiskState({balance: initial, goalPct: 10}, trades, 'all');
   return {values: [state.capitalBase, state.currentBalance, state.peakBalance, state.currentDdPct,
     state.currentDdUsd, state.totalPnl], calls};

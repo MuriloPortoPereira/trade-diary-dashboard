@@ -16,7 +16,7 @@ const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 function harness() {
   const ctx = vm.createContext({activeAccountId: 'active', accounts: [{id: 'active', balance: 1000}, {id: 'other', balance: 2000}], config: {balance: 900},
     getActiveAccount: () => ({balance: 800}), getAccountCapitalBase: acct => acct.balance + 250, fR: value => `$${value.toFixed(2)}`});
-  for (const file of ['src/modules/trades/domain/trade-timing.js','src/modules/analytics/domain/calculate-trade-metrics.js']) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), ctx);
+  for (const file of ['src/modules/trades/domain/trade-rules.js','src/modules/analytics/domain/calculate-trade-metrics.js']) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), ctx);
   vm.runInContext(`const timing=TradeDiaryTradeTiming.createTradeTiming(); const {normalizeClockTime,clockToMinutes,formatClockMinutes}=timing;\n${declaration('calcMetrics')}\n${source}`, ctx);
   return ctx;
 }

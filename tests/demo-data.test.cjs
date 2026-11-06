@@ -59,8 +59,10 @@ function setup(overrides = {}) {
     showAppNotice: (title, message) => calls.push(['notice', title, message]),
     ...overrides,
   };
+  const ensureTickmillAccount = sandbox.ensureTickmillAccount;
   const context = vm.createContext(sandbox);
   vm.runInContext(source, context, {filename: legacySources.every(Boolean) ? 'app.js#demo-data' : modulePath});
+  context.ensureTickmillAccount = ensureTickmillAccount;
   return {context, sandbox, calls};
 }
 

@@ -73,6 +73,7 @@ function setup({
     getMarket: symbol => `market:${symbol}`,
   });
   vm.runInContext(source, context, {filename: modulePath});
+  context.getLogDateRangeFromControls = () => ({startDate: '2026-01-01', endDate: '2026-01-31'});
   context.renderLogReadOnlyNotice = account => calls.push(['notice', account]);
   context.renderLogMetrics = (rows, incomplete) => calls.push(['metrics', rows, incomplete]);
   context.updateBulkBar = () => calls.push(['bulk']);

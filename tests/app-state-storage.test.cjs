@@ -28,6 +28,7 @@ function setup(stored = new Map()) {
     mergeStudyHubState(value) { calls.push(['study', value]); return value; },
     recomputeAllIncomplete() { calls.push(['incomplete']); },
   });
+  const ensureDefaultStrategies = context.ensureDefaultStrategies;
   for (const [file, name] of [[storagePath, 'save'], [loadPath, 'load']]) {
     const absolute = path.join(root, file);
     if (fs.existsSync(absolute)) vm.runInContext(fs.readFileSync(absolute, 'utf8'), context, {filename: file});
@@ -37,6 +38,7 @@ function setup(stored = new Map()) {
       vm.runInContext(declaration[0], context);
     }
   }
+  context.ensureDefaultStrategies = ensureDefaultStrategies;
   const before = Object.fromEntries(fields.map(field => [field, context[field]]));
   return {context, calls, stored, before};
 }

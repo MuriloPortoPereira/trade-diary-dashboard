@@ -47,7 +47,9 @@ function harness({data = rows, risk = {currentBalance: 1010, capitalBase: 1000},
     tradeRow(row, flag) { assert.equal(flag, false); return `<tr>${row.id}</tr>`; },
     updateTopbarStats() { calls.push('topbar'); },
   });
+  const renderDashStrategyBoard = context.renderDashStrategyBoard;
   vm.runInContext(source, context);
+  context.renderDashStrategyBoard = renderDashStrategyBoard;
   assert.equal(vm.runInContext('renderDashboard()', context), undefined);
   return {context, nodes, calls, cards, charts};
 }

@@ -10,7 +10,8 @@ const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderDocumentMedia\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
-const source = ["formatDocDate", "normalizeDocImages", "formatDocumentSelection", "getDocumentEntryImages", "renderDocumentMedia", "renderDocFolderIcon"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
+const sources = [moduleSource, fs.readFileSync(path.join(root, 'src/modules/trades/domain/trade-rules.js'), 'utf8')];
+const source = ["formatDocDate", "normalizeDocImages", "formatDocumentSelection", "getDocumentEntryImages", "renderDocumentMedia", "renderDocFolderIcon"].map(name => sources.map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).find(Boolean)[0]).join('\n\n');
 
 function render(entry, images) {
   const calls = [];

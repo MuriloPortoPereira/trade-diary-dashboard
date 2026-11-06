@@ -28,7 +28,7 @@ function setup({account, trades = [], period, cashflow} = {}) {
   });
   const moduleFile = path.join(root, modulePath);
   if (fs.existsSync(moduleFile)) vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
-  vm.runInContext(workflowSource, context, {filename: workflowPath});
+  vm.runInContext(workflowSource.match(/^function calcAccountRiskState\([^]*?^\}/m)[0], context, {filename: workflowPath});
   return {result: context.calcAccountRiskState(acct, trades, period), calls};
 }
 

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const files = ['src/modules/documents/presentation/documents-page.js', 'app.js'];
+const files = ['src/modules/documents/presentation/documents-page.js', 'src/modules/trades/domain/trade-rules.js', 'app.js'];
 const names = ['formatDocDate', 'normalizeDocImages', 'formatDocumentSelection', 'getDocumentEntryImages', 'setDocumentEntryImages', 'triggerDocumentImageUpload', 'addDocumentImages', 'removeDocumentImage', 'getDocumentEntries', 'getDocumentFolders', 'selectDocumentFolder', 'selectDocumentEntry', 'getCurrentDocumentEntry', 'openDocumentTrade', 'createGeneralDocument', 'createDailyDocument', 'createDocumentFromActiveFolder', 'getDocumentCreateLabel', 'getDocumentCreateDesc', 'saveCurrentDocument', 'deleteDocumentEntry', 'deleteCurrentDocument'];
 const sources = files.map(file => fs.readFileSync(path.join(root, file), 'utf8'));
 const declarations = names.map(name => {

@@ -181,3 +181,102 @@ function buildStopFeeAnalysis(acct, acctTrades=[]){
     feesInR:parseFloat(feesInR.toFixed(2)),
   };
 }
+
+
+function getActiveAccount(){
+  accounts=accounts.map(normalizeAccount);
+  return accounts.find(a=>a.id===activeAccountId)||accounts[0];
+}
+
+function getAccountTrades(accountId){
+  if(!accountId||accountId==='all')return trades;
+  return trades.filter(t=>t.accountId===accountId||(accountId==='default'&&!t.accountId));
+}
+
+function getAccountWorkingBalance(acct){
+  const account=acct?normalizeAccount(acct):getActiveAccount();
+  if(!account)return config.balance||1000;
+  const acctTrades=getAccountTrades(account.id);
+  const risk=calcAccountRiskState(account,acctTrades);
+  const currentBalance=risk?.currentBalance;
+  return Number.isFinite(currentBalance)&&currentBalance>0
+    ? currentBalance
+    : (account.balance||config.balance||1000);
+}
+
+function isFuturesAccount(acct){
+  return false;
+}
+
+function normalizeAccountType(type){
+  return type==='futures_usd'?'cfd_pct':(type||'cfd_pct');
+}
+
+function normalizeAccount(acct={}){
+  return {
+    ...acct,
+    type:normalizeAccountType(acct.type),
+    ddDaily:acct.ddDaily??2,
+    ddWeekly:acct.ddWeekly??5,
+    ddMonthly:acct.ddMonthly??acct.ddTotal??8,
+    ddTotal:acct.ddTotal??10,
+    risk:acct.risk??1,
+    goalPct:acct.goalPct??10,
+    cashflows:Array.isArray(acct.cashflows)
+      ? acct.cashflows.map(sanitizeAccountCashflow).filter(Boolean)
+      : [],
+  };
+}
+
+function normalizeCashflowType(type){
+  return type==='withdrawal'?'withdrawal':'deposit';
+}
+
+function sanitizeAccountCashflow(flow={}){
+  const amount=Math.abs(parseFloat(flow.amount)||0);
+  if(!amount)return null;
+  return {
+    id:flow.id||uid(),
+    type:normalizeCashflowType(flow.type),
+    date:flow.date||new Date().toISOString().split('T')[0],
+    amount,
+    note:cleanMTCell(flow.note||''),
+  };
+}
+
+function getAccountCashflows(acct){
+  return Array.isArray(acct?.cashflows)?acct.cashflows:[];
+}
+
+function calcAccountCashflow(acct){
+  return TradeDiaryAccountCashflow.calculateCashflowTotals(getAccountCashflows(acct));
+}
+
+function getAccountCapitalBase(acct){
+  return (acct?.balance||0)+calcAccountCashflow(acct).net;
+}
+
+function getAccountCurrentBalance(acct, acctTrades=getAccountTrades(acct?.id)){
+  const m=calcMetrics(acctTrades||[],acct?.id);
+  return getAccountCapitalBase(acct)+m.totalPnl;
+}
+
+function addAccountCashflow(accountId, flow){
+  const acct=accounts.find(a=>a.id===accountId);
+  if(!acct)return null;
+  const entry=sanitizeAccountCashflow(flow);
+  if(!entry)return null;
+  if(!Array.isArray(acct.cashflows))acct.cashflows=[];
+  acct.cashflows.push(entry);
+  save();
+  return entry;
+}
+
+function deleteAccountCashflow(accountId, flowId){
+  const acct=accounts.find(a=>a.id===accountId);
+  if(!acct||!Array.isArray(acct.cashflows))return false;
+  const before=acct.cashflows.length;
+  acct.cashflows=acct.cashflows.filter(flow=>flow.id!==flowId);
+  if(acct.cashflows.length!==before){save();return true;}
+  return false;
+}

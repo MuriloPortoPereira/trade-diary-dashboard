@@ -25,7 +25,7 @@ function periodState(trades, period) {
     const file = path.join(root, 'src/modules/accounts/domain', name);
     if (fs.existsSync(file)) vm.runInContext(fs.readFileSync(file, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(workflowSource, context, {filename: workflowPath});
+  vm.runInContext(workflowSource.match(/^function calcAccountRiskState\([^]*?^\}/m)[0], context, {filename: workflowPath});
   const state = context.calcAccountRiskState({balance: 1000, goalPct: 10}, trades, period);
   return {values: [state.dayPnl, state.weekPnl, state.monthPnl, state.scopePnl, state.scopeLoss, state.activePeriod], calls};
 }

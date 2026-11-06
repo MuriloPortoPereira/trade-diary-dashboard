@@ -243,3 +243,116 @@ function addSampleTrades(){
     showAppNotice('Dados demo adicionados','300 trades simulados foram adicionados ao histórico.');
   },{confirmText:'Adicionar'});
 }
+
+function clampDisciplineScore(value){
+  const n=Math.round((Number(value)||0)/5)*5;
+  return Math.max(0,Math.min(100,n));
+}
+
+function normalizeLooseText(value){
+  return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+function createSeededRandom(seedText='seed'){
+  let seed=0;
+  const source=String(seedText||'seed');
+  for(let i=0;i<source.length;i++)seed=(seed*31+source.charCodeAt(i))>>>0;
+  return()=>{
+    seed=(seed*1664525+1013904223)>>>0;
+    return seed/4294967296;
+  };
+}
+
+function pickSeeded(random, list=[]){
+  const arr=Array.isArray(list)?list:[];
+  if(!arr.length)return'';
+  const rnd=typeof random==='function'?random:Math.random;
+  return arr[Math.floor(rnd()*arr.length)%arr.length];
+}
+
+function pickFollowedPlanForImport(status, random){
+  const rnd=typeof random==='function'?random:Math.random;
+  if(status==='WIN')return rnd()>0.22?'sim':'parcial';
+  if(status==='LOSS')return rnd()>0.58?'sim':rnd()>0.34?'parcial':'nao';
+  return rnd()>0.28?'sim':'parcial';
+}
+
+function calculateImportedDiscipline(followedPlan,status,errorCount,hesitation,random){
+  const rnd=typeof random==='function'?random:Math.random;
+  const base=followedPlan==='sim'
+    ? 74+rnd()*22-(status==='LOSS'?10:0)
+    : followedPlan==='parcial'
+      ? 46+rnd()*26
+      : 18+rnd()*28;
+  const penalty=Math.min(24,errorCount*8)+(hesitation?8:0);
+  return clampDisciplineScore(base-penalty);
+}
+
+function calculateImportedConfidence(status,followedPlan,random){
+  const rnd=typeof random==='function'?random:Math.random;
+  const raw=(status==='WIN'?62:status==='LOSS'?48:56)+(followedPlan==='sim'?12:followedPlan==='nao'?-10:0)+rnd()*18;
+  return clampDisciplineScore(raw);
+}
+
+function buildImportTimingFields(trade, random){
+  const rnd=typeof random==='function'?random:Math.random;
+  const market=trade.market||getMarket(trade.symbol)||'EUA';
+  let openMinutes=clockToMinutes(trade.openTime);
+  if(openMinutes==null){
+    const base=market==='Crypto'?10*60:market==='Forex'?8*60+35:market==='B3'?9*60+8:9*60+30;
+    openMinutes=base+Math.floor(rnd()*35);
+  }
+  let placedMinutes=clockToMinutes(trade.placedTime);
+  if(placedMinutes==null)placedMinutes=Math.max(0,openMinutes-(2+Math.floor(rnd()*13)));
+  let exitMinutes=clockToMinutes(trade.exitTime);
+  if(exitMinutes==null&&['WIN','LOSS','BE'].includes(trade.status)){
+    const duration=trade.status==='WIN'
+      ? 6+Math.floor(rnd()*26)
+      : trade.status==='LOSS'
+        ? 4+Math.floor(rnd()*30)
+        : 3+Math.floor(rnd()*16);
+    exitMinutes=Math.min(openMinutes+duration,23*60+59);
+  }
+  return{
+    placedTime:formatClockMinutes(placedMinutes),
+    openTime:formatClockMinutes(openMinutes),
+    exitTime:exitMinutes==null?'':formatClockMinutes(exitMinutes),
+  };
+}
+
+function ensureAccountByName(name, defaults={}){
+  const target=cleanMTCell(name);
+  const existing=accounts.find(acct=>normalizeLooseText(acct.name)===normalizeLooseText(target));
+  if(existing)return existing;
+  const account=normalizeAccount({
+    id:(normalizeLooseText(target).replace(/[^\w]+/g,'-')||`a${Date.now()}`),
+    name:target,
+    type:'cfd_pct',
+    color:'#22d5ed',
+    balance:1000,
+    risk:1,
+    mult:1,
+    ddDaily:2,
+    ddWeekly:5,
+    ddMonthly:8,
+    ddTotal:10,
+    goalPct:10,
+    goalWeek:0,
+    goalMonth:0,
+    goalTotal:0,
+    cashflows:[],
+    ...defaults,
+  });
+  accounts.push(account);
+  return account;
+}
+
+function ensureTickmillAccount(){
+  return ensureAccountByName('Tickmill',{
+    id:'tickmill',
+    color:'#2bd9a0',
+    balance:3000,
+    risk:1,
+    goalPct:10,
+  });
+}

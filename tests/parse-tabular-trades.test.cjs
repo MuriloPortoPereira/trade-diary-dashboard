@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const moduleFile = path.join(root, modulePath);
-const sources = [app];
+const sources = [app, fs.readFileSync(path.join(root, 'src/modules/trades/application/trade-workflows.js'), 'utf8')];
 if (fs.existsSync(moduleFile)) sources.push(fs.readFileSync(moduleFile, 'utf8'));
 const parserNames = ['parseMT5Rows', 'parseGenericTradeRows', 'parseSpreadsheetRows', 'parseMT4Raw'];
 function declaration(name) {
@@ -25,11 +25,9 @@ function setup() {
     constructor(...args) { super(...(args.length ? args : ['2026-10-15T12:00:00.000Z'])); }
   }
   const context = vm.createContext({Date: FixedDate, trades: [], uid: () => `generated-${++ids}`});
-  vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/trades/domain/trade-timing.js'), 'utf8'), context);
-  const marketMap = app.match(/^const MARKET_MAP = \{[^]*?^\};/m);
-  assert.ok(marketMap);
-  vm.runInContext([marketMap[0], ...['cleanMTCell', 'parseMTNumber', 'normalizeDate', 'normalizeImportHeader',
-    'mtTradeStatus', 'getMarket'].map(declaration),
+  vm.runInContext(fs.readFileSync(path.join(root, 'src/modules/trades/domain/trade-rules.js'), 'utf8'), context);
+  vm.runInContext([...['cleanMTCell', 'parseMTNumber', 'normalizeDate', 'normalizeImportHeader',
+    'mtTradeStatus'].map(declaration),
     'const tradeTimingDomain=TradeDiaryTradeTiming.createTradeTiming({normalizeDate,cleanCell:cleanMTCell});',
     declaration('normalizeClockTime'), ...parserNames.map(declaration)].join('\n'), context);
   return {context, idCount: () => ids};

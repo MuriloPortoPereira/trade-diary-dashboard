@@ -1,3 +1,19 @@
+function buildHesitationStats(source=[]){
+  return TradeDiaryTradeMetrics.buildHesitationStats(source);
+}
+
+function buildDisciplineBuckets(source=[]){
+  return TradeDiaryTradeMetrics.buildDisciplineBuckets(source);
+}
+
+function getClosedTradesWithSubjectiveEmotion(list=[]){
+  return TradeDiaryTradeMetrics.getClosedTradesWithSubjectiveEmotion(list);
+}
+
+function getClosedTradesWithPlanTag(list=[]){
+  return TradeDiaryTradeMetrics.getClosedTradesWithPlanTag(list);
+}
+
 function renderStatsPsych(){
   const arr=getStatsPeriodTrades();
   const closed=arr.filter(t=>t.status==='WIN'||t.status==='LOSS'||t.status==='BE');

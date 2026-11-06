@@ -253,3 +253,37 @@ function deleteTrade(id){
     }
   });
 }
+
+function getOrderedTrades(arr){
+  return [...arr].filter(t=>t?.date).sort((a,b)=>{
+    if(a.date===b.date){
+      return String(a.createdAt||'').localeCompare(String(b.createdAt||''));
+    }
+    return String(a.date).localeCompare(String(b.date));
+  });
+}
+
+function getAnchorTradeDate(arr){
+  const ordered=getOrderedTrades(arr);
+  return ordered.length ? ordered[ordered.length-1].date : new Date().toISOString().split('T')[0];
+}
+
+function filterByPeriod(arr, period){
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
+  if(period==='today'){const today=now.toISOString().slice(0,10);return arr.filter(t=>t.date===today);}
+  if(period==='month') return arr.filter(t=>{if(!t.date)return false;const d=new Date(t.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===mo;});
+  if(period==='year')  return arr.filter(t=>{if(!t.date)return false;return new Date(t.date+'T12:00').getFullYear()===y;});
+  if(period==='week'){const ws=new Date(now);ws.setDate(now.getDate()-now.getDay());return arr.filter(t=>{if(!t.date)return false;return new Date(t.date+'T12:00')>=ws;});}
+  return arr;
+}
+
+function mtTradeStatus(pnl){return pnl==null?'OPEN':Math.abs(pnl)<0.005?'BE':pnl>0?'WIN':'LOSS';}
+
+function recomputeAllIncomplete(){
+  trades=trades.map(trade=>{
+    const missing=calcImportMissingFields(trade,trade.status);
+    const incomplete=missing.length>0;
+    if(incomplete===!!trade.incomplete&&JSON.stringify(missing)===JSON.stringify(trade.missing_fields||[]))return trade;
+    return {...trade,incomplete,missing_fields:missing};
+  });
+}

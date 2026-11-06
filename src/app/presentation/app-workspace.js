@@ -162,3 +162,75 @@ function showPage(id){
   ({dashboard:renderDashboard,log:renderLog,calendar:renderCalendar,stats:renderStats,psych:renderPsych,setup:renderSetup,premarket:renderPremarket,strategyHub:renderStrategyHub,studyHub:renderStudyHub,documents:renderDocumentsPage,notifications:renderNotificationsPage,accounts:renderAccountsPage,partners:renderPartnersPage,profile:renderProfilePage}[id]||(() => {}))();
   toggleSidebar(false);
 }
+
+
+let topbarDensity='full';
+
+const topbarValueCache={};
+
+function formatTopbarMoneyCompact(value){
+  const n=Number(value)||0;
+  const abs=Math.abs(n);
+  const sign=n<0?'-':'';
+  const compact=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:1});
+  if(abs>=1000000)return `${sign}$${compact(abs/1000000)}M`;
+  if(abs>=1000)return `${sign}$${compact(abs/1000)}K`;
+  return `${sign}${fR(abs)}`;
+}
+
+function formatTopbarSignedCompactMoney(value){
+  const n=Number(value)||0;
+  return `${n>=0?'+':'-'}${formatTopbarMoneyCompact(Math.abs(n))}`;
+}
+
+function formatTopbarSignedPct(value, digits=1){
+  const n=Number(value)||0;
+  return `${n>=0?'+':''}${n.toFixed(digits)}%`;
+}
+
+function topbarGoalPctLabel(value){
+  const n=Number(value||0);
+  return Number.isInteger(n)?n.toFixed(0):n.toFixed(1);
+}
+
+function setTopbarClass(el, base, cls){
+  if(!el)return;
+  el.className=[base,cls||''].filter(Boolean).join(' ');
+}
+
+function setTopbarValue(id, values, cls='', baseClass='tb-stat-val'){
+  topbarValueCache[id]={full:values.full,compact:values.compact||values.full,cls,baseClass};
+  renderTopbarValue(id);
+}
+
+function applyTopbarDensity(){
+  Object.keys(topbarValueCache).forEach(renderTopbarValue);
+}
+
+function fitTopbarDensity(){
+  applyTopbarDensity();
+}
+
+function bindWorkspaceEvents(){
+  document.addEventListener('dragover',e=>e.preventDefault());
+  document.addEventListener('drop',e=>{
+    e.preventDefault();
+    const files=Array.from(e.dataTransfer.files);
+    if(!files.length)return;
+    const f=files[0];
+    if(f.name.endsWith('.json')){importJSON({target:{files}});return;}
+    if(f.name.endsWith('.xlsx')||f.name.endsWith('.html')||f.name.endsWith('.htm')){handleMT5Upload({target:{files:[f]}});return;}
+    handleCSVUpload({target:{files}});
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(document.getElementById('appDialogModal')?.classList.contains('open'))closeAppDialog();
+      document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+      clearSelection();
+      toggleSidebar(false);
+    }
+    if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();openModal('tradeModal');}
+    if(e.key==='Delete'&&selectedTrades.size>0){bulkDelete();}
+  });
+}

@@ -237,3 +237,45 @@ function clearSelection(){
   const ca=document.getElementById('chkAll');if(ca)ca.checked=false;
   updateBulkBar();
 }
+
+function getSortedTrades(arr){
+  const {col,dir}=sortState;
+  return [...arr].sort((a,b)=>{
+    let va=a[col],vb=b[col];
+    if(col==='idx'){va=arr.indexOf(a);vb=arr.indexOf(b);}
+    if(va==null)return 1;if(vb==null)return -1;
+    if(typeof va==='string')va=va.toLowerCase();
+    if(typeof vb==='string')vb=vb.toLowerCase();
+    const cmp=va<vb?-1:va>vb?1:0;
+    return dir==='asc'?cmp:-cmp;
+  });
+}
+
+function normalizeLogDate(value){
+  const raw=String(value||'').trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw)?raw:'';
+}
+
+function normalizeLogDateRange(startDate='',endDate=''){
+  let start=normalizeLogDate(startDate);
+  let end=normalizeLogDate(endDate);
+  if(start&&end&&start>end)[start,end]=[end,start];
+  return {startDate:start,endDate:end};
+}
+
+function isTradeInLogDateRange(trade,startDate='',endDate=''){
+  const range=normalizeLogDateRange(startDate,endDate);
+  if(!range.startDate&&!range.endDate)return true;
+  const date=normalizeLogDate(trade?.date);
+  if(!date)return false;
+  if(range.startDate&&date<range.startDate)return false;
+  if(range.endDate&&date>range.endDate)return false;
+  return true;
+}
+
+function getLogDateRangeFromControls(){
+  return normalizeLogDateRange(
+    document.getElementById('filterDateStart')?.value||'',
+    document.getElementById('filterDateEnd')?.value||''
+  );
+}

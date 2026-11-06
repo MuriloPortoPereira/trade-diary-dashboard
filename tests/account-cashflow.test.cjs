@@ -8,17 +8,21 @@ const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
 const moduleFile = path.join(root, modulePath);
-const start = appSource.indexOf('function getAccountCashflows(');
-const end = appSource.indexOf('\nfunction getAccountCurrentBalance(', start);
-assert.ok(start >= 0 && end > start, 'account cashflow source must remain available');
-const source = appSource.slice(start, end);
+const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
+const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
+const source = ['getAccountCashflows', 'calcAccountCashflow', 'getAccountCapitalBase'].map(name => {
+  assert.doesNotMatch(appSource, new RegExp(`^function ${name}\\(`, 'm'));
+  const match = workflowSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
+  assert.ok(match, `${name} must remain available in the account workflow`);
+  return match[0];
+}).join('\n\n');
 
 function loadCashflow() {
   const context = vm.createContext({});
   if (fs.existsSync(moduleFile)) {
     vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
   }
-  vm.runInContext(source, context, {filename: 'app.js#account-cashflow'});
+  vm.runInContext(source, context, {filename: workflowPath});
   return context;
 }
 
@@ -117,8 +121,8 @@ test('cashflow domain loads once before consumers while legacy helpers remain gl
   ]) {
     assert.ok(domainIndex < scripts.findIndex(script => script.src === consumer));
   }
-  assert.match(appSource, /^function getAccountCashflows\(acct\)\{/m);
-  assert.match(appSource, /^function calcAccountCashflow\(acct\)\{/m);
-  assert.match(appSource, /^function getAccountCapitalBase\(acct\)\{/m);
-  assert.match(appSource, /return TradeDiaryAccountCashflow\.calculateCashflowTotals\(getAccountCashflows\(acct\)\);/);
+  assert.match(workflowSource, /^function getAccountCashflows\(acct\)\{/m);
+  assert.match(workflowSource, /^function calcAccountCashflow\(acct\)\{/m);
+  assert.match(workflowSource, /^function getAccountCapitalBase\(acct\)\{/m);
+  assert.match(workflowSource, /return TradeDiaryAccountCashflow\.calculateCashflowTotals\(getAccountCashflows\(acct\)\);/);
 });

@@ -9,7 +9,8 @@ const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const legacy = appSource.match(/^function renderAccountList\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
-const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
+const source = moduleSource.match(/^function renderAccountList\([^]*?^\}/m)[0];
 
 function render(accounts, visible = true) {
   const node = {innerHTML: 'before'};
@@ -87,6 +88,6 @@ test('account list loads once as a synchronous classic script before accounts pa
     .filter(match => match[1].includes(`src="${modulePath}"`));
   assert.equal(tags.length, 1);
   assert.doesNotMatch(tags[0][1], /\b(?:async|defer|type="module")\b/i);
-  assert.ok(source.indexOf('function renderAccountList(') < source.indexOf('function renderAccountsPage('));
+  assert.ok(moduleSource.indexOf('function renderAccountList(') < moduleSource.indexOf('function renderAccountsPage('));
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });

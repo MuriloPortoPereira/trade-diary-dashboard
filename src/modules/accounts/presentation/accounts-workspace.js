@@ -528,3 +528,38 @@ function renderAccountsPage(){
     </div>`;
   }).join('');
 }
+
+
+function getTradeFormAccount(){
+  const acctId=document.getElementById('t-account')?.value||activeAccountId;
+  return accounts.find(a=>a.id===acctId)||getActiveAccount();
+}
+
+function formatSignedMoney(value){
+  const n=Number(value)||0;
+  return `${n>=0?'+':'-'}${fR(Math.abs(n))}`;
+}
+
+function formatAccountBalanceChange(risk){
+  if(!risk)return'—';
+  const parts=[`P/L ${formatSignedMoney(risk.totalPnl)}`];
+  if(Math.abs(risk.cashflowNet||0)>0.0001)parts.push(`Mov. ${formatSignedMoney(risk.cashflowNet)}`);
+  return parts.join(' · ');
+}
+
+function setMode(m){
+  config.mode=m;save();
+  document.getElementById('modePercent')?.classList.toggle('active',m==='percent');
+  document.getElementById('modeAbsolute')?.classList.toggle('active',m==='absolute');
+  const pEl=document.getElementById('modePercentFields');
+  const aEl=document.getElementById('modeAbsFields');
+  if(pEl)pEl.style.display=m==='percent'?'':'none';
+  if(aEl)aEl.style.display=m==='absolute'?'':'none';
+  const cur=document.querySelector('.page.active')?.id?.replace('page-','');
+  if(cur==='log')renderLog();
+  if(cur==='dashboard')renderDashboard();
+}
+
+function acctTypeLabel(t){
+  return{cfd_pct:'CFD %',futures_usd:'CFD %',prop_pct:'Prop Firm %',crypto:'Crypto'}[t]||t;
+}

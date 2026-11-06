@@ -113,3 +113,41 @@ globalThis.TradeDiaryTradeTiming = (() => {
 
   return {createTradeTiming};
 })();
+
+const MARKET_MAP = {
+  'US30':'EUA','DJI':'EUA','DOW':'EUA','DJ30':'EUA','DJIUSD':'EUA','USAIND':'EUA',
+  'US500':'EUA','SP500':'EUA','SPX500':'EUA','SPX':'EUA','SPXUSD':'EUA',
+  'USTEC':'EUA','NAS100':'EUA','NDX':'EUA','NASDAQ':'EUA','TECH100':'EUA',
+  'US2000':'EUA','RUT2000':'EUA','RUSSELL':'EUA',
+  'GER40':'EUA','DAX':'EUA','UK100':'EUA','FRA40':'EUA',
+  'EURUSD':'Forex','GBPUSD':'Forex','USDJPY':'Forex','AUDUSD':'Forex','USDCAD':'Forex',
+  'NZDUSD':'Forex','USDCHF':'Forex','EURGBP':'Forex','EURJPY':'Forex','GBPJPY':'Forex',
+  'EURCAD':'Forex','AUDCAD':'Forex','CADJPY':'Forex','CHFJPY':'Forex','AUDNZD':'Forex',
+  'XAUUSD':'Forex','XAGUSD':'Forex','GOLD':'Forex','SILVER':'Forex',
+  'USOIL':'Forex','UKOIL':'Forex','OIL':'Forex','WTI':'Forex','BRENT':'Forex',
+  'BTCUSD':'Crypto','ETHUSD':'Crypto','BNBUSD':'Crypto','SOLUSD':'Crypto',
+  'ADAUSD':'Crypto','XRPUSD':'Crypto','DOTUSD':'Crypto','LTCUSD':'Crypto',
+  'DOGEUSD':'Crypto','AVAXUSD':'Crypto',
+  'AAPL':'EUA','TSLA':'EUA','AMZN':'EUA','GOOGL':'EUA','MSFT':'EUA',
+  'NVDA':'EUA','META':'EUA','NFLX':'EUA',
+  'WIN':'B3','WDO':'B3','WINFUT':'B3','WDOFUT':'B3','IBOV':'B3',
+  'PETR4':'B3','VALE3':'B3','ITUB4':'B3',
+};
+
+function getMarket(sym){
+  if(!sym)return'';
+  const s=sym.toUpperCase().replace(/\.[0-9A-Z]+$/,'');
+  if(MARKET_MAP[s])return MARKET_MAP[s];
+  if(/^(BTC|ETH|BNB|SOL|ADA|XRP|DOGE|AVAX|DOT|LTC)/.test(s))return'Crypto';
+  if(/^(EUR|GBP|USD|AUD|CAD|CHF|NZD|JPY|XAU|XAG)/.test(s))return'Forex';
+  if(/^(US|SP|NDX|DOW|DJI|NAS|TECH|RUSS)/.test(s))return'EUA';
+  if(/^(WIN|WDO|IND|DI1|DOL)/.test(s))return'B3';
+  return'';
+}
+
+function normalizeDocImages(images){
+  if(!Array.isArray(images))return[];
+  return images
+    .filter(img=>img&&img.dataUrl)
+    .map(img=>({name:img.name||'imagem',dataUrl:img.dataUrl}));
+}

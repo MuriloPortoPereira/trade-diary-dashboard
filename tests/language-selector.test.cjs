@@ -30,7 +30,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
   const localScripts = scripts.filter(script => script.src && !script.src.startsWith('https://'));
   assert.deepEqual(localScripts.map(script => script.src), [
     'src/modules/simulation/domain/simulation-calculations.js',
-    'src/modules/trades/domain/trade-timing.js',
+    'src/modules/trades/domain/trade-rules.js',
     'src/modules/analytics/domain/calculate-trade-metrics.js',
     'src/modules/accounts/domain/account-risk-calculations.js',
     'src/modules/accounts/application/account-risk-workflows.js',

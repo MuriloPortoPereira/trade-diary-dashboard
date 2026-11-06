@@ -49,5 +49,55 @@ globalThis.TradeDiaryTradeMetrics = (() => {
       sharpe,sortino,calmar,recovery,maxWS,maxLS,maxLoseStreakPnl,grossW,grossL,startBal};
   }
 
-  return {calculateTradeMetrics};
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  function buildHesitationStats(source=[]){
+    const hesitations=source.filter(t=>t&&t.hesitation);
+    const total=hesitations.length;
+    const wins=hesitations.filter(t=>t.status==='WIN').length;
+    const losses=hesitations.filter(t=>t.status==='LOSS').length;
+    const breakeven=hesitations.filter(t=>t.status==='BE').length;
+    const other=Math.max(total-wins-losses-breakeven,0);
+    const potentialPnl=hesitations.reduce((a,t)=>a+(Number(t.pnl)||0),0);
+    const decided=wins+losses;
+    return {
+      total,
+      wins,
+      losses,
+      breakeven,
+      other,
+      potentialPnl,
+      winRatePct:decided?+(wins/decided*100).toFixed(0):0,
+      lossRatePct:decided?+(losses/decided*100).toFixed(0):0,
+    };
+  }
+
+  function buildDisciplineBuckets(source=[]){
+    const labels=['0-20%','21-40%','41-60%','61-80%','81-100%'];
+    const buckets=labels.map(label=>({label,count:0,wins:0,pnl:0,winRatePct:null,avgPnl:null}));
+    (Array.isArray(source)?source:[]).forEach(trade=>{
+      if(trade?.discipline==null)return;
+      const val=clamp(Number(trade.discipline)||0,0,100);
+      const index=val<=20?0:val<=40?1:val<=60?2:val<=80?3:4;
+      const bucket=buckets[index];
+      bucket.count++;
+      if(trade.status==='WIN')bucket.wins++;
+      bucket.pnl+=(trade.pnl||0);
+    });
+    return buckets.map(bucket=>({
+      ...bucket,
+      winRatePct:bucket.count?+(bucket.wins/bucket.count*100).toFixed(1):null,
+      avgPnl:bucket.count?+((bucket.pnl/bucket.count).toFixed(2)):null,
+    }));
+  }
+
+  function getClosedTradesWithSubjectiveEmotion(list=[]){
+    return (Array.isArray(list)?list:[]).filter(t=>['WIN','LOSS','BE'].includes(t?.status)&&String(t?.emotion||'').trim());
+  }
+
+  function getClosedTradesWithPlanTag(list=[]){
+    return (Array.isArray(list)?list:[]).filter(t=>['WIN','LOSS','BE'].includes(t?.status)&&['sim','parcial','nao'].includes(String(t?.followedPlan||'').trim()));
+  }
+
+  return {calculateTradeMetrics,buildHesitationStats,buildDisciplineBuckets,getClosedTradesWithSubjectiveEmotion,getClosedTradesWithPlanTag};
 })();

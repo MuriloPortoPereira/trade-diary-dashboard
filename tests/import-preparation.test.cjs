@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const preparationPath = 'src/modules/data-transfer/application/transfer-workflows.js';
 const rulesPath = 'src/modules/data-transfer/domain/import-trade-rules.js';
-const candidates = [app, fs.readFileSync(path.join(root, 'src/modules/documents/presentation/documents-page.js'), 'utf8')];
+const candidates = [app, fs.readFileSync(path.join(root, 'src/modules/trades/domain/trade-rules.js'), 'utf8')];
 if (fs.existsSync(path.join(root, preparationPath))) candidates.push(fs.readFileSync(path.join(root, preparationPath), 'utf8'));
 const names = ['calcImportMissingFields', 'prepareImportedTrades', 'setPendingImport', 'clearPendingImport',
   'getPendingImportAccountId', 'getTradeImportPositionKey', 'normalizeDocImages'];

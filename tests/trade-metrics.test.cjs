@@ -8,10 +8,8 @@ const root = path.resolve(__dirname, '..');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/analytics/domain/calculate-trade-metrics.js';
 const moduleFile = path.join(root, modulePath);
-const start = appSource.indexOf('function calcMetrics(');
-const end = appSource.indexOf('\nfunction filterByPeriod(', start);
-assert.ok(start >= 0 && end > start, 'calcMetrics source must remain available');
-const source = appSource.slice(start, end);
+const source = appSource.match(/^function calcMetrics\([^]*?^\}/m)?.[0];
+assert.ok(source, 'calcMetrics source must remain available');
 
 function loadMetrics({accounts, activeAccountId = 'a1', activeAccount, configBalance = 3000, capitalBase} = {}) {
   const accountRows = accounts ?? [{id: 'a1', balance: 2000}];
@@ -126,14 +124,14 @@ test('daily ratios retain sample deviation, downside denominator and annualizati
   assert.equal(result.recovery, 1 / 3);
 });
 
-test('isolated metrics domain exposes one calculator without UI, storage or account state', () => {
+test('isolated metrics domain exposes calculators without UI, storage or account state', () => {
   const forbidden = ['document', 'localStorage', 'fetch', 'Chart', 'accounts', 'activeAccountId', 'config'];
   const sandbox = {};
   for (const name of forbidden) Object.defineProperty(sandbox, name, {get() { throw new Error(`metrics domain accessed ${name}`); }});
   const context = vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(moduleFile, 'utf8'), context, {filename: modulePath});
   assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbidden.includes(name)), ['TradeDiaryTradeMetrics']);
-  assert.deepEqual(Object.keys(context.TradeDiaryTradeMetrics), ['calculateTradeMetrics']);
+  assert.deepEqual(Object.keys(context.TradeDiaryTradeMetrics), ['calculateTradeMetrics', 'buildHesitationStats', 'buildDisciplineBuckets', 'getClosedTradesWithSubjectiveEmotion', 'getClosedTradesWithPlanTag']);
   const result = context.TradeDiaryTradeMetrics.calculateTradeMetrics([
     {status: 'WIN', pnl: 25, r: 1, date: '2026-01-01'},
   ], 500);

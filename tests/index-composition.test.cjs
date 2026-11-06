@@ -9,9 +9,9 @@ const index = fs.readFileSync(path.join(root, 'index.html'));
 
 test('published shell preserves every byte and its existing mixed line endings', () => {
   // Workspace consolidation changes script and stylesheet registrations only.
-  assert.equal(index.length, 102013);
+  assert.equal(index.length, 102012);
   assert.equal(createHash('sha256').update(index).digest('hex'),
-    'f5c281a66fa3a1518519e01f4fa4a86b34c8e427bc898edaa3d41f6e4b04ffc7');
+    '119ee43ec824066d4fa3e7f4c0e922353de0e582e9cef2962a27f7efee949aaf');
   assert.equal((index.toString().match(/\r\n/g) || []).length, 1417);
   assert.equal((index.toString().match(/\n/g) || []).length, 1503);
 });

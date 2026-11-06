@@ -29,7 +29,8 @@ function setup() {
     const filename = path.join(root, 'src/modules/accounts/domain', name);
     vm.runInContext(fs.readFileSync(filename, 'utf8'), context, {filename: name});
   }
-  vm.runInContext(source, context, {filename: modulePath});
+  const workflowSource = ['calcAccountRiskState', 'getTradeWeekKey', 'buildStopFeeAnalysis'].map(name => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
+  vm.runInContext(workflowSource, context, {filename: modulePath});
   return context;
 }
 
