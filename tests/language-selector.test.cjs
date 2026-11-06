@@ -77,6 +77,7 @@ test('catalog scripts are data-only and load in order before selector and app.js
     'src/modules/accounts/presentation/risk-board.js',
     'src/modules/analytics/presentation/dashboard-page.js',
     'src/modules/analytics/presentation/dashboard-equity-mode.js',
+    'src/modules/analytics/application/strategy-analysis.js',
     'src/modules/analytics/presentation/strategy-rows.js',
     'src/modules/analytics/presentation/strategy-comparison.js',
     'src/modules/analytics/presentation/statistics-page.js',

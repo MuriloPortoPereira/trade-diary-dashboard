@@ -1020,6 +1020,12 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Assinaturas, coerções, mediana superior, probabilidades como contagens e wrapper Monte Carlo preservados; 100 projeções + 100 planos diferenciais sem divergência.
 - Carga clássica sizing → projection → panel → app; somente duas tags de script mudam. `app.js`: 1.809 → 1.662 linhas.
 
+## G7f: consultas e comparação de estratégias
+
+- Treze APIs coesas em `analytics/application/strategy-analysis.js`, carregadas antes dos renderers e de `app.js`; corpos byte a byte idênticos.
+- Caracterização de BE, vazios, capital, ordenação, resultados, janelas, coerções e empates; preservado o desempate histórico de duas infinidades para o segundo nome.
+- Dependências transitórias de conta, métricas e formatação explícitas; sem DOM/storage/Chart e sem afirmar domínio puro. `app.js`: 1.662 → 1.470 linhas.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.

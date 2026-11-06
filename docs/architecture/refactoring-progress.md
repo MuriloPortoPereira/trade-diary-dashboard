@@ -166,6 +166,8 @@
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
 ## Current
+- G7f: 13 queries/helpers de estratégias reunidos em `analytics/application/strategy-analysis.js`, com corpos idênticos; estado/formatadores globais são dívida transitória explícita. `app.js`: 1.662 → 1.470 linhas. Caracterização pré-corte e revisão independente sem bloqueios.
+- G7f validado: 578 testes Node e 113 checks no navegador, sincronização HTML, sintaxe/diff e revisão independente sem bloqueios.
 - G7e: domínio `TradeDiarySimulationProjection` separa expectativa/trajetórias e recebe RNG explícito; mensagens/`fR` ficam na apresentação. Painel consolidado incorpora sizing-fields; arquivo minúsculo removido. Wrappers públicos preservados.
 - G7e: `app.js` passa de 1.809 para 1.662 linhas; carga sizing → projection → panel → app. Somente duas tags de script mudam no HTML. Seis caracterizações e 200 comparações diferenciais aprovadas; revisão independente sem bloqueios.
 - G7e validado: 571 testes Node, 113 checks no navegador e os dois geradores em --check, sintaxe/diff aprovados no snapshot do commit.
