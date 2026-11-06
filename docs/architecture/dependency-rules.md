@@ -18,6 +18,14 @@
 - G5d: `application/restore-backup.js` mantém estado/adaptadores globais como exceção transitória documentada; inversão pendente. Corpo intacto preserva alterações parciais nas falhas, sem DOM/storage direto.
 - G5g: domínio de importação recebe resolvedor de chave por parâmetro; não consulta conta/pendências globais. Preparação em application mantém adaptadores legados transitórios de estado, relógio e normalização, sem DOM/storage direto.
 - G5h: load em application usa readPersistedAppState (contrato de leitura bruta), sem storage direto. IO em app/infrastructure; save preserva acesso sequencial ao estado global como dívida transitória, sem snapshot antecipado.
+- G7e: projeção numérica recebe dados e RNG explícitos; mensagens e moeda ficam no painel. Wrappers clássicos de sizing/Monte Carlo preservam assinaturas.
+- G7c–G7i: controllers coesos por feature continuam com estado global legado; queries de estratégia em application usam métricas/formatadores globais como exceção transitória. `normalizeDocImages` ainda é consumido por trades/importação a partir da apresentação documental; inversão pendente, sem alegação de domínio puro.
+
+## Compatibilidade verificada (G7j)
+- Manter wrappers que fornecem defaults/estado/tradução: timing, sizing, CSV, payload de backup e resumo. `buildTradesCSV(list=trades)` continua contrato público.
+- Pontes `window.sh_*` e wrappers intraday mantêm closures, retornos e efeitos; intraday agenda atualização e não é alias descartável.
+- Remover somente após migrar todos os consumidores e proteger seus contratos, com ganho real de manutenção. Permanência é decisão explícita nesta fase.
+- `tests/classic-script-contract.test.cjs` verifica arquivos/duplicatas, carga clássica síncrona, compilação e ordem de providers. Referências por regex são heurísticas; inicialização/DOM continuam cobertos pelo smoke.
 
 ## Ciclos e duplicação
 Baseline não tem imports/exports: não há grafo de imports com ciclos a resolver.

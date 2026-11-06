@@ -1044,6 +1044,14 @@ O plano não exige criar todos os destinos de uma vez nem um CSS/JS por função
 - Aviso somente leitura incorporado a `trade-log-controls.js`; script isolado removido e consumidores/carga atualizados.
 - Caracterização cobre filtros/dedupe, navegação/fim, continuação após salvar e locks de conta/all/readonly; revisão independente sem bloqueios. `app.js`: 1.215 → 1.114 linhas.
 
+## G7j: contrato clássico e resíduos explícitos
+
+- Contrato central protege arquivos existentes/únicos, scripts clássicos síncronos, compilação individual/conjunta, providers e ordem crítica. Smoke permanece evidência da execução real.
+- Wrappers ativos mantidos: consumidores/defaults/retornos e efeitos ainda são contratos. Nenhuma remoção apenas por tamanho; regras/limites documentados em `dependency-rules.md`.
+- Estado atual: `app.js` com 1.114 linhas; sete blocos coesos extraídos/consolidados em G7c–G7i, mantendo APIs/dados e removendo dois arquivos minúsculos.
+- Próximas responsabilidades: helpers de demos/importação; consultas/normalização/datas; psicologia/alertas; apresentação comum. Caracterizar e aproveitar módulos existentes antes de novos arquivos.
+- Fechamento arquitetural ainda depende de rever esses resíduos e as exceções globais. O mapa distingue composição legítima de responsabilidade de feature pendente; não confundir redução de linhas com migração integral.
+
 ## Ajuste de granularidade após G5k
 
 - Três controles coesos de apresentação, antes distribuídos em arquivos de 5, 7 e 10 linhas, foram reunidos em `presentation/data-transfer-controls.js`.
@@ -1105,4 +1113,5 @@ Responsáveis e remoção da exceção: G1–G2 reduzem CSS; G3–G6 reduzem JS;
 Catálogos de idioma já foram separados no lote 2b. O template e a closure StudyHub exigem exceções próprias durante G6.
 A exceção de tamanho de `study-hub-legacy-runtime.js` foi removida no G6d: o arquivo passou de 2.389 para 233 linhas por responsabilidades coesas. G7a eliminou a linha gigante de autoria: editar os quatro HTMLs em `presentation/templates/`. `study-hub-template.js` tem exceção como asset gerado de distribuição, sem lógica de negócio; fontes legíveis, gerador e --check são a interface de manutenção. Factories acima de 500 linhas ainda combinam UI e cálculos locais; a revisão final deve avaliar ganho real antes de novas divisões.
 Cada próxima sessão escolhe um lote; não aceita crescimento novo indiscriminado nesses arquivos.
+G7j: `app.js` permanece em 1.114 linhas como exceção temporária de composição/resíduos. Ownership e próximos blocos no topo de `project-map.md`; wrappers ativos e estado único podem permanecer. Os arquivos gerados de HTML continuam distribuição estática versionada.
 G7b tornou `index.html` uma distribuição gerada/versionada: manter seu tamanho preserva o deploy estático; autoria ocorre nas quinze views e dois fragmentos do shell. Não é necessário dividi-lo em runtime. `.gitattributes` preserva os bytes herdados das fontes e saída; gerador/teste garantem sincronização.

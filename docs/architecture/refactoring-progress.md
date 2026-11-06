@@ -2,9 +2,9 @@
 
 ## Overall status
 - Preparação concluída: ambiente, auditoria, AGENTS, mapas, arquitetura alvo e ADRs.
-- Implementação parcial: sizing, CSV, idiomas, G1–G3, núcleo G4a–G4g, G5a–G5p e estrutura G6 concluídos; HTML de autoria G7a–G7b implementado.
+- Implementação parcial: sizing, CSV, idiomas, G1–G3, núcleo G4a–G4g, G5a–G5p e estrutura G6 concluídos; autoria HTML G7a–G7b e blocos coesos G7c–G7i implementados.
 - G4 inclui timing, métricas, cashflow e primeiros limites de risco puros.
-- G7: composição estática decidida nos ADRs 004/005; revisão dos consumidores, compatibilidade e resíduos ainda pendente.
+- G7j: composição estática e compatibilidade verificadas; wrappers ativos mantidos. Resíduos e acoplamentos globais ainda impedem declarar toda a migração concluída.
 - Testes, revisão e documentação acompanham cada lote; isso não equivale à validação integral da aplicação.
 - Sequência e critérios de conclusão: [roadmap](refactoring-roadmap.md).
 
@@ -165,42 +165,39 @@
 - Nove casos direcionados passaram antes do corte; matriz v28 ampliada para 922 casos, com referência imutável de `3f434a9`.
 - 59 testes Node, 27 checks no navegador, sintaxe, parsing e diff aprovados; 922 estados visuais idênticos, com 53 imagens/223 pixels dentro da tolerância existente; revisão independente sem bloqueios.
 
+### Blocos recentes: G7c–G7i
+
+Todos tiveram caracterização pré-corte, revisão independente sem bloqueios e 113 checks no navegador no snapshot de cada commit. Contagens abaixo são casos Node executados com subprocessos permitidos.
+
+| Lote | Responsabilidade | Linhas de app.js após | Testes Node |
+|---|---|---:|---:|
+| G7c | Documentos: três origens, consultas, CRUD e mídia | 1.932 | 559 |
+| G7d | Rotina, hábitos e disciplina na página existente | 1.809 | 565 |
+| G7e | Domínio numérico/RNG e painel de simulação consolidado | 1.662 | 571 |
+| G7f | Queries/comparação de estratégias | 1.470 | 578 |
+| G7g | Controller de parceiros, clipboard e QR | 1.375 | 586 |
+| G7h | Controles de contas, setup e tags | 1.215 | 596 |
+| G7i | Edição em lote, locks e aviso do diário consolidado | 1.114 | 603 |
+
 ## Current
-- G7i: 12 APIs de edição/bloqueios reunidas em `incomplete-trade-flow.js` (90 linhas) e `trade-log-controls.js` (104); aviso somente leitura incorporado e arquivo minúsculo removido. Corpos e regras preservados. `app.js`: 1.215 → 1.114 linhas.
-- G7i validado: 603 testes Node, 113 checks no navegador, dois geradores, sintaxe/diff e revisão independente sem bloqueios.
-- G7h: 13 controles de contas/setup/tags reunidos nos três módulos de apresentação existentes; dez caracterizações pré-corte e revisão independente sem bloqueios. Defaults, preservação de trades e timing das confirmações mantidos. `app.js`: 1.375 → 1.215 linhas.
-- G7h validado: 596 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios.
-- G7g: dez funções de parceiros reunidas à página existente (142 linhas), incluindo configuração, clipboard e QR. Corpos e callbacks preservados; oito caracterizações, consumidores e revisão independente sem bloqueios. `app.js`: 1.470 → 1.375 linhas.
-- G7g validado: 586 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios.
-- G7f: 13 queries/helpers de estratégias reunidos em `analytics/application/strategy-analysis.js`, com corpos idênticos; estado/formatadores globais são dívida transitória explícita. `app.js`: 1.662 → 1.470 linhas. Caracterização pré-corte e revisão independente sem bloqueios.
-- G7f validado: 578 testes Node e 113 checks no navegador, sincronização HTML, sintaxe/diff e revisão independente sem bloqueios.
-- G7e: domínio `TradeDiarySimulationProjection` separa expectativa/trajetórias e recebe RNG explícito; mensagens/`fR` ficam na apresentação. Painel consolidado incorpora sizing-fields; arquivo minúsculo removido. Wrappers públicos preservados.
-- G7e: `app.js` passa de 1.809 para 1.662 linhas; carga sizing → projection → panel → app. Somente duas tags de script mudam no HTML. Seis caracterizações e 200 comparações diferenciais aprovadas; revisão independente sem bloqueios.
-- G7e validado: 571 testes Node, 113 checks no navegador e os dois geradores em --check, sintaxe/diff aprovados no snapshot do commit.
-- G7d: 11 funções de rotina reunidas à página existente (183 linhas), sem novo script. Denominadores distintos, correlação por sessão, timestamps e ordem dos efeitos preservados. `app.js`: 1.932 → 1.809 linhas.
-- G7d validado: 565 testes Node e 113 checks no navegador no snapshot do índice; sintaxe/diff e revisão independente sem bloqueios.
-- G7c: 22 funções documentais reunidas nos dois módulos de apresentação existentes, com caracterização pré-corte das três origens de notas, CRUD e callbacks assíncronos. Corpos preservados byte a byte; nenhum script novo.
-- Projeções/normalização documentais continuam acopladas ao estado legado; não são domínio puro. A persistência e as APIs globais permanecem compatíveis.
-- G7c validado em snapshot do índice: 559 testes Node e 113 checks no navegador, sintaxe/diff e revisão independente sem bloqueios; `app.js`: 2.269 → 1.932 linhas.
-- A cópia de trabalho passou a ser persistente após limpeza de `/tmp` na retomada; commits validados são aplicados à cópia original a cada etapa. Alterações locais do usuário continuam preservadas.
-- G7b: quinze páginas HTML de autoria nas features e dois fragmentos do shell; manifesto explícito e gerador por concatenação de buffers, conforme ADR-005.
-- `index.html` continua versionado, com os mesmos 107.193 bytes da baseline `953d990`; nenhum DOM, estilo, handler, asset ou script de runtime foi alterado.
-- G7a preserva os 151.521 bytes montados do StudyHub; runtime com 233 linhas/11.187 bytes. `app.js` permanece em 2.269 linhas.
-- Caracterização executada antes do corte; 92 arquivos Node, 113 checks no navegador, sintaxe/diff e os dois geradores em --check aprovados na cópia limpa de validação.
-- Revisão independente somente leitura: sem bloqueios; concatenação, fingerprint, boundary por página, atributos Git e fluxo de autoria/deploy conferidos.
-- Alterações locais do usuário preservadas; a suíte integral da cópia limpa não valida a edição preexistente em `tests/calendar-controls.test.cjs`.
+- G7j: contrato central de scripts em `tests/classic-script-contract.test.cjs`: arquivos existentes/únicos, carga clássica síncrona, compilação individual/conjunta, providers e ordem crítica. Não substitui execução no navegador.
+- Fechamento G7j: 607 casos Node em 100 arquivos, 113 checks no navegador, sintaxe de 34 scripts alterados, dois geradores em --check, diff e revisão independente aprovados. HTML fora das tags de script idêntico à baseline `b2424b3`; CSS sem alterações.
+- Wrappers ativos preservados por consumidores reais e defaults; intraday acrescenta comportamento e não é alias removível. Decisão em [regras de dependência](dependency-rules.md).
+- `app.js`: 2.269 → 1.114 linhas neste conjunto; dois arquivos minúsculos incorporados a módulos existentes. Simulação tem domínio numérico; consultas/controllers ainda acoplados ao estado são dívida explícita.
+- Fontes HTML e distribuição sincronizadas; só quatro tags de script mudaram desde G7b, com DOM/estilos preservados. O template StudyHub mantém 151.521 bytes; runtime de 233 linhas.
+- A cópia de trabalho é persistente após limpeza de `/tmp`; commits validados são aplicados à cópia original a cada etapa. Alterações locais do usuário preservadas; a suíte limpa não valida a edição preexistente de `tests/calendar-controls.test.cjs`.
 
 ## Next
-- Revisar compatibilidade dos scripts clássicos e consumidores; wrappers só podem ser removidos com todos os consumidores protegidos e ganho real de manutenção.
-- Depois: revisar acoplamentos/resíduos ainda em `app.js`, documentação e critérios de fechamento arquitetural; não confundir redução de linhas com conclusão de toda a refatoração.
-- Manter o critério de coesão nos módulos já extraídos; consolidar somente quando reduzir custo real de navegação sem alterar ordem clássica.
-- Seguir o [roadmap](refactoring-roadmap.md); agrupar responsabilidades coesas com um commit e validação ao fechamento.
+- Helpers de demonstração/importação: caracterizar aleatoriedade derivada, enriquecimento e resolução de conta antes de consolidar por responsabilidade.
+- Resíduos de consultas/normalização de contas, datas/filtros do diário e estatísticas de psicologia/alertas: extrair entradas explícitas onde existir boundary real.
+- Apresentação comum em `app.js` (charts, formatadores, tooltips e topbar): reunir por consumidor sem criar arquivos por função. Estado único e bridges permanecem composição.
+- Encerrar com revisão dos acoplamentos/dependências e documentação consolidada; manter wrappers enquanto forem contrato ativo. Sem framework ou mudança de produto nesta etapa.
 
 ## Risks
 - `getTradeWeekKey` está protegido indiretamente pelo agrupamento semanal; entrada vazia, data inválida e fronteira domingo/sábado ainda não possuem casos diretos.
 - A tradução do botão de confirmação remove o span importCount; comportamento preexistente preservado. O preview mantém guarda e o smoke verifica as linhas reais.
 - A checagem integral de storage do smoke permanece síncrona; o novo fluxo assíncrono protege as seis chaves de save, pois cotação/StudyHub também gravam em segundo plano.
-- Monólitos permanecem grandes, com justificativa temporária no roadmap.
+- `app.js` ainda possui 1.114 linhas de composição e resíduos; exceção temporária e ownership no mapa/roadmap. Assets HTML gerados não são fontes de autoria.
 - Persistência principal, seeds/bootstrap e cotação caracterizados; trades, risco por calendário e persistências auxiliares do StudyHub ainda sem cobertura ampla.
 - Smoke cobre janela inicial e fluxos específicos, incluindo console.error com prefixo StudyHub Legacy desde G6a; demais erros silenciados e falhas assíncronas posteriores permanecem fora da cobertura.
 - Runner visual G1 captura console/runtime durante as visitas; comparação permite erros preexistentes iguais (baseline G1: zero).

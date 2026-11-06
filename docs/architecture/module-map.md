@@ -12,19 +12,19 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 | Shell/navegação | `src/app/application/bootstrap-app.js`; `src/app/presentation/navigation.js` | Carga inicial, IDs `page-*`, funções globais, contas e estado |
 | Operações | `src/modules/trades/application/trade-workflows.js`; `renderLog` | Formulário, `trades`, contas, persistência, seleção e métricas |
 | Dados demonstrativos | `src/modules/trades/application/demo-data.js` | Geração determinística, importação Tickmill, estratégias, confirmação e persistência |
-| Contas/risco | `normalizeAccount`, `calcAccountRiskState`, `saveAccount`, `renderAccountsPage` | `accounts`, trades, calendário atual, cashflows, formatação |
+| Contas/risco | `accounts/application/account-risk-workflows.js`; `presentation/{account-form,risk-setup-page,risk-tags}.js`; `normalizeAccount` em `app.js` | `accounts`, trades, calendário atual, cashflows, formatação |
 | Dashboard | `renderDashboard`, `calcMetrics`, `renderRiskBoard` | Conta ativa, filtros, Chart.js, DOM |
-| Estratégias/análises | `getStrategySnapshots`, `renderStrategyCompareCards`, `renderStats`, `renderStrategyHub` | Trades, timing, métricas, Chart.js |
-| Calendário/rotina | `renderCalendar`, `renderPremarket`, `savePM` | Trades, `preMarketData`, datas, storage |
+| Estratégias/análises | `analytics/application/strategy-analysis.js`; renderers em `analytics/presentation/` | Queries sem DOM; conta/métricas/formatação globais transitórias; Chart.js na apresentação |
+| Calendário/rotina | `calendar/presentation/calendar-page.js`; `routine/presentation/premarket-page.js` reúne renderer e controles | Trades, `preMarketData`, datas, save e helpers globais |
 | Psicologia | `renderPsych`, `renderStatsPsych`, `buildHesitationStats` | Campos subjetivos das operações e gráficos |
-| Simulação principal | `calculateSimulationSizing`, `buildSimulationPlan`, `renderSimulation` | Helpers numéricos, conta ativa, configuração, formatação e gráficos |
+| Simulação principal | `simulation/domain/calculate-simulation-{sizing,projection}.js`; `presentation/simulation-panel.js` | Domínio numérico/RNG; painel consulta conta/configuração e formata/renderiza; wrappers mantidos |
 | Importação | `parseMT5Rows`, `parseGenericTradeRows`, `parseMT5HTML`, `confirmImport` | FileReader, datas, IDs, normalizadores, contas e `save` |
 | Backup/exportação | `createBackupPayload`, `restoreBackupData`, `exportJSON`, `buildTradesCSV` | Estado global, JSON, CSV, Blob, confirmação e storage |
 | StudyHub nativo | `src/modules/study-hub/presentation/study-hub-page.js`: `renderStudyHub`, wrappers de cálculo, `syncStudyHubLegacyInputs` | Estado `studyHubState`, conta, risco, domínio nativo, DOM legado e `window.sh_*` |
 | StudyHub legado | `presentation/study-hub-legacy-runtime.js`: montagem/pontes; `presentation/study-hub-{propfirm,plan,tradesim,mental}.js`: ferramentas isoladas | Estado privado por ferramenta, Chart.js, helpers puros no domínio e storage em infrastructure |
 | Intraday adicional | `src/modules/study-hub/presentation/study-hub-intraday.js`: `studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact` | IIFE própria; wrappers de `sh_buildIntraday`/`sh_tsRunAll` |
-| Documentos/imagens | `renderDocumentsPage`, `saveCurrentDocument`, `getDocumentEntries` | Trades, rotina, `config.generalDocs`, FileReader, DOM |
-| Parceiros | `renderPartnersPage`, `ensurePartnerHubConfig` | `config.partnerHub`, links, imagens, clipboard |
+| Documentos/imagens | `documents/presentation/{documents-page,document-rendering-helpers}.js`: workspace e mídia | Trades, rotina, `config.generalDocs`, FileReader, DOM; dependências globais transitórias |
+| Parceiros | `partners/presentation/partners-page.js`: controller completo | `config.partnerHub`, links, imagens, clipboard |
 | Perfil/notificações | `renderProfilePage`, `renderNotificationsPage`, `buildOperationalAlerts` | Conta ativa, risco e histórico; sem autenticação |
 | Configuração/storage | `renderSetup`, `saveConfig`, `save`, `load` | Globals, normalização, localStorage |
 | Idiomas/cotação | `TRANSLATIONS`, `applyLanguage`; `src/modules/preferences/infrastructure/exchange-rate.js` | DOM, storage, AwesomeAPI; cotação também duplicada no legado |
@@ -65,7 +65,7 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 | `src/app/application/load-app-state.js` | load/normalização via contrato de leitura bruta; 17 linhas, sem storage direto |
 | `tests/app-state-storage.test.cjs` | Caracterização de ordem, seis formatos, defaults, round-trip, falhas parciais e carga |
 | `tests/simulation-sizing.test.cjs` | Caracterização dos valores/defaults e regressões do cálculo |
-| `src/modules/simulation/presentation/simulation-sizing-fields.js` | Sincronização dos percentuais com os três campos monetários da simulação; 14 linhas intactas |
+| `src/modules/simulation/presentation/simulation-panel.js` (campos incorporados em G7e) | Sincronização dos percentuais e demais controles da simulação no painel coeso |
 | `tests/simulation-sizing-fields.test.cjs` | Caracterização de conta, fallbacks, conversão, projeções, retorno e carga |
 | `src/modules/simulation/presentation/simulation-panel.js` | Snapshot, seleção de conta e renderer do painel; quatro funções/81 linhas |
 | `tests/simulation-panel.test.cjs` | Caracterização de snapshot, reset, modos manual/conta, painel, plano, gráfico e carga |
@@ -242,7 +242,7 @@ e quinze páginas nas respectivas features. `scripts/build-index.cjs` gera `inde
 | `tests/trade-plan-deviation.test.cjs` | Caracterização de guard, opções, fallback, disciplina e carga |
 | `src/modules/trades/presentation/incomplete-trade-flow.js` | Projeção do fluxo de conclusão sequencial de trades incompletos; 31 linhas intactas |
 | `tests/incomplete-trade-flow.test.cjs` | Caracterização de cadastro, edição, fluxo único/múltiplo, navegação, alvos opcionais e carga |
-| `src/modules/trades/presentation/trade-log-read-only-notice.js` | Aviso de consulta do diário quando a conta filtrada não é ativa; 16 linhas intactas |
+| `src/modules/trades/presentation/trade-log-controls.js` (aviso incorporado em G7i) | Aviso de consulta e bloqueios de edição no controller do diário |
 | `tests/trade-log-read-only-notice.test.cjs` | Caracterização de guard, bloqueio, mensagens, escaping e carga |
 | `src/modules/trades/presentation/trade-error-chips.js` | Composição dos chips de erros da operação; 12 linhas intactas |
 | `tests/trade-error-chips.test.cjs` | Caracterização de guard, normalização, deduplicação, seleção, escaping e carga |

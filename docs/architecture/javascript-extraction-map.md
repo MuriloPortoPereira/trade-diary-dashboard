@@ -90,7 +90,7 @@ atualização das métricas permanecem nas dependências globais existentes.
 normalização, formulário e persistência permanecem nas dependências existentes.
 
 `renderLogReadOnlyNotice` (G3ae) foi movida intacta para
-`src/modules/trades/presentation/trade-log-read-only-notice.js`: filtro,
+`src/modules/trades/presentation/trade-log-controls.js` (aviso incorporado em G7i): filtro,
 conta ativa, decisão de bloqueio e escaping permanecem nas dependências existentes.
 
 `renderErrorChips` (G3af) foi movida intacta para
@@ -126,7 +126,7 @@ trade em edição e mutações permanecem nas dependências existentes.
 edição, exclusão e persistência permanecem nas dependências existentes.
 
 `syncSimulationMoneyFromPercent` (G3am) foi movida intacta para
-`src/modules/simulation/presentation/simulation-sizing-fields.js`: snapshot,
+`src/modules/simulation/presentation/simulation-panel.js` (campos incorporados em G7e): snapshot,
 conversão, cálculo de sizing e helpers de campos permanecem nas dependências existentes.
 
 O painel de simulação (G3aw) foi movido intacto para

@@ -66,6 +66,7 @@ Não foram adicionados hooks globais nem alterados modelos, permissões ou orça
 
 ```bash
 node --test tests/*.test.cjs
+node tests/classic-script-contract.test.cjs
 node scripts/build-index.cjs --check
 node scripts/build-study-hub-template.cjs --check
 node --check app.js
@@ -89,6 +90,15 @@ Desde G7b, localizar a página HTML pelo manifesto `src/app/presentation/shell/i
 Após editar a fonte da feature ou `shell/{open,close}.html`, executar `node scripts/build-index.cjs`
 e versionar fonte e saída. O gerador preserva bytes/ordem; `--check` detecta saída desatualizada.
 Não editar somente `index.html`. Produção não executa o gerador; ver [ADR-005](adr/005-static-shell-composition.md).
+
+G7j acrescenta contrato central de carga: arquivos locais existentes/únicos, scripts clássicos síncronos,
+compilação individual/conjunta e providers/ordem crítica. Compilação não executa DOM/bootstrap; manter o smoke.
+Consolidações atuais: `simulation-sizing-fields.js` está em `simulation-panel.js`; `trade-log-read-only-notice.js`
+está em `trade-log-controls.js`. Os nomes dos testes históricos permanecem válidos.
+
+Retomada: `/tmp` foi limpo e processos auxiliares perderam artefatos. Usar checkout persistente, commitar e
+aplicar cada etapa validada imediatamente à branch original. O sandbox também restringiu subprocessos Node;
+o comando completo foi executado com permissão apropriada, sem alterar testes para esconder falhas.
 
 Smoke requer Chrome/Chromium instalado. Por padrão usa `google-chrome`;
 para outro binário: `CHROME_BIN=/caminho/chromium node scripts/browser-smoke.cjs`.

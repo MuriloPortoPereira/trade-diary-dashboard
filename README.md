@@ -120,11 +120,11 @@ Para editar HTML, localize a página no [manifesto de composição](src/app/pres
 | G4: regras de domínio | Núcleo planejado extraído; resíduos/acoplamentos seguem para revisão final |
 | G5: persistência/importação | Formatos, coordenação, IO, bootstrap e workflows extraídos em G5a–G5p |
 | G6: StudyHub | Estrutura concluída: quatro ferramentas privadas, domínio, estado, storage e runtime de montagem |
-| G7: HTML e compatibilidade | Autoria HTML concluída em G7a–G7b; revisão de compatibilidade e fechamento pendentes |
+| G7: HTML e compatibilidade | Autoria concluída, controllers consolidados e contrato clássico verificado em G7a–G7j; resíduos/acoplamentos ainda pendentes |
 
-O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 2.269 linhas; ainda contém estado, integração e resíduos a revisar. O template StudyHub já tem fontes HTML legíveis; consulte o mapa antes de abrir arquivos extensos.
+O trabalho avança em commits por responsabilidade, sem reescrever a aplicação. O [progresso detalhado](docs/architecture/refactoring-progress.md) registra o último lote validado; o [roadmap](docs/architecture/refactoring-roadmap.md) define as verificações seguintes. `app.js` passou de 11.068 para 1.114 linhas; ainda contém estado, integração e resíduos a revisar. Documentos, rotina, simulação, estratégias, parceiros, contas e controles do diário possuem módulos coesos; dois arquivos pequenos foram incorporados aos módulos responsáveis.
 
-O estágio atual é G7b: quinze páginas de autoria por feature e dois fragmentos do shell geram os mesmos 107.193 bytes de `index.html`. A validação deste lote passou em 92 arquivos de teste Node e 113 verificações no navegador, em cópia limpa. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada; neste lote, os bytes publicados permaneceram idênticos. Falta revisar compatibilidade, resíduos e acoplamentos, consolidar apenas onde houver ganho e fechar os critérios arquiteturais.
+O estágio atual é G7j: fontes HTML por feature, domínio numérico de projeção e contrato central de scripts clássicos. Wrappers usados pelos consumidores permanecem. Validação final: 607 testes Node em 100 arquivos, 113 verificações no navegador, dois geradores e sintaxe dos 34 scripts alterados, em cópia limpa. Desde G7b, somente quatro tags de script mudaram no HTML; DOM e estilos foram preservados. A última matriz visual completa foi executada no G3g, com 922 estados equivalentes dentro da tolerância documentada. Faltam os resíduos de importação/demonstração, consultas/normalização, estatísticas/alertas e apresentação comum, seguidos do fechamento das dependências globais documentadas.
 
 ## Deploy e dados
 

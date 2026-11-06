@@ -4,6 +4,7 @@
 Fallback: `rg -n 'function NOME' app.js`; abrir apenas o trecho necessário.
 HTML StudyHub: editar `src/modules/study-hub/presentation/templates/*.html`; não abrir integralmente o asset gerado `study-hub-template.js` para análise. Usar símbolos e trechos localizados nas fontes de autoria.
 HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` para localizar a fonte na feature. Editar o fragmento e executar `node scripts/build-index.cjs`; `index.html` é a distribuição versionada.
+Localização atual na tabela abaixo. Seções por lote registram caminhos/contagens históricos: sizing-fields foi incorporado ao painel de simulação; aviso somente leitura foi incorporado aos controles do diário.
 
 ## Shell e páginas: composição estática (G7b)
 
@@ -35,6 +36,14 @@ HTML das páginas: consultar `src/app/presentation/shell/index.fragments.json` p
 | Persistência/configuração | `src/app/infrastructure/app-state-storage.js`: `save`/leitura; `src/app/application/load-app-state.js`: `load`; `saveConfig` em `app.js` |
 | Idioma/câmbio | `src/modules/preferences/presentation/`; `src/modules/preferences/infrastructure/exchange-rate.js` |
 | Visual | `src/styles/`, CSS de preferências/StudyHub e arquivos responsivos; consultar o mapa CSS |
+
+## Resíduos de app.js após G7j
+
+- Composição: estado global, inicializadores de adaptadores, listeners transversais e wrappers ativos; manter enquanto houver consumidores.
+- Demonstrações/importação: `createSeededRandom`, enriquecimento de disciplina/confiança/timing e resolução de contas (`ensureAccountByName`, `ensureTickmillAccount`).
+- Consultas/normalização de contas e datas/filtros do diário; `normalizeAccount`, capital/cashflows, ordenação e range de datas.
+- Apresentação comum: charts/datasets, formatadores, `TIPS`/tooltips, densidade/topbar e rótulos de risco; sem divisão por função.
+- Estatísticas de psicologia e alertas: `buildHesitationStats`, `buildDisciplineBuckets`, `buildOperationalAlerts`. Caracterizar antes de escolher entradas explícitas e destino.
 
 ## StudyHub: runtime e intraday (G6a)
 
