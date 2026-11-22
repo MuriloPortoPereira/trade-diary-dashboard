@@ -1,0 +1,148 @@
+.tbl {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#logTable {
+  min-width: 1380px;
+}
+
+.tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 10px 12px;
+  background: rgba(2, 4, 5, 0.98);
+  color: var(--dim);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+.tbl td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+  font-size: 12px;
+}
+
+.tbl tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.tbl tbody tr.selected td {
+  background: rgba(34, 213, 237, 0.07) !important;
+}
+
+.tbl td.mono,
+.text-mono {
+  font-family: "DM Mono", monospace;
+}
+
+.tbl td.td-sm {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.tbl td.td-symbol {
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tbl td.td-chk,
+.tbl th.td-chk {
+  width: 32px;
+  padding-left: 12px;
+  padding-right: 4px;
+}
+
+.tbl td.td-actions {
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:hover {
+  color: var(--accent);
+}
+
+.sort-ind {
+  margin-left: 3px;
+  color: var(--accent);
+  font-size: 9px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge.win {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.badge.loss {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.badge.long,
+.badge.open {
+  color: var(--green);
+  background: rgba(69, 224, 123, 0.16);
+  border: 1px solid rgba(69, 224, 123, 0.20);
+}
+
+.badge.short {
+  color: var(--red);
+  background: rgba(255, 93, 104, 0.16);
+  border: 1px solid rgba(255, 93, 104, 0.20);
+}
+
+.badge.incomplete {
+  color: var(--yellow);
+  background: var(--yellow-soft);
+  border: 1px solid rgba(255, 206, 103, 0.18);
+}
+
+tr.trade-row-incomplete {
+  background: rgba(255, 206, 103, 0.03);
+}
+
+.incomplete-alert {
+  cursor: default;
+  margin-bottom: 14px;
+}
+
+.btn-link-warn {
+  background: none;
+  border: none;
+  color: var(--yellow);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+

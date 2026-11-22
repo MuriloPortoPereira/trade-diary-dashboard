@@ -1,0 +1,3 @@
+# Preserve original line endings of migrated static HTML and CSS assets.
+index.html -text whitespace=cr-at-eol
+src/**/*.css -text whitespace=-blank-at-eof,cr-at-eol

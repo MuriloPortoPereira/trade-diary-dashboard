@@ -1,0 +1,31 @@
+.err-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.err-chip:hover {
+  color: var(--red);
+  border-color: rgba(255, 93, 104, 0.18);
+}
+
+.err-chip.on {
+  color: var(--red);
+  border-color: rgba(255, 93, 104, 0.18);
+  background: rgba(255, 93, 104, 0.10);
+}
+
+.error-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+

@@ -5,13 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mukas Hub - Diário Profissional</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="src/styles/app-shell.css">
+<link rel="stylesheet" href="src/styles/page-layout.css">
+<link rel="stylesheet" href="src/styles/analysis-panels.css">
+<link rel="stylesheet" href="src/modules/accounts/presentation/account-risk-and-cashflow.css">
+<link rel="stylesheet" href="src/modules/analytics/presentation/strategy-comparison.css">
+<link rel="stylesheet" href="src/modules/calendar/presentation/calendar-grids.css">
+<link rel="stylesheet" href="src/modules/trades/presentation/trade-tables.css">
+<link rel="stylesheet" href="src/styles/workspace-controls.css">
+<link rel="stylesheet" href="src/modules/routine/presentation/premarket.css">
+<link rel="stylesheet" href="src/modules/trades/presentation/error-chips.css">
+<link rel="stylesheet" href="src/modules/data-transfer/presentation/data-transfer.css">
+<link rel="stylesheet" href="src/styles/workspace-integration.css">
+<link rel="stylesheet" href="src/modules/study-hub/presentation/study-hub-native.css">
+<link rel="stylesheet" href="src/styles/workspace-summaries.css">
+<link rel="stylesheet" href="src/modules/documents/presentation/documents.css">
+<link rel="stylesheet" href="src/modules/accounts/presentation/account-overview.css">
+<link rel="stylesheet" href="src/modules/partners/presentation/partners.css">
+<link rel="stylesheet" href="src/styles/tag-cloud.css">
+<link rel="stylesheet" href="src/styles/page-motion.css">
+<link rel="stylesheet" href="src/styles/responsive.css">
+<link rel="stylesheet" href="src/modules/study-hub/presentation/legacy-controls.css">
+<link rel="stylesheet" href="src/modules/study-hub/presentation/legacy-panels.css">
 </head>
 <body>
 
 <div id="layout">
 
-<!-- ── TOPBAR ── -->
+<!-- ── BARRA SUPERIOR ── -->
 <header id="topbar">
   <div class="topbar-left">
     <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
@@ -60,7 +81,7 @@
 </header>
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-<!-- ── SIDEBAR ── -->
+<!-- ── BARRA LATERAL ── -->
 <nav id="sidebar">
   <div class="sidebar-section">
     <div class="nav-item active" onclick="showPage('dashboard')">
@@ -145,10 +166,10 @@
   </div>
 </nav>
 
-<!-- ── MAIN ── -->
+<!-- ── CONTEÚDO PRINCIPAL ── -->
 <main id="main">
 
-<!-- ════ DASHBOARD ════ -->
+<!-- ════ PAINEL ════ -->
 <div class="page active" id="page-dashboard">
   <div class="page-header app-page-header">
     <div>
@@ -245,7 +266,7 @@
   </div>
 </div>
 
-<!-- ════ LOG ════ -->
+<!-- ════ HISTÓRICO ════ -->
 <div class="page" id="page-log">
   <div class="page-header app-page-header">
     <div>
@@ -328,7 +349,7 @@
   <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
     <div><div class="page-kicker" data-i18n="cal.kicker">Diário</div><div class="page-title" data-i18n="cal.title">Diário de Performance</div><div class="page-sub" data-i18n="cal.sub">Sua evolução operacional por sessão, semana e mês</div></div>
     <div class="calendar-toolbar flex gap-8 ml-auto" style="flex-shrink:0;flex-wrap:wrap;align-items:center">
-      <!-- Date picker rápido -->
+      <!-- Seletor rápido de data -->
       <div class="calendar-month-control" style="display:flex;gap:4px;align-items:center;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px 10px">
         <input type="month" id="calMonthPicker" class="calendar-month-input" onchange="calGoToMonth(this.value)" style="background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Mono',monospace">
       </div>
@@ -359,7 +380,7 @@
   </div>
 </div>
 
-<!-- ════ STATS ════ -->
+<!-- ════ ESTATÍSTICAS ════ -->
 <div class="page" id="page-stats">
   <div class="page-header flex gap-12" style="align-items:flex-start;flex-wrap:wrap">
     <div><div class="page-kicker" data-i18n="stats.kicker">Insights</div><div class="page-title" data-i18n="stats.title">Análises</div><div class="page-sub" data-i18n="stats.sub">Leitura completa da performance, consistência e contexto operacional</div></div>
@@ -389,7 +410,7 @@
     <button class="tab-btn" onclick="switchStatTab('simulation',this)" data-i18n="stats.tab.simulation">Simulação</button>
   </div>
 
-  <!-- OVERVIEW -->
+  <!-- VISÃO GERAL -->
   <div id="statTab-overview">
     <div class="metrics-row" id="statsMetrics"></div>
     <div class="chart-card">
@@ -423,7 +444,7 @@
     </div>
   </div>
 
-  <!-- BY STRATEGY -->
+  <!-- POR ESTRATÉGIA -->
   <div id="statTab-strategy" style="display:none">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="chart-card"><div class="chart-title" data-i18n="stats.stratPnl">P/L por Estratégia</div><div class="chart-wrap" style="height:180px"><canvas id="stStratPnlChart"></canvas></div></div>
@@ -489,7 +510,7 @@
     </div>
   </div>
 
-  <!-- BY TIME -->
+  <!-- POR HORÁRIO -->
   <div id="statTab-time" style="display:none">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="chart-card"><div class="chart-title" data-i18n="stats.monthPnl">P/L por Mês</div><div class="chart-wrap" style="height:180px"><canvas id="stMonthPnlChart"></canvas></div></div>
@@ -507,7 +528,7 @@
     </div>
   </div>
 
-  <!-- SIMULATION -->
+  <!-- SIMULAÇÃO -->
   <div id="statTab-simulation" style="display:none">
     <div class="setup-card">
       <div class="setup-card-title" data-i18n="stats.monteCarlo">Simulação Monte Carlo — Próximas N Trades</div>
@@ -562,7 +583,7 @@
     </div>
   </div>
 
-  <!-- PSICOLÓGICO NAS STATS -->
+  <!-- PSICOLÓGICO NAS ESTATÍSTICAS -->
   <div id="statTab-psych" style="display:none">
     <div class="metrics-row" id="statPsychCards"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -587,7 +608,7 @@
   </div>
 </div>
 
-<!-- ════ PRÉ-MARKET ════ -->
+<!-- ════ PRÉ-MERCADO ════ -->
 <div class="page" id="page-premarket">
   <div class="page-header flex gap-12" style="align-items:flex-start">
     <div>
@@ -755,7 +776,7 @@
   </div>
 </div>
 
-<!-- ════ IMPORT/EXPORT ════ -->
+<!-- ════ IMPORTAÇÃO/EXPORTAÇÃO ════ -->
 <div class="page" id="page-import">
   <div class="page-header">
     <div class="page-kicker" data-i18n="import.kicker">Sistema</div>
@@ -906,7 +927,7 @@
   </div>
 </div>
 
-<!-- ════ SETUP ════ -->
+<!-- ════ CONFIGURAÇÃO ════ -->
 <div class="page" id="page-setup">
   <div class="page-header flex gap-12" style="align-items:flex-start">
     <div><div class="page-kicker" data-i18n="setup.kicker">Risco</div><div class="page-title" data-i18n="setup.title">Conta e Setup</div><div class="page-sub" data-i18n="setup.sub">Parâmetros da conta, limites de risco e biblioteca operacional</div></div>
@@ -1101,7 +1122,7 @@
 </main>
 </div>
 
-<!-- ════ MODAL: NOVO TRADE ════ -->
+<!-- ════ MODAL: NOVA OPERAÇÃO ════ -->
 <div class="modal-overlay" id="tradeModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -1273,7 +1294,7 @@
       </div>
       <div id="errorChips" class="error-chip-grid"></div>
 
-      <!-- Breakeven -->
+      <!-- Resultado neutro -->
       <div class="form-grid fg-3" style="margin-bottom:10px">
         <div class="field-group">
           <label data-i18n="modal.trade.result">Resultado</label>
@@ -1300,7 +1321,7 @@
         <label data-i18n="modal.trade.remarks">Observações / Análise</label>
         <textarea id="t-remarks" data-i18n-ph="modal.trade.remarksPh" placeholder="Contexto, setup, lições aprendidas, análise pós-trade..."></textarea>
       </div>
-      <!-- Upload de imagens -->
+      <!-- Envio de imagens -->
       <div style="margin-top:10px">
         <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📎 Imagens do Trade</div>
         <input type="file" id="t-images" accept="image/*,image/jpeg,image/png,image/gif,image/webp" multiple onchange="previewTradeImages(event)" style="display:none">
@@ -1430,6 +1451,53 @@
   </div>
 </div>
 
+<script src="src/modules/simulation/domain/simulation-calculations.js"></script>
+<script src="src/modules/trades/domain/trade-rules.js"></script>
+<script src="src/modules/analytics/domain/calculate-trade-metrics.js"></script>
+<script src="src/modules/accounts/domain/account-risk-calculations.js"></script>
+<script src="src/modules/accounts/application/account-risk-workflows.js"></script>
+<script src="src/modules/study-hub/domain/study-hub-calculations.js"></script>
+<script src="src/modules/study-hub/application/study-hub-state.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-page.js"></script>
+<script src="src/modules/data-transfer/infrastructure/trade-file-formats.js"></script>
+<script src="src/modules/data-transfer/infrastructure/browser-file-io.js"></script>
+<script src="src/modules/data-transfer/domain/import-trade-rules.js"></script>
+<script src="src/modules/data-transfer/application/transfer-workflows.js"></script>
+<script src="src/modules/data-transfer/presentation/data-transfer-page.js"></script>
+<script src="src/modules/preferences/presentation/translation-catalog.js"></script>
+<script src="src/modules/preferences/presentation/locales/pt-BR.js"></script>
+<script src="src/modules/preferences/presentation/locales/en-US.js"></script>
+<script src="src/modules/preferences/presentation/language-selector.js"></script>
+<script src="src/app/presentation/app-workspace.js"></script>
+<script src="src/shared/presentation/analysis-widgets.js"></script>
+<script src="src/modules/trades/application/trade-workflows.js"></script>
+<script src="src/modules/trades/presentation/trade-form.js"></script>
+<script src="src/modules/trades/presentation/trade-log.js"></script>
+<script src="src/modules/psychology/presentation/psychology-page.js"></script>
+<script src="src/modules/simulation/presentation/simulation-panel.js"></script>
+<script src="src/modules/calendar/presentation/calendar-page.js"></script>
+<script src="src/modules/accounts/presentation/accounts-workspace.js"></script>
+<script src="src/modules/analytics/presentation/analytics-workspace.js"></script>
+<script src="src/modules/analytics/application/strategy-analysis.js"></script>
+<script src="src/modules/calendar/presentation/dashboard-calendar.js"></script>
+<script src="src/modules/notifications/presentation/notifications-page.js"></script>
+<script src="src/modules/routine/presentation/premarket-page.js"></script>
+<script src="src/modules/documents/presentation/documents-page.js"></script>
+<script src="src/modules/partners/presentation/partners-page.js"></script>
+<script src="src/modules/profile/presentation/profile-page.js"></script>
+<script src="src/app/infrastructure/app-state-storage.js"></script>
+<script src="src/app/application/load-app-state.js"></script>
+<script src="src/modules/preferences/infrastructure/exchange-rate.js"></script>
+<script src="src/modules/trades/application/demo-data.js"></script>
+<script src="src/app/application/bootstrap-app.js"></script>
 <script src="app.js"></script>
+<script src="src/modules/study-hub/infrastructure/study-hub-storage.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-propfirm.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-plan.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-tradesim.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-mental.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-template.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-legacy-runtime.js"></script>
+<script src="src/modules/study-hub/presentation/study-hub-intraday.js"></script>
 </body>
 </html>

@@ -1,0 +1,573 @@
+function formatDocDate(date){
+  return date ? new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) : 'Sem data';
+}
+
+function formatDocumentSelection(type){
+  const editor=document.getElementById('docEditorBody');
+  if(!editor||editor.disabled)return;
+  const start=editor.selectionStart??editor.value.length;
+  const end=editor.selectionEnd??editor.value.length;
+  const selected=editor.value.slice(start,end);
+  const fallback={
+    bold:'texto em negrito',
+    italic:'texto em italico',
+    underline:'texto sublinhado',
+    h1:'Titulo',
+    h2:'Subtitulo',
+    list:'item da lista',
+    quote:'citacao',
+  }[type]||'texto';
+  const text=selected||fallback;
+  let replacement=text;
+  let caretStart=start;
+  let caretEnd=start+replacement.length;
+  const prefixLines=prefix=>text.split(/\r?\n/).map(line=>`${prefix}${line}`).join('\n');
+
+  if(type==='bold'){
+    replacement=`**${text}**`;
+    caretStart=start+2;
+    caretEnd=caretStart+text.length;
+  } else if(type==='italic'){
+    replacement=`_${text}_`;
+    caretStart=start+1;
+    caretEnd=caretStart+text.length;
+  } else if(type==='underline'){
+    replacement=`<u>${text}</u>`;
+    caretStart=start+3;
+    caretEnd=caretStart+text.length;
+  } else if(type==='h1'){
+    replacement=prefixLines('# ');
+  } else if(type==='h2'){
+    replacement=prefixLines('## ');
+  } else if(type==='list'){
+    replacement=prefixLines('- ');
+  } else if(type==='quote'){
+    replacement=prefixLines('> ');
+  }
+
+  editor.setRangeText(replacement,start,end,'end');
+  if(!selected&&['bold','italic','underline'].includes(type))editor.setSelectionRange(caretStart,caretEnd);
+  editor.focus();
+}
+
+function getDocumentEntryImages(entry){
+  return normalizeDocImages(entry?.images);
+}
+
+function renderDocumentMedia(entry){
+  const images=getDocumentEntryImages(entry);
+  if(!images.length){
+    return `<div class="doc-media-empty">${entry?.kind==='trade'?'Nenhuma imagem salva neste trade.':'Sem mídia vinculada a este documento.'}</div>`;
+  }
+  return `<div class="doc-media-grid">${images.map((img,i)=>`
+    <div class="doc-media-item">
+      <img src="${img.dataUrl}" alt="${escapeHtml(img.name||'Mídia vinculada')}" class="doc-media-image">
+      <button type="button" class="doc-media-remove" onclick="removeDocumentImage(${i})" title="Remover imagem">x</button>
+    </div>`).join('')}</div>`;
+}
+
+function renderDocFolderIcon(type){
+  const icons={
+    plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    calendar:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v4M17 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/></svg>',
+    file:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h6l4 4v14H6V3h2Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
+    folder:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 2h9v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>',
+  };
+  return `<span class="doc-folder-icon">${icons[type]||icons.file}</span>`;
+}
+
+function setDocumentEntryImages(entry,images){
+  if(!entry)return;
+  const next=normalizeDocImages(images);
+  const now=new Date().toISOString();
+  if(entry.kind==='trade'){
+    const idx=trades.findIndex(trade=>trade.id===entry.tradeId);
+    if(idx>=0){
+      trades[idx].images=next;
+      trades[idx].updatedAt=now;
+    }
+    return;
+  }
+  if(entry.kind==='daily'){
+    if(!preMarketData[entry.date])preMarketData[entry.date]={};
+    preMarketData[entry.date].images=next;
+    preMarketData[entry.date].savedAt=now;
+    return;
+  }
+  if(entry.kind==='general'){
+    const idx=(config.generalDocs||[]).findIndex(doc=>doc.id===entry.docId);
+    if(idx>=0){
+      config.generalDocs[idx].images=next;
+      config.generalDocs[idx].updatedAt=now;
+    }
+  }
+}
+
+function triggerDocumentImageUpload(){
+  const entry=getCurrentDocumentEntry();
+  if(!entry){showAppNotice('Selecione um documento','Selecione uma nota antes de adicionar imagem.');return;}
+  document.getElementById('docImageInput')?.click();
+}
+
+function addDocumentImages(e){
+  const entry=getCurrentDocumentEntry();
+  const files=Array.from(e.target.files||[]);
+  if(!entry||!files.length)return;
+  const target={...entry};
+  files.forEach(file=>{
+    if(!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const images=[...getDocumentEntryImages(target),{name:file.name,dataUrl:ev.target.result}];
+      target.images=images;
+      setDocumentEntryImages(target,images);
+      save();
+      renderDocumentsPage();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function removeDocumentImage(index){
+  const entry=getCurrentDocumentEntry();
+  if(!entry)return;
+  const images=getDocumentEntryImages(entry);
+  images.splice(index,1);
+  setDocumentEntryImages(entry,images);
+  save();
+  renderDocumentsPage();
+}
+
+function getDocumentEntries(folderId=activeDocFolder){
+  if(folderId==='tradeNotes'){
+    return getOrderedTrades(getAccountTrades(activeAccountId))
+      .filter(trade=>(trade.remarks||'').trim())
+      .map(trade=>{
+        const images=normalizeDocImages(trade.images);
+        const pnlStr=trade.pnl!=null?((trade.pnl>=0?'+':'')+fR(trade.pnl)):'—';
+        const rStr=(trade.r!=null&&Number.isFinite(trade.r))?((trade.r>=0?'+':'')+trade.r.toFixed(2)+'R'):'';
+        return {
+          id:`trade:${trade.id}`,
+          kind:'trade',
+          tradeId:trade.id,
+          status:trade.status||'OPEN',
+          pnl:trade.pnl,
+          title:`${trade.symbol||'Trade'} · ${formatDocDate(trade.date)}`,
+          meta:`${trade.strategy||'Sem estratégia'}${rStr?' · '+rStr:''} · ${pnlStr}`,
+          body:trade.remarks||'',
+          images,
+          media:images[0]?.dataUrl||null,
+          updatedAt:trade.updatedAt||trade.createdAt||'',
+        };
+      });
+  }
+  if(folderId==='dailyNotes'){
+    return Object.entries(preMarketData)
+      .filter(([,entry])=>entry?.docCreatedAt||(entry?.notes||'').trim())
+      .sort((a,b)=>b[0].localeCompare(a[0]))
+      .map(([date,entry])=>{
+        const images=normalizeDocImages(entry.images);
+        const parts=[];
+        if(entry.mood)parts.push(`Humor ${entry.mood}/5`);
+        if(entry.energy)parts.push(`Energia ${entry.energy}/5`);
+        if(entry.stress)parts.push(`Estresse ${entry.stress}/5`);
+        return {
+          id:`daily:${date}`,
+          kind:'daily',
+          date,
+          title:`${formatDocDate(date)}`,
+          meta:parts.length?parts.join(' · '):'Nota do dia',
+          body:entry.notes||'',
+          images,
+          media:images[0]?.dataUrl||null,
+          updatedAt:entry.savedAt||'',
+        };
+      });
+  }
+  return (config.generalDocs||[])
+    .map(doc=>{
+      const images=normalizeDocImages(doc.images);
+      const wordCount=(doc.content||'').trim().split(/\s+/).filter(Boolean).length;
+      const updatedStr=doc.updatedAt?new Date(doc.updatedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'—';
+      return {
+        id:`general:${doc.id}`,
+        kind:'general',
+        docId:doc.id,
+        title:doc.title||'Documento geral',
+        meta:`${wordCount} ${wordCount===1?'palavra':'palavras'} · atualizado ${updatedStr}`,
+        hasContent:wordCount>0,
+        body:doc.content||'',
+        images,
+        media:images[0]?.dataUrl||null,
+        updatedAt:doc.updatedAt||'',
+      };
+    })
+    .sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+}
+
+function getDocumentFolders(){
+  return [
+    {id:'tradeNotes',  label:'Trades',      desc:'Observações registradas nos trades',  icon:'file',     count:getDocumentEntries('tradeNotes').length},
+    {id:'dailyNotes',  label:'Diário',       desc:'Notas do dia criadas na rotina',      icon:'calendar', count:getDocumentEntries('dailyNotes').length},
+    {id:'generalNotes',label:'Documentos',   desc:'Playbook, mapa de risco e anotações', icon:'folder',   count:getDocumentEntries('generalNotes').length},
+  ];
+}
+
+function selectDocumentFolder(folderId){
+  activeDocFolder=folderId;
+  activeDocId=null;
+  renderDocumentsPage();
+}
+
+function selectDocumentEntry(entryId){
+  activeDocId=entryId;
+  renderDocumentsPage();
+}
+
+function getCurrentDocumentEntry(){
+  return getDocumentEntries(activeDocFolder).find(entry=>entry.id===activeDocId)||null;
+}
+
+function openDocumentTrade(){
+  const entry=getCurrentDocumentEntry();
+  if(entry?.kind!=='trade'||!entry.tradeId)return;
+  openModal('tradeModal',entry.tradeId);
+}
+
+function createDefaultGeneralDocuments(){
+  // Textos iniciais usados quando a lista de documentos salvos é inválida.
+  return [
+    {
+      id:'playbook',
+      title:'Playbook operacional',
+      content:[
+        '# Playbook Operacional',
+        '',
+        '## Regras de entrada',
+        '- Aguardar fechamento do candle de confirmação',
+        '- Setup deve estar alinhado com o contexto da sessão',
+        '- Não operar contra a tendência principal sem confluência clara',
+        '',
+        '## Regras de saída',
+        '- Respeitar o stop definido antes da entrada',
+        '- Parcial no primeiro alvo (1R); stop no breakeven após 1.5R',
+        '- Não mover stop contra a posição',
+        '',
+        '## Gestão de risco',
+        '- Máximo 1-2% de risco por trade',
+        '- Parar operações ao atingir o stop diário',
+        '- Revisar semana ao atingir 50% do stop semanal',
+        '',
+        '## Revisão pós-trade',
+        '- Registrar emoção, contexto e lição em cada operação',
+        '- Revisar trades da semana todo sábado',
+        '- Atualizar este playbook mensalmente',
+      ].join('\n'),
+      images:[],
+      updatedAt:new Date().toISOString(),
+    },
+    {
+      id:'risk-map',
+      title:'Mapa de risco',
+      content:[
+        '# Mapa de Risco',
+        '',
+        '## Limites por sessão',
+        '- **Stop diário:** 2% do capital — parar imediatamente ao atingir',
+        '- **Meta diária:** 1% do capital — reduzir tamanho após atingir',
+        '',
+        '## Limites semanais',
+        '- **Stop semanal:** 5% do capital',
+        '- **Meta semanal:** definida na rotina de pré-mercado',
+        '',
+        '## Limites mensais',
+        '- **Stop mensal:** 8% do capital',
+        '- **Drawdown máximo:** 10% — parar e revisar o processo',
+        '',
+        '## Regras de escalonamento',
+        '- Aumentar lote apenas após 20 trades consecutivos dentro dos limites',
+        '- Reduzir lote após 3 stops consecutivos',
+        '- Nunca dobrar posição para recuperar perda',
+      ].join('\n'),
+      images:[],
+      updatedAt:new Date().toISOString(),
+    },
+  ];
+}
+
+function createGeneralDocument(){
+  const id=uid();
+  if(!Array.isArray(config.generalDocs))config.generalDocs=[];
+  config.generalDocs.unshift({
+    id,
+    title:'Nova anotação geral',
+    content:'',
+    images:[],
+    updatedAt:new Date().toISOString(),
+  });
+  activeDocFolder='generalNotes';
+  activeDocId=`general:${id}`;
+  save();
+  renderDocumentsPage();
+}
+
+function createDailyDocument(){
+  const date=new Date().toISOString().split('T')[0];
+  const now=new Date().toISOString();
+  if(!preMarketData[date])preMarketData[date]={};
+  preMarketData[date]={
+    ...preMarketData[date],
+    notes:preMarketData[date].notes||'',
+    docCreatedAt:preMarketData[date].docCreatedAt||now,
+    savedAt:now,
+  };
+  activeDocFolder='dailyNotes';
+  activeDocId=`daily:${date}`;
+  save();
+  renderDocumentsPage();
+}
+
+function createDocumentFromActiveFolder(){
+  if(activeDocFolder==='dailyNotes'){createDailyDocument();return;}
+  if(activeDocFolder==='tradeNotes'){
+    showAppNotice('Notas de trades','Notas de trades são criadas ao preencher o campo "Observações / Análise" dentro de um trade. Abra ou registre um trade para começar.');
+    return;
+  }
+  createGeneralDocument();
+}
+
+function getDocumentCreateLabel(){
+  return ({
+    dailyNotes:'Nova nota do dia',
+    tradeNotes:'Como criar',
+    generalNotes:'Nova anotação',
+  })[activeDocFolder]||'Nova anotação';
+}
+
+function getDocumentCreateDesc(){
+  return ({
+    dailyNotes:'Abre nota do dia atual',
+    tradeNotes:'Notas vêm do campo de observações do trade',
+    generalNotes:'Cria documento editável',
+  })[activeDocFolder]||'Cria documento editável';
+}
+
+function saveCurrentDocument(){
+  const entry=getCurrentDocumentEntry();
+  const titleEl=document.getElementById('docEditorTitle');
+  const bodyEl=document.getElementById('docEditorBody');
+  if(!entry||!titleEl||!bodyEl){showAppNotice('Selecione um documento','Selecione um documento antes de salvar.');return;}
+  const body=bodyEl.value||'';
+  const title=titleEl.value||'Documento';
+  const now=new Date().toISOString();
+
+  // Notas de operações e do dia são salvas na origem; documentos gerais ficam na configuração.
+  if(entry.kind==='trade'){
+    const idx=trades.findIndex(trade=>trade.id===entry.tradeId);
+    if(idx>=0){
+      trades[idx].remarks=body;
+      trades[idx].updatedAt=now;
+    }
+  } else if(entry.kind==='daily'){
+    if(!preMarketData[entry.date])preMarketData[entry.date]={};
+    preMarketData[entry.date].notes=body;
+    preMarketData[entry.date].docCreatedAt=preMarketData[entry.date].docCreatedAt||now;
+    preMarketData[entry.date].savedAt=now;
+  } else if(entry.kind==='general'){
+    const idx=(config.generalDocs||[]).findIndex(doc=>doc.id===entry.docId);
+    if(idx>=0){
+      config.generalDocs[idx].title=title;
+      config.generalDocs[idx].content=body;
+      config.generalDocs[idx].updatedAt=now;
+    }
+  }
+
+  save();
+  refreshAll();
+  showAppNotice('Documento salvo','✓ Documento salvo!');
+}
+
+function deleteDocumentEntry(entry){
+  if(!entry)return false;
+  const now=new Date().toISOString();
+  if(entry.kind==='trade'){
+    const idx=trades.findIndex(trade=>trade.id===entry.tradeId);
+    if(idx<0)return false;
+    trades[idx].remarks='';
+    trades[idx].images=[];
+    trades[idx].updatedAt=now;
+  } else if(entry.kind==='daily'){
+    if(!preMarketData[entry.date])return false;
+    preMarketData[entry.date]={
+      ...preMarketData[entry.date],
+      notes:'',
+      images:[],
+      savedAt:now,
+    };
+    delete preMarketData[entry.date].docCreatedAt;
+  } else if(entry.kind==='general'){
+    const before=(config.generalDocs||[]).length;
+    config.generalDocs=(config.generalDocs||[]).filter(doc=>doc.id!==entry.docId);
+    if(config.generalDocs.length===before)return false;
+  } else {
+    return false;
+  }
+  activeDocId=null;
+  return true;
+}
+
+function deleteCurrentDocument(){
+  const entry=getCurrentDocumentEntry();
+  if(!entry){showAppNotice('Excluir documento','Selecione uma anotação antes de excluir.');return;}
+  const label=entry.kind==='trade'
+    ? 'Limpar a anotação deste trade? O trade será mantido.'
+    : entry.kind==='daily'
+      ? 'Excluir esta anotação diária? A rotina do dia será mantida.'
+      : `Excluir "${entry.title}"?`;
+  showAppConfirm('Excluir anotação',label,()=>{
+    if(deleteDocumentEntry(entry)){
+      save();
+      renderDocumentsPage();
+      showAppNotice('Anotação excluída','Anotação removida com sucesso.');
+    }
+  },{danger:true,confirmText:'Excluir'});
+}
+
+function renderDocumentsPage(){
+  const folders=getDocumentFolders();
+  if(!folders.some(folder=>folder.id===activeDocFolder))activeDocFolder='generalNotes';
+  const entries=getDocumentEntries(activeDocFolder);
+  if(!entries.some(entry=>entry.id===activeDocId))activeDocId=entries[0]?.id||null;
+
+  const folderEl=document.getElementById('docFolders');
+  if(folderEl){
+    folderEl.innerHTML=`
+      <div class="doc-folder-section-label">Pastas</div>
+      ${folders.map(folder=>`
+      <button class="doc-folder ${folder.id===activeDocFolder?'active':''}" onclick="selectDocumentFolder('${folder.id}')">
+        ${renderDocFolderIcon(folder.icon)}
+        <span class="doc-folder-copy">
+          <span>${escapeHtml(folder.label)}</span>
+          <small>${escapeHtml(folder.desc)}</small>
+        </span>
+        <strong>${folder.count}</strong>
+      </button>`).join('')}
+      <div class="doc-folder-separator"></div>
+      <button class="doc-folder doc-folder-create" onclick="createDocumentFromActiveFolder()">
+        ${renderDocFolderIcon('plus')}
+        <span class="doc-folder-copy">
+          <span>${getDocumentCreateLabel()}</span>
+          <small>${getDocumentCreateDesc()}</small>
+        </span>
+      </button>`;
+  }
+
+  const createBtn=document.getElementById('docCreateBtn');
+  if(createBtn){
+    createBtn.textContent=`+ ${getDocumentCreateLabel()}`;
+    createBtn.style.display=activeDocFolder==='tradeNotes'?'none':'inline-flex';
+  }
+  const deleteBtn=document.getElementById('docDeleteBtn');
+  if(deleteBtn)deleteBtn.style.display=getCurrentDocumentEntry()&&activeDocFolder!=='tradeNotes'?'inline-flex':'none';
+
+  const activeFolder=folders.find(f=>f.id===activeDocFolder);
+  const titleEl=document.getElementById('docListTitle');
+  const countEl=document.getElementById('docListCount');
+  if(titleEl)titleEl.textContent=activeFolder?.label||'Notas';
+  if(countEl)countEl.textContent=`${entries.length} ${entries.length===1?'item':'itens'}`;
+
+  const entriesEl=document.getElementById('docEntries');
+  if(entriesEl){
+    const emptyText={
+      tradeNotes:'Nenhuma observação registrada ainda. Abra um trade e preencha o campo "Observações / Análise" — ele aparece aqui automaticamente.',
+      dailyNotes:'Nenhuma nota do dia ainda. Clique em "Nova nota do dia" para criar.',
+      generalNotes:'Nenhum documento ainda. Clique em "Nova anotação" para começar.',
+    }[activeDocFolder]||'Nenhum documento encontrado.';
+    entriesEl.innerHTML=entries.length?entries.map(entry=>{
+      const statusBadge=entry.kind==='trade'&&entry.status
+        ?`<span class="badge ${entry.status.toLowerCase()} doc-entry-badge">${entry.status}</span>`
+        :'';
+      const kindIcon={
+        trade:'◈',
+        daily:'◷',
+        general:'◻',
+      }[entry.kind]||'';
+      const preview=entry.body?(entry.body.replace(/[#*`>\-]/g,'').trim().slice(0,60)+'…'):'';
+      return `<button class="doc-entry ${entry.id===activeDocId?'active':''}${entry.kind==='general'&&!entry.hasContent?' doc-entry-empty':''}" onclick="selectDocumentEntry('${entry.id}')">
+        <span class="doc-entry-top">
+          <span class="doc-entry-kind">${kindIcon}</span>
+          <span class="doc-entry-title">${escapeHtml(entry.title)}</span>
+          ${statusBadge}
+        </span>
+        <span class="doc-entry-meta">${escapeHtml(entry.meta)}</span>
+        ${preview?`<span class="doc-entry-preview">${escapeHtml(preview)}</span>`:''}
+      </button>`;
+    }).join(''):`<div class="doc-empty">${emptyText}</div>`;
+  }
+
+  const current=getCurrentDocumentEntry();
+  const heading=document.getElementById('docEditorHeading');
+  const meta=document.getElementById('docEditorMeta');
+  const editorTitle=document.getElementById('docEditorTitle');
+  const editorBody=document.getElementById('docEditorBody');
+  const media=document.getElementById('docMedia');
+  const tradeBtn=document.getElementById('docOpenTradeBtn');
+  if(!heading||!meta||!editorTitle||!editorBody||!media||!tradeBtn)return;
+  if(!current){
+    const emptyHeadings={
+      tradeNotes:'Nenhum trade selecionado',
+      dailyNotes:'Nenhuma nota do dia selecionada',
+      generalNotes:'Nenhum documento selecionado',
+    };
+    const emptyHints={
+      tradeNotes:'Selecione um trade ao lado ou abra um trade e preencha o campo Observações — ele aparece aqui automaticamente.',
+      dailyNotes:'Selecione uma data ao lado ou clique em "Nova nota do dia" para criar.',
+      generalNotes:'Selecione um documento ao lado ou clique em "Nova anotação" para criar.',
+    };
+    heading.textContent=emptyHeadings[activeDocFolder]||'Nenhum documento selecionado';
+    meta.textContent=emptyHints[activeDocFolder]||'Selecione um item ao lado para editar.';
+    editorTitle.value='';
+    editorBody.value='';
+    editorTitle.disabled=true;
+    editorBody.disabled=true;
+    tradeBtn.style.display='none';
+    media.innerHTML='<div class="doc-media-empty">Nenhuma mídia vinculada.</div>';
+    return;
+  }
+
+  heading.textContent=current.title;
+  meta.textContent=current.meta;
+  editorTitle.value=current.title;
+  editorBody.value=current.body||'';
+  editorTitle.disabled=current.kind!=='general';
+  editorBody.disabled=false;
+  tradeBtn.style.display=current.kind==='trade'?'inline-flex':'none';
+  media.innerHTML=renderDocumentMedia(current);
+
+  // Painel de contexto da operação vinculada
+  const tradeCtx=document.getElementById('docTradeContext');
+  if(tradeCtx){
+    if(current.kind==='trade'){
+      const tr=getAccountTrades(activeAccountId).find(t=>t.id===current.tradeId);
+      if(tr){
+        const pnlStr=tr.pnl!=null?((tr.pnl>=0?'+':'')+fR(tr.pnl)):'—';
+        const rStr=(tr.r!=null&&Number.isFinite(tr.r))?((tr.r>=0?'+':'')+tr.r.toFixed(2)+'R'):'—';
+        tradeCtx.style.display='flex';
+        tradeCtx.innerHTML=`
+          <span class="badge ${(tr.status||'open').toLowerCase()}">${tr.status||'OPEN'}</span>
+          <span class="doc-ctx-item"><span class="doc-ctx-label">Símbolo</span><strong>${escapeHtml(tr.symbol||'—')}</strong></span>
+          <span class="doc-ctx-sep">·</span>
+          <span class="doc-ctx-item"><span class="doc-ctx-label">Direção</span><strong>${tr.direction||'—'}</strong></span>
+          <span class="doc-ctx-sep">·</span>
+          <span class="doc-ctx-item"><span class="doc-ctx-label">Entrada</span><strong class="mono">${tr.entry||'—'}</strong></span>
+          <span class="doc-ctx-sep">·</span>
+          <span class="doc-ctx-item"><span class="doc-ctx-label">R</span><strong class="mono ${tr.r>=0?'text-green':'text-red'}">${rStr}</strong></span>
+          <span class="doc-ctx-sep">·</span>
+          <span class="doc-ctx-item"><span class="doc-ctx-label">P/L</span><strong class="mono ${(tr.pnl||0)>=0?'text-green':'text-red'}">${pnlStr}</strong></span>
+          ${tr.strategy?`<span class="doc-ctx-sep">·</span><span class="doc-ctx-item"><span class="doc-ctx-label">Setup</span><strong>${escapeHtml(tr.strategy)}</strong></span>`:''}
+        `;
+      } else { tradeCtx.style.display='none'; }
+    } else { tradeCtx.style.display='none'; }
+  }
+}

@@ -1,0 +1,35 @@
+# Dependencies and build outputs
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.next/
+vendor/
+target/
+venv/
+.venv/
+generated/
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+*.bak
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local AI agent and tooling state
+.agents/
+.agent/
+.serena/
+.codex/
