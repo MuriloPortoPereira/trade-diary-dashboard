@@ -1,3 +1,24 @@
+/*
+ * Cenários visuais para os componentes compartilhados de resumo em páginas de workspace:
+ * cartões hero do Perfil, listas de status (`renderStatusList`), chips de resumo analítico
+ * (`renderAnalysisSummary`) e linhas amplas de estratégia (`renderStrategyRows`).
+ *
+ * Objetivo:
+ *   Validar cores por tom (`safe`, `warn`, `danger`, `info` e neutro), estados vazios,
+ *   tipografia, espaçamentos e quebras responsivas no breakpoint `720px`.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs` nos estados `workspace-summary-*`.
+ *
+ * Pontos-chave:
+ *   - Salva o `innerHTML` original dos contêineres modificados em `window.workspaceSummaryStyleRestore`
+ *     e restaura tudo entre casos via `resetWorkspaceSummaryStyleState`.
+ *   - Garante que dados de aplicação e `localStorage` permaneçam inalterados.
+ */
+
+/*
+ * Restaura o HTML original dos contêineres de resumo alterados pelo cenário anterior.
+ */
 function resetWorkspaceSummaryStyleState() {
   for (const saved of window.workspaceSummaryStyleRestore || []) {
     document.getElementById(saved.id).innerHTML = saved.html;
@@ -5,10 +26,15 @@ function resetWorkspaceSummaryStyleState() {
   delete window.workspaceSummaryStyleRestore;
 }
 
+/*
+ * Prepara e valida o componente de resumo de workspace correspondente a `name`
+ * (Perfil, Notificações, chips de Psicologia ou linhas de Strategy Hub).
+ */
 function prepareWorkspaceSummaryStyleScenario(name) {
   const fingerprint = () => JSON.stringify({accounts, trades, config, preMarketData, studyHubState,
     storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
   const before = fingerprint();
+  // Registra o HTML anterior para restauração limpa em `resetWorkspaceSummaryStyleState`.
   const remember = target => {
     window.workspaceSummaryStyleRestore = [{id: target.id, html: target.innerHTML}];
   };
@@ -16,6 +42,7 @@ function prepareWorkspaceSummaryStyleScenario(name) {
   const rgb = {safe: '69, 224, 123', warn: '255, 206, 103', danger: '255, 93, 104', info: '34, 213, 237'};
   let target;
   if (name === 'workspace-summary-profile') {
+    // Valida grade hero 2/1 colunas, cartões de métrica e lista compacta de mandatos no Perfil.
     target = document.querySelector('#profileHero .hero-metric-grid');
     const grid = getComputedStyle(target);
     const columns = matchMedia('(max-width:720px)').matches ? 1 : 2;
@@ -33,6 +60,7 @@ function prepareWorkspaceSummaryStyleScenario(name) {
         !value.fontFamily.includes('DM Mono')) throw new Error('Profile summary card changed');
     }
   } else if (name.startsWith('workspace-summary-status-')) {
+    // Valida `renderStatusList` no feed de Notificações com todos os tons ou estado vazio.
     target = document.getElementById('notificationFeed');
     remember(target);
     const empty = name.endsWith('-empty');
@@ -60,6 +88,7 @@ function prepareWorkspaceSummaryStyleScenario(name) {
       }
     }
   } else if (name.startsWith('workspace-summary-chips')) {
+    // Valida `renderAnalysisSummary` em Estatísticas/Psicologia (chips neutro + 4 tons ou vazio).
     target = document.getElementById('statDiscSummary');
     remember(target);
     const empty = name.endsWith('-empty');
@@ -81,6 +110,7 @@ function prepareWorkspaceSummaryStyleScenario(name) {
       }
     }
   } else if (name === 'workspace-summary-strategy') {
+    // Valida espaçamento vertical das linhas amplas de estratégia em `#strategyHubBoard`.
     target = document.getElementById('strategyHubBoard');
     remember(target);
     renderStrategyRows(target.id, [{name: 'Breakout', pnl: 20, n: 1, wr: 100, recovery: 2},

@@ -1,3 +1,24 @@
+/*
+ * Cenários visuais da página de Parceiros e Apoio (`#page-partners`).
+ *
+ * Objetivo:
+ *   Cobrir todas as combinações de apresentação do hub de parceiros: estado vazio,
+ *   populado (afiliados + QR code BTC), somente afiliados e somente QR code, verificando
+ *   responsividade em 720px/1420px e ocultação da grade legada `#partnersGrid`.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs` nos estados `partner-presentation-*`.
+ *
+ * Pontos-chave:
+ *   - Substitui `config.partnerHub` apenas em memória com imagem SVG inline determinística
+ *     e restaura `config` no `finally`.
+ *   - Aguarda `imageEl.decode()` quando há QR code para evitar screenshots incompletos.
+ */
+
+/*
+ * Configura `config.partnerHub` em memória conforme `name`, renderiza a página de Parceiros,
+ * valida cards de afiliados, estados vazios, pré-visualização de QR code e integridade dos dados.
+ */
 async function preparePartnerStyleScenario(name) {
   const fingerprint = () => JSON.stringify({accounts, trades, config, preMarketData, studyHubState,
     storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
@@ -5,8 +26,10 @@ async function preparePartnerStyleScenario(name) {
   const previousConfig = config;
   const affiliates = name === 'partner-presentation-populated' || name === 'partner-presentation-affiliate-only';
   const qr = name === 'partner-presentation-populated' || name === 'partner-presentation-qr-only';
+  // QR code sintético em SVG inline para renderização determinística sem rede.
   const image = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="148" height="148"><rect width="148" height="148" fill="#1a3c4b"/><path d="M20 20h108v108H20z" fill="#d6f3e7"/></svg>');
   try {
+    // Injeta configuração temporária do hub de parceiros e re-renderiza a página.
     config = {...config, partnerHub: {
       affiliates: affiliates ? [
         {id: 'visual-partner-a', name: 'Mesa parceira com nome longo para observar a quebra de linha',
@@ -18,6 +41,8 @@ async function preparePartnerStyleScenario(name) {
       coffeeUrl: 'https://example.test/support',
     }};
     renderPartnersPage();
+
+    // Valida estrutura geral da página e confirma que a grade legada `#partnersGrid` segue oculta.
     const root = document.getElementById('page-partners');
     const editor = document.getElementById('partnerAffiliatesEditor');
     const preview = document.getElementById('partnerBtcQrPreview');
@@ -30,6 +55,8 @@ async function preparePartnerStyleScenario(name) {
       style(document.getElementById('partnersGrid')).display !== 'none') {
       throw new Error('Partner page layout changed');
     }
+
+    // Valida cartões de edição de afiliados ou estado vazio correspondente.
     const cards = [...editor.querySelectorAll('.partner-affiliate-editor-card')];
     if (cards.length !== (affiliates ? name === 'partner-presentation-populated' ? 2 : 1 : 0)) {
       throw new Error('Partner affiliate card count changed');
@@ -49,6 +76,8 @@ async function preparePartnerStyleScenario(name) {
     } else if (style(editor.querySelector('.partner-empty-state')).display !== 'flex') {
       throw new Error('Partner affiliate empty state changed');
     }
+
+    // Valida pré-visualização do QR code (aguardando decodificação) ou estado vazio do QR.
     if (qr) {
       const shell = preview.querySelector('.partner-qr-shell');
       const imageEl = preview.querySelector('.partner-qr-image');

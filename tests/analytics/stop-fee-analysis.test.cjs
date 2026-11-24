@@ -1,14 +1,42 @@
+/*
+ * Objetivo:
+ *   Testar o componente de apresentacao de analise de stops e impacto de taxas
+ *   (`renderStopFeeAnalysis`), garantindo a ordem dos 4 cards de risco, tons de alerta
+ *   (`safe`, `warn`, `danger`), limiar inclusivo de 25% para taxas, tooltips e guard clause.
+ *
+ * Modulo da aplicacao testado:
+ *   - `src/modules/analytics/presentation/analytics-workspace.js` (funcao `renderStopFeeAnalysis`)
+ *   - Remocao da declaracao legada em `app.js` e inclusao em `index.html`
+ *
+ * Estrategia de isolamento:
+ *   - Executa `analytics-workspace.js` em `node:vm` fornecendo um stub parametrizavel de
+ *     `buildStopFeeAnalysis` (que tambem valida passagem exata de `account` e `rows`),
+ *     `fR`, `mkTip` e o no DOM simulado `'target'`.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Cenario seguro gera 4 cards `safe` na ordem fixa ("Dias acima do stop", "Stops semana / mês",
+ *     "Taxas pagas", "Edge removido") com 4 tooltips correspondentes.
+ *   - Violacoes de stop e taxas elevadas aplicam tons `danger`/`warn`, arredondamento de R (`0.63R`)
+ *     e sinais negativos sem mutar o objeto de analise.
+ *   - Limiar de alerta de taxas e inclusivo em 25% para `edgeRemovedPct` OU `feeDragPct`; quando
+ *     `expectancyBeforeFees` e 0, exibe `feeDragPct`.
+ *   - Alvo DOM ausente retorna imediatamente antes de calcular a analise ou gerar tooltips.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+// Confirma que `renderStopFeeAnalysis` ja foi removida de `app.js` e carrega `analytics-workspace.js`.
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderStopFeeAnalysis\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+// Auxiliar de renderizacao: monta um objeto de analise saudavel por padrao (sobrescrevivel via
+// `overrides`), valida que `buildStopFeeAnalysis` recebe exatamente `(account, rows)` e captura
+// HTML gerado, chamadas e lista de tooltips.
 function render(overrides = {}, visible = true) {
   const analysis = {daysOverDailyStop: 0, daysOverDailyStopPct: 0, dayLimit: 20, days: 5,
     weeksOverWeeklyStop: 0, monthsOverMonthlyStop: 0, weekLimit: 50, monthLimit: 100,
@@ -27,6 +55,8 @@ function render(overrides = {}, visible = true) {
   return {html: node.innerHTML, calls, tips, analysis};
 }
 
+// Verifica o cenario sem violacoes nem taxas: 4 cards com tom `safe` na ordem canonica,
+// textos de limite diario, `0S · 0M`, `0.00R consumidos`, status `aceitável` e 4 tooltips.
 test('safe analysis renders four ordered cards, limits, fees and tooltips', () => {
   const {html, calls, tips} = render();
   assert.deepEqual(calls, ['analysis']);
@@ -42,6 +72,9 @@ test('safe analysis renders four ordered cards, limits, fees and tooltips', () =
   assert.match(tips[3], /Edge Removido pelas Taxas/);
 });
 
+// Exercita o cenario de risco elevado com estouros diarios/semanais/mensais e taxas altas:
+// confirma 1 card `danger` e 3 `warn`, percentuais, formato `1S · 2M`, arredondamento `0.63R`,
+// expectancia negativa apos taxas (`$-2.00`) e preservacao do valor original em `analysis.feesInR`.
 test('breaches and fees preserve danger/warn tones and signed formatting', () => {
   const values = {daysOverDailyStop: 2, daysOverDailyStopPct: 40, weeksOverWeeklyStop: 1,
     monthsOverMonthlyStop: 2, totalFees: 12.5, feesInR: 0.625, feePerTrade: 2.5,
@@ -57,6 +90,9 @@ test('breaches and fees preserve danger/warn tones and signed formatting', () =>
   assert.equal(analysis.feesInR, values.feesInR);
 });
 
+// Testa a fronteira exata do alerta de taxas: `24.99` em ambos ainda e `safe` ("aceitável"),
+// enquanto `25` em `edgeRemovedPct` ou `feeDragPct` ja vira `warn` ("alto impacto"); tambem valida
+// que com `expectancyBeforeFees === 0` o valor exibido cai para `feeDragPct` (`12%`).
 test('fee warning threshold is inclusive at 25 for either percentage', () => {
   for (const [edgeRemovedPct, feeDragPct, warning] of [[24.99,24.99,false],[25,0,true],[0,25,true]]) {
     const {html} = render({edgeRemovedPct, feeDragPct});
@@ -68,6 +104,8 @@ test('fee warning threshold is inclusive at 25 for either percentage', () => {
   assert.match(html, /risk-insight-value">12%/);
 });
 
+// Garante que quando o elemento DOM alvo nao existe, a funcao retorna imediatamente sem
+// chamar `buildStopFeeAnalysis` nem `mkTip` e mantendo `'before'`.
 test('missing target returns before calculating or formatting', () => {
   const {html, calls, tips} = render({}, false);
   assert.equal(html, 'before');
@@ -75,6 +113,8 @@ test('missing target returns before calculating or formatting', () => {
   assert.deepEqual(tips, []);
 });
 
+// Valida em `index.html` o carregamento sincrono unico de `analytics-workspace.js` e a
+// presenca de `calendar-page.js` antes de `app.js`.
 test('stop fee and calendar presentation load synchronously before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));

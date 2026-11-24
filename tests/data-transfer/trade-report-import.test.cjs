@@ -1,3 +1,23 @@
+/*
+ * Testes unitarios para adaptadores de upload de relatorios MT4/MT5 (HTML, XLSX, texto) e loader SheetJS.
+ *
+ * Modulos testados:
+ * - `src/modules/data-transfer/infrastructure/browser-file-io.js` (`loadSheetJS`, `parseMT5HTML`)
+ * - `src/modules/data-transfer/presentation/data-transfer-page.js`
+ *   (`handleMT5Upload`, `handleReportUpload`, `handleHistoryUpload`, `handleMT5Result`).
+ *
+ * Estrategia de isolamento:
+ * - Extrai as 6 funcoes dos modulos de infraestrutura/apresentacao e executa em `vm.createContext`.
+ * - Simula `document` (`getElementById`, `createElement`, `head.appendChild`), `window`, `FileReader`,
+ *   `XLSX` e funcoes de workflow (`prepareImportedTrades`, `setPendingImport`, `showImportPreview`, `openModal`).
+ *
+ * Regras criticas garantidas:
+ * - Roteamento de historico envia apenas `.htm`/`.html` (case-insensitive) para MT5 e o restante para CSV/XLSX.
+ * - `loadSheetJS` chama callback sincronamente se `window.XLSX` ja existir ou injeta `<script>` CDN uma vez.
+ * - Relatorios HTML sao lidos em `utf-16`, filtram linhas `<tr>` com menos de 10 celulas `<td>/<th>` e preservam o no de preview capturado.
+ * - Uploads XLSX capturam erros no preview sem quebrar a UI, enquanto erros em HTML propagam.
+ * - Relatorio vazio preserva `pendingImport` anterior; resultado nao vazio abre modal mesmo se preparacao retornar vazio.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -7,12 +27,16 @@ const root = path.resolve(__dirname, '../..');
 const files = ['src/modules/data-transfer/infrastructure/browser-file-io.js', 'src/modules/data-transfer/presentation/data-transfer-page.js', 'app.js'];
 const sources = files.filter(file => fs.existsSync(path.join(root, file))).map(file => fs.readFileSync(path.join(root, file), 'utf8'));
 const names = ['handleMT5Upload', 'handleReportUpload', 'handleHistoryUpload', 'loadSheetJS', 'parseMT5HTML', 'handleMT5Result'];
+// Extrai os 6 handlers e adaptadores de relatorio das fontes disponiveis.
 const declarations = names.map(name => {
   const match = sources.map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).find(Boolean);
   assert.ok(match, name);
   return match[0];
 }).join('\n');
+// Converte objetos do realm VM para comparacao segura em Node.
 const plain = value => JSON.parse(JSON.stringify(value));
+
+// Cria sandbox VM com DOM, FileReader, scripts injetados e espias para todo o pipeline de importacao de relatorios.
 function setup() {
   const calls = [], readers = [], scripts = [];
   const nodes = {csvPreview: {innerHTML: ''}, mt4Preview: {innerHTML: ''}};
@@ -39,6 +63,8 @@ function setup() {
   vm.runInContext(declarations, context);
   return {context, calls, readers, scripts, nodes};
 }
+
+// Verifica que uploads sem arquivo nao fazem nada e que `handleHistoryUpload` roteia apenas `.htm`/`.html` para MT5 e demais extensoes para CSV.
 test('report upload ignores missing file and routes case-insensitive HTML only through MT upload', () => {
   const {context, calls, readers} = setup();
   for(const name of ['handleMT5Upload', 'handleReportUpload', 'handleHistoryUpload']) context[name]({target: {files: []}});
@@ -51,6 +77,8 @@ test('report upload ignores missing file and routes case-insensitive HTML only t
     assert.equal(calls.at(-1)[0], /\.htm[l]?$/i.test(filename) ? 'mt' : 'csv');
   }
 });
+
+// Valida `loadSheetJS`: execucao imediata quando `window.XLSX` ja esta carregado; caso contrario, injeta a URL exata da CDN no `<head>` e aguarda `onload`.
 test('SheetJS loader runs synchronously when present and otherwise waits for script onload', () => {
   const {context, calls, scripts} = setup();
   let count = 0; const callback = () => count++;
@@ -65,6 +93,8 @@ test('SheetJS loader runs synchronously when present and otherwise waits for scr
   assert.equal(scripts[0].onerror, undefined);
   scripts[0].onload(); assert.equal(count, 2);
 });
+
+// Garante que upload HTML le apenas o primeiro arquivo em UTF-16, mostra status e entrega o resultado usando a referencia do no de preview capturada no inicio.
 test('HTML upload uses first file, UTF-16 and parser result with captured preview node', () => {
   const {context, calls, readers, nodes} = setup();
   context.parseMT5HTML = (html, name) => { calls.push(['html', html, name]); return ['result']; };
@@ -78,6 +108,8 @@ test('HTML upload uses first file, UTF-16 and parser result with captured previe
   assert.deepEqual(calls.at(-2), ['html', '<table>', file.name]);
   assert.deepEqual(calls.at(-1), ['result', ['result'], preview]);
 });
+
+// Testa o fallback para texto puro MT4 quando o arquivo nao e HTML nem XLSX, usando `#mt4Preview` quando `#csvPreview` falta e aceitando ausencia total de preview.
 test('non HTML/XLSX upload falls back to MT4 text and optional preview', () => {
   const {context, calls, readers, nodes} = setup();
   delete nodes.csvPreview;
@@ -94,6 +126,8 @@ test('non HTML/XLSX upload falls back to MT4 text and optional preview', () => {
   readers[1].onload({target: {result: ''}});
   assert.equal(calls.at(-1)[2], null);
 });
+
+// Verifica upload XLSX via `handleMT5Upload`: adia leitura ate `loadSheetJS`, usa primeira planilha, le `activeAccountId` na conclusao e encaminha para preview/modal.
 test('XLSX upload defers reading, selects first sheet and preserves conversion options', () => {
   const {context, calls, readers, nodes} = setup(); let loaded;
   context.loadSheetJS = callback => { loaded = callback; };
@@ -116,6 +150,8 @@ test('XLSX upload defers reading, selects first sheet and preserves conversion o
   assert.match(nodes.csvPreview.innerHTML, /1 trades detectados/);
   assert.deepEqual(calls.slice(-2).map(call => call[0]), ['preview', 'open']);
 });
+
+// Confirma a politica de erro: falhas no XLSX (leitura ou `handleMT5Result`) sao renderizadas no preview, enquanto erros em `parseMT5HTML` propagam.
 test('XLSX processing catches parser and result errors while HTML errors propagate', () => {
   const {context, readers, nodes} = setup();
   context.loadSheetJS = callback => callback();
@@ -132,6 +168,8 @@ test('XLSX processing catches parser and result errors while HTML errors propaga
   context.handleMT5Upload({target: {files: [{name: 'bad.html'}]}});
   assert.throws(() => readers[1].onload({target: {result: ''}}), error => error === failure);
 });
+
+// Valida `parseMT5HTML`: injeta HTML em `<div>`, extrai `tr -> td,th` aplicando trim, descarta linhas com menos de 10 colunas e delega com o nome do arquivo intacto.
 test('HTML reader trims td/th, filters short rows and delegates unchanged filename', () => {
   const {context, calls} = setup();
   const makeRow = size => ({querySelectorAll(selector) { assert.equal(selector, 'td,th'); return Array.from({length: size}, (_, i) => ({textContent: `  cell ${i}\n`})); }});
@@ -142,6 +180,8 @@ test('HTML reader trims td/th, filters short rows and delegates unchanged filena
   assert.deepEqual(plain(calls[0][1]), [Array.from({length: 10}, (_, i) => `cell ${i}`), Array.from({length: 11}, (_, i) => `cell ${i}`)]);
   assert.equal(calls[0][2], 'report.html'); assert.equal(result[0].id, 'parsed');
 });
+
+// Verifica `handleMT5Result`: lista vazia mantem `pendingImport` intacto (com ou sem no de preview), e lista nao vazia prossegue para `setPendingImport` + preview + modal.
 test('empty report preserves pending state and result flow opens even if preparation returns empty', () => {
   const {context, calls, nodes} = setup();
   const prior = context.pendingImport = [{id: 'prior'}];
@@ -155,6 +195,7 @@ test('empty report preserves pending state and result flow opens even if prepara
   assert.strictEqual(calls[1][1], context.pendingImport);
 });
 
+// Garante em index.html a inclusao unica antes de app.js e a disponibilidade global de todas as 6 funcoes sem IO na carga.
 test('report adapters load as classic globals before app and perform no IO at startup', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   for(const file of files.slice(0, 2)) {

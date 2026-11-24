@@ -1,4 +1,23 @@
-// Reset transient calendar UI between captures; fixture data stays unchanged.
+/*
+ * Cenários visuais do mini-calendário do Dashboard e da página de Calendário (Diário).
+ *
+ * Objetivo:
+ *   Cobrir modos de visualização (`month`, `week`, `biweek`), estados de célula
+ *   (`win`, `loss`, `today`, `other-month`), painel de detalhe do dia, foco no seletor
+ *   de mês, virada de ano, mês bissexto (fevereiro/2024), rolagem horizontal e hover.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs`, fornecendo tanto a limpeza entre casos
+ *   (`resetCalendarStyleState`) quanto o preparo de cada cenário (`prepareCalendarStyleScenario`).
+ *
+ * Pontos-chave:
+ *   - Restaura a referência de `accounts` e verifica integridade de dados e `localStorage`.
+ *   - Retorna seletor CSS quando o caso requer `:hover` forçado via CDP.
+ */
+
+/*
+ * Reseta o estado transitório da UI do calendário entre capturas; dados do fixture não mudam.
+ */
 function resetCalendarStyleState() {
   calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calViewMode = 'week';
   document.getElementById('calBtnWeek').classList.add('active');
@@ -7,12 +26,17 @@ function resetCalendarStyleState() {
   document.getElementById('calGridWrap').scrollLeft = 0;
 }
 
+/*
+ * Prepara o estado visual do mini-calendário ou do calendário completo indicado por `name`,
+ * validando transições, estilos da barra de ferramentas e retornando eventual alvo de hover.
+ */
 function prepareCalendarStyleScenario(name) {
   const previousAccounts = accounts;
   const before = JSON.stringify({accounts, trades, storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
   let hover = null;
   try {
     if (name.startsWith('calendar-mini-')) {
+      // Cenários do mini-calendário no Dashboard (hover em dia positivo ou clique para abrir o Diário).
       const mini = document.getElementById('dashCalendarMini');
       for (const state of ['is-gain', 'is-loss', 'is-muted', 'today']) {
         if (!mini.querySelector(`.dash-cal-cell.${state}`)) throw new Error(`Mini calendar state missing: ${state}`);
@@ -23,6 +47,7 @@ function prepareCalendarStyleScenario(name) {
         if (!document.querySelector('#page-calendar.active')) throw new Error('Mini calendar did not navigate');
       } else hover = '#dashCalendarMini .dash-cal-cell.is-gain';
     } else {
+      // Cenários da página completa do Calendário: alternância de modo e validação da grade base.
       const wrap = document.getElementById('calGridWrap');
       if (name === 'calendar-month-compat') setCalView('month');
       else document.getElementById(name === 'calendar-biweek' ? 'calBtnBiweek' : 'calBtnWeek').click();
@@ -33,6 +58,8 @@ function prepareCalendarStyleScenario(name) {
       }
       const day = value => wrap.querySelector(`[onclick="showCalDay(${value})"]`);
       const detail = document.getElementById('calDayDetail');
+
+      // Seleção de dia com ganho, dia com perda ou dia vazio (que deve ocultar o painel de detalhe).
       if (['calendar-day-win', 'calendar-day-loss', 'calendar-day-empty'].includes(name)) {
         day(name === 'calendar-day-loss' ? 9 : 10).click();
         const status = name === 'calendar-day-loss' ? 'loss' : 'win';
@@ -48,6 +75,8 @@ function prepareCalendarStyleScenario(name) {
         picker.value = value; picker.dispatchEvent(new Event('change', {bubbles: true}));
         if (picker.value !== value) throw new Error('Calendar month picker changed');
       };
+
+      // Foco no seletor de mês e verificação de dimensões/tipografia da barra do calendário.
       if (name === 'calendar-toolbar-month-focus') {
         const picker = document.getElementById('calMonthPicker');
         const toolbar = document.querySelector('.calendar-toolbar');
@@ -64,6 +93,8 @@ function prepareCalendarStyleScenario(name) {
           pickerStyle.fontSize !== '14px' || pickerStyle.fontWeight !== '700' || buttonStyle.minHeight !== '38px' ||
           buttonStyle.padding !== '0px 18px' || buttonStyle.fontSize !== '13px') throw new Error('Calendar toolbar styles changed');
       }
+
+      // Navegação cruzando virada de ano (dezembro -> janeiro -> dezembro) e mês bissexto.
       if (name === 'calendar-nav-year') {
         pick('2026-12');
         document.querySelector('#page-calendar [onclick="calNav(1)"]').click();
@@ -75,6 +106,8 @@ function prepareCalendarStyleScenario(name) {
         pick('2024-02');
         if (calYear !== 2024 || calMonth !== 1 || wrap.querySelectorAll('.cal-day[onclick]').length !== 29) throw new Error('Leap month day count changed');
       }
+
+      // Rolagem horizontal na grade semanal e alvo de hover em célula positiva.
       if (!['calendar-day-win', 'calendar-day-loss'].includes(name)) wrap.scrollIntoView({block: 'center'});
       if (name === 'calendar-week-scroll') {
         wrap.scrollLeft = wrap.scrollWidth;

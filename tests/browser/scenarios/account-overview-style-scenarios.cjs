@@ -1,9 +1,32 @@
+/*
+ * Cenários visuais de visão geral de contas (`#accountsOverview`) na página de Contas.
+ *
+ * Objetivo:
+ *   Validar grade responsiva, cartões de conta, ações de conta ativa/inativa,
+ *   barras de progresso de risco e quebra de títulos longos nos estados:
+ *   `account-overview-single`, `account-overview-multiple`, `account-overview-empty`
+ *   e `account-overview-long-title`.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs` para assegurar que refatorações nos estilos
+ *   da página de Contas não quebrem breakpoints (720px e 1420px) nem alterem `localStorage`.
+ *
+ * Pontos-chave:
+ *   - Substitui `accounts` apenas em memória durante a renderização e restaura no `finally`.
+ *   - Confere fingerprint de dados e `localStorage` ao final para garantir efeito colateral zero.
+ */
+
+/*
+ * Prepara o estado visual solicitado em `#accountsOverview`, valida propriedades CSS
+ * computadas por breakpoint e centraliza a grade na viewport antes do screenshot.
+ */
 function prepareAccountOverviewStyleScenario(name) {
   const fingerprint = () => JSON.stringify({accounts, trades, activeAccountId,
     storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
   const before = fingerprint();
   const previousAccounts = accounts;
   try {
+    // Ajusta temporariamente a lista de contas conforme o cenário desejado.
     if (name === 'account-overview-empty') accounts = [];
     else if (name === 'account-overview-multiple') {
       accounts = [...accounts, {...accounts[0], id: 'visual-secondary', name: 'Conta secundária', color: '#69e07b'}];
@@ -12,6 +35,8 @@ function prepareAccountOverviewStyleScenario(name) {
         name: 'Conta de caracterização com nome longo para verificar a quebra de linha no cabeçalho'});
     }
     renderAccountsPage();
+
+    // Verifica estrutura da grade externa e número esperado de cartões renderizados.
     const grid = document.getElementById('accountsOverview');
     const style = (element, pseudo) => getComputedStyle(element, pseudo);
     const width = innerWidth;
@@ -22,6 +47,8 @@ function prepareAccountOverviewStyleScenario(name) {
     const cards = [...grid.querySelectorAll('.account-overview-card')];
     const count = name === 'account-overview-empty' ? 0 : name === 'account-overview-multiple' ? 2 : 1;
     if (cards.length !== count) throw new Error('Account overview card count changed');
+
+    // Valida tipografia, espaçamento, responsividade interna e barras de progresso de cada cartão.
     for (const card of cards) {
       const head = card.querySelector('.account-overview-head');
       const actions = card.querySelector('.account-overview-actions');
@@ -44,6 +71,7 @@ function prepareAccountOverviewStyleScenario(name) {
           style(progress.firstElementChild).display !== 'block') throw new Error('Account progress presentation changed');
       }
     }
+    // Confere ações específicas dos cenários de múltiplas contas e título longo.
     if (name === 'account-overview-multiple' &&
       (!cards[0].querySelector('.badge.long') || !cards[1].querySelector('button[onclick*="selectAccount"]'))) {
       throw new Error('Active/inactive account actions changed');

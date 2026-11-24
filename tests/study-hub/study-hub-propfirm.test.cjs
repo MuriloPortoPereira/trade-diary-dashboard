@@ -1,3 +1,23 @@
+/*
+ * Testes unitarios para o simulador PropFirm do Study Hub e seus calculos auxiliares de dominio.
+ *
+ * Modulos testados:
+ * - `src/modules/study-hub/presentation/study-hub-propfirm.js` (`TradeDiaryStudyHubPropFirm`)
+ * - `src/modules/study-hub/infrastructure/study-hub-storage.js`
+ * - `src/modules/study-hub/domain/study-hub-calculations.js` (`liqBRL`, `genSteps`, `gerarCenarios`).
+ *
+ * Estrategia de isolamento:
+ * - Executa dominio, storage e apresentacao em `vm.createContext` com DOM sob demanda (`get(id)` cria nos automaticamente),
+ *   `localStorage` instrumentado (`reads`/`writes`), `Chart`, `FileReader` sincrono, `alert` e `Blob`/`URL` simulados.
+ * - Captura o callback de inicializacao (`loads`) passado a fabrica para testar separadamente criacao vs carga.
+ *
+ * Regras criticas garantidas:
+ * - Criacao da fabrica apenas le `pfCot` e registra o listener de carga sem gravar no storage.
+ * - `calcSimulador` calcula risco/alvo/trades, constroi grafico e grava `pfState` v1.0 sem campos transientes (`s_step`).
+ * - Importacao JSON/CSV aplica cotacao antes dos campos, tolera CSV permissivo e alerta em JSON malformado.
+ * - No evento de carga, `pfState` e restaurado primeiro e a cotacao do Hub (`hubCot`) prevalece nos calculos finais.
+ * - Definir o script da fabrica nao toca em DOM, `localStorage` nem `Chart`, e nao vaza helpers internos no escopo global.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -5,11 +25,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../..');
 
+// Prepara sandbox VM com storage inicial, valores de inputs e espias para leituras, gravacoes, graficos, alertas e downloads.
 function setup(initial = {}, fields = {}) {
   const store = new Map(Object.entries(initial)), reads = [], writes = [], loads = [], charts = [], alerts = [], downloads = [];
   const elements = new Map();
   const node = value => ({value, textContent: '', innerHTML: '', style: {}, options: [],
     classList: {toggle() {}}, querySelectorAll: () => [], click() { downloads.push(this); }});
+  // Cria dinamicamente qualquer elemento DOM consultado por ID para evitar boilerplate repetitivo nos testes.
   const get = id => { if (!elements.has(id)) elements.set(id, node(fields[id] ?? '')); return elements.get(id); };
   const c = vm.createContext({document: {getElementById: get, querySelectorAll: () => [],
     createElement: () => node(''), body: {appendChild() {}, removeChild() {}}},
@@ -27,6 +49,7 @@ function setup(initial = {}, fields = {}) {
   return {api, math: c.TradeDiaryStudyHubCalculations, c, store, reads, writes, loads, charts, alerts, downloads, get};
 }
 
+// Verifica inicializacao preguicosa (apenas leitura de `pfCot`, sem escrita) e calculo do simulador (risco $50, alvo $100, 10 trades, 10 pontos no grafico e `pfState` persistido sem `s_step`).
 test('propfirm creation defers load and calculator preserves sizing, chart and state format', () => {
   const h = setup({pfCot: '6.25'}, {s_conta: '10000', s_ddmax: '10', s_dddaily: '2',
     s_stops: '20', s_rrr: '2', s_step: '1', s_fim: '10'});
@@ -42,6 +65,7 @@ test('propfirm creation defers load and calculator preserves sizing, chart and s
   assert.equal(Object.hasOwn(state, 's_step'), false);
 });
 
+// Valida restauracao via JSON (grava `pfCot` antes de preencher campos) e politica de erros de `localStorage`: `calcSimulador` absorve quota cheia, enquanto `pfSetCot` propaga o erro.
 test('JSON restoration applies rate before fields and retains caller error policies', () => {
   const h = setup();
   h.api.importFase({target: {files: [{name: 'config.json', text: JSON.stringify({cot: 6, s_conta: '1234'})}]}}, 'f2');
@@ -52,6 +76,7 @@ test('JSON restoration applies rate before fields and retains caller error polic
   assert.throws(() => h.api.pfSetCot(7), /quota/);
 });
 
+// Testa importacao CSV permissiva (ignora linhas vazias/invalidas e selecao sem arquivo), alerta em JSON corrompido e nome datado do arquivo na exportacao JSON.
 test('phase CSV imports and exports preserve permissive fields and filename', () => {
   const h = setup();
   h.api.importFase({target: {files: []}}, 'f2');
@@ -64,6 +89,7 @@ test('phase CSV imports and exports preserve permissive fields and filename', ()
   assert.match(h.downloads[0].download, /^propfirm_config_\d{4}-\d{2}-\d{2}\.json$/);
 });
 
+// Verifica sequencia no evento `load`: restaura `pfState` salvo, aplica precedencia de `hubCot` (6.5) nos calculos finais e recupera silenciosamente caso `pfState` esteja malformado.
 test('load restores saved pfState before the hub rate takes precedence for final calculations', () => {
   const h = setup({pfCot: '5.8', pfState: JSON.stringify({cot: 6, s_conta: '25000', s_stops: '50'})},
     {hubCot: '6.5'});
@@ -81,6 +107,7 @@ test('load restores saved pfState before the hub rate takes precedence for final
   assert.equal(JSON.parse(malformed.store.get('pfState')).cot, 6.25);
 });
 
+// Valida funcoes matematicas puras do dominio PropFirm: `liqBRL` (payout, taxa, imposto e cambio), `genSteps` (precisao decimal, fallback 40 e teto 200) e `gerarCenarios` (65 cenarios pos/neg/zero).
 test('legacy payout, integer steps and scenarios retain deductions, fallbacks and limits', () => {
   const {math} = setup();
   assert.equal(math.liqBRL(1000, 80, 5, 10, 5), 3420);
@@ -91,6 +118,7 @@ test('legacy payout, integer steps and scenarios retain deductions, fallbacks an
   assert.equal(rows.find(row => row.n === 2 && row.w === 1).type, 'zero');
 });
 
+// Garante que apenas carregar o arquivo `study-hub-propfirm.js` expoe somente a fabrica `TradeDiaryStudyHubPropFirm` sem efeitos colaterais ou vazamento de globais.
 test('defining the PropFirm factory has no DOM, storage or chart effects and exposes no helpers', () => {
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'Chart']) {

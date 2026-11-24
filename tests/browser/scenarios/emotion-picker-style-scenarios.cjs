@@ -1,10 +1,33 @@
-// Presentation fixture for legacy emotion-picker styles; no application data or handlers.
+/*
+ * Cenários visuais para os estilos legados do seletor de emoções (`.emotion-grid` e `.emotion-chip`).
+ *
+ * Objetivo:
+ *   Montar um fixture descartável de apresentação (sem alterar dados ou handlers da aplicação)
+ *   para validar os estados ocioso, selecionado e sob hover dos chips de emoção.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs` nos estados `emotion-picker-idle`,
+ *   `emotion-picker-hover` e `emotion-picker-selected`.
+ *
+ * Pontos-chave:
+ *   - Injeta `#styleEmotionPickerFixture` no Dashboard e remove-o entre casos.
+ *   - Confere grade, bordas, fundos e tipografia computados dos estados base e `.selected`.
+ */
+
+/*
+ * Remove o fixture descartável do seletor de emoções entre execuções de cenário.
+ */
 function resetEmotionPickerStyleState() {
   document.getElementById('styleEmotionPickerFixture')?.remove();
 }
 
+/*
+ * Cria o grid sintético de chips de emoção, aplica `.selected` quando solicitado,
+ * valida estilos computados e retorna o seletor de `:hover` no cenário `emotion-picker-hover`.
+ */
 function prepareEmotionPickerStyleScenario(name) {
   const before = JSON.stringify({accounts, trades, storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
+  // Monta um bloco descartável com dois chips de emoção diretamente no Dashboard.
   const fixture = document.createElement('div');
   fixture.id = 'styleEmotionPickerFixture';
   fixture.className = 'emotion-grid';
@@ -16,6 +39,7 @@ function prepareEmotionPickerStyleScenario(name) {
   if (name === 'emotion-picker-selected') chip.classList.add('selected');
   fixture.scrollIntoView({block: 'center'});
 
+  // Valida propriedades de grade, espaçamento, tipografia e cores nos estados base e selecionado.
   const gridStyle = getComputedStyle(fixture);
   const chipStyle = getComputedStyle(chip);
   const emojiStyle = getComputedStyle(chip.querySelector('.emotion-emoji'));

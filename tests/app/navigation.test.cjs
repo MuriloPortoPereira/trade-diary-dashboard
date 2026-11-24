@@ -1,3 +1,27 @@
+/*
+ * Objetivo do arquivo:
+ *   Testar a navegacao entre paginas, o controle da barra lateral (sidebar) e a
+ *   atualizacao global da interface (refreshAll, toggleSidebar e showPage).
+ *
+ * Modulo/arquivo testado:
+ *   Funcoes refreshAll, toggleSidebar e showPage em src/app/presentation/app-workspace.js
+ *   (verificando tambem que nao ha declaracoes legadas restantes em app.js).
+ *
+ * Estrategia de isolamento:
+ *   Carrega apenas as tres funcoes em uma sandbox node:vm contendo todas as 14 paginas
+ *   e itens de menu simulados, stubs para todos os renderizadores de modulo e espias
+ *   para sincronizacao de conta, topbar, banner de incompletos e reset de simulacao.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - refreshAll() renderiza a pagina ativa (ou dashboard como fallback) e em seguida
+ *     atualiza o chrome compartilhado na ordem exata: conta -> trades -> sync -> topbar -> banner.
+ *   - toggleSidebar() alterna 'open'/'show' simultaneamente, aceita parametro force
+ *     e e seguro (no-op) quando os elementos da sidebar nao existem no DOM.
+ *   - showPage() atualiza classes .active de pagina e menu, fecha a sidebar e executa
+ *     ganchos especificos (resetar dashPeriod para 'all' no dashboard e resetar defaults
+ *     de simulacao ao abrir stats com a aba de simulacao visivel).
+ *   - Paginas desconhecidas limpam estados ativos sem chamar nenhum renderizador.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -14,6 +38,7 @@ const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = legacy ?? ["refreshAll", "toggleSidebar", "showPage"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 const pageIds = ['dashboard', 'log', 'calendar', 'stats', 'psych', 'setup', 'premarket', 'strategyHub', 'studyHub', 'documents', 'notifications', 'accounts', 'partners', 'profile'];
 
+// Simulador de classList com suporte a add, remove, contains e toggle(name, force).
 function classList(initial = []) {
   const classes = new Set(initial);
   return {
@@ -28,6 +53,8 @@ function classList(initial = []) {
   };
 }
 
+// Monta o DOM simulado de navegacao (paginas, itens .nav-item com onclick, sidebar,
+// overlay, seletor de periodo e aba de simulacao) junto com todos os renderizadores espiados.
 function setup({activePage = 'dashboard', includeSidebar = true, simulationVisible = false} = {}) {
   const pages = pageIds.map(id => ({id: `page-${id}`, classList: classList(id === activePage ? ['active'] : [])}));
   const navItems = pageIds.map(id => ({
@@ -72,6 +99,8 @@ function setup({activePage = 'dashboard', includeSidebar = true, simulationVisib
   return {context, pages, navItems, sidebar, overlay, elements, calls, account};
 }
 
+// Verifica que refreshAll() despacha primeiro o renderizador da pagina ativa ('log') e
+// depois sincroniza conta ativa, trades da conta, saldo no chrome, topbar e banner.
 test('refresh dispatches the active page then updates shared account chrome in order', () => {
   const {context, calls, account} = setup({activePage: 'log'});
   context.refreshAll();
@@ -80,6 +109,8 @@ test('refresh dispatches the active page then updates shared account chrome in o
   ]);
 });
 
+// Testa dois casos de borda em refreshAll(): sem nenhuma pagina ativa usa 'dashboard'
+// como padrao; com uma pagina desconhecida ativa, pula o renderizador mas ainda atualiza o chrome.
 test('refresh defaults to dashboard and unknown pages still update shared chrome', () => {
   const missing = setup({activePage: null});
   missing.context.refreshAll();
@@ -90,6 +121,8 @@ test('refresh defaults to dashboard and unknown pages still update shared chrome
   assert.deepEqual(unknown.calls.slice(0, 2), ['getActiveAccount', 'getAccountTrades:a1']);
 });
 
+// Valida alternancia da sidebar e overlay (sem argumento alterna; com false fecha ambos)
+// e confirma retorno seguro quando sidebar/overlay nao existem no DOM.
 test('sidebar toggles current state, accepts force and requires both elements', () => {
   const present = setup();
   present.context.toggleSidebar();
@@ -102,6 +135,8 @@ test('sidebar toggles current state, accepts force and requires both elements', 
   assert.equal(missing.context.toggleSidebar(true), undefined);
 });
 
+// Garante que showPage('calendar') desativa a pagina anterior, ativa apenas a nova pagina
+// e seu item correspondente no menu, invoca renderCalendar() e fecha a sidebar aberta.
 test('show page switches page and nav classes, dispatches renderer and closes sidebar', () => {
   const {context, pages, navItems, sidebar, calls} = setup({activePage: 'dashboard'});
   sidebar.classList.add('open');
@@ -114,6 +149,8 @@ test('show page switches page and nav classes, dispatches renderer and closes si
   assert.equal(sidebar.classList.contains('open'), false);
 });
 
+// Testa efeitos especificos por pagina: abrir 'dashboard' redefine dashPeriod para 'all';
+// abrir 'stats' quando statTab-simulation esta visivel chama resetSimulationEntryDefaults antes de renderStats.
 test('dashboard resets period while simulation stats resets entry defaults before render', () => {
   const dashboard = setup({activePage: 'log'});
   dashboard.context.showPage('dashboard');
@@ -124,6 +161,8 @@ test('dashboard resets period while simulation stats resets entry defaults befor
   assert.deepEqual(stats.calls, ['resetSimulation', 'stats']);
 });
 
+// Quando um ID de pagina inexistente e solicitado, limpa .active de todas as paginas e
+// itens de navegacao sem acionar nenhum renderizador.
 test('unknown page clears active state and only closes the sidebar', () => {
   const {context, pages, navItems, calls} = setup({activePage: 'dashboard'});
   context.showPage('missing');
@@ -132,6 +171,8 @@ test('unknown page clears active state and only closes the sidebar', () => {
   assert.deepEqual(calls, []);
 });
 
+// Verifica remocao das declaracoes legadas em app.js, carregamento unico sincrono de
+// app-workspace.js antes de profile-page.js e app.js, e ordem interna refreshAll -> showPage.
 test('navigation declarations load once in the synchronous workspace before app.js', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

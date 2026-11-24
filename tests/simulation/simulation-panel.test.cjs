@@ -1,3 +1,30 @@
+/*
+ * Objetivo:
+ *   Validar a camada de apresentacao do painel de simulacao Monte Carlo: aplicacao de snapshot
+ *   de conta (applySimulationAccountSnapshot), reset para valores padrao (resetSimulationEntryDefaults),
+ *   carregamento ao trocar a conta (loadSimFromAccount) e renderizacao completa de cartoes, resumo,
+ *   plano e grafico (renderSimulation).
+ *
+ * Modulo testado:
+ *   src/modules/simulation/presentation/simulation-panel.js
+ *   (funcoes applySimulationAccountSnapshot, resetSimulationEntryDefaults, loadSimFromAccount
+ *   e renderSimulation, verificando tambem a migracao das declaracoes legadas de app.js
+ *   e o registro sincrono no index.html).
+ *
+ * Estrategia de isolamento:
+ *   Carrega simulation-panel.js em uma sandbox node:vm com mocks de elementos de formulario/saida,
+ *   Proxy para tooltips (TIPS), espias de adaptadores de campos/snapshot/plano (reaplicados apos
+ *   runInContext para sobrescrever implementacoes internas do proprio arquivo) e espias para
+ *   buildMonteCarloBalanceProjection e mkChart.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - simulation-panel.js e analytics-workspace.js carregam como scripts classicos sincronos antes de app.js.
+ *   - applySimulationAccountSnapshot formata saldo, trava readOnly e preenche campos derivados na ordem exata.
+ *   - resetSimulationEntryDefaults usa a conta selecionada ou recorre a conta ativa quando o select esta em 'manual'.
+ *   - loadSimFromAccount destrava saldo em modo 'manual' e aplica snapshot antes da projecao quando e uma conta real.
+ *   - renderSimulation popula opcoes faltantes de contas, exibe campo de RRR customizado, gera 100 cenarios,
+ *     4 cartoes, resumo com probabilidades, bloco de plano e grafico com 5 datasets.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -13,6 +40,8 @@ const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined
 for (const [index, part] of legacyParts.entries()) assert.equal(part, undefined, `${names[index]} must be moved`);
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+// Verifica no index.html que simulation-panel.js e incluido uma unica vez como script classico sincrono
+// antes de app.js, assim como analytics-workspace.js.
 test('simulation panel and analytics dispatchers load before app.js as classic scripts', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
@@ -23,10 +52,15 @@ test('simulation panel and analytics dispatchers load before app.js as classic s
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
+// Fabrica de elemento DOM simulado com propriedades comuns de inputs e containers do painel de simulacao.
 function element(extra = {}) {
   return {style: {}, value: '', innerHTML: '', textContent: '', readOnly: false, ...extra};
 }
 
+// Helper de ambiente em VM para o painel de simulacao: cria todos os inputs/containers (incluindo
+// simAccount com appendChild e options configuraveis), injeta contas, helpers de dominio e graficos.
+// Salva e reaplica os 6 adaptadores mockados apos runInContext para isolar o teste das implementacoes
+// irmas declaradas no mesmo arquivo simulation-panel.js.
 function setup({accountValue = 'manual', optionCount = 2, rrrValue = '1', sizing} = {}) {
   const options = Array.from({length: optionCount}, () => ({}));
   const elements = {
@@ -76,6 +110,8 @@ function setup({accountValue = 'manual', optionCount = 2, rrrValue = '1', sizing
   return {context, elements, calls};
 }
 
+// Valida applySimulationAccountSnapshot('a2'): formata o saldo com 2 casas, ativa readOnly
+// e dispara na ordem exata a escrita de WR, RiskPct, GoalPct, StopPct, RRR e sincronizacao monetaria.
 test('account snapshot updates balance, lock and derived fields in order', () => {
   const {context, elements, calls} = setup();
   vm.runInContext("applySimulationAccountSnapshot('a2')", context);
@@ -91,6 +127,8 @@ test('account snapshot updates balance, lock and derived fields in order', () =>
   ]);
 });
 
+// Verifica resetSimulationEntryDefaults tanto com conta especifica ('a2') quanto com 'manual'
+// (que faz fallback para a conta ativa), mantendo simBalance como readOnly em ambos os casos.
 test('entry reset uses selected account and falls back from manual to active account', () => {
   const selected = setup({accountValue: 'a2'});
   vm.runInContext('resetSimulationEntryDefaults()', selected.context);
@@ -100,6 +138,8 @@ test('entry reset uses selected account and falls back from manual to active acc
   assert.equal(manual.elements.simBalance.readOnly, true);
 });
 
+// Testa loadSimFromAccount em modo 'manual': desbloqueia o campo de saldo para edicao manual
+// e executa exatamente uma projecao Monte Carlo e uma renderizacao de grafico.
 test('manual load unlocks balance, applies manual snapshot and renders', () => {
   const {context, elements, calls} = setup({accountValue: 'manual'});
   vm.runInContext('loadSimFromAccount()', context);
@@ -108,6 +148,8 @@ test('manual load unlocks balance, applies manual snapshot and renders', () => {
   assert.equal(calls.filter(call => call[0] === 'chart').length, 1);
 });
 
+// Testa loadSimFromAccount com uma conta real ('a2'): trava o saldo em readOnly e aplica os campos
+// do snapshot antes de invocar a projecao Monte Carlo.
 test('account load applies its snapshot before rendering', () => {
   const {context, elements, calls} = setup({accountValue: 'a2'});
   vm.runInContext('loadSimFromAccount()', context);
@@ -115,6 +157,9 @@ test('account load applies its snapshot before rendering', () => {
   assert.ok(calls.findIndex(call => call[0] === 'field') < calls.findIndex(call => call[0] === 'projection'));
 });
 
+// Valida renderSimulation de ponta a ponta com select incompleto (optionCount: 1) e RRR customizado:
+// acrescenta as 2 contas cadastradas ao select mantendo 'manual', exibe simRRRCustom, passa rrr 1.5
+// e 100 cenarios para a projecao, renderiza 4 cartoes, resumo (40% e 10%), plano e grafico 'simChart' com 5 series.
 test('simulation renderer preserves account options, custom RRR, cards, summary, plan and chart', () => {
   const {context, elements, calls} = setup({accountValue: 'manual', optionCount: 1, rrrValue: 'custom'});
   vm.runInContext('renderSimulation()', context);

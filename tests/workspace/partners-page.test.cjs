@@ -1,3 +1,27 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar a renderizacao da pagina de parceiros (renderPartnersPage): estados vazios,
+ *   preenchimento com afiliados e QR Code BTC escapando HTML com seguranca, guarda
+ *   quando falta algum elemento obrigatorio do DOM e contrato de script no index.html.
+ *
+ * Modulo/arquivo testado:
+ *   Funcao renderPartnersPage em src/modules/partners/presentation/partners-page.js
+ *   (confirmando que a declaracao legada foi removida de app.js).
+ *
+ * Estrategia de isolamento:
+ *   Carrega partners-page.js em uma sandbox node:vm, substitui getPartnerHubConfig por
+ *   um stub controlado apos o carregamento e instrumenta getElementById e escapeHtml
+ *   (permitindo omitir nos especificos via parametro absent).
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Hub vazio habilita o botao de adicionar afiliado, exibe placeholders de QR Code e
+ *     lista vazia com seus botoes inline e oculta a grade legada (partnersGrid).
+ *   - Hub preenchido escapa caracteres especiais (<, &, ") nos campos dos afiliados,
+ *     mantem handlers inline onchange/onclick corretos e nao muta o objeto hub original.
+ *   - Se qualquer alvo obrigatorio (ex.: partnerCoffeeUrl) estiver ausente, retorna antes
+ *     de chamar getPartnerHubConfig ou alterar controles opcionais.
+ *   - Script classico sincrono carregado uma unica vez antes de profile-page.js no index.html.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,6 +36,9 @@ const extracted = fs.existsSync(path.join(root, partnerPath));
 const source = extracted ? fs.readFileSync(path.join(root, partnerPath), 'utf8') : legacyDeclaration;
 assert.ok(source, 'renderPartnersPage must remain available');
 
+// Monta a sandbox vm com os seis nos DOM da pagina de parceiros (podendo omitir IDs via
+// absent), registra todas as chamadas a getElementById/getPartnerHubConfig/escapeHtml
+// e preserva o stub de getPartnerHubConfig sobre a definicao do modulo.
 function createHarness(hub, absent = []) {
   const calls = [];
   const ids = ['partnersGrid', 'partnerAffiliatesEditor', 'partnerBtcAddress', 'partnerCoffeeUrl',
@@ -30,6 +57,8 @@ function createHarness(hub, absent = []) {
   return {calls, nodes, context};
 }
 
+// Verifica a renderizacao com configuracao vazia: consulta o hub uma unica vez, habilita
+// o botao de adicionar, mostra estados vazios com botoes de acao e esconde partnersGrid.
 test('empty partner hub renders existing empty states and hides legacy grid', () => {
   const {calls, nodes, context} = createHarness({btcAddress: '', coffeeUrl: '', btcQrImage: '', affiliates: []});
   assert.equal(vm.runInContext('renderPartnersPage()', context), undefined);
@@ -45,6 +74,9 @@ test('empty partner hub renders existing empty states and hides legacy grid', ()
   assert.equal(nodes.partnersGrid.style.display, 'none');
 });
 
+// Testa hub populado com caracteres sensiveis (<, &, "): valida preenchimento dos inputs,
+// imagem do QR Code com botao de limpar, escape seguro nos valores HTML, handlers inline
+// corretos e preservacao imutavel dos dados originais no objeto hub.
 test('populated partner hub preserves fields, escaping and inline handlers', () => {
   const hub = {btcAddress: 'bc1test', coffeeUrl: 'https://coffee.test', btcQrImage: 'data:image/png;base64,abc',
     affiliates: [{id: 'affiliate-1', name: 'Mesa <&', url: 'https://example.test/?a=1&b=2',
@@ -63,6 +95,8 @@ test('populated partner hub preserves fields, escaping and inline handlers', () 
   assert.equal(hub.affiliates[0].name, 'Mesa <&');
 });
 
+// Garante retorno antecipado quando um elemento obrigatorio (partnerCoffeeUrl) esta ausente:
+// consulta os 6 IDs mas nao chama getPartnerHubConfig e nao altera disabled nem display.
 test('missing required target returns before reading hub or mutating optional controls', () => {
   const {calls, nodes, context} = createHarness({affiliates: []}, ['partnerCoffeeUrl']);
   vm.runInContext('renderPartnersPage()', context);
@@ -74,6 +108,8 @@ test('missing required target returns before reading hub or mutating optional co
   assert.equal(nodes.partnersGrid.style.display, 'grid');
 });
 
+// Confirma que a declaracao legada foi removida de app.js e que partners-page.js carrega
+// uma unica vez como script classico sincrono imediatamente antes de profile-page.js.
 test('extracted partners renderer stays a synchronous classic script before app.js', () => {
   if (!extracted) return;
   assert.ok(!legacyDeclaration, 'legacy declaration must be moved');

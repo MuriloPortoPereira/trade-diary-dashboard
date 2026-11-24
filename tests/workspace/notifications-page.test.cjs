@@ -1,3 +1,27 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar a renderizacao da pagina de notificacoes operacionais (renderNotificationsPage):
+ *   coleta de alertas da conta ativa, copia defensiva dos objetos de alerta, mensagem
+ *   de estado vazio, propagacao de falhas e registro do script no index.html.
+ *
+ * Modulo/arquivo testado:
+ *   Funcao renderNotificationsPage em src/modules/notifications/presentation/notifications-page.js
+ *   (com assercao imediata de que a declaracao legada foi removida de app.js).
+ *
+ * Estrategia de isolamento:
+ *   Extrai renderNotificationsPage e executa em uma sandbox node:vm com stubs que
+ *   verificam identidade dos argumentos (conta e trades) passados a buildOperationalAlerts
+ *   e capturam os argumentos enviados a renderStatusList.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Fluxo exato: getActiveAccount -> getAccountTrades(activeAccountId) ->
+ *     buildOperationalAlerts(acct, trades) -> renderStatusList('notificationFeed', ...).
+ *   - Os alertas passados a renderStatusList sao copias rasas (novo array e novos objetos),
+ *     evitando mutacao acidental dos objetos originais.
+ *   - Cada invocacao rele activeAccountId dinamicamente e preserva o texto padrao de feed vazio.
+ *   - Falhas (ex.: buildOperationalAlerts retornando null) propagam sem renderizar feed parcial.
+ *   - Script classico sincrono carregado uma unica vez antes de app.js no index.html.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,6 +36,8 @@ assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8')
   .match(/^function renderNotificationsPage\([^]*?^\}/m)[0];
 
+// Prepara o contexto vm com conta 'a', um trade de amostra e espias que confirmam que
+// buildOperationalAlerts recebe exatamente a conta e trades consultados antes de renderStatusList.
 function harness(alerts) {
   const account = {id: 'a'};
   const rows = [{id: 'trade-a'}];
@@ -32,6 +58,8 @@ function harness(alerts) {
   return {context, calls};
 }
 
+// Verifica que renderNotificationsPage consulta conta/trades/alertas em ordem, envia para
+// 'notificationFeed' com mensagem vazia padrao e entrega copias (novo array e novos itens) sem mutar alertas.
 test('notifications renders copied alerts for the active account without mutation', () => {
   const alerts = [{tone: 'warn', title: 'Limite', summary: 'Atenção', action: 'showPage("setup")', extra: 3}];
   const {context, calls} = harness(alerts);
@@ -46,6 +74,8 @@ test('notifications renders copied alerts for the active account without mutatio
   assert.equal(alerts[0].extra, 3);
 });
 
+// Garante que mudar activeAccountId entre duas chamadas faz consultar os trades da nova
+// conta ('a' e depois 'b') e mantem a mensagem de estado vazio quando nao ha alertas.
 test('notifications preserves the empty feed message and current account on each call', () => {
   const {context, calls} = harness([]);
   vm.runInContext('renderNotificationsPage(); activeAccountId="b"; renderNotificationsPage()', context);
@@ -56,12 +86,15 @@ test('notifications preserves the empty feed message and current account on each
   }
 });
 
+// Caso buildOperationalAlerts retorne null, o erro de .map() propaga imediatamente antes
+// de chamar renderStatusList, impedindo a exibicao de um feed incompleto.
 test('notifications propagates alert failures without rendering a partial feed', () => {
   const {context, calls} = harness(null);
   assert.throws(() => vm.runInContext('renderNotificationsPage()', context), /map/);
   assert.equal(calls.length, 3);
 });
 
+// Confirma no index.html o carregamento unico e sincrono de notifications-page.js antes de app.js.
 test('notifications registers once as a synchronous classic script before app initialization', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)];

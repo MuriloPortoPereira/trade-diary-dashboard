@@ -1,3 +1,28 @@
+/*
+ * Objetivo:
+ *   Testar toda a camada de aplicacao de analise e comparacao de estrategias
+ *   (`strategy-analysis.js`), cobrindo suas 13 funcoes publicas: snapshots, series de equity,
+ *   estatisticas de resultado, janelas de horario dominantes, definicoes de metricas,
+ *   pontuacoes comparativas e criterio de vencedor.
+ *
+ * Modulo da aplicacao testado:
+ *   - `src/modules/analytics/application/strategy-analysis.js` (13 funcoes globais)
+ *   - Integracao com dominio (`trade-rules.js`, `calculate-trade-metrics.js`) e `calcMetrics` em `app.js`
+ *
+ * Estrategia de isolamento:
+ *   - Carrega os modulos reais de dominio (`trade-rules.js` e `calculate-trade-metrics.js`),
+ *     instancia `TradeDiaryTradeTiming.createTradeTiming()`, injeta `calcMetrics` extraido de `app.js`
+ *     e executa `strategy-analysis.js` em uma sandbox `node:vm` sem DOM nem storage.
+ *   - O ultimo teste carrega `strategy-analysis.js` em um contexto completamente vazio (`{}`)
+ *     para provar que o script classico declara todas as 13 APIs sem executar E/S no carregamento.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Filtragem de valores finitos em media/mediana e formatacao de razoes (`∞`, `-∞`, `—`, 2 casas).
+ *   - Inclusao de `BE` nos denominadores de snapshots, ranking por P/L e uso da base de capital da conta escolhida.
+ *   - Ordenacao cronologica deterministica (data, horario de abertura/saida, `createdAt`) e arredondamento da curva de equity.
+ *   - Ranking de janelas de horario por frequencia -> P/L -> horario mais cedo, com wrap de minutos negativos.
+ *   - Escala comparativa com valores negativos, metricas "menor e melhor", empates e assimetria legada para `Infinity`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -5,14 +30,18 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/analytics/application/strategy-analysis.js';
+// Lista completa das 13 funcoes publicas que devem existir uma unica vez em `strategy-analysis.js`.
 const names = ['formatStrategyRatio','getStrategySnapshots','getClosedStrategyTradesChronologically','buildStrategyEquitySeries','getStrategyCompareMetricDefs','averageNumber','medianNumber','getStrategyOutcomeStats','getTimingWindowLabel','getDominantTimingWindow','coerceStrategyCompareValue','getStrategyCompareScores','getStrategyMetricWinner'];
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+// Extrai uma funcao especifica ainda residente em `app.js` (como `calcMetrics`) para compor o harness.
 function declaration(name) {
   const match = app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
   assert.ok(match, `legacy declaration ${name}`);
   return match[0];
 }
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
+// Monta o ambiente integrado em `node:vm` com contas simuladas, dominio de trades/metricas,
+// utilitarios de horario (`TradeDiaryTradeTiming`), `calcMetrics` e o modulo `strategy-analysis.js`.
 function harness() {
   const ctx = vm.createContext({activeAccountId: 'active', accounts: [{id: 'active', balance: 1000}, {id: 'other', balance: 2000}], config: {balance: 900},
     getActiveAccount: () => ({balance: 800}), getAccountCapitalBase: acct => acct.balance + 250, fR: value => `$${value.toFixed(2)}`});
@@ -20,8 +49,11 @@ function harness() {
   vm.runInContext(`const timing=TradeDiaryTradeTiming.createTradeTiming(); const {normalizeClockTime,clockToMinutes,formatClockMinutes}=timing;\n${declaration('calcMetrics')}\n${source}`, ctx);
   return ctx;
 }
+// Converte valores do realm da VM em objetos planos do Node para comparacoes `deepEqual` confiaveis.
 const plain = value => JSON.parse(JSON.stringify(value));
 
+// Verifica defaults de entrada vazia, filtragem de valores nao finitos em `averageNumber`/`medianNumber`,
+// formatacao de `formatStrategyRatio` (`∞`, `-∞`, `—`, `'1.23'`) e as 8 definicoes de metricas comparativas.
 test('empty statistics, finite filtering, ratio formatting and metric definitions preserve defaults', () => {
   const c = harness();
   assert.deepEqual(plain(c.getStrategySnapshots([])), []);
@@ -38,6 +70,9 @@ test('empty statistics, finite filtering, ratio formatting and metric definition
   assert.equal(defs.find(d=>d.key==='maxDD').get({maxDD:0.12}), 12);
 });
 
+// Valida `getStrategySnapshots`: ignora `OPEN`, inclui `BE` no total/WR/avgR, agrupa trades sem
+// estrategia como `'Sem estratégia'`, ordena por P/L, aplica a base de capital da conta ativa ou
+// da conta passada explicitamente (`'other'`), copia o array de trades preservando referencias e sem mutar a entrada.
 test('snapshots include BE in denominators, rank strategies and use the selected capital base', () => {
   const c=harness();
   const trades=[{status:'WIN',strategy:'A',pnl:100,r:2,date:'2026-01-01'},{status:'LOSS',strategy:'A',pnl:-50,r:-1,date:'2026-01-02'},{status:'BE',strategy:'A',pnl:0,r:0},{status:'OPEN',strategy:'A',pnl:999},{status:'WIN',pnl:60}];
@@ -51,6 +86,9 @@ test('snapshots include BE in denominators, rank strategies and use the selected
   assert.notEqual(a.trades,trades); assert.equal(a.trades[0],trades[0]); assert.equal(JSON.stringify(trades),before);
 });
 
+// Testa ordenacao cronologica (`getClosedStrategyTradesChronologically`) por data, horario de
+// abertura/saida e desempate por `createdAt`, alem da curva de equity (`buildStrategyEquitySeries`)
+// com arredondamento em 2 casas e fallback para capital `1000` quando `startBal` e invalido.
 test('chronological closed trades preserve inputs and equity uses valid capital or fallback with rounding', () => {
   const c=harness();
   const trades=[{id:'later',status:'WIN',date:'2026-01-02',pnl:0.106},{id:'exit',status:'LOSS',date:'2026-01-01',exitTime:'10:00',pnl:-1},{id:'first',status:'BE',date:'2026-01-01',openTime:'9:00',pnl:0},null,{status:'OPEN'}];
@@ -64,6 +102,8 @@ test('chronological closed trades preserve inputs and equity uses valid capital 
   assert.equal(c.getClosedStrategyTradesChronologically(tied)[0],tied[1]);
 });
 
+// Confirma `getStrategyOutcomeStats`: separa `WIN`, `LOSS` e `BE` (excluindo `OPEN`), calcula
+// taxas percentuais, media de ganhos/perdas, mediana de P/L e extremos (melhor/pior trade).
 test('outcome statistics distinguish wins, losses and BE and retain numeric coercion', () => {
   const c=harness();
   const row={trades:[{status:'WIN',pnl:20},{status:'WIN',pnl:40},{status:'LOSS',pnl:-10},{status:'BE',pnl:0},{status:'OPEN',pnl:900}]};
@@ -71,6 +111,9 @@ test('outcome statistics distinguish wins, losses and BE and retain numeric coer
   assert.deepEqual(plain(s),{total:4,wins:2,losses:1,bes:1,winRatePct:50,lossRatePct:25,beRatePct:25,avgWinPnl:30,avgLossPnl:-10,medianPnl:10,bestPnl:40,worstPnl:-10});
 });
 
+// Verifica o agrupamento de janelas de horario (`getDominantTimingWindow` e `getTimingWindowLabel`):
+// ignora horarios invalidos, prioriza maior contagem, desempata por maior P/L e depois pelo horario
+// mais cedo, suporta largura customizada (60 min) e faz wrap circular para minutos negativos (`-1` -> `23:59-00:28`).
 test('timing windows rank frequency then P/L then earlier time and wrap labels', () => {
   const c=harness();
   const t=(openTime,pnl)=>({openTime,pnl});
@@ -83,6 +126,10 @@ test('timing windows rank frequency then P/L then earlier time and wrap labels',
   assert.equal(c.getTimingWindowLabel(60,60),'01:00-01:59');
 });
 
+// Valida normalizacao de pontuacao (`getStrategyCompareScores`), determinacao de vencedor
+// (`getStrategyMetricWinner`) e coercao (`coerceStrategyCompareValue`): escalas negativas,
+// inversao `better: 'lower'`, empate finito (`'Empate'`), comportamento legado quando ambos sao
+// `Infinity` (retorna `'B'`), `Infinity` vs finito (`[100, 80]`) e `-Infinity` (`-5` relativo a `4`).
 test('comparison scores preserve negative scales, lower-is-better, ties and Infinity winner asymmetry', () => {
   const c=harness(), higher={get:r=>r.value,better:'higher'}, lower={...higher,better:'lower'};
   const a={name:'A',value:-10},b={name:'B',value:-5};
@@ -100,6 +147,8 @@ test('comparison scores preserve negative scales, lower-is-better, ties and Infi
   assert.equal(c.coerceStrategyCompareValue(NaN),0); assert.equal(c.coerceStrategyCompareValue(-Infinity,4),-5);
 });
 
+// Garante que `strategy-analysis.js` pode ser carregado em um contexto totalmente vazio sem
+// side effects de E/S, declarando exatamente uma vez cada uma das 13 funcoes esperadas.
 test('classic application script declares all thirteen APIs without executing IO', () => {
   const c=vm.createContext({});
   vm.runInContext(source,c);

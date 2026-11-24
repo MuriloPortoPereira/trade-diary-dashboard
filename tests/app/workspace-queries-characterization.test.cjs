@@ -1,3 +1,32 @@
+/*
+ * Objetivo do arquivo:
+ *   Suite de caracterizacao abrangente para consultas, normalizadores e regras de
+ *   dominio transversais do workspace: geracao deterministica para importacao,
+ *   classificacao de mercados, ordenacao e filtragem de trades por periodo/intervalo,
+ *   gestao/migracao de estrategias, recalculo de trades incompletos e preview de imagens.
+ *
+ * Modulos/arquivos testados:
+ *   Funcoes e mapa MARKET_MAP distribuidos entre demo-data.js, trade-workflows.js,
+ *   trade-log.js, trade-form.js, analytics-workspace.js, load-app-state.js,
+ *   trade-rules.js, documents-page.js e app.js.
+ *
+ * Estrategia de isolamento:
+ *   Localiza cada declaracao de funcao e a constante MARKET_MAP nos arquivos de
+ *   origem existentes e as executa juntas em uma sandbox node:vm com Date fixo
+ *   ('2026-11-06T12:00:00Z'), controles de formulario simulados e espias de UI/persistencia.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - PRNG deterministico (createSeededRandom), arredondamento em passos de 5 na
+ *     disciplina, normalizacao sem acentos e reuso idempotente da conta Tickmill.
+ *   - Inferencia de mercado (Forex/B3/Crypto), higienizacao de imagens de documentos,
+ *     horarios sinteticos de importacao e status MT5 (OPEN/BE/LOSS/WIN).
+ *   - Ordenacao e filtros de periodo (all/today/week/month/year/custom) sem mutar
+ *     o array original e inversao automatica quando data inicial > data final.
+ *   - Migracao da chave legada 'strategys', bloqueio de duplicatas normalizadas ao
+ *     renomear, registro em deletedDefaultStrategies e remocao condicionada a confirmacao.
+ *   - Preserva identidade de objetos validos em recomputeAllIncomplete e filtra apenas
+ *     arquivos de imagem em previewTradeImages.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,6 +41,7 @@ const files = ['src/modules/trades/application/demo-data.js',
   'src/modules/documents/presentation/documents-page.js', 'app.js'];
 const sources = files.filter(file => fs.existsSync(path.join(root, file)))
   .map(file => fs.readFileSync(path.join(root, file), 'utf8'));
+// Busca a declaracao de funcao (tanto em linha unica quanto multilinha) na lista de fontes.
 function declaration(name) {
   for (const source of sources) {
     const match = source.match(new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'))
@@ -28,6 +58,8 @@ const names = ['clampDisciplineScore', 'normalizeLooseText', 'createSeededRandom
   'rememberDeletedDefaultStrategy', 'renameStrategy', 'editStrategy', 'strategyUsageCount',
   'normalizeStrategyName', 'tagConfigKey', 'ensureDefaultStrategies', 'getMarket', 'normalizeDocImages',
   'mtTradeStatus', 'recomputeAllIncomplete', 'previewTradeImages', 'removeTradeImage', 'renderDashStrategyBoard'];
+// Monta a sandbox vm com MARKET_MAP, todas as funcoes alvo, Date fixo em 2026-11-06,
+// controles DOM dinamicos e stubs de notificacao/confirmacao/prompt/salvamento.
 function setup(extra = {}) {
   const calls = [];
   const controls = {};
@@ -52,8 +84,12 @@ function setup(extra = {}) {
   vm.runInContext([map, ...names.map(declaration)].join('\n'), context);
   return {context, calls, controls};
 }
+// Normaliza objetos originados no contexto vm para objetos JS simples comparaveis via deepEqual.
 const plain = value => JSON.parse(JSON.stringify(value));
 
+// Valida utilitarios de importacao deterministica: limites/arredondamento de disciplina,
+// remocao de acentos, sequencia reproduzivel de createSeededRandom, calculo de plano/confianca
+// e criacao/reaproveitamento case/accent-insensitive da conta Tickmill.
 test('seeded import helpers preserve defaults, rounding, branches and account reuse', () => {
   const {context: c} = setup();
   assert.deepEqual([-3, 'invalid', 12, 13, 102].map(c.clampDisciplineScore), [0, 0, 10, 15, 100]);
@@ -74,6 +110,9 @@ test('seeded import helpers preserve defaults, rounding, branches and account re
   assert.equal(c.accounts.length, 1);
 });
 
+// Verifica deteccao de mercado por simbolo (incluindo sufixo .a e contratos WIN),
+// filtragem/padronizacao de imagens de documentos, geracao de horarios para trades
+// fechados vs abertos e classificacao de status MT5 (null -> OPEN, ~0 -> BE, <0 -> LOSS, >0 -> WIN).
 test('market rules, media normalization and import timing retain legacy loose behavior', () => {
   const {context: c} = setup({clockToMinutes: value => value ? Number(value.split(':')[0])*60+Number(value.split(':')[1]) : null,
     formatClockMinutes: value => `${String(Math.floor(value/60)).padStart(2,'0')}:${String(value%60).padStart(2,'0')}`});
@@ -84,6 +123,9 @@ test('market rules, media normalization and import timing retain legacy loose be
   assert.deepEqual([null, 0.004, -1, 1].map(c.mtTradeStatus), ['OPEN','BE','LOSS','WIN']);
 });
 
+// Testa ordenacao cronologica (desempate por createdAt, exclusao de linhas sem data),
+// data ancora, filtros de periodo (all/today/week/month/year), ordenacao por sortState,
+// normalizacao de datas do log, troca automatica de intervalo invertido e consulta custom de stats.
 test('trade ordering, period queries and date controls preserve boundaries without mutating input', () => {
   const {context:c, controls} = setup();
   const rows = [{date:'2026-11-06', createdAt:'b'}, {date:'2026-11-05'}, {date:'2026-11-06',createdAt:'a'}, {}];
@@ -111,6 +153,9 @@ test('trade ordering, period queries and date controls preserve boundaries witho
   assert.equal(c.getStatsPeriodTrades().length, 1);
 });
 
+// Verifica ciclo de vida das estrategias: normalizacao alfanumerica, migracao/deduplicacao
+// de 'strategys' respeitando deletedDefaultStrategies, contagem de uso na conta ativa,
+// bloqueio de colisao ao renomear, propagacao exata para trades, prompt de edicao e confirmacao de exclusao.
 test('strategy migration, edits and deletion retain persistence and history semantics', () => {
   const {context:c, calls} = setup();
   assert.equal(c.normalizeStrategyName(' Ação + 2 '), 'acao2');
@@ -130,6 +175,9 @@ test('strategy migration, edits and deletion retain persistence and history sema
   assert.deepEqual(calls.slice(-2), ['save','render']);
 });
 
+// Garante que recomputeAllIncomplete preserva a referencia de trades ja completos e clona
+// apenas os incompletos com missing_fields; valida guarda de container e filtro MIME em
+// previewTradeImages, remocao de imagem e delegacao do painel de estrategias no dashboard.
 test('incomplete recalculation and media actions preserve identity, filters and rendering', () => {
   const {context:c, calls, controls} = setup({calcImportMissingFields: row => row.id === 'ok' ? [] : ['date'],
     FileReader: class {readAsDataURL(file) {this.onload({target:{result:file.url}});}}});

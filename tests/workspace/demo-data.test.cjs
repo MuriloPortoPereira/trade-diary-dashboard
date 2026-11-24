@@ -1,3 +1,29 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar o gerador de dados de demonstracao (300 trades deterministicos), o fluxo
+ *   de importacao demo Tickmill (40 trades remapeados), a idempotencia do seed de
+ *   estrategias demo e o carregamento automatico vs manual com trava de edicao e confirmacao.
+ *
+ * Modulo/arquivo testado:
+ *   src/modules/trades/application/demo-data.js (funcoes buildTickmillDemoImport,
+ *   loadTickmillDemoImport, buildSampleTrades, ensureSampleStrategies, loadSampleData
+ *   e addSampleTrades, garantindo tambem ausencia de declaracoes legadas em app.js).
+ *
+ * Estrategia de isolamento:
+ *   Executa o modulo em uma sandbox node:vm com Date fixo ('2026-11-04T15:30:00.000Z'),
+ *   gerador sequencial de UIDs ('uid-1'..'uid-300') e stubs espiados para persistencia,
+ *   UI de topbar, preview de importacao, modais, trava de conta e confirmacao.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - buildSampleTrades() produz sempre exatamente os mesmos 300 trades (verificado
+ *     via digest SHA-256) e usa a conta ativa e data atual quando argumentos sao omitidos.
+ *   - buildTickmillDemoImport() limita e remapeia exatamente 40 trades com IDs
+ *     'tickmill-demo-1..40'; loadTickmillDemoImport() respeita a ordem de 7 efeitos colaterais.
+ *   - ensureSampleStrategies() e idempotente (case-insensitive) e loadSampleData() persiste ao final.
+ *   - addSampleTrades() respeita showLogAccountEditLockNotice, exige confirmacao antes de
+ *     incluir os trades e executa save -> refreshAll -> showAppNotice apos confirmar.
+ *   - Carregamento sincrono unico no index.html antes de app.js.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
@@ -21,12 +47,16 @@ const source = legacySources.every(Boolean)
   ? legacySources.join('\n\n')
   : fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+// Subclasse de Date que congela o instante padrao em 2026-11-04T15:30:00.000Z para
+// garantir geracao 100% deterministica das datas dos trades de demonstracao.
 class FixedDate extends Date {
   constructor(value) {
     super(value === undefined ? '2026-11-04T15:30:00.000Z' : value);
   }
 }
 
+// Configura a sandbox vm com conta padrao, estrategias/erros padrao, UIDs previsiveis,
+// normalizadores reais simplificados e espias para todos os efeitos colaterais de UI/storage.
 function setup(overrides = {}) {
   const calls = [];
   let uidIndex = 0;
@@ -66,6 +96,8 @@ function setup(overrides = {}) {
   return {context, sandbox, calls};
 }
 
+// Valida determinismo absoluto de buildSampleTrades: parametros padrao igualam chamada
+// explicita, gera 300 trades completos (sem imagens e incomplete=false) com hash SHA-256 exato.
 test('sample generator preserves its deterministic 300-trade dataset and defaults', () => {
   const {context} = setup();
   const result = context.buildSampleTrades('account-a', '2026-11-04');
@@ -83,6 +115,8 @@ test('sample generator preserves its deterministic 300-trade dataset and default
   assert.equal(digest, '59e941c718328e41a982852ec3af52edcd7dfe85d8ba6373bfb91983722276ba');
 });
 
+// Verifica o recorte e remapeamento de 40 trades na importacao demo Tickmill e a sequencia
+// exata de efeitos de loadTickmillDemoImport (conta -> pending -> save -> topbar -> preview -> modal).
 test('Tickmill demo keeps 40 remapped trades and import side-effect order', () => {
   const built = setup();
   built.context.buildSampleTrades = accountId => Array.from({length: 45}, (_, index) => ({id: `old-${index}`, accountId, value: index}));
@@ -106,6 +140,8 @@ test('Tickmill demo keeps 40 remapped trades and import side-effect order', () =
   ]);
 });
 
+// Confirma que ensureSampleStrategies nao duplica 'Al Brooks' quando 'al brooks' ja existe,
+// adiciona apenas a estrategia faltante ('Halt Vwap') e que loadSampleData popula trades e salva.
 test('sample strategies and automatic loading remain idempotent and ordered', () => {
   const {context, sandbox, calls} = setup({config: {balance: 1000, strategies: ['al brooks']}});
   context.ensureSampleStrategies();
@@ -117,6 +153,8 @@ test('sample strategies and automatic loading remain idempotent and ordered', ()
   assert.equal(calls.at(-1)[0], 'save');
 });
 
+// Testa addSampleTrades em dois caminhos: (1) com trava ativa, aborta antes de abrir confirmacao;
+// (2) sem trava, solicita confirmacao e somente no callback anexa trades, salva, atualiza UI e avisa.
 test('manual loading preserves lock guard, confirmation and callback effects', () => {
   const locked = setup({showLogAccountEditLockNotice: action => { lockedCalls.push(action); return true; }});
   const lockedCalls = [];
@@ -142,6 +180,8 @@ test('manual loading preserves lock guard, confirmation and callback effects', (
   ]);
 });
 
+// Verifica no index.html que demo-data.js e carregado uma vez como script sincrono antes
+// de app.js e que nenhuma das seis funcoes permaneceu em app.js.
 test('extracted demo data remains one synchronous classic script before app.js', () => {
   if (legacySources.every(Boolean)) return;
   assert.equal(legacySources.filter(Boolean).length, 0);

@@ -1,3 +1,15 @@
+/*
+ * Objetivo: Testar a inicializacao e o preenchimento da pagina de configuracao de risco e setup
+ * (`renderSetup`), garantindo precedencia entre conta ativa, `config` e valores padrao.
+ * Modulo/arquivo testado: funcao `renderSetup` em
+ * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de `app.js`).
+ * Estrategia de isolamento: extrai apenas `renderSetup` e executa em `node:vm` com `FixedDate`
+ * (`2026-10-07`), mapa configuravel de campos DOM (suportando campos ausentes) e spies para os
+ * sub-renderizadores (`renderSetupRiskSummary`, `renderSetupCashflowList`, `renderTags`).
+ * Pontos-chave garantidos: precedencia da conta ativa preservando zeros explicitos, manutencao
+ * de data ja preenchida vs inicializacao automatica quando vazia, tolerancia a `null` e campos
+ * ausentes sem interromper renderizadores filhos, e ordem de declaracao/carregamento do script.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,11 +24,19 @@ assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = moduleSource.match(/^function renderSetup\([^]*?^\}/m)[0];
 
+/*
+ * Lista completa dos IDs de inputs gerenciados por `renderSetup`.
+ */
 const fieldIds = [
   'cfg-balance', 'cfg-goal', 'cfg-risk', 'cfg-dd-daily', 'cfg-dd-weekly',
   'cfg-dd-monthly', 'cfg-dd', 'cfg-tf', 'cfg-mult', 'cfg-sym-default', 'setup-flow-date',
 ];
 
+/*
+ * Helper de renderizacao em sandbox: cria os inputs simulados (omitindo os listados em `missing`),
+ * congela `Date.prototype.toISOString()` em 2026-10-07, registra chamadas em `calls`, executa
+ * `renderSetup()` e retorna o estado resultante dos campos e dos renderizadores downstream.
+ */
 function render({account = null, config = {}, values = {}, missing = []} = {}) {
   const nodes = Object.fromEntries(fieldIds
     .filter(id => !missing.includes(id))
@@ -39,6 +59,11 @@ function render({account = null, config = {}, values = {}, missing = []} = {}) {
   return {nodes, calls};
 }
 
+/*
+ * Precedencia da conta ativa: todos os campos numericos zerados na conta prevalecem sobre valores
+ * positivos de `config`, `mult: 0` vira string vazia, data ja existente em `setup-flow-date` e
+ * preservada e os sub-renderizadores executam na sequencia esperada.
+ */
 test('account values take precedence while zero values and an existing date are preserved', () => {
   const account = {
     balance: 0, goalPct: 0, risk: 0, ddDaily: 0, ddWeekly: 0,
@@ -58,6 +83,11 @@ test('account values take precedence while zero values and an existing date are 
   ]);
 });
 
+/*
+ * Fallback sem conta ativa: le campos de `config` quando disponiveis, aplica defaults legados
+ * (`goal: 10`, `ddDaily: 2`, `ddWeekly: 5`, `ddMonthly: 8`, `dd: 10` inclusive sobre `dd: 0`) e
+ * inicializa `setup-flow-date` vazio com a data ISO do dia (`2026-10-07`).
+ */
 test('missing account uses config and legacy defaults and initializes an empty date', () => {
   const config = {balance: 500, risk: 2, dd: 0, tf: 'H1', mult: 3, symDefault: 'WIN'};
   const {nodes} = render({config, values: {'setup-flow-date': ''}});
@@ -74,6 +104,10 @@ test('missing account uses config and legacy defaults and initializes an empty d
   assert.equal(nodes['setup-flow-date'].value, '2026-10-07');
 });
 
+/*
+ * Resiliencia a `null` e DOM incompleto: valores `null` em `config` nao sobrescrevem o conteudo
+ * previo dos inputs e a ausencia de campos opcionais nao impede a chamada de resumo, cashflows e tags.
+ */
 test('null values and missing fields stay untouched without skipping downstream renderers', () => {
   const {nodes, calls} = render({
     config: {balance: null, goal: null, risk: null, tf: null},
@@ -87,6 +121,11 @@ test('null values and missing fields stay untouched without skipping downstream 
   assert.deepEqual(calls.filter(call => call[0] === 'tags').map(call => call[1]), ['strategy', 'emotion', 'market']);
 });
 
+/*
+ * Contrato de carregamento e ordenacao interna: confirma script classico sincrono unico antes de
+ * `app.js` e que os componentes `renderSetupRiskSummary` e `renderSetupCashflowList` sao definidos
+ * antes de `renderSetup`.
+ */
 test('risk setup page loads once after its components and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]

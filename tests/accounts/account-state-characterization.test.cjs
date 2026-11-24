@@ -1,3 +1,18 @@
+/*
+ * Objetivo: Suite de caracterizacao abrangente para 19 funcoes centrais de estado de contas,
+ * normalizacao, sanitizacao/CRUD de cashflow, consultas de trades, calculo de saldos, formatacao
+ * monetaria, rotulos de tipo e alternancia de modo (`percent`/`absolute`).
+ * Modulo/arquivo testado: declaracoes unicas distribuidas entre `app.js`,
+ * `src/modules/accounts/application/account-risk-workflows.js` e
+ * `src/modules/accounts/presentation/accounts-workspace.js` (com apoio do dominio
+ * `src/modules/accounts/domain/account-risk-calculations.js`).
+ * Estrategia de isolamento: localiza exatamente uma definicao para cada uma das 19 funcoes,
+ * executa-as em `node:vm` com relogio congelado (`2026-11-06`), gerador de ID sequencial (`uid`)
+ * e mocks rastreaveis de persistencia, limpeza de texto, risco, metricas e DOM.
+ * Pontos-chave garantidos: preservacao fiel de fallbacks nullish/legados, excecoes `TypeError`,
+ * nao mutacao de objetos originais, coercoes numericas/textuais, limiar de exibicao de cashflow
+ * e persistencia antes de atualizacoes de UI.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -13,7 +28,16 @@ const source = names.map(name => {
   assert.equal(definitions.length, 1, `${name} remains available exactly once`);
   return definitions[0][0];
 }).join('\n');
+/*
+ * Helper de normalizacao: converte estruturas criadas dentro do contexto `vm` em objetos JSON
+ * planos para comparacao segura com `assert.deepEqual`.
+ */
 const plain = value => JSON.parse(JSON.stringify(value));
+/*
+ * Helper de inicializacao em sandbox: monta o contexto `vm` com `Date` fixo, gerador `uid`
+ * deterministico (`flow-1`, `flow-2`...), stubs gravadores em `calls`, dominio de calculos de
+ * risco e todas as 19 funcoes sob caracterizacao.
+ */
 function setup() {
   const calls = [], nodes = {};
   let nextId = 0;
@@ -32,6 +56,11 @@ function setup() {
   return {c, calls, nodes};
 }
 
+/*
+ * Normalizacao de conta e tipo: confirma defaults para campos ausentes/nullish, preservacao de
+ * zeros, strings vazias, booleanos e propriedades extras sem mutar a entrada, conversao do tipo
+ * legado `futures_usd` para `cfd_pct`, `isFuturesAccount` sempre falso e `TypeError` em `null`.
+ */
 test('normalization preserves nullish defaults, unknown fields and legacy account types', () => {
   const {c} = setup();
   assert.deepEqual(plain(c.normalizeAccount()), {type: 'cfd_pct', ddDaily: 2, ddWeekly: 5, ddMonthly: 8, ddTotal: 10, risk: 1, goalPct: 10, cashflows: []});
@@ -44,6 +73,11 @@ test('normalization preserves nullish defaults, unknown fields and legacy accoun
   assert.throws(() => c.normalizeAccount(null), {name: 'TypeError'});
 });
 
+/*
+ * Sanitizacao de cashflow: retorna `null` sem efeitos colaterais para entradas invalidas,
+ * converte prefixos negativos via valor absoluto com `uid`/data atual/nota limpa, preserva
+ * `Infinity` e data bruta, lanca `TypeError` em `null`/`Symbol` e exige `withdrawal` minusculo.
+ */
 test('cashflow sanitization preserves parsing, generated defaults, cleaning and errors', () => {
   const {c, calls} = setup();
   assert.equal(c.sanitizeAccountCashflow(), null); assert.equal(c.sanitizeAccountCashflow({amount: 'invalid'}), null); assert.deepEqual(calls, []);
@@ -56,6 +90,11 @@ test('cashflow sanitization preserves parsing, generated defaults, cleaning and 
   assert.equal(c.normalizeCashflowType('Withdrawal'), 'deposit');
 });
 
+/*
+ * Busca de conta ativa (`getActiveAccount`): normaliza e substitui a referencia de `c.accounts`
+ * filtrando cashflows invalidos sem mutar o array original, faz fallback para a primeira conta
+ * quando o ID ativo nao existe e devolve `undefined` se a lista estiver vazia.
+ */
 test('account normalization sanitizes cashflows without mutating input and active lookup replaces state', () => {
   const {c} = setup();
   const original = [{id: 'a', cashflows: [{id: 'x', amount: 0}, {id: 'y', amount: '-2'}]}, {id: 'b'}];
@@ -65,6 +104,11 @@ test('account normalization sanitizes cashflows without mutating input and activ
   c.activeAccountId = 'missing'; assert.equal(c.getActiveAccount().id, 'a'); c.accounts = []; assert.equal(c.getActiveAccount(), undefined);
 });
 
+/*
+ * Filtragem de trades por conta: devolve exatamente a mesma referencia `c.trades` para filtro
+ * ausente, `'all'` ou `0`, inclui trades sem `accountId`/vazio/`'default'` sob `'default'` e
+ * aplica igualdade estrita entre string `'1'` e numero `1`.
+ */
 test('trade queries preserve all-array identity, strict ids and default legacy membership', () => {
   const {c} = setup(); c.trades = [{id: 'a', accountId: 'a'}, {id: 'b'}, {id: 'c', accountId: ''}, {id: 'd', accountId: 'default'}, {id: 'e', accountId: 1}];
   assert.equal(c.getAccountTrades(), c.trades); assert.equal(c.getAccountTrades('all'), c.trades); assert.equal(c.getAccountTrades(0), c.trades);
@@ -72,6 +116,10 @@ test('trade queries preserve all-array identity, strict ids and default legacy m
   assert.deepEqual(c.getAccountTrades('1'), []); assert.deepEqual(c.getAccountTrades(1).map(t => t.id), ['e']);
 });
 
+/*
+ * Saldo operacional (`getAccountWorkingBalance`): usa o saldo de risco apenas quando e numero
+ * finito e positivo; caso contrario cai na cadeia `account.balance -> config.balance -> 1000`.
+ */
 test('working balance uses only positive finite risk values and preserves fallback coercion', () => {
   const {c, calls} = setup(); const account = {id: 'a', balance: 200}; c.trades = [{accountId: 'a'}];
   c.riskBalance = 220; assert.equal(c.getAccountWorkingBalance(account), 220); assert.equal(calls.at(-1)[2][0], c.trades[0]);
@@ -80,6 +128,11 @@ test('working balance uses only positive finite risk values and preserves fallba
   assert.equal(c.getAccountWorkingBalance(), '300'); c.config.balance = 0; assert.equal(c.getAccountWorkingBalance(), 1000);
 });
 
+/*
+ * Capital base e saldo atual: valida preservacao da referencia de `cashflows`, override explicito
+ * de lista de trades `null` (interpretada como `[]`), concatenacao JS legada quando `balance` e
+ * string (`'10015'` e `'100157'`) e retorno `0` para conta nula.
+ */
 test('capital and current balances preserve cashflow references, defaults and addition semantics', () => {
   const {c, calls} = setup(); const flows = [{type: 'deposit', amount: 20}, {type: 'withdrawal', amount: 5}];
   const account = {id: 'a', balance: 100, cashflows: flows}; c.trades = [{accountId: 'a', pnl: 7}, {accountId: 'b', pnl: 99}];
@@ -92,6 +145,11 @@ test('capital and current balances preserve cashflow references, defaults and ad
   assert.equal(c.getAccountCapitalBase(null), 0);
 });
 
+/*
+ * Persistencia de adicao e remocao de cashflow: protege contra conta ausente, valor invalido e
+ * campo `cashflows` nao-array, grava apenas quando ha mudanca real (`save` chamado 2 vezes no
+ * total) e remove todas as ocorrencias correspondentes ao ID solicitado.
+ */
 test('cashflow add and delete preserve guards, stored references and persistence counts', () => {
   const {c, calls} = setup(); c.accounts = [{id: 'a', cashflows: 'invalid'}];
   assert.equal(c.addAccountCashflow('missing', {amount: 1}), null); assert.deepEqual(calls, []);
@@ -103,6 +161,11 @@ test('cashflow add and delete preserve guards, stored references and persistence
   assert.equal(calls.filter(call => call === 'save').length, 2);
 });
 
+/*
+ * Selecao de conta no formulario de trade: busca diretamente em `accounts` pelo seletor `#t-account`
+ * sem disparar normalizacao quando ha correspondencia ou valor vazio; recorre a `getActiveAccount`
+ * (que normaliza `accounts`) apenas se o ID selecionado nao for encontrado.
+ */
 test('trade form account uses direct selection before active account normalization', () => {
   const {c, nodes} = setup(); const original = [{id: 'a'}, {id: 'b'}]; c.accounts = original; nodes['t-account'] = {value: 'b'};
   assert.equal(c.getTradeFormAccount(), original[1]); assert.equal(c.accounts, original);
@@ -111,6 +174,11 @@ test('trade form account uses direct selection before active account normalizati
   c.accounts = []; delete nodes['t-account']; assert.equal(c.getTradeFormAccount(), undefined);
 });
 
+/*
+ * Formatacao monetaria com sinal e resumo de variacao: converte zeros/NaN/undefined/invalidos em
+ * `+money:0`, preserva `-` e `Infinity`, retorna `—` sem estado e so anexa o trecho `· Mov.`
+ * quando `Math.abs(cashflowNet)` ultrapassa o limiar de `0.0001`.
+ */
 test('money labels retain signs, coercion and the cashflow visibility threshold', () => {
   const {c} = setup();
   for (const value of [0, -0, NaN, undefined, 'invalid']) assert.equal(c.formatSignedMoney(value), '+money:0');
@@ -121,6 +189,11 @@ test('money labels retain signs, coercion and the cashflow visibility threshold'
 });
 
 
+/*
+ * Alternancia de modo (`setMode`): salva configuracao antes de alternar classes/visibilidade dos
+ * campos opcionais, re-renderiza exclusivamente a pagina ativa (`page-log` ou `page-dashboard`) e
+ * tolera ausencia completa de elementos DOM.
+ */
 test('mode changes persist before updating optional fields and refresh the current page only', () => {
   const {c, calls, nodes} = setup();
   let page = 'page-log';
@@ -137,6 +210,10 @@ test('mode changes persist before updating optional fields and refresh the curre
   c.setMode('unknown'); assert.equal(c.config.mode, 'unknown'); assert.deepEqual(calls, ['save']);
 });
 
+/*
+ * Rotulos de tipo de conta: mapeia aliases legados (`cfd_pct` e `futures_usd` -> `'CFD %'`),
+ * `prop_pct` e `crypto`, devolvendo valores desconhecidos, `undefined` ou `null` sem alteracao.
+ */
 test('account type labels preserve legacy aliases and unknown values', () => {
   const {c} = setup();
   for (const type of ['cfd_pct', 'futures_usd']) assert.equal(c.acctTypeLabel(type), 'CFD %');

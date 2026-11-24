@@ -1,9 +1,33 @@
+/*
+ * Objetivo:
+ *   Validar a renderizacao da pagina dedicada de Psicologia (`renderPsych`), verificando
+ *   resumos de melhor/pior emocao, taxa de adesao ao plano, disciplina media, graficos
+ *   (`emotionChart` e `discChart`) e tabela detalhada por estado emocional.
+ *
+ * Modulo da aplicacao testado:
+ *   - `src/modules/psychology/presentation/psychology-page.js` (funcao `renderPsych`)
+ *   - Existencia do modulo extraido, remocao do legado em `app.js` e inclusao em `index.html`
+ *
+ * Estrategia de isolamento:
+ *   - Extrai apenas `renderPsych` via regex e a executa em contexto `node:vm` com mocks de
+ *     DOM, `getAccountTrades`, filtros comportamentais (`getClosedTradesWithSubjectiveEmotion`,
+ *     `getClosedTradesWithPlanTag`) e `mkChart`.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Exclusao de trades `OPEN` antes de delegar para os seletores de emocao e plano.
+ *   - Calculo correto de melhor/pior emocao por win rate, aderencia ao plano (`sim`), media de disciplina e R medio.
+ *   - Estado neutro seguro para base vazia (`'—'`, `'0%'`, tabela vazia e datasets zerados).
+ *   - Tolerancia a ausencia de nos opcionais de resumo sem bloquear graficos nem tabela.
+ *   - Carregamento sincrono unico em `index.html` antes de `app.js`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+// Confirma que `psychology-page.js` existe, que `renderPsych` nao permanece em `app.js`
+// e extrai somente a declaracao de `renderPsych` para execucao isolada.
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/psychology/presentation/psychology-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
@@ -13,6 +37,8 @@ assert.ok(!legacyDeclaration, 'legacy declaration must be moved');
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = ["renderPsych"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
+// Cria o harness de teste para `renderPsych`, permitindo configurar a lista de trades e quais
+// elementos do DOM estao presentes (`visible`), alem de registrar todas as chamadas em `calls`.
 function createHarness({trades = [], visible} = {}) {
   const ids = visible ?? ['bestEmotion', 'bestEmotionWR', 'worstEmotion', 'worstEmotionWR',
     'followedPlanRate', 'avgDisc', 'psychTbody'];
@@ -37,6 +63,9 @@ function createHarness({trades = [], visible} = {}) {
   return {calls, context, nodes};
 }
 
+// Exercita um conjunto completo com trades WIN, LOSS, BE e um OPEN (que deve ser ignorado):
+// valida melhor/pior emocao, taxa de plano seguido (50%), disciplina media arredondada (73%),
+// os dois graficos com seus rotulos/series, as 3 linhas da tabela e a passagem de apenas 4 trades fechados.
 test('psychology renders emotion summaries, discipline, charts and table', () => {
   const trades = [
     {status: 'WIN', emotion: 'Confiante', r: 2, discipline: 90, followedPlan: 'sim'},
@@ -65,6 +94,8 @@ test('psychology renders emotion summaries, discipline, charts and table', () =>
   assert.deepEqual(calls.slice(0, 3), [['trades', 'account-a'], ['emotions', 4], ['plans', 4]]);
 });
 
+// Verifica o estado vazio (nenhum trade): indicadores de emocao mostram `'—'` e subtitulo vazio,
+// percentuais ficam em `'0%'`, tabela e limpa e ambos os graficos recebem series vazias.
 test('empty psychology keeps neutral summaries and empty chart datasets', () => {
   const {calls, context, nodes} = createHarness();
   vm.runInContext('renderPsych()', context);
@@ -80,6 +111,8 @@ test('empty psychology keeps neutral summaries and empty chart datasets', () => 
   assert.deepEqual(Array.from(charts[1][2].data.datasets[0].data), []);
 });
 
+// Confirma que quando apenas `psychTbody` existe no DOM (cartoes de resumo ausentes),
+// a funcao nao falha e continua gerando os dois graficos e preenchendo a tabela normalmente.
 test('optional summary nodes do not prevent charts and table rendering', () => {
   const trade = {status: 'WIN', emotion: 'Calmo', r: 1, discipline: 85, followedPlan: 'sim'};
   const {calls, context, nodes} = createHarness({trades: [trade], visible: ['psychTbody']});
@@ -88,6 +121,8 @@ test('optional summary nodes do not prevent charts and table rendering', () => {
   assert.match(nodes.psychTbody.innerHTML, /Calmo/);
 });
 
+// Garante em `index.html` que `psychology-page.js` e carregado exatamente uma vez entre os
+// scripts locais, de forma sincrona classica e antes de `app.js`.
 test('extracted psychology renderer stays a synchronous classic script before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)]

@@ -1,3 +1,17 @@
+/*
+ * Objetivo: Garantir o calculo correto dos limites de drawdown (diario, semanal, mensal e total),
+ * risco por trade, consumo/excesso no escopo selecionado e pureza da camada de dominio.
+ * Modulo/arquivo testado: `TradeDiaryRiskLimits` em
+ * `src/modules/accounts/domain/account-risk-calculations.js` e sua integracao em
+ * `calcAccountRiskState` em `src/modules/accounts/application/account-risk-workflows.js`.
+ * Estrategia de isolamento: executa o modulo de dominio e o workflow em `node:vm` com `Date`
+ * fixo (`FixedDate`) e mocks para ordenacao, data ancora, fluxo de caixa e formatadores; valida
+ * pureza do dominio em sandbox separado com globais proibidas bloqueadas.
+ * Pontos-chave garantidos: percentuais padrao de limite, diferenca entre `capitalBase` e
+ * `goalBase`, teto de `scopeUsage` em 1 preservando `scopeUsageRaw` e excesso em USD/%,
+ * selecao de escopos `today`/`week`/`month`/`all`, protecao contra capital zerado e carregamento
+ * sincrono antes dos consumidores em `index.html`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -10,6 +24,11 @@ const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';
 const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js';
 const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
+/*
+ * Helper de execucao em sandbox: fixa a data do sistema em 2026-10-14T12:00:00Z, injeta stubs
+ * (notando que `getOrderedTrades` inverte a lista simulando reordenacao cronologica) e invoca
+ * `calcAccountRiskState` retornando o estado calculado e o rastro de chamadas.
+ */
 function setup({account, trades = [], period, cashflow} = {}) {
   class FixedDate extends Date {
     constructor(...args) { super(...(args.length ? args : ['2026-10-14T12:00:00Z'])); }
@@ -32,6 +51,10 @@ function setup({account, trades = [], period, cashflow} = {}) {
   return {result: context.calcAccountRiskState(acct, trades, period), calls};
 }
 
+/*
+ * Valores padrao sem trades: conta apenas com `balance: 1000` assume limites default (2%, 5%,
+ * 10%, 10%), risco por trade 0, escopo padrao total (100 / 10%) e todos os consumos/excessos em 0.
+ */
 test('risk limits preserve defaults and empty account calculations', () => {
   const {result, calls} = setup({account: {balance: 1000}});
   assert.deepEqual(calls, ['ordered', 'anchor', 'cashflow']);
@@ -45,6 +68,11 @@ test('risk limits preserve defaults and empty account calculations', () => {
   ], [0, 0, 0, 0, 0, 0, 0]);
 });
 
+/*
+ * Escopo diario com estouro de limite: usa `capitalBase` (1150) para limites diario/semanal/mensal
+ * e risco por trade, usa `goalBase` (1200) para `totalLimit`, limita `scopeUsage` a 1 mas preserva
+ * `scopeUsageRaw` (40/23), excesso em dolares (17) e excesso percentual arredondado (1.48).
+ */
 test('daily limit uses cashflow capital and caps usage while preserving excess', () => {
   const {result} = setup({
     account: {balance: 1000, ddDaily: 2, ddWeekly: 5, ddMonthly: 8, ddTotal: 10, risk: 1, goalPct: 10},
@@ -63,6 +91,10 @@ test('daily limit uses cashflow capital and caps usage while preserving excess',
   ], [40, 23, 2, 40 / 23, 1, 17, 17, 1.48, 40]);
 });
 
+/*
+ * Selecao por periodo (`week`, `month`, `all`): valida que o mesmo historico multi-data produz
+ * perdas acumuladas, limites e taxas de uso coerentes para cada janela temporal.
+ */
 test('week, month and total scopes preserve selection and cumulative losses', () => {
   const trades = [
     {status: 'LOSS', date: '2026-10-14', pnl: -40},
@@ -80,6 +112,10 @@ test('week, month and total scopes preserve selection and cumulative losses', ()
   }
 });
 
+/*
+ * Casos de borda extremos: capital zerado, percentuais de DD zerados e risco negativo resultam
+ * em limites e ratios zerados (sem `NaN`/`Infinity`), mantendo ainda o registro do excesso em USD.
+ */
 test('risk limits retain zero capital, fallback percentages and cycle base', () => {
   const {result} = setup({
     account: {balance: 0, ddDaily: 0, ddWeekly: 0, ddTotal: 0, risk: -3, goalPct: 0},
@@ -94,6 +130,10 @@ test('risk limits retain zero capital, fallback percentages and cycle base', () 
   assert.equal(result.goalProgress, 0);
 });
 
+/*
+ * Pureza do modulo de dominio: garante ausencia de acesso a DOM, storage, rede ou estado global,
+ * verifica exatamente os metodos expostos por `TradeDiaryRiskLimits` e testa `calculateRiskThresholds`.
+ */
 test('isolated risk limits expose only pure calculations', () => {
   const forbidden = ['document', 'localStorage', 'fetch', 'accounts', 'config'];
   const sandbox = {};
@@ -106,6 +146,10 @@ test('isolated risk limits expose only pure calculations', () => {
   assert.deepEqual(JSON.parse(JSON.stringify(thresholds)), {dayLimit: 20, weekLimit: 50, monthLimit: 100, riskPerTradeUsd: 10});
 });
 
+/*
+ * Ordem de carregamento e migracao: confirma script classico sincrono unico em `index.html`
+ * antes dos consumidores e que `calcAccountRiskState` existe no workflow e nao em `app.js`.
+ */
 test('risk limits load once before classic consumers and keep global risk API', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({

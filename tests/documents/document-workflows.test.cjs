@@ -1,3 +1,18 @@
+/*
+ * Objetivo: Validar todo o ciclo de vida e os fluxos operacionais do modulo de documentos
+ * (consultas multi-fonte, criacao, selecao, formatacao de texto, salvamento, exclusao com
+ * confirmacao e upload/remocao assincrona de imagens).
+ * Modulo/arquivo testado: 22 funcoes de documentos declaradas uma unica vez entre
+ * `src/modules/documents/presentation/documents-page.js`,
+ * `src/modules/trades/domain/trade-rules.js` e `app.js`.
+ * Estrategia de isolamento: extrai exatamente uma declaracao para cada funcao e executa em
+ * `node:vm` com relogio fixo (`Clock` em `2026-11-06T12:34:56.000Z`), `FileReader` simulado que
+ * enfileira leitores em `readers` para testar callbacks fora de ordem, nos DOM e spies em `calls`.
+ * Pontos-chave garantidos: integracao das 3 origens (`tradeNotes`, `dailyNotes`, `generalNotes`),
+ * preservacao de dados nao relacionados (`pnl`, `habits`) ao salvar/excluir, formatacao Markdown
+ * multilinha com selecao de cursor, captura da entrada original em uploads assincronos mesmo apos
+ * troca de documento ou pasta, e guardas defensivos contra entradas invalidas.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,8 +27,20 @@ const declarations = names.map(name => {
   assert.equal(matches.length, 1, name);
   return matches[0][0];
 }).join('\n');
+/*
+ * Helper de serializacao: converte valores criados no realm `vm` em objetos JSON planos para
+ * comparacao com `assert.deepEqual`.
+ */
 const plain = value => JSON.parse(JSON.stringify(value));
+/*
+ * Timestamp ISO congelado usado em todas as verificacoes de `updatedAt` e `savedAt`.
+ */
 const now = '2026-11-06T12:34:56.000Z';
+/*
+ * Helper de ambiente em sandbox: cria o contexto `vm` com `Clock` fixo, mocks de estado
+ * (`trades`, `preMarketData`, `config.generalDocs`), controles DOM, `FileReader` rastreavel em
+ * `readers` e spies de persistencia/UI/modais em `calls`.
+ */
 function setup() {
   const calls = [], readers = [], nodes = {docEditorTitle: {value: ''}, docEditorBody: {value: ''}, docImageInput: {click() {calls.push('click');}}};
   class Clock extends Date { constructor(...args) {super(...(args.length ? args : [now]));} }
@@ -29,6 +56,11 @@ function setup() {
   vm.runInContext(declarations, c);
   return {c, calls, nodes, readers};
 }
+/*
+ * Consultas nas tres fontes (`tradeNotes`, `dailyNotes`, `generalNotes`): verifica filtragem por
+ * conta ativa e exclusao de observacoes em branco, ordenacao reversa/por data, projecao de
+ * metadados e imagens normalizadas, contagem das 3 pastas e fallbacks de `formatDocDate`/`normalizeDocImages`.
+ */
 test('document queries retain the three sources, filtering, projection and ordering', () => {
   const {c, calls} = setup();
   c.trades = [{id: 1, accountId: 'a', remarks: 'first', date: '2026-11-05', pnl: 0, r: 0, images: [{dataUrl: 'x'}]}, {id: 2, accountId: 'a', remarks: 'second'}, {id: 3, accountId: 'a', remarks: '  '}, {id: 4, accountId: 'b', remarks: 'foreign'}];
@@ -45,6 +77,11 @@ test('document queries retain the three sources, filtering, projection and order
   assert.equal(c.formatDocDate(''), 'Sem data');
   assert.deepEqual(plain(c.normalizeDocImages(null)), []);
 });
+/*
+ * Criacao, selecao e abertura de trade vinculado: valida criacao de nota geral com `save -> render`,
+ * reuso de diario existente preservando `habits`/`notes`/`docCreatedAt`, troca de pasta limpando
+ * `activeDocId`, rotulos explicativos e aviso na pasta de trades, e `openModal('tradeModal', 7)`.
+ */
 test('creation, selection, labels and linked trade preserve state and effect order', () => {
   const {c, calls} = setup();
   c.createGeneralDocument();
@@ -61,6 +98,11 @@ test('creation, selection, labels and linked trade preserve state and effect ord
   c.trades = [{id: 7, accountId: 'a', remarks: 'note'}]; c.selectDocumentEntry('trade:7'); c.openDocumentTrade();
   assert.deepEqual(calls.at(-1), ['modal', 'tradeModal', 7]);
 });
+/*
+ * Salvamento e exclusao nos tres tipos (`trade`, `daily`, `general`): confirma atualizacao de
+ * conteudo/timestamps na ordem `save -> refresh -> notice`, confirmacao perigosa antes da
+ * exclusao (`activeDocId` so zera no callback) e preservacao de `pnl` do trade e `habits` do diario.
+ */
 test('save and delete preserve trade and routine data, timestamps and confirmation timing', () => {
   for (const kind of ['trade', 'daily', 'general']) {
     const {c, calls, nodes} = setup();
@@ -85,6 +127,10 @@ test('save and delete preserve trade and routine data, timestamps and confirmati
     if (kind === 'general') assert.equal(c.config.generalDocs.length, 0);
   }
 });
+/*
+ * Guardas defensivos: `deleteDocumentEntry` retorna `false` para nulo, tipo desconhecido ou IDs
+ * inexistentes; salvar, excluir ou acionar upload sem documento selecionado emite `notice`.
+ */
 test('missing documents and invalid deletion retain guards', () => {
   const {c, calls} = setup();
   assert.equal(c.deleteDocumentEntry(null), false);
@@ -95,6 +141,11 @@ test('missing documents and invalid deletion retain guards', () => {
   c.saveCurrentDocument(); c.deleteCurrentDocument(); c.triggerDocumentImageUpload();
   assert.deepEqual(calls.map(v => v[0]), ['notice', 'notice', 'notice']);
 });
+/*
+ * Formatacao de selecao no editor: testa todos os estilos inline (`bold`, `italic`, `underline`),
+ * prefixos multilinha (`h1`, `h2`, `list`, `quote`), tipo desconhecido inalterado, insercao de
+ * placeholder com selecao do texto interno quando vazio e bloqueio quando o editor esta desabilitado.
+ */
 test('formatting preserves selection, multiline prefixes, fallback caret and disabled guard', () => {
   const {c, nodes} = setup(); const editor = nodes.docEditorBody;
   editor.setRangeText = function(text, start, end, mode) {assert.equal(mode, 'end'); this.value = this.value.slice(0, start) + text + this.value.slice(end);};
@@ -105,6 +156,12 @@ test('formatting preserves selection, multiline prefixes, fallback caret and dis
   editor.value = ''; editor.selectionEnd = 0; c.formatDocumentSelection('bold'); assert.equal(editor.value, '**texto em negrito**'); assert.deepEqual(editor.range, [2, 18]);
   editor.disabled = true; c.formatDocumentSelection('italic'); assert.equal(editor.value, '**texto em negrito**');
 });
+/*
+ * Uploads assincronos e concorrencia de selecao: ignora arquivos nao-imagem (`text/plain`), limpa
+ * o input, captura o documento `'general:a'` mesmo apos trocar `activeDocId` para `'general:b'`,
+ * anexa imagens na ordem real de conclusao dos `onload`, persiste/renderiza a cada callback e
+ * valida `removeDocumentImage`.
+ */
 test('asynchronous uploads capture original entry and append in callback order after selection changes', () => {
   const {c, calls, readers} = setup();
   c.config.generalDocs = [{id: 'a', images: [{dataUrl: 'initial'}]}, {id: 'b', images: []}]; c.activeDocId = 'general:a';
@@ -117,6 +174,11 @@ test('asynchronous uploads capture original entry and append in callback order a
   assert.deepEqual(calls.slice(-4), ['save', 'render', 'save', 'render']);
   c.activeDocId = 'general:a'; c.removeDocumentImage(1); assert.equal(c.config.generalDocs[0].images.length, 2);
 });
+/*
+ * Setters de midia (`setDocumentEntryImages`): descartam propriedades extras das imagens,
+ * preservam dados nao relacionados (`pnl`, `habits`, `content`), gravam `updatedAt`/`savedAt`,
+ * toleram entrada `null` e inicializam registro diario novo sob demanda.
+ */
 test('media setters preserve unrelated fields and timestamp each source', () => {
   const {c} = setup(); c.trades = [{id: 1, pnl: 9}]; c.preMarketData = {day: {habits: [true]}}; c.config.generalDocs = [{id: 1, content: 'keep'}];
   const images = [{dataUrl: 'url', extra: 'drop'}];
@@ -125,6 +187,11 @@ test('media setters preserve unrelated fields and timestamp each source', () => 
   assert.deepEqual(plain(c.preMarketData.day.images), [{name: 'imagem', dataUrl: 'url'}]);
   c.setDocumentEntryImages(null, images); c.setDocumentEntryImages({kind: 'daily', date: 'new'}, images); assert.equal(c.preMarketData.new.savedAt, now);
 });
+/*
+ * Isolamento de alvo em troca de pasta durante upload: ao iniciar upload em documento de trade
+ * ou diario e trocar imediatamente para `generalNotes`, o `onload` assincrono ainda grava a
+ * imagem no registro original sem poluir `generalDocs` nem alterar `pnl`/`habits`.
+ */
 test('trade and daily uploads keep their original target when the selected folder changes', () => {
   for (const kind of ['trade', 'daily']) {
     const {c, readers} = setup();

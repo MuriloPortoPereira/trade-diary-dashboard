@@ -1,3 +1,14 @@
+/*
+ * Objetivo: Testar a renderizacao da lista de aportes e retiradas da conta ativa exibida na
+ * pagina de configuracao/setup (`renderSetupCashflowList`).
+ * Modulo/arquivo testado: funcao `renderSetupCashflowList` em
+ * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de `app.js`).
+ * Estrategia de isolamento: executa o modulo em `node:vm` com mocks de DOM (`setupCashflowList`),
+ * leitura de conta ativa, consulta/calculo de cashflows, formatadores (`fR`, `fDate`) e `escapeHtml`.
+ * Pontos-chave garantidos: guarda de container ausente, limpeza do HTML sem conta ativa, mensagem
+ * de lista vazia, resumo com sinal/cor, escape de notas, handlers `deleteSetupCashflow` por ID,
+ * imutabilidade do array de fluxos e carregamento sincrono antes de `app.js`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,6 +22,11 @@ const legacy = appSource.match(/^function renderSetupCashflowList\([^]*?^\}/m)?.
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+/*
+ * Helper de renderizacao em sandbox: instancia o container simulado `setupCashflowList` (ou `null`
+ * quando `visible: false`), injeta conta ativa, lista de movimentacoes e resumo, executa
+ * `renderSetupCashflowList()` e devolve o HTML final, as chamadas gravadas e os fluxos.
+ */
 function render({account = {id: 'account-a'}, flows = [], summary = {deposits: 0, withdrawals: 0, net: 0}, visible = true} = {}) {
   const node = {innerHTML: 'before'};
   const calls = [];
@@ -31,18 +47,30 @@ function render({account = {id: 'account-a'}, flows = [], summary = {deposits: 0
   return {html: node.innerHTML, calls, flows};
 }
 
+/*
+ * Guarda de container ausente: sem `#setupCashflowList` no DOM, retorna antes mesmo de consultar
+ * `getActiveAccount()`.
+ */
 test('missing target returns before resolving the active account', () => {
   const {html, calls} = render({visible: false});
   assert.equal(html, 'before');
   assert.deepEqual(calls, [['target', 'setupCashflowList']]);
 });
 
+/*
+ * Conta ativa ausente: limpa o container (`innerHTML = ''`) e encerra sem consultar fluxos nem
+ * calcular totais.
+ */
 test('missing active account clears the target before cashflow work', () => {
   const {html, calls} = render({account: null});
   assert.equal(html, '');
   assert.deepEqual(calls, [['target', 'setupCashflowList'], ['account']]);
 });
 
+/*
+ * Conta sem movimentacoes: consulta fluxos e resumo passando o objeto da conta ativa e exibe a
+ * mensagem padrao de lista vazia.
+ */
 test('empty setup cashflows keep the message after lookup and calculation', () => {
   const account = {id: 'account-a'};
   const {html, calls} = render({account});
@@ -52,6 +80,11 @@ test('empty setup cashflows keep the message after lookup and calculation', () =
   assert.equal(calls.find(call => call[0] === 'calculate')[1], account);
 });
 
+/*
+ * Lista preenchida: valida totais de aportes/retiradas e liquido positivo (`+R$100` verde),
+ * ordenacao das linhas, classes por tipo, formatacao de data, escape HTML na nota, fallback `—`,
+ * handlers `deleteSetupCashflow('<id>')` e imutabilidade dos registros originais.
+ */
 test('setup rows preserve summary, order, formatting, escaping and id handlers', () => {
   const flows = [
     {id: 'deposit-1', type: 'deposit', date: '2026-10-01', amount: 125, note: 'Aporte <principal>'},
@@ -73,6 +106,10 @@ test('setup rows preserve summary, order, formatting, escaping and id handlers',
   assert.equal(JSON.stringify(flows), before);
 });
 
+/*
+ * Caso de borda de saldo liquido negativo e tipo desconhecido: aplica `text-red` sem sinal `+`
+ * no total liquido e usa o fallback visual verde `Aporte` para tipos desconhecidos.
+ */
 test('negative setup net and unknown flow type keep legacy tones and labels', () => {
   const {html} = render({
     flows: [{id: 'other-1', type: 'other', date: '', amount: 10, note: null}],
@@ -82,6 +119,10 @@ test('negative setup net and unknown flow type keep legacy tones and labels', ()
   assert.match(html, /class="text-green">Aporte<\/span>/);
 });
 
+/*
+ * Contrato de carregamento: garante script classico sincrono unico em `index.html` antes de
+ * `app.js` e definicao de `renderSetupCashflowList` anterior a `renderSetup`.
+ */
 test('setup cashflow renderer loads once as a synchronous classic script before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]

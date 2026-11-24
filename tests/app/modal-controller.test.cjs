@@ -1,3 +1,31 @@
+/*
+ * Objetivo do arquivo:
+ *   Testar o controlador generico de modais (openModal e closeModal), cobrindo
+ *   bloqueios de edicao em tradeModal, criacao vs edicao de trades, abertura de
+ *   accountModal e modais genericos, alem da limpeza de fluxo ao fechar.
+ *
+ * Modulo/arquivo testado:
+ *   Funcoes openModal e closeModal em src/app/presentation/app-workspace.js
+ *   (verificando tambem a remocao definitiva de declaracoes legadas em app.js).
+ *
+ * Estrategia de isolamento:
+ *   Extrai apenas openModal e closeModal e executa-as em uma sandbox node:vm com
+ *   elementos de modal simulados, Date deterministico e espias que registram a
+ *   sequencia exata de efeitos colaterais (bloqueio, selects, reset, preenchimento,
+ *   duracao, fluxo, lista de contas e limpeza em lote).
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Quando a conta bloqueia edicao, openModal('tradeModal', ...) retorna false
+ *     imediatamente sem tocar em editingId ou no DOM.
+ *   - Ao editar trade existente, executa lock -> populate -> reset -> fill -> flow;
+ *     se o ID nao for encontrado, pula apenas fill.
+ *   - Ao criar novo trade, define editingId=null, preenche data atual (YYYY-MM-DD)
+ *     e recalcula duracao antes de atualizar a UI de fluxo.
+ *   - accountModal oculta o formulario e renderiza lista de contas; modais genericos
+ *     apenas alternam a classe 'open'.
+ *   - closeModal limpa o fluxo em lote (clearBulkIncompleteFlow) exclusivamente
+ *     para tradeModal.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -13,6 +41,7 @@ const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = legacy ?? ["openModal", "closeModal"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
+// Fabrica leve de classList baseada em Set para simular manipulacao de classes CSS.
 function classList() {
   const classes = new Set();
   return {
@@ -22,6 +51,8 @@ function classList() {
   };
 }
 
+// Monta a sandbox vm com modais simulados, data fixa ('2026-10-13'), estado de bloqueio
+// configuravel e callbacks instrumentados para verificar a ordem de execucao.
 function setup({locked = false, trades = [{id: 't1'}]} = {}) {
   const elements = {
     tradeModal: {classList: classList()},
@@ -52,6 +83,8 @@ function setup({locked = false, trades = [{id: 't1'}]} = {}) {
   return {context, elements, calls};
 }
 
+// Garante que, com a trava de conta ativa, tanto editar quanto adicionar no tradeModal
+// retornam false antes de modificar editingId ou adicionar a classe 'open'.
 test('trade modal lock returns false before changing state or DOM', () => {
   const {context, elements, calls} = setup({locked: true});
   assert.equal(context.openModal('tradeModal', 't1'), false);
@@ -63,6 +96,8 @@ test('trade modal lock returns false before changing state or DOM', () => {
   assert.deepEqual(calls, [['lock', 'adicionar']]);
 });
 
+// Verifica o fluxo completo de edicao de um trade encontrado: define editingId, abre o
+// modal e dispara em ordem lock('editar'), populate, reset, fill(trade) e flow.
 test('editing a trade preserves lookup and form effect order', () => {
   const trade = {id: 't1', symbol: 'US30'};
   const {context, elements, calls} = setup({trades: [trade]});
@@ -74,12 +109,16 @@ test('editing a trade preserves lookup and form effect order', () => {
   ]);
 });
 
+// Caso o ID informado para edicao nao exista na lista de trades, mantem populate, reset
+// e flow sem chamar fillForm com valor indefinido.
 test('missing edited trade still resets and updates flow without filling', () => {
   const {context, calls} = setup({trades: []});
   context.openModal('tradeModal', 'missing');
   assert.deepEqual(calls, [['lock', 'editar'], ['populate'], ['reset'], ['flow']]);
 });
 
+// No modo de criacao (sem ID), zera editingId, preenche a data de hoje via FixedDate
+// e executa duration antes de atualizar a interface de fluxo do modal.
 test('new trade applies current date and duration before flow update', () => {
   const {context, elements, calls} = setup();
   context.openModal('tradeModal');
@@ -90,6 +129,8 @@ test('new trade applies current date and duration before flow update', () => {
   ]);
 });
 
+// Confirma comportamentos independentes: accountModal esconde accountForm e chama
+// renderAccountList; modais genericos como csvConfirmModal abrem sem efeitos colaterais.
 test('account and generic modals preserve their independent behavior', () => {
   const account = setup();
   account.context.openModal('accountModal', 'unexpected-id');
@@ -103,6 +144,8 @@ test('account and generic modals preserve their independent behavior', () => {
   assert.deepEqual(generic.calls, []);
 });
 
+// Valida que closeModal remove a classe 'open' em qualquer modal, mas dispara
+// clearBulkIncompleteFlow exclusivamente ao fechar tradeModal.
 test('closing removes open state and only trade modal clears bulk flow', () => {
   const trade = setup();
   trade.elements.tradeModal.classList.add('open');
@@ -116,6 +159,8 @@ test('closing removes open state and only trade modal clears bulk flow', () => {
   assert.deepEqual(generic.calls, []);
 });
 
+// Assegura que app.js nao contem mais openModal/closeModal e que app-workspace.js
+// carrega uma unica vez como script sincrono antes de profile-page.js e app.js.
 test('modal and navigation declarations share one synchronous workspace before app.js', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

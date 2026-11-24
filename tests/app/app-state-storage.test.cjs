@@ -1,3 +1,30 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar toda a camada de persistencia de estado da aplicacao (salvamento em
+ *   localStorage, leitura bruta e hidratacao com normalizacao/recalculo), incluindo
+ *   tratamento de falhas parciais, JSON corrompido e ordem exata das chaves.
+ *
+ * Modulos/arquivos testados:
+ *   - src/app/infrastructure/app-state-storage.js (save e readPersistedAppState)
+ *   - src/app/application/load-app-state.js (load)
+ *   (com verificacao de limpeza em app.js e invocacao em bootstrap-app.js).
+ *
+ * Estrategia de isolamento:
+ *   Carrega ambos os scripts em um contexto node:vm com um localStorage simulado
+ *   baseado em Map e stubs espiados para normalizadores (estrategias, parceiros,
+ *   contas, studyHub e recomputeAllIncomplete), permitindo injetar erros cirurgicos
+ *   em qualquer chave ou etapa do ciclo.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - save() grava exatamente as 6 chaves tl_* na ordem definida, serializando
+ *     JSON sob demanda e gravando activeAccountId sem JSON.stringify.
+ *   - Erros de serializacao ou cota em save() propagam sem rollback das chaves ja gravadas.
+ *   - load() le todas as 6 chaves antes de fazer parse, faz shallow-merge de config,
+ *     normaliza contas preservando os argumentos de Array.prototype.map e engole falhas
+ *     sem quebrar o boot, mantendo atribuicoes anteriores ao ponto de erro.
+ *   - readPersistedAppState() retorna valores brutos sem aplicar estado e propaga erros.
+ *   - Os scripts nao executam IO no carregamento e respeitam a ordem classica no index.html.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,8 +38,12 @@ const storagePath = 'src/app/infrastructure/app-state-storage.js';
 const loadPath = 'src/app/application/load-app-state.js';
 const keys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
 const fields = ['trades', 'config', 'preMarketData', 'accounts', 'activeAccountId', 'studyHubState'];
+// Converte objetos criados dentro da sandbox vm para estruturas JS puras do host,
+// evitando falsas falhas de assert.deepEqual por prototipos de contextos distintos.
 const plain = value => JSON.parse(JSON.stringify(value));
 
+// Prepara o ambiente vm com estado previo conhecido, localStorage instrumentado e
+// normalizadores espiados; retorna referencias iniciais (before) para validar identidade.
 function setup(stored = new Map()) {
   const calls = [];
   const context = vm.createContext({
@@ -43,6 +74,8 @@ function setup(stored = new Map()) {
   return {context, calls, stored, before};
 }
 
+// Verifica que save() retorna undefined e grava exatamente as 6 chaves esperadas em ordem,
+// serializando cinco delas como JSON e passando tl_activeAccount em formato bruto (ex.: null -> 'null').
 test('save writes exactly six keys in order with JSON fields and a raw active account', () => {
   const {context, calls, stored, before} = setup();
   context.activeAccountId = null;
@@ -55,6 +88,9 @@ test('save writes exactly six keys in order with JSON fields and a raw active ac
   assert.equal(stored.get('tl_activeAccount'), 'null');
 });
 
+// Garante avaliacao sequencial de cada campo durante save(): um toJSON em trades que altera
+// config reflete no valor gravado em tl_config, e uma referencia circular em config lanca erro
+// preservando tl_trades ja gravado anteriormente.
 test('save serializes each field when reached and retains earlier writes on serialization failure', () => {
   const {context, stored} = setup();
   context.trades = {toJSON() { context.config = {changed: true}; return []; }};
@@ -69,6 +105,8 @@ test('save serializes each field when reached and retains earlier writes on seri
   assert.deepEqual([...stored], [['tl_trades', '[]']]);
 });
 
+// Confirma que uma falha de escrita no localStorage (ex.: quota excedida em tl_accounts)
+// interrompe o salvamento propagando o erro original, sem reverter as 3 chaves anteriores.
 test('save propagates storage failure without rolling back or writing later keys', () => {
   const {context, stored} = setup();
   const failure = new Error('quota reached');
@@ -84,6 +122,8 @@ test('save propagates storage failure without rolling back or writing later keys
   assert.deepEqual([...stored.keys()], keys.slice(0, 3));
 });
 
+// Quando o localStorage esta vazio, load() le as 6 chaves, mantem as referencias padrao
+// em memoria intactas, executa normalizadores globais + recomputeAllIncomplete e nao grava nada.
 test('load without saved keys preserves defaults and runs normalizers before recomputing', () => {
   const {context, calls, before} = setup();
   assert.equal(context.load(), undefined);
@@ -93,6 +133,8 @@ test('load without saved keys preserves defaults and runs normalizers before rec
   assert.equal(calls.some(call => call[0] === 'write'), false);
 });
 
+// Testa o ciclo completo save -> load em um contexto novo: recupera todos os 6 payloads
+// com fidelidade e confirma que normalizeAccount recebe (item, indice, arrayOriginal) de .map().
 test('save/load round-trip retains six payloads and normalizes accounts with original map arguments', () => {
   const saved = setup();
   saved.context.trades = [{id: 'trade', pnl: 0}];
@@ -112,6 +154,9 @@ test('save/load round-trip retains six payloads and normalizes accounts with ori
   assert.strictEqual(accounts[0][1], accounts[0][3][0]);
 });
 
+// Valida retrocompatibilidade com estado parcial: mescla superficialmente config mantendo
+// chaves padrao ('theme'), aceita lista vazia de contas, ignora activeAccountId vazio e
+// preserva intactas as referencias dos campos ausentes no storage.
 test('partial legacy state shallow-merges config, keeps absent fields and accepts empty accounts', () => {
   const {context, before, calls} = setup(new Map([
     ['tl_config', '{"nested":{"new":true}}'], ['tl_accounts', '[]'], ['tl_activeAccount', ''],
@@ -128,6 +173,8 @@ test('partial legacy state shallow-merges config, keeps absent fields and accept
   assert.strictEqual(context.studyHubState, before.studyHubState);
 });
 
+// Garante que load() realiza todas as leituras de localStorage antes de aplicar qualquer
+// campo: se a leitura falhar na 6a chave (tl_studyhub), engole a excecao e nenhum campo muda.
 test('load reads all keys before parsing and swallows storage access failures without applying payloads', () => {
   const {context, calls, before} = setup(new Map([['tl_trades', '[]']]));
   const original = context.localStorage.getItem;
@@ -137,6 +184,8 @@ test('load reads all keys before parsing and swallows storage access failures wi
   for (const field of fields) assert.strictEqual(context[field], before[field]);
 });
 
+// Verifica o comportamento frente a JSON invalido em tl_config: tl_trades ja aplicado
+// permanece atualizado, mas o erro aborta o restante do load() sem lancar excecao.
 test('malformed saved config leaves previously loaded trades applied and stops later work', () => {
   const {context, calls, before} = setup(new Map([['tl_trades', '[]'], ['tl_config', '{bad'], ['tl_pm', '{}']]));
   assert.doesNotThrow(() => context.load());
@@ -146,6 +195,8 @@ test('malformed saved config leaves previously loaded trades applied and stops l
   assert.deepEqual(calls.map(call => call[0]), Array(6).fill('read'));
 });
 
+// Caso normalizeAccount lance erro em uma das contas, mantem trades/config/preMarketData
+// ja hidratados, nao substitui o array de contas antigo e interrompe efeitos posteriores.
 test('account normalization failure keeps earlier assignments and prevents account replacement and later effects', () => {
   const {context, calls, before} = setup(new Map([
     ['tl_trades', '[]'], ['tl_config', '{"theme":"light"}'], ['tl_pm', '{"new":{}}'],
@@ -162,6 +213,8 @@ test('account normalization failure keeps earlier assignments and prevents accou
   assert.deepEqual(calls.slice(6).map(call => call[0]), ['strategies', 'partners', 'normalize', 'normalize']);
 });
 
+// Testa valores JSON validos porem permissivos (null, false) e assegura que uma excecao
+// em recomputeAllIncomplete e capturada sem desfazer o estado ja carregado.
 test('load preserves permissive parsed values and catches recomputation errors after assignments', () => {
   const {context, before} = setup(new Map([
     ['tl_trades', 'null'], ['tl_config', 'false'], ['tl_pm', 'null'], ['tl_accounts', '[]'], ['tl_studyhub', 'null'],
@@ -175,6 +228,8 @@ test('load preserves permissive parsed values and catches recomputation errors a
   assert.equal(context.studyHubState, null);
 });
 
+// Valida o contrato puro de readPersistedAppState(): devolve as strings brutas (mesmo
+// JSON invalido) sem mutar estado global e propaga erros reais do localStorage.
 test('raw state reader returns unparsed values without applying state or swallowing storage errors', () => {
   const {context, calls, before} = setup(new Map([['tl_trades', '{invalid'], ['tl_activeAccount', 'chosen']]));
   const raw = context.readPersistedAppState();
@@ -186,6 +241,9 @@ test('raw state reader returns unparsed values without applying state or swallow
   assert.throws(() => context.readPersistedAppState(), error => error === failure);
 });
 
+// Confirma que carregar os dois scripts nao toca em document/localStorage/fetch, verifica
+// ordem e atributos no index.html, limpeza de app.js, chamada em bootstrap-app.js e a
+// substituicao injetavel de readPersistedAppState() dentro de load().
 test('classic persistence scripts initialize without IO and load runs through a replaceable raw read contract', () => {
   const sandbox = {trades: ['old'], config: {}, preMarketData: {}, accounts: [], activeAccountId: 'active', studyHubState: {},
     ensureDefaultStrategies: value => value, ensurePartnerHubConfig: value => value,

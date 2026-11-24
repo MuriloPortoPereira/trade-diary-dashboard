@@ -1,5 +1,27 @@
-// Usage: capture <new-directory> | compare <baseline-directory> <new-directory>
-// Reuses the isolated CDP browser and deterministic fixture from the StudyHub checks.
+/*
+ * Verificador principal de regressão visual e CSSOM da casca (shell) e páginas da aplicação.
+ *
+ * Uso:
+ *   node tests/browser/shell-style-check.cjs capture <novo-diretorio>
+ *   node tests/browser/shell-style-check.cjs compare <diretorio-baseline> <novo-diretorio>
+ *   node tests/browser/shell-style-check.cjs compare-saved <diretorio-antes> <diretorio-depois>
+ *
+ * Objetivo:
+ *   Reutilizar a sessão Chrome/CDP isolada e o fixture determinístico do StudyHub para
+ *   capturar snapshots completos de estilos computados, geometria (DOMRect), fontes,
+ *   pseudo-elementos, rolagem, localStorage e capturas PNG em múltiplos breakpoints e
+ *   estados interativos (hover, foco, modais, abas, tabelas, formulários e páginas).
+ *
+ * Papel na verificação visual:
+ *   Permite provar que refatorações de CSS/JS não alteram layout, estilos computados nem
+ *   renderização visual. Diferenças estruturais/CSSOM falham imediatamente; pequenas
+ *   variações de antialiasing nos PNGs passam pelo tolerador `compare-browser-images.py`.
+ *
+ * Pontos-chave:
+ *   - Orquestra os 22 módulos de cenário em `tests/browser/scenarios/*.cjs`.
+ *   - Valida keyframes, transições e carregamento de fontes antes de congelar animações.
+ *   - Usa `CSS.forcePseudoState` via CDP para inspecionar estados `:hover` reais.
+ */
 const assert = require('node:assert/strict');
 const {mkdir, readFile, writeFile} = require('node:fs/promises');
 const path = require('node:path');
@@ -7,6 +29,8 @@ const {createHash} = require('node:crypto');
 const {execFileSync} = require('node:child_process');
 const openBrowser = require('./helpers/study-hub-browser.cjs');
 const {deterministicFixture, settle} = require('./study-hub-style-check.cjs');
+
+// Importação dos módulos de preparo e reset de cenários visuais específicos.
 const {resetMetricTooltip, prepareMetricScenario} = require('./scenarios/metric-style-scenarios.cjs');
 const {prepareDashboardLayoutScenario} = require('./scenarios/dashboard-layout-scenarios.cjs');
 const {prepareAccountStyleScenario} = require('./scenarios/account-style-scenarios.cjs');
@@ -56,6 +80,7 @@ const partnerStates = ['partner-presentation-empty', 'partner-presentation-popul
   'partner-presentation-affiliate-only', 'partner-presentation-qr-only'];
 const partnerWidths = [390, 719, 720, 721, 1419, 1420, 1421, 1440];
 
+// Matriz de estados e larguras de viewport (incluindo bordas de breakpoint -1/0/+1).
 const tagCloudStates = ['tag-cloud-default', 'tag-cloud-empty', 'tag-cloud-long'];
 const tagCloudWidths = [390, 720, 1440];
 
@@ -88,8 +113,15 @@ const actionStates = ['primary-hover', 'ghost-hover', 'icon-hover', 'date-start-
   'date-filtered', 'date-clear-hover', 'date-cleared'].map(name => `actions-${name}`);
 const states = ['sidebar-open', 'nav-hover', 'language-hover', 'language-menu', 'language-option-focus',
   'cotacao-focus', 'cotacao-hover', 'account-hover', 'account-modal', 'trade-modal'];
+// Calcula hash SHA-256 usado para comparar rapidamente snapshots JSON e imagens PNG.
 const hash = value => createHash('sha256').update(value).digest('hex');
 
+/*
+ * Função executada dentro do navegador para coletar um retrato completo (CSSOM + DOM)
+ * de todos os elementos visíveis, incluindo retângulos, propriedades computadas,
+ * pseudo-elementos `::before`/`::after`, rolagem, modais abertos, abas ativas,
+ * fontes carregadas e conteúdo do `localStorage`.
+ */
 function inspectShell() {
   const properties = ['display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
     'padding', 'margin', 'gap', 'grid-template-columns', 'flex-direction', 'align-items', 'justify-content',
@@ -143,11 +175,18 @@ function inspectShell() {
     sheetsLoaded: [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet)};
 }
 
+/*
+ * Executa a captura completa de baseline ou nova versão no diretório especificado.
+ * Configura fuso horário, fixture determinístico, checa animações/transições antes de
+ * congelá-las, percorre todas as larguras e cenários, grava `<largura>-<caso>.json` e
+ * `.png`, e ao final salva o resumo `report.json`.
+ */
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(path.resolve(__dirname, '../..'));
   const report = {version: 29, tagCloudStates, tagCloudWidths, partnerStates, partnerWidths, accountOverviewStates, accountOverviewWidths, documentStates, documentWidths, workspaceSummaryStates, workspaceSummaryWidths, studyHubNativeStates, studyHubNativeWidths, workspaceGridStates, workspaceGridWidths, navigationFooterStates, dataTransferStates, dataTransferWidths, widths, pageWidths, statTabs, states, actionStates, metricStates, metricBoundaryWidths, strategyStates, calendarStates, tableStates, formStates, modalTabStates, uploadZoneStates, emotionPickerStates, tagEditorStates, alertUtilityStates, tradeActionStates, premarketErrorChipStates, cases: []};
   try {
+    // Configura emulação determinística (timezone, relógio/RNG/fetch e viewport inicial).
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
     await browser.command('Emulation.setDeviceMetricsOverride', {width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false});
@@ -158,10 +197,12 @@ async function capture(directory) {
       if (document.readyState === 'complete') done(); else addEventListener('load', done, {once: true});
     })`);
     assert.equal(await browser.evaluate('Chart.version'), '4.4.1');
-    // A full capture can exceed the five-minute exchange-rate refresh interval.
-    // Settle the fixture response once, then pause only that background timer.
+    // Uma captura completa pode exceder o intervalo de 5 minutos da atualização de cotação.
+    // Liquida a resposta do fixture uma vez e pausa apenas esse temporizador em segundo plano.
     await browser.evaluate(`(async () => { clearInterval(cotacaoInterval); cotacaoInterval = null; await fetchCotacao(); })()`);
     assert.equal(await browser.evaluate('cotacaoInterval'), null);
+
+    // Valida keyframes, animações e transições reais antes de desativar animações para screenshots.
     report.fadeUpKeyframes = await browser.evaluate(`(() => {
       const rules = [];
       for (const sheet of document.styleSheets) {
@@ -180,8 +221,8 @@ async function capture(directory) {
       return [style.animationName, style.animationDuration];
     })()`);
     assert.deepEqual(report.pageAnimation, ['fade-up', '0.28s']);
-    // Eagerly load every declared face: splitting links can change which unused weights
-    // the browser downloads during transient layout, without changing the final CSS.
+    // Carrega antecipadamente todas as fontes declaradas: dividir links pode alterar quais pesos
+    // não utilizados o navegador baixa durante layouts transitórios, sem mudar o CSS final.
     await browser.evaluate(`document.fonts.ready.then(() => Promise.all([...document.fonts].map(font => font.load())))`);
     report.animation = await browser.evaluate(`(() => {
       document.getElementById('cotRefreshBtn').classList.add('spinning');
@@ -204,6 +245,8 @@ async function capture(directory) {
       return [style.transitionProperty, style.transitionDuration, style.transitionTimingFunction];
     })()`);
     assert.deepEqual(report.fieldTransition, ['border-color, background, box-shadow', '0.2s, 0.2s, 0.2s', 'ease, ease, ease']);
+
+    // Desabilita animações, transições e cursor piscante para tornar cada captura reproduzível.
     await browser.evaluate(`Chart.defaults.animation = false;
       const style = document.createElement('style');
       style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
@@ -214,6 +257,8 @@ async function capture(directory) {
     const pages = await browser.evaluate(`[...document.querySelectorAll('.page')].map(el => el.id.slice(5))`);
     assert.equal(pages.length, 15);
     report.pages = pages;
+
+    // Loop principal por largura de viewport e conjunto de casos aplicáveis a cada largura.
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
       const cases = [...(pageWidths.includes(width) ? pages : ['dashboard']),
@@ -234,6 +279,7 @@ async function capture(directory) {
         'strategy-compare-full', 'calendar-week-scroll', 'calendar-biweek', 'table-log-scroll',
         ...(pageWidths.includes(width) ? [...calendarStates, ...tableStates, ...formStates, ...modalTabStates, ...uploadZoneStates, ...emotionPickerStates, ...tagEditorStates, ...alertUtilityStates, ...tradeActionStates, ...premarketErrorChipStates, ...navigationFooterStates] : [])];
       for (const name of cases) {
+        // Determina qual página deve ser ativada antes de aplicar o cenário atual.
         const page = name.startsWith('tag-cloud-') ? 'profile' : name.startsWith('partner-presentation-') ? 'partners' : name.startsWith('account-overview-') ? 'accounts' : name.startsWith('documents-') ? 'documents' : name.startsWith('workspace-summary-status-') ? 'notifications' : name.startsWith('workspace-summary-chips') ? 'stats' :
           name === 'workspace-summary-profile' ? 'profile' : name === 'workspace-summary-strategy' ? 'strategyHub' : name.startsWith('study-native-') ? 'studyHub' : name.startsWith('workspace-grid-') ? {strategy: 'strategyHub', profile: 'profile', partners: 'partners'}[name.slice('workspace-grid-'.length)] : (name.startsWith('data-transfer-') || name === 'tabs-import-export' || name === 'common-alert-info') ? 'import' : (name === 'tabs-calendar-biweek' || name === 'common-utilities') ? 'calendar' :
           name === 'tabs-studyhub-plano' ? 'studyHub' : (name.startsWith('table-') && name !== 'table-dashboard-sticky') || name.startsWith('trade-actions-') ? 'log' :
@@ -241,6 +287,8 @@ async function capture(directory) {
           (name === 'account-cashflow-setup' || name.startsWith('tag-editor-')) ? 'setup' :
           name.startsWith('strategy-compare') ? 'stats' : name.startsWith('metric-risk') ? 'stats' : name.startsWith('actions-') ? 'log' :
           name.startsWith('stats-') ? 'stats' : pages.includes(name) ? name : 'dashboard';
+
+        // Reset completo entre casos para evitar vazamento de estado, modais, foco ou rolagem.
         await browser.evaluate(`(async () => { await (${resetMetricTooltip})();
           (${resetWorkspaceSummaryStyleState})();
           (${resetDocumentStyleState})();
@@ -260,12 +308,16 @@ async function capture(directory) {
           document.getElementById('stStratA').value = ''; document.getElementById('stStratB').value = '';
           document.querySelectorAll('.dashboard-table-scroll,.table-card').forEach(el => { el.scrollLeft = 0; el.scrollTop = 0; });
           document.querySelector('main').scrollTop = 0; document.getElementById('sidebar').scrollTop = 0; window.scrollTo(0,0); })()`);
+
+        // Abre a aba correta de Estatísticas quando o caso pertence à página `stats`.
         if (page === 'stats') {
           const tab = name.startsWith('workspace-summary-chips') ? 'psych' : name.startsWith('strategy-compare') ? 'strategy' : name.startsWith('stats-') ? name.slice(6) : 'overview';
           const selector = `#statTabNav [onclick*="'${tab}'"]`;
           await browser.evaluate(`document.querySelector(${JSON.stringify(selector)}).click();
             if (getComputedStyle(document.getElementById(${JSON.stringify('statTab-' + tab)})).display !== 'block') throw new Error('Stats tab did not open');`);
         }
+
+        // Despacha o preparo do cenário específico e captura eventual seletor de `:hover`.
         let hover;
         if (name.startsWith('metric-')) hover = await browser.evaluate(`(${prepareMetricScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('layout-')) hover = await browser.evaluate(`(${prepareDashboardLayoutScenario})(${JSON.stringify(name)})`);
@@ -343,18 +395,22 @@ async function capture(directory) {
         if (name.startsWith('account-overview-')) await browser.evaluate(`(${prepareAccountOverviewStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('partner-presentation-')) await browser.evaluate(`(${preparePartnerStyleScenario})(${JSON.stringify(name)})`);
         if (name.startsWith('tag-cloud-')) await browser.evaluate(`(${prepareTagCloudStyleScenario})(${JSON.stringify(name)})`);
+
+        // Força o pseudo-estado `:hover` via CDP quando o cenário exige elemento sob cursor.
         let nodeId;
         if (hover) {
           ({nodeId} = await browser.command('DOM.querySelector', {nodeId: root.nodeId, selector: hover}));
           assert.ok(nodeId, `Hover target missing: ${hover}`);
           await browser.command('CSS.forcePseudoState', {nodeId, forcedPseudoClasses: ['hover']});
         }
-        // StudyHub can introduce additional font faces when its template is mounted.
+        // O StudyHub pode introduzir famílias de fontes adicionais quando seu template é montado.
         await browser.evaluate(`(async () => {
           await document.fonts.ready;
           await Promise.all([...document.fonts].map(font => font.load()));
           await (${settle})();
         })()`);
+
+        // Coleta o snapshot CSSOM/DOM, valida invariantes e grava JSON + screenshot PNG.
         const state = await browser.evaluate(`(${inspectShell})()`);
         assert.equal(state.activePage, `page-${name === 'calendar-mini-open' ? 'calendar' : page}`);
         assert.equal(state.pageDisplays.filter(([, display]) => display !== 'none').length, 1, 'Only the active page is displayed');
@@ -367,6 +423,7 @@ async function capture(directory) {
         const png = Buffer.from(data, 'base64');
         await writeFile(path.join(directory, file + '.png'), png);
         report.cases.push({name: file, nodes: state.snapshot.length, stateHash: hash(JSON.stringify(state)), imageHash: hash(png)});
+        // Limpa o pseudo-estado forçado para não contaminar o caso seguinte.
         if (nodeId) await browser.command('CSS.forcePseudoState', {nodeId, forcedPseudoClasses: []});
       }
       console.log(`Captured ${width}px: ${cases.length} shell/page states.`);
@@ -378,6 +435,14 @@ async function capture(directory) {
   } finally { await browser.close(); }
 }
 
+/*
+ * Ponto de entrada da CLI:
+ *   - `capture`: gera nova baseline em disco.
+ *   - `compare`: captura novo diretório e compara contra uma baseline existente.
+ *   - `compare-saved`: compara dois diretórios já capturados sem abrir o navegador.
+ * Exige igualdade exata de estado/estilos/geometria e delega diferenças de hash de imagem
+ * para o comparador de pixels com limite de ruído de rasterização (`compare-browser-images.py`).
+ */
 async function main() {
   const [mode, beforeDirectory, afterDirectory] = process.argv.slice(2);
   assert.ok(['capture', 'compare', 'compare-saved'].includes(mode) && beforeDirectory && (mode === 'capture' || afterDirectory),
@@ -392,6 +457,7 @@ async function main() {
     : JSON.parse(await readFile(path.join(afterDirectory, 'report.json'), 'utf8'));
   const withoutImageHashes = report => ({...report, cases: report.cases.map(({imageHash, ...state}) => state)});
   assert.deepEqual(withoutImageHashes(after), withoutImageHashes(before), 'Style/geometry/font/storage differences; inspect JSON artifacts');
+  // Para imagens cujo hash binário divergiu, verifica se a diferença está dentro do limite de antialiasing.
   const noise = [];
   for (const [index, entry] of after.cases.entries()) {
     if (entry.imageHash === before.cases[index].imageHash) continue;

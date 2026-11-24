@@ -1,3 +1,25 @@
+/*
+ * Testes unitarios e de fluxo para os handlers de importacao da tela de transferencia de dados.
+ *
+ * Modulo testado:
+ * - `src/modules/data-transfer/presentation/data-transfer-page.js`
+ *   (`importJSON`, `handleCSVUpload`, `parseMT4`, `showImportPreview`, `confirmImport`)
+ * - Colabora com `src/modules/data-transfer/domain/import-trade-rules.js` para deduplicacao na confirmacao.
+ *
+ * Estrategia de isolamento:
+ * - Extrai as 5 funcoes de fluxo de importacao do arquivo de apresentacao e executa em `vm.createContext`.
+ * - Simula `FileReader`, `XLSX`, `setTimeout`, DOM (`document.getElementById`) e todos os colaboradores
+ *   de UI/persistencia (`showAppConfirm`, `showAppNotice`, `openModal`, `closeModal`, `save`, `refreshAll`).
+ * - Registra cada passo em `calls`, `readers`, `tasks` e `confirmations` para testar fluxos assincronos
+ *   de forma totalmente sincrona e deterministica.
+ *
+ * Regras criticas garantidas:
+ * - Importacao JSON exige confirmacao explicita antes de restaurar, salvar, atualizar UI e notificar.
+ * - Upload CSV/XLSX usa o primeiro arquivo, captura `activeAccountId` no momento da conclusao e abre preview.
+ * - Preview escapa o nome da conta contra XSS, limita a tabela a 80 linhas e conta os incompletos totais.
+ * - Confirmacao deduplica posicoes e IDs, insere novos trades no topo, limpa pendentes e abre fluxo de incompletos.
+ * - Scripts classicos carregam sem IO na inicializacao, na ordem correta em `index.html`, sem copias em `app.js`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -10,13 +32,16 @@ const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const moduleFile = path.join(root, modulePath);
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : app;
 const names = ['importJSON', 'handleCSVUpload', 'parseMT4', 'showImportPreview', 'confirmImport'];
+// Extrai os 5 handlers principais de importacao para executa-los isoladamente no contexto VM.
 const declarations = names.map(name => {
   const match = source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
   assert.ok(match, `Missing ${name}`);
   return match[0];
 }).join('\n');
+// Converte objetos criados na VM para objetos planos do realm de teste.
 const plain = value => JSON.parse(JSON.stringify(value));
 
+// Monta o ambiente VM completo com FileReader simulado, nos DOM essenciais, espias de persistencia/UI e regras de importacao reais.
 function setup() {
   const calls = [], readers = [], tasks = [], confirmations = [];
   const nodes = {csvPreview: {innerHTML: ''}, csvConfirmPreview: {innerHTML: ''}, importCount: {}, mt4Input: {value: ''}};
@@ -59,6 +84,7 @@ function setup() {
   return {context, calls, readers, tasks, confirmations, nodes, prepared};
 }
 
+// Verifica que importJSON ignora selecao vazia, le apenas o primeiro arquivo, valida, exibe confirmacao e so restaura/salva apos o aceite do usuario.
 test('JSON import reads one file and waits for confirmation before restoration and save', () => {
   const {context, calls, readers, confirmations} = setup();
   context.importJSON({target: {files: []}});
@@ -77,6 +103,7 @@ test('JSON import reads one file and waits for confirmation before restoration a
   assert.strictEqual(calls[5][1], calls[1][1]);
 });
 
+// Garante que erros de parse ou validacao viram avisos de erro (`danger: true`) sem abrir confirmacao, enquanto falhas dentro do callback de restauracao propagam.
 test('JSON read errors become notices while deferred restoration errors propagate', () => {
   const {context, calls, readers, confirmations} = setup();
   context.importJSON({target: {files: [{}]}});
@@ -96,6 +123,7 @@ test('JSON read errors become notices while deferred restoration errors propagat
   assert.equal(calls.length, length);
 });
 
+// Valida o upload de CSV: ignora evento sem arquivos, le apenas o primeiro em UTF-8, usa o `activeAccountId` no momento do onload e exibe preview com `pendingImport`.
 test('CSV upload uses the first file, UTF-8, completion-time account and pending preview', () => {
   const {context, calls, readers, prepared} = setup();
   context.handleCSVUpload({target: {}});
@@ -113,6 +141,7 @@ test('CSV upload uses the first file, UTF-8, completion-time account and pending
   assert.notStrictEqual(calls[4][1], prepared);
 });
 
+// Confirma aviso amigavel quando CSV nao gera trades (incluindo result null -> '') sem abrir modal, e propagacao direta de excecoes do parser CSV.
 test('empty CSV shows the existing notice and CSV parser errors remain uncaught', () => {
   const {context, calls, readers} = setup();
   context.prepareImportedTrades = () => [];
@@ -126,6 +155,7 @@ test('empty CSV shows the existing notice and CSV parser errors remain uncaught'
   assert.throws(() => readers[0].onload({target: {result: 'bad'}}), error => error === failure);
 });
 
+// Testa upload XLSX: exibe status de processamento, aguarda carregamento do SheetJS, le ArrayBuffer da primeira aba com `cellDates: true` e abre modal de confirmacao.
 test('XLSX upload waits for SheetJS, reads the first sheet and preserves conversion options', () => {
   const {context, calls, readers, tasks, nodes} = setup();
   const sheet = {}, rows = [['date']];
@@ -151,6 +181,7 @@ test('XLSX upload waits for SheetJS, reads the first sheet and preserves convers
   assert.deepEqual(calls.at(-1), ['open', 'csvConfirmModal']);
 });
 
+// Garante mensagens de preview e notice para XLSX vazio, captura de erro de leitura no preview e tolerancia quando o elemento `csvPreview` nao existe.
 test('empty and failing XLSX keep their preview messages without changing error policy', () => {
   const {context, calls, readers, tasks, nodes} = setup();
   context.XLSX = {read() { return {SheetNames: ['sheet'], Sheets: {sheet: {}}}; }, utils: {sheet_to_json() { return []; }}};
@@ -169,6 +200,7 @@ test('empty and failing XLSX keep their preview messages without changing error 
   assert.doesNotThrow(() => readers[1].onload({target: {result: null}}));
 });
 
+// Verifica importacao via texto colado MT4: barra entrada vazia, preserva texto bruto sem trim prematuro, passa a lista preparada ao preview e avisa se nada for detectado.
 test('MT4 text import keeps blank/empty guards and previews the prepared list directly', () => {
   const {context, calls, nodes, prepared} = setup();
   context.parseMT4();
@@ -187,6 +219,7 @@ test('MT4 text import keeps blank/empty guards and previews the prepared list di
   assert.deepEqual(calls.map(call => call[0]), ['mt4', 'notice']);
 });
 
+// Valida showImportPreview: atualiza `#importCount` antes do retorno por falta do container, escapa nome da conta, conta incompletos alem da linha 80 e trunca a tabela em 80 linhas.
 test('preview updates count before its guard and retains account escaping and the 80-row cap', () => {
   const {context, nodes} = setup();
   delete nodes.csvConfirmPreview;
@@ -207,6 +240,7 @@ test('preview updates count before its guard and retains account escaping and th
   assert.match(html, />\+0<\/td>/);
 });
 
+// Testa confirmImport fim a fim: deduplica por posicao e ID, adiciona os aceitos no inicio de `trades`, reseta banner de incompletos e agenda abertura ordenada por data em 600ms.
 test('confirmation deduplicates positions and ids before prepending, saving and opening incomplete trades', () => {
   const {context, calls, tasks} = setup();
   const old = {id: 'old', position: 'old-position'};
@@ -230,6 +264,7 @@ test('confirmation deduplicates positions and ids before prepending, saving and 
   assert.deepEqual(calls.slice(-2), [['page', 'log'], ['bulk', ['second', 'new']]]);
 });
 
+// Verifica dois casos de borda na confirmacao: importar 0 itens ainda limpa/salva/fecha sem agendar timer; erro em `save()` propaga mantendo mutacoes ja ocorridas.
 test('confirmation preserves zero-import save behavior and partial mutations on save failure', () => {
   const {context, calls, tasks} = setup();
   context.confirmImport();
@@ -249,6 +284,7 @@ test('confirmation preserves zero-import save behavior and partial mutations on 
   assert.deepEqual(calls.map(call => call[0]), ['clear']);
 });
 
+// Garante a ordem interna de leitura: `confirmImport` varre `trades` existentes antes de ler `pendingImport` (testado via getter com efeito colateral).
 test('confirmation reads pending records after scanning existing positions and ids', () => {
   const {context} = setup();
   const candidate = {id: 'current'};
@@ -260,6 +296,7 @@ test('confirmation reads pending records after scanning existing positions and i
   assert.strictEqual(context.trades[1], existing);
 });
 
+// Confirma que os handlers residem exclusivamente no modulo de apresentacao, inicializam sem IO/leitura de estado e respeitam a ordem de script em index.html.
 test('import handlers remain classic globals and initialize without reading state or IO', () => {
   assert.ok(fs.existsSync(moduleFile));
   const sandbox = {};

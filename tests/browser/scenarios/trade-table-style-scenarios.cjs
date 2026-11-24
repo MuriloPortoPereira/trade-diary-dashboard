@@ -1,4 +1,24 @@
-// Reset only transient table controls between isolated browser captures.
+/*
+ * Cenários visuais para as tabelas de trades (tabela recente no Dashboard e log completo
+ * `#logTable` na página de Histórico).
+ *
+ * Objetivo:
+ *   Cobrir cabeçalho fixo (`sticky`) sob rolagem vertical no Dashboard, ordenação
+ *   ascendente/descendente com indicadores (`↑`/`↓`), seleção individual e em massa,
+ *   trades incompletos com aviso `#incompleteAlert` e todos os badges (`win`, `loss`,
+ *   `open`, `incomplete`, `long`, `short`), tabela vazia, rolagem horizontal e hover.
+ *
+ * Papel na verificação visual:
+ *   Consumido por `shell-style-check.cjs` nos estados `table-*`.
+ *
+ * Pontos-chave:
+ *   - `resetTradeTableStyleState` restaura ordenação padrão, limpa seleção e zera rolagem.
+ *   - Substitui `trades` apenas em memória quando necessário e restaura no `finally`.
+ */
+
+/*
+ * Reseta apenas os controles transitórios da tabela de trades entre capturas isoladas.
+ */
 function resetTradeTableStyleState() {
   sortState = {col: 'date', dir: 'desc'};
   document.querySelectorAll('.sort-ind').forEach(el => { el.textContent = ''; });
@@ -7,12 +27,17 @@ function resetTradeTableStyleState() {
   document.getElementById('logTable').parentElement.scrollLeft = 0;
 }
 
+/*
+ * Prepara o estado de tabela correspondente a `name`, valida comportamento de rolagem,
+ * ordenação, seleção, badges e aviso de incompletos, e retorna eventual seletor de `:hover`.
+ */
 function prepareTradeTableStyleScenario(name) {
   const previousTrades = trades, previousAccounts = accounts;
   const before = JSON.stringify({accounts, trades, storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
   let hover = null;
   try {
     if (name === 'table-dashboard-sticky') {
+      // Gera 20 linhas temporárias para confirmar que o cabeçalho `th` permanece sticky ao rolar.
       trades = Array.from({length: 20}, (_, i) => ({...previousTrades[i % 2], id: `visual-table-${i}`}));
       renderDashboard();
       const scroller = document.querySelector('.dashboard-table-scroll');
@@ -24,6 +49,7 @@ function prepareTradeTableStyleScenario(name) {
         throw new Error('Recent trade header did not remain sticky during vertical scroll');
       }
     } else {
+      // Prepara variações de dados em memória (trades incompletos/abertos ou lista vazia) e renderiza `#logTable`.
       if (name.startsWith('table-incomplete')) {
         trades = [
           {...previousTrades[0], direction: 'Long', incomplete: true, missing_fields: ['strategy']},
@@ -36,6 +62,8 @@ function prepareTradeTableStyleScenario(name) {
       const table = document.getElementById('logTable'), scroller = table.parentElement;
       const ids = () => [...table.querySelectorAll('tbody input[type="checkbox"]')].map(el => el.dataset.id);
       table.scrollIntoView({block: 'center'});
+
+      // Ordenação por P/L (ascendente e descendente) com checagem de ordem das linhas e seta.
       if (name.startsWith('table-sort-') && name !== 'table-sort-hover') {
         const th = table.querySelector('[onclick="sortLog(\'pnl\')"]');
         th.click();
@@ -47,6 +75,8 @@ function prepareTradeTableStyleScenario(name) {
         }
         th.scrollIntoView({block: 'center'});
       }
+
+      // Seleção individual, selecionar todos e limpeza total da seleção.
       if (name === 'table-row-selected-hover') {
         table.querySelector('tbody input[type="checkbox"]').click();
         if (selectedTrades.size !== 1 || table.querySelectorAll('tr.selected').length !== 1) throw new Error('Trade row selection changed');
@@ -59,6 +89,8 @@ function prepareTradeTableStyleScenario(name) {
           if (selectedTrades.size || table.querySelector('tr.selected') || document.getElementById('bulkBar').classList.contains('show')) throw new Error('Clearing selection changed');
         }
       }
+
+      // Validação de trades incompletos, banner de alerta, badges e foco no botão de correção.
       if (name.startsWith('table-incomplete')) {
         const alert = document.getElementById('incompleteAlert');
         if (getComputedStyle(alert).display !== 'block' || document.getElementById('incompleteCount').textContent !== '1' ||
@@ -73,6 +105,8 @@ function prepareTradeTableStyleScenario(name) {
           if (document.activeElement !== link) throw new Error('Incomplete action did not focus');
         }
       }
+
+      // Tabela vazia, rolagem horizontal completa e seleção de alvos de hover.
       if (name === 'table-empty' && (ids().length || !table.querySelector('tbody td[colspan="22"]'))) throw new Error('Empty trade table changed');
       if (name === 'table-log-scroll') {
         scroller.scrollLeft = scroller.scrollWidth;

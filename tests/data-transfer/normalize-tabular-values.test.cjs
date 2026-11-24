@@ -1,3 +1,21 @@
+/*
+ * Testes unitarios para normalizacao de valores tabulares (numeros, datas, celulas e cabecalhos).
+ *
+ * Modulo testado:
+ * - `src/modules/data-transfer/infrastructure/trade-file-formats.js`
+ *   (`parseMTNumber`, `normalizeDate`, `cleanMTCell`, `normalizeImportHeader`).
+ *
+ * Estrategia de isolamento:
+ * - Carrega o modulo de formatos em uma sandbox `vm.createContext` expondo apenas `Date`.
+ * - Testa tanto chamadas puras quanto interceptacoes dinamicas de globais (`parseMTNumber`, `cleanMTCell`)
+ *   para garantir compatibilidade com resolucao tardia (late lookup).
+ *
+ * Regras criticas garantidas:
+ * - Conversao numerica preserva `-0`, BigInt, moedas/parenteses contabeis e heuristicas de separador decimal.
+ * - `normalizeDate` suporta formatos ISO, `DD/MM/YYYY`, `YYYY.MM.DD`, seriais de Excel (incluindo fracao) e UTC em `Date`.
+ * - `cleanMTCell` colapsa espacos/quebras/NBSP mantendo pontuacao; `normalizeImportHeader` remove acentos e simbolos mantendo `%` e `_`.
+ * - Modulo inicializa sem acesso a DOM/storage/estado e e carregado uma vez antes de `app.js`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -9,18 +27,22 @@ const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const modulePath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const moduleFile = path.join(root, modulePath);
 const names = ['parseMTNumber', 'normalizeDate', 'cleanMTCell', 'normalizeImportHeader'];
+// Carrega o modulo dedicado de formatos (ou faz fallback para declaracoes em app.js caso ainda nao extraido).
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : names.map(name => {
   const match = app.match(new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'))
     || app.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'));
   assert.ok(match, `Missing ${name}`);
   return match[0];
 }).join('\n');
+
+// Cria um contexto VM limpo contendo apenas `Date` e avalia as funcoes de normalizacao.
 function setup() {
   const context = vm.createContext({Date});
   vm.runInContext(source, context);
   return context;
 }
 
+// Verifica conversao de valores nulos/nao-finitos/invalidos para `null`, preservacao de numeros finitos, BigInt, arrays e zero negativo (`-0`).
 test('numeric normalization preserves null/finite/scalar conversion and signed zero', () => {
   const context = setup();
   for (const value of [null, undefined, NaN, Infinity, -Infinity, '', '  ', '\u2014', true, false, {}, 'invalid', '--1']) {
@@ -33,6 +55,7 @@ test('numeric normalization preserves null/finite/scalar conversion and signed z
   assert.equal(Object.is(context.parseMTNumber('(0)'), -0), true);
 });
 
+// Valida heuristicas de formatacao regional: R$, $, parenteses negativos, NBSP, sinais positivos e separadores ambiguos/parse permissivo legado.
 test('numeric locale heuristics keep currency, parentheses, ambiguous separators and loose parsing', () => {
   const context = setup();
   for (const [input, expected] of [
@@ -42,6 +65,7 @@ test('numeric locale heuristics keep currency, parentheses, ambiguous separators
   ]) assert.equal(context.parseMTNumber(input), expected, input);
 });
 
+// Testa limpeza de celulas: coercoes de `null`/`undefined`/primitivos/arrays, remocao de espacos nas bordas e colapso de tabs/quebras/NBSP preservando pontuacao.
 test('cell cleaning preserves coercion, trimming, whitespace collapse and punctuation', () => {
   const context = setup();
   for (const [input, expected] of [[null, ''], [undefined, ''], [0, '0'], [false, 'false'],
@@ -50,6 +74,7 @@ test('cell cleaning preserves coercion, trimming, whitespace collapse and punctu
   }
 });
 
+// Verifica normalizacao de datas textuais (PT-BR, pontos, ISO), datas seriais do Excel (com e sem fracao decimal) e retorno vazio para entradas invalidas.
 test('date normalization keeps textual formats, Excel fractions, loose ranges and invalid fallback', () => {
   const context = setup();
   for (const [input, expected] of [[null, ''], [undefined, ''], ['', ''], ['invalid', ''],
@@ -60,6 +85,7 @@ test('date normalization keeps textual formats, Excel fractions, loose ranges an
   assert.equal(context.normalizeDate(new Date('invalid')), '');
 });
 
+// Confirma diferenca critica de fuso: objetos `Date` usam UTC (`2024-02-29` em +03:00), enquanto strings com data inicial preservam o dia textual (`2024-03-01`).
 test('Date instances use UTC while date-prefixed strings retain their textual calendar day', () => {
   const context = setup();
   const timestamp = '2024-03-01T00:30:00+03:00';
@@ -67,6 +93,7 @@ test('Date instances use UTC while date-prefixed strings retain their textual ca
   assert.equal(context.normalizeDate(timestamp), '2024-03-01');
 });
 
+// Valida normalizacao de nomes de colunas: remove diacriticos, espacos e barras/pontuacao, preservando `%`, `_` e digitos para matching de aliases.
 test('header normalization strips accents/punctuation while retaining percent, underscore and digits', () => {
   const context = setup();
   for (const [input, expected] of [[null, ''], [false, 'false'], [0, '0'], [' S/L ', 'sl'],
@@ -75,6 +102,7 @@ test('header normalization strips accents/punctuation while retaining percent, u
   }
 });
 
+// Garante que `normalizeDate` consulta `parseMTNumber` dinamicamente apenas quando o texto nao casa com formatos de data conhecidos, apos `toString()`.
 test('date parsing retains late lookup of the global numeric helper after string coercion', () => {
   const context = setup();
   const calls = [];
@@ -87,6 +115,7 @@ test('date parsing retains late lookup of the global numeric helper after string
   assert.equal(context.normalizeDate(input), '2024-01-02');
 });
 
+// Confirma delegacao de `normalizeImportHeader` para o helper global `cleanMTCell` e propagacao fiel de erros de `toString()` / `toISOString()`.
 test('header normalization retains the global cell helper and conversion errors propagate', () => {
   const context = setup();
   const input = {};
@@ -103,6 +132,7 @@ test('header normalization retains the global cell helper and conversion errors 
   assert.throws(() => original.normalizeDate(date), error => error === failure);
 });
 
+// Verifica pureza do modulo na inicializacao, aridade das funcoes, remocao das declaracoes em app.js e ordem interna e de script em index.html.
 test('normalization APIs initialize and run without application state or IO as ordered classic globals', () => {
   assert.ok(fs.existsSync(moduleFile));
   const sandbox = {};

@@ -1,3 +1,22 @@
+/*
+ * Testes unitarios para a alternancia de abas na pagina de importacao e exportacao.
+ *
+ * Modulo testado:
+ * - `src/modules/data-transfer/presentation/data-transfer-page.js` (`switchImportTab`).
+ *
+ * Estrategia de isolamento:
+ * - Carrega o script de apresentacao em `vm.createContext` com mocks de paineis (`style.display`),
+ *   botoes de aba (`getAttribute('onclick')` + `classList.toggle`) e funcoes auxiliares de exportacao.
+ * - Sobrescreve `renderBackupSummary` e `renderExportAccountFilter` no contexto apos a carga para
+ *   espionar a invocacao e a ordem exata sem executar a logica interna dessas funcoes.
+ *
+ * Regras criticas garantidas:
+ * - A declaracao legada `switchImportTab` foi removida de `app.js`.
+ * - Aba `csv` exibe apenas o painel de importacao e nao dispara trabalho da aba de exportacao.
+ * - Aba `export` exibe o painel de exportacao e dispara na ordem: `createBackupPayload` -> `renderBackupSummary` -> `renderExportAccountFilter`.
+ * - Abas desconhecidas ocultam ambos os paineis e desativam todos os botoes sem efeitos colaterais.
+ * - Paineis ausentes no DOM sao tolerados sem impedir atualizacao dos botoes e efeitos da aba `export`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -7,10 +26,12 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/data-transfer/presentation/data-transfer-page.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+// Garante que a implementacao legada nao permanece em app.js.
 const legacy = appSource.match(/^function switchImportTab\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+// Verifica em index.html que o modulo carrega uma unica vez como script classico sincrono antes de app.js.
 test('import tabs load once as a classic script after dependencies and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
@@ -20,6 +41,7 @@ test('import tabs load once as a classic script after dependencies and before ap
   assert.ok(html.indexOf(modulePath) < html.indexOf('src="app.js"'));
 });
 
+// Cria um mock de botao de aba que valida o nome da classe `'active'` e registra o estado booleano alternado.
 function createButton(onclick) {
   return {
     active: null,
@@ -28,6 +50,7 @@ function createButton(onclick) {
   };
 }
 
+// Configura a sandbox VM com DOM simulado (paineis e botoes), executa `switchImportTab(id)` e retorna o rastro de chamadas.
 function render(id, {csv = {style: {display: 'before'}}, exportPanel = {style: {display: 'before'}}} = {}) {
   const calls = [];
   const payload = {kind: 'current'};
@@ -53,12 +76,14 @@ function render(id, {csv = {style: {display: 'before'}}, exportPanel = {style: {
     renderExportAccountFilter() { calls.push(['filter']); },
   });
   vm.runInContext(source, context, {filename: modulePath});
+  // Substitui as funcoes definidas pelo proprio arquivo por espias para isolar apenas o comportamento de switchImportTab.
   context.renderBackupSummary = value => calls.push(['summary', value]);
   context.renderExportAccountFilter = () => calls.push(['filter']);
   vm.runInContext('switchImportTab(selectedTab)', context);
   return {csv, exportPanel, csvButton, exportButton, calls, payload};
 }
 
+// Verifica que selecionar a aba `csv` mostra o painel CSV, oculta o painel de exportacao, ativa o botao correto e nao gera resumo/filtro de backup.
 test('csv tab shows import, hides export and updates active buttons without export work', () => {
   const result = render('csv');
   assert.equal(result.csv.style.display, '');
@@ -72,6 +97,7 @@ test('csv tab shows import, hides export and updates active buttons without expo
   ]);
 });
 
+// Verifica que selecionar a aba `export` alterna a visibilidade e executa na ordem payload -> resumo -> filtro de contas.
 test('export tab renders current backup summary then account filter', () => {
   const result = render('export');
   assert.equal(result.csv.style.display, 'none');
@@ -88,6 +114,7 @@ test('export tab renders current backup summary then account filter', () => {
   ]);
 });
 
+// Garante que um identificador de aba desconhecido oculta ambos os paineis, desmarca os botoes e nao dispara rotinas de exportacao.
 test('unknown tab hides both panels, deactivates buttons and skips export work', () => {
   const result = render('other');
   assert.equal(result.csv.style.display, 'none');
@@ -97,6 +124,7 @@ test('unknown tab hides both panels, deactivates buttons and skips export work',
   assert.equal(result.calls.length, 3);
 });
 
+// Confirma resiliencia quando os elementos de painel estao ausentes (`null`): botoes e atualizacoes da aba `export` continuam funcionando.
 test('missing panels remain optional while buttons and export effects still update', () => {
   const result = render('export', {csv: null, exportPanel: null});
   assert.equal(result.csvButton.active, false);

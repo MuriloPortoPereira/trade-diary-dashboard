@@ -1,17 +1,40 @@
-// Usage: node tests/browser/study-hub-style-check.cjs capture /tmp/before
-//        node tests/browser/study-hub-style-check.cjs compare /tmp/before /tmp/after
-// Captures use a fresh profile, fixed clock/RNG and mocked exchange rate, never personal data.
+/*
+ * Verificador de regressão visual e CSSOM dedicado ao módulo StudyHub.
+ *
+ * Uso:
+ *   node tests/browser/study-hub-style-check.cjs capture /tmp/before
+ *   node tests/browser/study-hub-style-check.cjs compare /tmp/before /tmp/after
+ *
+ * Objetivo:
+ *   Capturar e comparar estilos computados, geometria, `localStorage` e capturas PNG
+ *   das quatro abas do StudyHub (`propfirm`, `plano`, `tradesim`, `mental`) em uma
+ *   grade de larguras que cobre os pontos de quebra responsivos (`-1`, exato, `+1`).
+ *
+ * Papel na verificação visual:
+ *   Além de auditar isoladamente o StudyHub, exporta `deterministicFixture` e `settle`,
+ *   reutilizados pelo verificador completo da casca (`shell-style-check.cjs`).
+ *
+ * Pontos-chave:
+ *   - Usa perfil descartável, relógio e `Math.random` fixos e cotação mockada (sem dados pessoais).
+ *   - Congela animações de CSS e de Chart.js para produzir hashes binários reprodutíveis.
+ */
 const assert = require('node:assert/strict');
 const {mkdir, readFile, writeFile} = require('node:fs/promises');
 const path = require('node:path');
 const {createHash} = require('node:crypto');
 const openBrowser = require('./helpers/study-hub-browser.cjs');
 
+// Raiz do projeto, larguras de breakpoint e abas do StudyHub cobertas na matriz.
 const root = path.resolve(__dirname, '../..');
 const widths = [390, ...[720, 768, 900, 1200, 1600].flatMap(width => [width - 1, width, width + 1])];
 const tabs = ['propfirm', 'plano', 'tradesim', 'mental'];
 const hash = value => createHash('sha256').update(value).digest('hex');
 
+/*
+ * Fixture determinístico injetado antes de qualquer script do documento via CDP.
+ * Fixa `Date`, `Math.random`, intercepta o `fetch` da cotação USD/BRL e pré-popula
+ * `localStorage` com uma conta e dois trades previsíveis (um WIN e um LOSS).
+ */
 function deterministicFixture() {
   const OriginalDate = Date;
   const fixedTime = new OriginalDate('2026-09-11T15:00:00Z').getTime();
@@ -24,7 +47,7 @@ function deterministicFixture() {
   window.fetch = (input, options) => String(input).includes('economia.awesomeapi.com.br')
     ? Promise.resolve(new Response(JSON.stringify({USDBRL: {bid: '5.80'}}), {headers: {'Content-Type': 'application/json'}}))
     : originalFetch(input, options);
-  // Explicit account/trade fixture avoids sample-data IDs generated from a constant RNG.
+  // Fixture explícito de conta e trades evita IDs de dados de exemplo gerados por RNG constante.
   localStorage.setItem('tl_accounts', JSON.stringify([{id: 'visual', name: 'Visual fixture', type: 'cfd_pct', balance: 1000, risk: 1}]));
   localStorage.setItem('tl_activeAccount', 'visual');
   localStorage.setItem('tl_trades', JSON.stringify([
@@ -35,6 +58,10 @@ function deterministicFixture() {
   localStorage.setItem('appCotacao', '5.80');
 }
 
+/*
+ * Aguarda o carregamento de fontes, força renderização síncrona dos gráficos Chart.js
+ * sem animação e espera dois quadros de `requestAnimationFrame` para estabilizar o layout.
+ */
 async function settle() {
   await document.fonts.ready;
   await new Promise(resolve => setTimeout(resolve, 180));
@@ -42,6 +69,10 @@ async function settle() {
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
+/*
+ * Inspeciona uma aba ativa do StudyHub no navegador, coletando retângulos, estilos
+ * computados, textos, valores de campos, estado do `localStorage` e folhas CSS carregadas.
+ */
 function inspectTab(tab) {
   const host = document.getElementById('studyHubLegacyApp');
   const active = document.getElementById(`mod-${tab}`);
@@ -73,11 +104,16 @@ function inspectTab(tab) {
   };
 }
 
+/*
+ * Abre o navegador isolado, navega para o StudyHub e captura JSON + PNG para cada
+ * combinação de largura e aba, gravando `report.json` com hashes para comparação.
+ */
 async function capture(directory) {
   await mkdir(directory, {recursive: false});
   const browser = await openBrowser(root);
   const report = {version: 1, widths, tabs, cases: []};
   try {
+    // Emula fuso horário, injeta fixture determinístico e carrega a página inicial.
     await browser.command('Emulation.setTimezoneOverride', {timezoneId: 'America/Sao_Paulo'});
     await browser.command('Page.addScriptToEvaluateOnNewDocument', {source: `(${deterministicFixture})()`});
     await browser.command('Emulation.setDeviceMetricsOverride', {width: 1601, height: 1000, deviceScaleFactor: 1, mobile: false});
@@ -88,11 +124,13 @@ async function capture(directory) {
       if (document.readyState === 'complete') done(); else window.addEventListener('load', done, {once: true});
     })`);
     assert.equal(await browser.evaluate('Chart.version'), '4.4.1');
+    // Congela animações/transições e abre a página do StudyHub.
     await browser.evaluate(`Chart.defaults.animation = false;
       const style = document.createElement('style');
       style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';
       document.head.append(style);
       showPage('studyHub');`);
+    // Percorre todas as larguras e abas, gravando artefatos individuais de estado e imagem.
     for (const width of widths) {
       await browser.command('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
       for (const tab of tabs) {
@@ -118,6 +156,10 @@ async function capture(directory) {
   } finally { await browser.close(); }
 }
 
+/*
+ * Ponto de entrada da CLI para os modos `capture` (gera baseline) e `compare`
+ * (captura novo estado e exige igualdade exata com o `report.json` da baseline).
+ */
 async function main() {
   const [mode, beforeDirectory, afterDirectory] = process.argv.slice(2);
   assert.ok(['capture', 'compare'].includes(mode) && beforeDirectory && (mode !== 'compare' || afterDirectory), 'Usage: capture <new-directory> | compare <baseline-directory> <new-directory>');

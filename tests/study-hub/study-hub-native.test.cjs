@@ -1,3 +1,25 @@
+/*
+ * Testes unitarios e de integracao para a arquitetura nativa do Study Hub (dominio, estado e pagina).
+ *
+ * Modulos testados:
+ * - `src/modules/study-hub/domain/study-hub-calculations.js` (`TradeDiaryStudyHubCalculations`)
+ * - `src/modules/study-hub/application/study-hub-state.js` (`defaultStudyHubState`, `mergeStudyHubState`)
+ * - `src/modules/study-hub/presentation/study-hub-page.js` (leitores de formulario, handlers de save,
+ *   adaptadores de inputs legados, `renderStudyHub` e wrappers de snapshot/simulacao)
+ * - `src/app/infrastructure/app-state-storage.js` (persistencia em `tl_studyhub`).
+ *
+ * Estrategia de isolamento:
+ * - Executa as tres camadas do Study Hub e o storage de estado em `vm.createContext`, com DOM simulado
+ *   baseado em `Map`, `Date.now()` congelado em `123456` e `localStorage` em memoria.
+ * - Valida tambem a pureza do modulo de dominio em uma sandbox com getters armadilha para DOM/IO/globais.
+ *
+ * Regras criticas garantidas:
+ * - Estado padrao cria instancias independentes e `mergeStudyHubState` mescla backups parciais sem descartar extensoes.
+ * - Leitores de formulario tratam zeros, numeros parciais (`25000abc`), textos vazios e fallback de seed.
+ * - Handlers de salvamento persistem exatamente o mesmo estado em `tl_studyhub` antes de re-renderizar.
+ * - `renderStudyHub` normaliza aba desconhecida para `propfirm`, respeita ordem da ponte legada e agenda `enhance` em rAF.
+ * - Calculos de PropFirm, Mental e simulacao composta (PRNG deterministico `seededRand`) mantem precisao e reprodutibilidade.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,8 +33,10 @@ const pagePath = 'src/modules/study-hub/presentation/study-hub-page.js';
 const domainSource = fs.readFileSync(path.join(root, domainPath), 'utf8');
 const stateSource = fs.readFileSync(path.join(root, statePath), 'utf8');
 const pageSource = fs.readFileSync(path.join(root, pagePath), 'utf8');
+// Normaliza objetos criados no realm VM para comparacao profunda segura.
 const plain = value => JSON.parse(JSON.stringify(value));
 
+// Monta a sandbox VM completa do Study Hub nativo com inputs simulados, `Date.now` fixo e espias de `save`/`renderStudyHub`.
 function setup(values = {}) {
   const elements = new Map(Object.entries(values).map(([id, value]) => [id, {
     value, textContent: '', options: [], events: [],
@@ -33,13 +57,16 @@ function setup(values = {}) {
   context.studyHubState = context.defaultStudyHubState();
   vm.runInContext(pageSource, context);
   vm.runInContext(fs.readFileSync(path.join(root, 'src/app/infrastructure/app-state-storage.js'), 'utf8'), context);
+  // Envolve `save` para auditar ordem de execucao mantendo a gravacao real em `localStorage`.
   const save = context.save;
   context.save = () => { calls.push('save'); save(); };
+  // Preserva referencia a `renderStudyHub` real (`renderNative`) e substitui no contexto por espiao leve.
   const renderNative = context.renderStudyHub;
   context.renderStudyHub = () => calls.push('render');
   return {context, elements, calls, storage, renderNative};
 }
 
+// Verifica independencia entre chamadas de `defaultStudyHubState`, preservacao de campos extras/zeros no merge de backups parciais e fallback para entradas invalidas.
 test('StudyHub defaults stay independent and merge partial backups without dropping extensions', () => {
   const {context: c} = setup();
   const first = c.defaultStudyHubState(), second = c.defaultStudyHubState();
@@ -64,6 +91,7 @@ test('StudyHub defaults stay independent and merge partial backups without dropp
   }
 });
 
+// Testa os quatro leitores nativos de formulario (`Prop`, `Plan`, `Sim`, `Mental`): parseFloat/parseInt permissivos, fallback de zero para padroes, titulo vazio e seed via `Date.now()`.
 test('native form readers preserve zero fallbacks, partial numeric parsing and empty text', () => {
   const {context: c} = setup({studyPropAccount: '25000abc', studyPropRisk: '0', studyPropFee: '',
     studyPlanTitle: '', studyPlanMaxTrades: '0', studyPlanDailyStop: '3.5',
@@ -82,6 +110,7 @@ test('native form readers preserve zero fallbacks, partial numeric parsing and e
   assert.equal(c.getStudyMentalForm().stress, 5);
 });
 
+// Garante que todos os handlers de salvamento e simulacao gravam o estado atualizado em `tl_studyhub` na ordem `save` -> `render`.
 test('native save handlers persist the same state to tl_studyhub before refreshing', () => {
   const {context: c, calls, storage} = setup({studyPropAccount: '25000', studyPlanTitle: 'Novo plano',
     studyMentalFocus: '5', studySimCapital: '5000', studySimTrades: '7'});
@@ -100,6 +129,7 @@ test('native save handlers persist the same state to tl_studyhub before refreshi
   assert.equal(c.studyHubState.simulator.seed, 123456);
 });
 
+// Valida os adaptadores de sincronizacao com inputs legados: ignora elementos ausentes/nulos, dispara `input` depois `change`, faz matching numerico tolerante no `<select>` e cai para `'custom'`.
 test('legacy input adapters preserve event order, tolerant select matching and custom fallback', () => {
   const {context: c, elements} = setup({amount: '', ratio: ''});
   c.setStudyHubLegacyValue('missing', 3);
@@ -116,6 +146,7 @@ test('legacy input adapters preserve event order, tolerant select matching and c
   assert.deepEqual(select.events, ['input', 'change', 'input', 'change']);
 });
 
+// Testa o ciclo completo de `renderStudyHub`: normalizacao de aba desconhecida para `propfirm`, sequencia exata da ponte legada e execucao adiada de `studyHubEnhanceIntradayImpact` no rAF.
 test('native page keeps tab fallback, bridge order and deferred intraday enhancement', () => {
   const {context: c, elements, calls, renderNative} = setup();
   const frames = [], account = {id: 'a'}, rows = [];
@@ -148,6 +179,7 @@ test('native page keeps tab fallback, bridge order and deferred intraday enhance
   assert.equal(calls.at(-1), 'enhance');
 });
 
+// Valida calculos de PropFirm (risco, limites, payout bruto/liquido USD e BRL, breakeven, limites de imposto/conta negativa/cambio 0), score Mental com faixas (`safe`/`warn`/`danger`) e contagem de checklist.
 test('propfirm and mental snapshots preserve deductions, risk limits, defaults and thresholds', () => {
   const {context: c} = setup();
   const params = Object.freeze({accountSize: 10000, riskPct: 1, dailyDdPct: 2, maxDdPct: 10,
@@ -169,6 +201,7 @@ test('propfirm and mental snapshots preserve deductions, risk limits, defaults a
   assert.equal(c.countStudyChecklistItems(null), 0);
 });
 
+// Verifica simulacao Monte Carlo nativa: juros compostos (100% wins), piso minimo de 5 trades (6 labels), falencia a zero, ordenacao p10 <= p50 <= p90 e sequencia exata de `seededRand(1)`.
 test('native simulation preserves compounded outcomes, minimum trades, zero capital and reproducibility', () => {
   const {context: c} = setup();
   const allWins = c.buildStudySimulation({capital: 100, riskPct: 10, winRate: 100,
@@ -193,6 +226,7 @@ test('native simulation preserves compounded outcomes, minimum trades, zero capi
   assert.deepEqual([rand(), rand(), rand()], [0.6270739405881613, 0.002735721180215478, 0.5274470399599522]);
 });
 
+// Garante que chamar `getStudyPropSnapshot`, `getStudyMentalSnapshot` e `buildStudySimulation` sem argumentos le dinamicamente o `studyHubState` atual em cada invocacao.
 test('snapshot and simulation wrappers resolve the current state on each argument-free call', () => {
   const {context: c} = setup();
   assert.equal(c.getStudyPropSnapshot().accountSize, 100000);
@@ -212,6 +246,7 @@ test('snapshot and simulation wrappers resolve the current state on each argumen
   assert.equal(c.buildStudySimulation().p50[5], 10);
 });
 
+// Comprova pureza absoluta da camada de dominio (`study-hub-calculations.js`): nenhum acesso a DOM, storage, rede ou globais de estado.
 test('StudyHub domain consumes explicit input without DOM, IO or application state', () => {
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'fetch', 'studyHubState', 'accounts', 'config']) {
@@ -227,6 +262,7 @@ test('StudyHub domain consumes explicit input without DOM, IO or application sta
     runs: 20, trades: 5}).positiveRate, 0);
 });
 
+// Valida ordem de scripts em `index.html`: dominio e estado antes da pagina, e todos os tres como scripts classicos sincronos antes de `app.js` e `load-app-state.js`.
 test('native modules load once as classic scripts before application initialization and consumers', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({

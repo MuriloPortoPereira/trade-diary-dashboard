@@ -1,3 +1,30 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar a renderizacao da pagina de perfil (renderProfilePage): cabecalho da
+ *   conta com metricas (P/L, expectativa, profit factor infinito e progresso da meta),
+ *   painel de limiares de risco, grupos de tags com escape HTML, foco operacional
+ *   limitado aos 4 primeiros alertas e tolerancia a containers DOM ausentes.
+ *
+ * Modulo/arquivo testado:
+ *   Funcao renderProfilePage em src/modules/profile/presentation/profile-page.js
+ *   (verificando tambem que a declaracao legada foi removida de app.js).
+ *
+ * Estrategia de isolamento:
+ *   Carrega profile-page.js em uma sandbox node:vm com nos opcionais (profileHero,
+ *   profileRiskPanel, profileTags) e stubs espiados para consultas de conta/trades,
+ *   metricas, risco, formatadores, escapeHtml, buildOperationalAlerts e renderStatusList.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Escape seguro de HTML no nome da conta, tipo de conta e nos tres grupos de tags
+ *     (estrategias, emocoes e mercados) sem mutar config.
+ *   - Formatacao de Profit Factor Infinity como '∞', arredondamento do progresso da
+ *     meta (0.534 -> '53%') e fronteira de alerta de risco (dayUsage 0.7 -> warn vs
+ *     totalUsage 0.699 -> safe).
+ *   - Envia exatamente os 4 primeiros alertas operacionais para 'profileFocus'.
+ *   - Quando todos os alvos opcionais estao ausentes, ainda computa e renderiza os
+ *     alertas em renderStatusList sem executar formatacoes desnecessarias (fR).
+ *   - Carregamento sincrono unico no index.html antes de app.js.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,6 +39,8 @@ const extracted = fs.existsSync(path.join(root, profilePath));
 const source = extracted ? fs.readFileSync(path.join(root, profilePath), 'utf8') : legacyDeclaration;
 assert.ok(source, 'renderProfilePage must remain available');
 
+// Monta a sandbox vm para renderProfilePage permitindo customizar quais containers
+// existem no DOM, metricas e estado de risco, registrando a ordem de todas as chamadas.
 function createHarness({elements = ['profileHero', 'profileRiskPanel', 'profileTags'], metrics, risk} = {}) {
   const calls = [];
   const nodes = Object.fromEntries(elements.map(id => [id, {innerHTML: ''}]));
@@ -40,6 +69,9 @@ function createHarness({elements = ['profileHero', 'profileRiskPanel', 'profileT
   return {calls, nodes, account, trades, config, context};
 }
 
+// Valida a renderizacao completa: escape HTML no hero e nas tags, metricas (+R:12.5,
+// +0.375R, ∞, 53%), classes de risco warn/safe na fronteira 0.7 vs 0.699, drawdown 4.20%,
+// corte dos 4 primeiros alertas em profileFocus e imutabilidade de config.
 test('profile renders account metrics, risk thresholds and escaped tag groups', () => {
   const {calls, nodes, account, trades, config, context} = createHarness();
   assert.equal(vm.runInContext('renderProfilePage()', context), undefined);
@@ -65,6 +97,8 @@ test('profile renders account metrics, risk thresholds and escaped tag groups', 
   assert.deepEqual(config, {strategies: ['S<&'], emotions: ['E<&'], markets: ['M<&']});
 });
 
+// Quando profileHero, profileRiskPanel e profileTags nao existem no DOM, pula suas
+// renderizacoes (nao invoca fR) mas ainda calcula e renderiza a lista de foco operacional.
 test('profile still computes alerts when optional targets are absent', () => {
   const {calls, context} = createHarness({elements: [], metrics: {totalPnl: -2, exp: -0.2, pf: 1}, risk: {
     goalProgress: 0, riskSub: '', riskLabel: '', dayUsage: 0, dayLimit: 0,
@@ -77,6 +111,8 @@ test('profile still computes alerts when optional targets are absent', () => {
   assert.equal(calls.some(call => call[0] === 'fR'), false);
 });
 
+// Confirma remocao da declaracao legada em app.js e inclusao unica e sincrona de
+// profile-page.js antes de app.js no index.html.
 test('extracted profile stays a synchronous classic script before app.js', () => {
   if (!extracted) return;
   assert.ok(!legacyDeclaration, 'legacy declaration must be moved');

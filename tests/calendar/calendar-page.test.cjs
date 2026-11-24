@@ -1,3 +1,27 @@
+/*
+ * Objetivo do arquivo:
+ *   Validar a renderizacao principal da pagina de calendario (renderCalendar) em
+ *   todos os seus modos de exibicao (mensal, semanal, quinzenal e fallback legado),
+ *   incluindo ano bissexto (fevereiro/2024 com 29 dias), cartoes de metricas e i18n.
+ *
+ * Modulo/arquivo testado:
+ *   Funcao renderCalendar em src/modules/calendar/presentation/calendar-page.js
+ *   (confirmando que a declaracao legada foi removida de app.js).
+ *
+ * Estrategia de isolamento:
+ *   Executa renderCalendar em uma sandbox node:vm com Date fixo em 10/02/2024,
+ *   nos DOM simulados (calStats, calTitle, calGridWrap) e stubs espiados para
+ *   syncCalPicker, t(), getActiveAccount, getAccountTrades, calcMetrics e mkCard.
+ *
+ * Pontos-chave e regras criticas garantidas:
+ *   - Grade mensal de 42 celulas com 29 dias clicaveis em ano bissexto, marcacao
+ *     de 'today', classes win/loss e filtragem correta de trades fora do mes/sem data.
+ *   - Grade semanal alinhada com 5 semanas (35 slots) e totalizadores por semana.
+ *   - Grade quinzenal dividida em 1a Quinzena (1-15) e 2a Quinzena (16-29) com totais.
+ *   - Modos vazios preservam todos os dias clicaveis sem badges de P/L e sem mutar rows.
+ *   - Modo desconhecido cai no fallback quinzenal e traducoes t() sao lidas a cada render.
+ *   - Carregamento sincrono unico antes de notifications-page.js no index.html.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -10,6 +34,8 @@ assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = ["renderCalendar"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
+// Monta a sandbox vm fixando o "hoje" em 10/02/2024 (ano bissexto), executa renderCalendar()
+// verificando retorno true e devolve os nos renderizados, chamadas registradas e cartoes gerados.
 function harness(mode = 'month', rows = []) {
   const nodes = Object.fromEntries(['calStats', 'calTitle', 'calGridWrap'].map(id => [id, {innerHTML: '', textContent: ''}]));
   const calls = [], cards = [];
@@ -34,6 +60,8 @@ function harness(mode = 'month', rows = []) {
   return {nodes, calls, cards, context};
 }
 
+// Conjunto de trades de referencia para fevereiro/2024 cobrindo ganho no dia atual,
+// perda na 2a quinzena, dia bissexto (29/02), trade fora do mes (01/03) e trade sem data.
 const rows = [
   {id: 'gain', date: '2024-02-10', pnl: 10},
   {id: 'loss', date: '2024-02-16', pnl: -20},
@@ -42,6 +70,9 @@ const rows = [
   {id: 'undated'},
 ];
 
+// Valida a visao mensal ('month'): titulo em portugues, 29 dias clicaveis em grade de 42
+// celulas, classes today/win/loss, exibicao do dia 29, ordem picker -> account -> metrics
+// e formatacao dos 6 cartoes superiores (incluindo pf Infinity -> '—').
 test('month view preserves leap days, today, signed totals and day handlers', () => {
   const {nodes, calls, cards} = harness('month', rows);
   assert.equal(nodes.calTitle.textContent, 'Fevereiro 2024');
@@ -55,6 +86,8 @@ test('month view preserves leap days, today, signed totals and day handlers', ()
   assert.deepEqual(cards.map(card => card.val), ['$-5.00', '50.0%', 2, '—', '10.0%', '-0.25R']);
 });
 
+// Valida a visao semanal ('week'): titulo 'Mensal — Fevereiro 2024', 5 linhas semanais
+// (35 slots) e totais semanais vazios ('—'), positivos (+$10.00, +$3.00) e negativos ($-20.00).
 test('week view preserves aligned weeks, empty totals and gain/loss totals', () => {
   const {nodes} = harness('week', rows);
   assert.equal(nodes.calTitle.textContent, 'Mensal — Fevereiro 2024');
@@ -67,6 +100,8 @@ test('week view preserves aligned weeks, empty totals and gain/loss totals', () 
   assert.match(grid, /cal-week-total text-green">\+\$3\.00/);
 });
 
+// Valida a visao quinzenal ('biweek'): separa 1a Quinzena (1-15) e 2a Quinzena (16-29)
+// com contagem de trades e somatorio de P/L (+$10.00 na 1a e $-17.00 na 2a).
 test('biweek view preserves both ranges, trade counts and totals', () => {
   const {nodes} = harness('biweek', rows);
   const grid = nodes.calGridWrap.innerHTML;
@@ -78,6 +113,8 @@ test('biweek view preserves both ranges, trade counts and totals', () => {
   assert.match(grid, /2 trades · \$-17\.00/);
 });
 
+// Garante que os tres modos sem trades renderizam todos os 29 dias sem elementos cal-pnl
+// e que a renderizacao com dados nunca muta o array rows recebido.
 test('empty views keep dates and neutral period markers without mutating rows', () => {
   for (const mode of ['month', 'week', 'biweek']) {
     const {nodes} = harness(mode);
@@ -89,6 +126,8 @@ test('empty views keep dates and neutral period markers without mutating rows', 
   assert.equal(JSON.stringify(rows), before);
 });
 
+// Confirma fallback legado para grade quinzenal quando calViewMode e desconhecido e que
+// mudancas dinamicas na funcao de traducao t() refletem imediatamente na proxima chamada.
 test('unknown view keeps the legacy fortnight fallback and translations are read per call', () => {
   const {context, nodes} = harness('unknown');
   assert.match(nodes.calGridWrap.innerHTML, /cal-biweek-grid/);
@@ -97,6 +136,8 @@ test('unknown view keeps the legacy fortnight fallback and translations are read
   assert.equal(nodes.calTitle.textContent, 'February 2024');
 });
 
+// Verifica no index.html que calendar-page.js e carregado uma vez como script sincrono
+// antes de notifications-page.js.
 test('calendar loads once as a synchronous classic script before notifications', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));

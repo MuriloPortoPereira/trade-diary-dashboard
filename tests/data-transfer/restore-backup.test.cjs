@@ -1,3 +1,23 @@
+/*
+ * Testes unitarios para o fluxo de restauracao de backup em memoria.
+ *
+ * Modulo testado:
+ * - `src/modules/data-transfer/application/transfer-workflows.js` (`restoreBackupData`)
+ * - Colabora com `src/modules/data-transfer/infrastructure/trade-file-formats.js` para validacao e resumo.
+ *
+ * Estrategia de isolamento:
+ * - Carrega `restoreBackupData` em `vm.createContext` bloqueando qualquer acesso a `document`,
+ *   `localStorage` e `fetch` via getters armadilha.
+ * - Injeta estado inicial conhecido (`before`) e stubs rastreaveis para `ensureDefaultStrategies`,
+ *   `normalizeAccount` e `mergeStudyHubState`.
+ *
+ * Regras criticas garantidas:
+ * - Entradas invalidas sao rejeitadas antes de qualquer mutacao de estado ou normalizacao.
+ * - Backups parciais preservam estado nao informado e sempre renormalizam a configuracao vigente.
+ * - Restauracao completa faz merge raso em `config`, normaliza contas via `.map`, preserva referencias
+ *   de `trades`/`preMarketData` e retorna o resumo atualizado sem mutar o objeto de entrada.
+ * - Erros durante normalizacao propagam mantendo exatamente o ponto de mutacao alcancado ate a falha.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -13,6 +33,7 @@ const end = app.indexOf('\nfunction exposeJsonExport(', start);
 const source = fs.existsSync(moduleFile) ? fs.readFileSync(moduleFile, 'utf8') : app.slice(start, end);
 assert.ok(source.includes('function restoreBackupData('));
 
+// Inicializa sandbox VM com estado anterior registrado em `before`, armadilhas contra IO e normalizadores espionados.
 function setup(overrides = {}) {
   const calls = [];
   const sandbox = {
@@ -24,6 +45,7 @@ function setup(overrides = {}) {
     mergeStudyHubState(value) { calls.push(['study', value]); return {merged: value}; },
     ...overrides,
   };
+  // Impede que a logica de aplicacao toque em DOM, persistencia local ou rede diretamente.
   for (const name of ['document', 'localStorage', 'fetch']) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`unexpected ${name} access`); }});
   }
@@ -39,6 +61,7 @@ function setup(overrides = {}) {
   return {context, calls, before};
 }
 
+// Garante que qualquer entrada invalida (null, array, sem chave conhecida ou chave herdada) lanca erro antes de tocar no estado ou chamar normalizadores.
 test('backup restoration rejects invalid input before any state change or normalization', () => {
   for (const input of [null, [], {version: 2}, Object.create({trades: []})]) {
     const {context, calls, before} = setup();
@@ -48,6 +71,7 @@ test('backup restoration rejects invalid input before any state change or normal
   }
 });
 
+// Verifica que campos com tipos invalidos/vazios num backup reconhecido nao sobrescrevem o estado atual, mas `ensureDefaultStrategies` ainda roda na config existente.
 test('partial backup preserves omitted state and always normalizes existing config', () => {
   const {context, calls, before} = setup();
   const result = context.restoreBackupData({trades: 'invalid', config: null, preMarketData: [], accounts: [], activeAccountId: '', studyHubState: false});
@@ -56,6 +80,7 @@ test('partial backup preserves omitted state and always normalizes existing conf
   assert.deepEqual(JSON.parse(JSON.stringify(result)), {trades: 1, accounts: 1, preMarketDays: 1, documents: 0});
 });
 
+// Valida restauracao completa: merge raso de `config`, repasse completo dos argumentos do `.map` em `normalizeAccount`, ordem de chamadas, resumo final e imutabilidade da entrada.
 test('full backup keeps references, shallow config merge, map callback arguments and summary', () => {
   const {context, calls, before} = setup();
   const data = {trades: [], config: {nested: {replacement: true}, generalDocs: [1, 2]},
@@ -79,6 +104,7 @@ test('full backup keeps references, shallow config merge, map callback arguments
   assert.equal(JSON.stringify(data), unchanged);
 });
 
+// Testa casos legados permissivos: array em `config` espalhado em objeto, `studyHubState` truthy nao-objeto e fallback de `activeAccountId` para primeira conta (ou null se vazio).
 test('restoration retains permissive config arrays, truthy study state and account fallback', () => {
   const {context, calls} = setup({activeAccountId: null});
   const data = {config: ['legacy'], accounts: [{id: 'first'}], activeAccountId: 0, studyHubState: 'legacy'};
@@ -93,6 +119,7 @@ test('restoration retains permissive config arrays, truthy study state and accou
   assert.equal(empty.context.activeAccountId, null);
 });
 
+// Confirma que excecoes em `ensureDefaultStrategies` ou `normalizeAccount` propagam preservando a ordem sequencial de mutacoes ja aplicadas antes da falha.
 test('normalization errors propagate while retaining earlier mutations', () => {
   const error = new Error('normalization failed');
   const configFailure = setup({ensureDefaultStrategies() { throw error; }});
@@ -112,6 +139,7 @@ test('normalization errors propagate while retaining earlier mutations', () => {
   assert.strictEqual(accountFailure.context.studyHubState, accountFailure.before.studyHubState);
 });
 
+// Verifica integracao estrutural: `restoreBackupData` removida de app.js, consumida na apresentacao e carregada entre infraestrutura e apresentacao em index.html.
 test('restoration workflow remains global and loads once before classic consumers', () => {
   assert.ok(fs.existsSync(moduleFile));
   assert.doesNotMatch(app, /^function restoreBackupData\(/m);

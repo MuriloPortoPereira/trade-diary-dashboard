@@ -1,3 +1,13 @@
+/*
+ * Objetivo: Validar a atualizacao do indicador resumido da conta ativa na barra superior
+ * (ponto de cor, nome bruto e rotulo do tipo de conta).
+ * Modulo/arquivo testado: funcao `renderTopbarAccount` em `src/app/presentation/app-workspace.js`
+ * (confirmando remocao da declaracao legada em `app.js`).
+ * Estrategia de isolamento: executa `app-workspace.js` em `node:vm` com mocks para os tres nos
+ * opcionais do DOM (`acctDot`, `acctPillName`, `acctPillType`), `getActiveAccount` e `acctTypeLabel`.
+ * Pontos-chave garantidos: retorno imediato sem conta ativa, imutabilidade do objeto de conta,
+ * independencia entre elementos DOM opcionais e ordem sincrona de scripts em `index.html`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,6 +21,10 @@ const legacy = appSource.match(/^function renderTopbarAccount\([^]*?^\}/m)?.[0];
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+/*
+ * Helper de renderizacao em sandbox: cria os nos DOM configurados em `visible`, registra cada
+ * acesso em `calls`, executa `renderTopbarAccount()` e devolve os nos finais e o historico de chamadas.
+ */
 function render(account, visible = ['acctDot', 'acctPillName', 'acctPillType']) {
   const nodes = Object.fromEntries(visible.map(id => [id, {
     style: {background: 'before'},
@@ -27,11 +41,19 @@ function render(account, visible = ['acctDot', 'acctPillName', 'acctPillType']) 
   return {nodes, calls};
 }
 
+/*
+ * Guarda sem conta ativa: quando `getActiveAccount()` devolve `null`, a funcao encerra antes de
+ * consultar qualquer elemento da topbar ou formatar tipo.
+ */
 test('missing active account returns before accessing topbar elements', () => {
   const {calls} = render(null);
   assert.deepEqual(calls, [['account']]);
 });
 
+/*
+ * Atualizacao completa: aplica a cor de fundo no ponto, escreve o nome literal em `textContent`
+ * (sem escape manual), preenche o tipo formatado na ordem esperada e nao muta o objeto original.
+ */
 test('topbar account preserves color, raw name, type label and source object', () => {
   const account = {id: 'a', color: '#123456', name: 'Conta <Principal>', type: 'prop_pct'};
   const before = JSON.stringify(account);
@@ -44,6 +66,10 @@ test('topbar account preserves color, raw name, type label and source object', (
   assert.equal(JSON.stringify(account), before);
 });
 
+/*
+ * Elementos opcionais independentes: com apenas `acctDot` no DOM, `acctTypeLabel` nao e chamado;
+ * com apenas `acctPillType`, somente o rotulo de tipo e calculado e preenchido.
+ */
 test('topbar targets remain independently optional', () => {
   const account = {color: 'red', name: 'Conta', type: 'crypto'};
   const dotOnly = render(account, ['acctDot']);
@@ -55,6 +81,10 @@ test('topbar targets remain independently optional', () => {
   assert.deepEqual(typeOnly.calls.filter(call => call[0] === 'type'), [['type', 'crypto']]);
 });
 
+/*
+ * Contrato de carregamento: assegura que `app-workspace.js` e carregado uma vez de forma sincrona
+ * em `index.html` antes de `accounts-workspace.js` e `app.js`.
+ */
 test('account summary loads once as a synchronous classic script before accounts page', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]

@@ -1,3 +1,15 @@
+/*
+ * Objetivo: Testar a renderizacao da lista de movimentacoes financeiras (aportes e retiradas)
+ * dentro do formulario de edicao/criacao de conta.
+ * Modulo/arquivo testado: funcao `renderAccountCashflowList` em
+ * `src/modules/accounts/presentation/accounts-workspace.js` (e ausencia de copia legada em `app.js`).
+ * Estrategia de isolamento: executa o codigo do modulo em `node:vm` injetando o array
+ * `accountFormCashflows` e mocks para `document.getElementById`, `calcAccountCashflow`,
+ * formatadores (`fR`, `fDate`) e `escapeHtml`.
+ * Pontos-chave garantidos: saida imediata sem container no DOM, estado vazio com mensagem legada,
+ * resumo de totais com sinal/cores corretas, escape de HTML em notas, imutabilidade do array de
+ * fluxos, indices das acoes de remocao e ordem de carregamento em `index.html`.
+ */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -11,6 +23,11 @@ const legacy = appSource.match(/^function renderAccountCashflowList\([^]*?^\}/m)
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
+/*
+ * Helper de renderizacao: instancia um contexto `vm` com no DOM simulado (`node`), mocks de
+ * calculo/formatacao e o array `accountFormCashflows`, executa `renderAccountCashflowList()` e
+ * devolve o HTML gerado, o rastreamento de chamadas e uma copia serializada dos fluxos finais.
+ */
 function render(flows, summary = {deposits: 0, withdrawals: 0, net: 0}, visible = true) {
   const node = {innerHTML: 'before'};
   const calls = [];
@@ -34,6 +51,10 @@ function render(flows, summary = {deposits: 0, withdrawals: 0, net: 0}, visible 
   };
 }
 
+/*
+ * Guarda de DOM ausente: se o container alvo nao existe (`getElementById` retorna `null`), a
+ * funcao deve encerrar antes mesmo de invocar `calcAccountCashflow` ou ler os fluxos.
+ */
 test('missing target returns before calculating or reading cashflows', () => {
   const node = {innerHTML: 'before'};
   const context = vm.createContext({
@@ -46,6 +67,10 @@ test('missing target returns before calculating or reading cashflows', () => {
   assert.equal(node.innerHTML, 'before');
 });
 
+/*
+ * Estado vazio: com lista sem itens, calcula o resumo, exibe a mensagem informativa legada e
+ * evita chamadas desnecessarias ao formatador monetario `fR`.
+ */
 test('empty cashflows keep the legacy message after calculating the summary', () => {
   const {html, calls} = render([]);
   assert.equal(html, '<div class="account-cashflow-empty">Nenhum aporte ou retirada registrada. Saldo atual usa só saldo inicial + P/L.</div>');
@@ -53,6 +78,12 @@ test('empty cashflows keep the legacy message after calculating the summary', ()
   assert.equal(calls.some(call => call[0] === 'money'), false);
 });
 
+/*
+ * Renderizacao completa: verifica cabecalho de resumo (aportes, retiradas e saldo liquido
+ * positivo com sinal `+` em verde), ordem das linhas, rotulos/classes por tipo, formatacao de
+ * data, escape de HTML contra XSS na nota, fallback `—` para nota vazia, handlers de remocao
+ * indexados e imutabilidade do array original.
+ */
 test('cashflow rows preserve summary, order, types, formatting, escaping and actions', () => {
   const flows = [
     {type: 'deposit', date: '2026-10-01', amount: 125, note: 'Aporte <principal>'},
@@ -73,6 +104,10 @@ test('cashflow rows preserve summary, order, types, formatting, escaping and act
   assert.deepEqual(after, flows);
 });
 
+/*
+ * Caso de borda de sinal e tipo desconhecido: saldo liquido negativo recebe `text-red` sem
+ * prefixo `+`, enquanto um tipo nao reconhecido (`other`) cai no fallback visual de `Aporte`.
+ */
 test('negative net retains the red tone without a positive sign', () => {
   const {html} = render(
     [{type: 'other', date: '', amount: 10, note: null}],
@@ -82,6 +117,10 @@ test('negative net retains the red tone without a positive sign', () => {
   assert.match(html, /class="text-green">Aporte<\/span>/);
 });
 
+/*
+ * Contrato de script classico: confirma carregamento unico e sincrono em `index.html` antes de
+ * `app.js` e ordem interna onde `renderAccountCashflowList` antecede `newAccount`.
+ */
 test('cashflow form renderer loads once as a synchronous classic script before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
