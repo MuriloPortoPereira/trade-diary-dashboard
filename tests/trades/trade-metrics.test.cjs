@@ -1,31 +1,39 @@
 /*
  * Objetivo:
- *   Validar o calculo de metricas estatisticas de trades (calcMetrics e o dominio puro
- *   TradeDiaryTradeMetrics): resolucao de capital inicial, agrupamento de fechados,
- *   expectancia, profit factor, drawdown, sequencias, indices diarios (Sharpe, Sortino,
- *   Calmar, Recovery) e isolamento completo do modulo de dominio.
+ *   Validar o calculo de metricas estatisticas de trades (calcMetrics e o dominio
+ *   puro TradeDiaryTradeMetrics): resolucao de capital inicial, agrupamento de
+ *   fechados, expectancia, profit factor, drawdown, sequencias, indices diarios
+ *   (Sharpe, Sortino, Calmar, Recovery) e isolamento completo do modulo de dominio.
  *
  * Modulos testados:
- *   - src/modules/analytics/domain/calculate-trade-metrics.js (dominio puro TradeDiaryTradeMetrics)
- *   - app.js (wrapper global calcMetrics que resolve saldo inicial e delega para o dominio)
+ *   - src/modules/analytics/domain/calculate-trade-metrics.js (dominio puro
+ *     TradeDiaryTradeMetrics)
+ *   - app.js (wrapper global calcMetrics que resolve saldo inicial e delega para o
+ *     dominio)
  *
  * Estrategia de isolamento:
- *   Extrai a funcao calcMetrics de app.js e carrega o arquivo de dominio em uma sandbox node:vm
- *   com mocks de accounts, activeAccountId, config, getActiveAccount e getAccountCapitalBase.
- *   Tambem testa o modulo de dominio separadamente com getters armadilha (forbidden globals)
- *   para provar ausencia de acoplamento a DOM, storage, rede, Chart ou estado de contas.
+ *   Extrai a funcao calcMetrics de app.js e carrega o arquivo de dominio em uma
+ *   sandbox node:vm com mocks de accounts, activeAccountId, config, getActiveAccount
+ *   e getAccountCapitalBase. Tambem testa o modulo de dominio separadamente com
+ *   getters armadilha (forbidden globals) para provar ausencia de acoplamento a DOM,
+ *   storage, rede, Chart ou estado de contas.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Ordem de fallback do saldo inicial (startBal): capitalBase -> saldo da conta ativa/resolvida ->
- *     config.balance -> 1000.
- *   - Apenas trades fechados (WIN, LOSS, BE) entram nos calculos; OPEN e ignorado e referencias originais
- *     sao preservadas sem mutar a entrada.
- *   - Entradas vazias, apenas BE e apenas WIN preservam zeros, Infinity (pf/recovery) e TypeError em null.
- *   - Drawdown e sequencias preservam ordem reversa de entrada (mais recente primeiro) e o comportamento
- *     de maxLoseStreakPnl em sequencias de perda no final da serie.
- *   - Sharpe, Sortino, Calmar e Recovery preservam desvio amostral, denominador de downside e anualizacao.
- *   - O modulo de dominio e carregado uma unica vez antes de todos os consumidores e de app.js.
+ *   - Ordem de fallback do saldo inicial (startBal): capitalBase -> saldo da conta
+ *     ativa/resolvida -> config.balance -> 1000.
+ *   - Apenas trades fechados (WIN, LOSS, BE) entram nos calculos; OPEN e ignorado e
+ *     referencias originais sao preservadas sem mutar a entrada.
+ *   - Entradas vazias, apenas BE e apenas WIN preservam zeros, Infinity (pf/recovery)
+ *     e TypeError em null.
+ *   - Drawdown e sequencias preservam ordem reversa de entrada (mais recente
+ *     primeiro) e o comportamento de maxLoseStreakPnl em sequencias de perda no final
+ *     da serie.
+ *   - Sharpe, Sortino, Calmar e Recovery preservam desvio amostral, denominador de
+ *     downside e anualizacao.
+ *   - O modulo de dominio e carregado uma unica vez antes de todos os consumidores e
+ *     de app.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -39,8 +47,9 @@ const moduleFile = path.join(root, modulePath);
 const source = appSource.match(/^function calcMetrics\([^]*?^\}/m)?.[0];
 assert.ok(source, 'calcMetrics source must remain available');
 
-// Helper de carregamento integrado em VM: prepara contas, conta ativa, config.balance e mocks de
-// getActiveAccount/getAccountCapitalBase, executa o modulo de dominio e o wrapper calcMetrics de app.js.
+// Helper de carregamento integrado em VM: prepara contas, conta ativa, config.balance
+// e mocks de getActiveAccount/getAccountCapitalBase, executa o modulo de dominio e o
+// wrapper calcMetrics de app.js.
 function loadMetrics({accounts, activeAccountId = 'a1', activeAccount, configBalance = 3000, capitalBase} = {}) {
   const accountRows = accounts ?? [{id: 'a1', balance: 2000}];
   const selected = activeAccount ?? accountRows.find(account => account.id === activeAccountId) ?? null;
@@ -62,9 +71,10 @@ function loadMetrics({accounts, activeAccountId = 'a1', activeAccount, configBal
   return {context, calls};
 }
 
-// Valida toda a cascata de fallback para startBal: (1) capitalBase direto da conta encontrada;
-// (2) fallback para getActiveAccount() e account.balance quando ID nao existe e capitalBase e 0;
-// (3) config.balance quando nao ha conta; (4) constante 1000 quando config.balance tambem e 0.
+// Valida toda a cascata de fallback para startBal: (1) capitalBase direto da conta
+// encontrada; (2) fallback para getActiveAccount() e account.balance quando ID nao
+// existe e capitalBase e 0; (3) config.balance quando nao ha conta; (4) constante
+// 1000 quando config.balance tambem e 0.
 test('metrics preserve account resolution and starting-balance fallback order', () => {
   const direct = loadMetrics({capitalBase: 1500});
   assert.equal(direct.context.calcMetrics([], 'a1').startBal, 1500);
@@ -80,9 +90,10 @@ test('metrics preserve account resolution and starting-balance fallback order', 
   assert.equal(finalDefault.context.calcMetrics([], 'missing').startBal, 1000);
 });
 
-// Verifica filtragem de trades fechados (ignorando OPEN), preservacao das referencias dos objetos originais
-// em wins/losses/bes, calculo de totalPnl, win rate, media de R, expectancia (com precisao IEEE-754),
-// grossW/grossL, profit factor e imutabilidade do array de entrada.
+// Verifica filtragem de trades fechados (ignorando OPEN), preservacao das referencias
+// dos objetos originais em wins/losses/bes, calculo de totalPnl, win rate, media de
+// R, expectancia (com precisao IEEE-754), grossW/grossL, profit factor e
+// imutabilidade do array de entrada.
 test('metrics preserve closed groups, expectancy, profit factor and source references', () => {
   const {context} = loadMetrics({capitalBase: 1000});
   const rows = [
@@ -108,9 +119,10 @@ test('metrics preserve closed groups, expectancy, profit factor and source refer
   assert.equal(JSON.stringify(rows), before);
 });
 
-// Casos de borda de entradas extremas: chamada sem argumentos retorna todas as 17 metricas zeradas;
-// apenas breakeven contabiliza maxLS = 1 e pf = 0; apenas wins produz pf e recovery iguais a Infinity;
-// entrada null preserva o contrato de lancar TypeError.
+// Casos de borda de entradas extremas: chamada sem argumentos retorna todas as 17
+// metricas zeradas; apenas breakeven contabiliza maxLS = 1 e pf = 0; apenas wins
+// produz pf e recovery iguais a Infinity; entrada null preserva o contrato de lancar
+// TypeError.
 test('empty, breakeven and winning-only inputs retain zero and Infinity behavior', () => {
   const {context} = loadMetrics({capitalBase: 1000});
   const empty = context.calcMetrics();
@@ -127,9 +139,10 @@ test('empty, breakeven and winning-only inputs retain zero and Infinity behavior
   assert.throws(() => context.calcMetrics(null), {name: 'TypeError'});
 });
 
-// Valida o calculo cronologico de drawdown e sequencias (a entrada vem do mais recente para o mais antigo
-// e e invertida internamente): checa pico/drawdown em USD e percentual (50/1080), maxWS/maxLS e o
-// comportamento legado onde uma sequencia de perdas no final sem WIN posterior nao grava maxLoseStreakPnl.
+// Valida o calculo cronologico de drawdown e sequencias (a entrada vem do mais
+// recente para o mais antigo e e invertida internamente): checa pico/drawdown em USD
+// e percentual (50/1080), maxWS/maxLS e o comportamento legado onde uma sequencia de
+// perdas no final sem WIN posterior nao grava maxLoseStreakPnl.
 test('drawdown and streaks preserve reverse input order and trailing-loss behavior', () => {
   const {context} = loadMetrics({capitalBase: 1000});
   const newestFirst = [
@@ -153,8 +166,9 @@ test('drawdown and streaks preserve reverse input order and trailing-loss behavi
   assert.equal(unflushed.maxLoseStreakPnl, 0);
 });
 
-// Verifica a precisao numerica dos indices de risco-retorno agregados por dia:
-// Sharpe (desvio amostral), Sortino (denominador de retornos negativos), Calmar (anualizado) e Recovery.
+// Verifica a precisao numerica dos indices de risco-retorno agregados por dia: Sharpe
+// (desvio amostral), Sortino (denominador de retornos negativos), Calmar (anualizado)
+// e Recovery.
 test('daily ratios retain sample deviation, downside denominator and annualization', () => {
   const {context} = loadMetrics({capitalBase: 1000});
   const result = context.calcMetrics([
@@ -168,9 +182,10 @@ test('daily ratios retain sample deviation, downside denominator and annualizati
   assert.equal(result.recovery, 1 / 3);
 });
 
-// Prova pureza do modulo de dominio: instala getters que lancam excecao para globals proibidos
-// (document, localStorage, fetch, Chart, accounts, activeAccountId, config), valida que apenas
-// TradeDiaryTradeMetrics e exposto com as 5 funcoes esperadas e executa calculateTradeMetrics isoladamente.
+// Prova pureza do modulo de dominio: instala getters que lancam excecao para globals
+// proibidos (document, localStorage, fetch, Chart, accounts, activeAccountId,
+// config), valida que apenas TradeDiaryTradeMetrics e exposto com as 5 funcoes
+// esperadas e executa calculateTradeMetrics isoladamente.
 test('isolated metrics domain exposes calculators without UI, storage or account state', () => {
   const forbidden = ['document', 'localStorage', 'fetch', 'Chart', 'accounts', 'activeAccountId', 'config'];
   const sandbox = {};
@@ -186,9 +201,10 @@ test('isolated metrics domain exposes calculators without UI, storage or account
   assert.equal(result.startBal, 500);
 });
 
-// Garante no index.html que o dominio de metricas carrega uma unica vez como script classico sincrono
-// antes de todos os consumidores (log, analytics, calendario, contas, perfil e app.js) e que app.js
-// mantem o wrapper global calcMetrics delegando para TradeDiaryTradeMetrics.calculateTradeMetrics.
+// Garante no index.html que o dominio de metricas carrega uma unica vez como script
+// classico sincrono antes de todos os consumidores (log, analytics, calendario,
+// contas, perfil e app.js) e que app.js mantem o wrapper global calcMetrics delegando
+// para TradeDiaryTradeMetrics.calculateTradeMetrics.
 test('metrics domain loads once before consumers while calcMetrics remains global', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({

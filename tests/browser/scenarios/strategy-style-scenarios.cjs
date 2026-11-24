@@ -1,25 +1,28 @@
 /*
- * Cenários visuais para ranking de estratégias no Dashboard e comparador de estratégias
- * na aba Estatísticas (`#statTab-strategy`).
+ * Cenários visuais para ranking de estratégias no Dashboard e comparador de
+ * estratégias na aba Estatísticas (`#statTab-strategy`).
  *
  * Objetivo:
  *   Exercitar os renderizadores e handlers de `change` reais com dados temporários em
  *   perfil isolado para cobrir ranking misto/vazio e todos os estados de comparação
- *   (vazio, estratégia única, mesma estratégia, invertida, foco, gráficos e visão completa).
+ *   (vazio, estratégia única, mesma estratégia, invertida, foco, gráficos e visão
+ *   completa).
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos estados `strategy-*`.
  *
  * Pontos-chave:
- *   - Atribui nomes `Breakout` e `Pullback` aos dois trades do fixture apenas em memória
- *     e restaura `trades` e `accounts` no `finally`.
- *   - Valida a presença dos quatro gráficos Chart.js do comparador (`stCmpEquityChart`,
- *     `stCmpMetricBarsChart`, `stCmpOutcomeChart` e `stCmpTimingChart`).
+ *   - Atribui nomes `Breakout` e `Pullback` aos dois trades do fixture apenas em
+ *     memória e restaura `trades` e `accounts` no `finally`.
+ *   - Valida a presença dos quatro gráficos Chart.js do comparador
+ *     (`stCmpEquityChart`, `stCmpMetricBarsChart`, `stCmpOutcomeChart` e
+ *     `stCmpTimingChart`).
  */
 
 /*
  * Prepara o ranking ou comparador de estratégias correspondente a `name`, verifica
- * visibilidade dos painéis, cartões, gráficos e foco, e confirma efeito colateral zero.
+ * visibilidade dos painéis, cartões, gráficos e foco, e confirma efeito colateral
+ * zero.
  */
 function prepareStrategyStyleScenario(name) {
   const previousTrades = trades, previousAccounts = accounts;
@@ -28,11 +31,14 @@ function prepareStrategyStyleScenario(name) {
   const selectA = document.getElementById('stStratA'), selectB = document.getElementById('stStratB');
   try {
     if (previousTrades.length !== 2) throw new Error('Strategy scenarios require the two-trade fixture');
-    // Rotula os dois trades do fixture com estratégias distintas em memória para comparação.
+
+    // Rotula os dois trades do fixture com estratégias distintas em memória para
+    // comparação.
     trades = previousTrades.map((trade, index) => ({...trade, strategy: index ? 'Pullback' : 'Breakout'}));
     selectA.value = ''; selectB.value = '';
     if (name.startsWith('strategy-rank-')) {
-      // Cenários do quadro de ranking de estratégias no Dashboard (misto positivo/negativo ou vazio).
+      // Cenários do quadro de ranking de estratégias no Dashboard (misto
+      // positivo/negativo ou vazio).
       renderDashStrategyBoard(name === 'strategy-rank-empty' ? [] : trades);
       const board = document.getElementById('dashStrategyBoard');
       if (name === 'strategy-rank-empty') {
@@ -42,7 +48,8 @@ function prepareStrategyStyleScenario(name) {
       }
       board.scrollIntoView({block: 'center'});
     } else {
-      // Cenários do comparador de estratégias em Estatísticas (seletores, painel vazio/cheio e gráficos).
+      // Cenários do comparador de estratégias em Estatísticas (seletores, painel
+      // vazio/cheio e gráficos).
       renderStats();
       const choose = (select, value) => {
         select.value = value;
@@ -67,7 +74,9 @@ function prepareStrategyStyleScenario(name) {
             !document.getElementById(id).getClientRects().length) throw new Error(`Comparison chart missing: ${id}`);
         }
       }
-      // Enquadra a região relevante do comparador e aplica foco no seletor quando solicitado.
+
+      // Enquadra a região relevante do comparador e aplica foco no seletor quando
+      // solicitado.
       const target = name === 'strategy-compare-focus' ? selectA : empty ? emptyPanel :
         name === 'strategy-compare-charts' ? full.querySelector('.strategy-compare-grid') :
         name === 'strategy-compare-swapped' ? document.getElementById('stCmpSummaryBody') : document.getElementById('stCmpCards');

@@ -1,33 +1,42 @@
 /*
  * Objetivo:
  *   Validar o comparador lado a lado de estrategias (`renderStrategyCompareCards`),
- *   cobrindo guard clause do wrapper ausente, estado vazio de selecao, validacao contra
- *   comparacao da mesma estrategia consigo mesma e comparacao completa com 4 graficos e 3 resumos.
+ *   cobrindo guard clause do wrapper ausente, estado vazio de selecao, validacao
+ *   contra comparacao da mesma estrategia consigo mesma e comparacao completa com 4
+ *   graficos e 3 resumos.
  *
  * Modulo da aplicacao testado:
- *   - `src/modules/analytics/presentation/analytics-workspace.js` (funcao `renderStrategyCompareCards`)
- *   - Remocao da declaracao legada em `app.js` e ordem de declaracao/carregamento em `index.html`
+ *   - `src/modules/analytics/presentation/analytics-workspace.js` (funcao
+ *     `renderStrategyCompareCards`)
+ *   - Remocao da declaracao legada em `app.js` e ordem de declaracao/carregamento em
+ *     `index.html`
  *
  * Estrategia de isolamento:
- *   - Carrega `analytics-workspace.js` em `node:vm` com mocks de todos os 13 elementos do comparador
- *     e stubs deterministicos para metricas, timing, resultados, vencedores, curvas de equity,
- *     graficos (`mkChart`) e chips de resumo (`renderAnalysisSummary`).
+ *   - Carrega `analytics-workspace.js` em `node:vm` com mocks de todos os 13
+ *     elementos do comparador e stubs deterministicos para metricas, timing,
+ *     resultados, vencedores, curvas de equity, graficos (`mkChart`) e chips de
+ *     resumo (`renderAnalysisSummary`).
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Ausencia do container raiz `stStratCompare` aborta imediatamente antes de ler selecoes ou metricas.
- *   - Com lista vazia ou selecao incompleta, oculta `stCmpFull`, exibe `stCmpEmpty` com orientacao,
- *     limpa os 3 resumos e nao cria graficos.
- *   - Selecionar a mesma estrategia em A e B mantem estado vazio orientativo mas ainda preenche os
- *     cards individuais `stCmpA` e `stCmpB` sem renderizar graficos comparativos.
- *   - Comparacao valida entre A e B exibe `stCmpFull`, marca o vencedor, gera insights, 4 graficos e 3 resumos.
+ *   - Ausencia do container raiz `stStratCompare` aborta imediatamente antes de ler
+ *     selecoes ou metricas.
+ *   - Com lista vazia ou selecao incompleta, oculta `stCmpFull`, exibe `stCmpEmpty`
+ *     com orientacao, limpa os 3 resumos e nao cria graficos.
+ *   - Selecionar a mesma estrategia em A e B mantem estado vazio orientativo mas
+ *     ainda preenche os cards individuais `stCmpA` e `stCmpB` sem renderizar graficos
+ *     comparativos.
+ *   - Comparacao valida entre A e B exibe `stCmpFull`, marca o vencedor, gera
+ *     insights, 4 graficos e 3 resumos.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-// Verifica que `renderStrategyCompareCards` foi removida de `app.js` e carrega `analytics-workspace.js`.
+// Verifica que `renderStrategyCompareCards` foi removida de `app.js` e carrega
+// `analytics-workspace.js`.
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
@@ -35,8 +44,9 @@ const legacy = appSource.match(/^function renderStrategyCompareCards\([^]*?^\}/m
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
-// Confirma carregamento unico e sincrono classico antes de `app.js` em `index.html`, bem como
-// a declaracao de `renderStrategyRows` antes de `renderStrategyCompareCards` no modulo.
+// Confirma carregamento unico e sincrono classico antes de `app.js` em `index.html`,
+// bem como a declaracao de `renderStrategyRows` antes de `renderStrategyCompareCards`
+// no modulo.
 test('strategy comparison loads once as a classic script after rows and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
@@ -47,14 +57,16 @@ test('strategy comparison loads once as a classic script after rows and before a
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
-// Fabrica um no DOM minimo com propriedades mutaveis para os containers do comparador.
+// Fabrica um no DOM minimo com propriedades mutaveis para os containers do
+// comparador.
 function element(extra = {}) {
   return {style: {}, innerHTML: '', textContent: '', value: '', ...extra};
 }
 
-// Auxiliar de renderizacao do comparador: monta os elementos da UI (com `includeWrap` para testar
-// o wrapper ausente), define 4 metricas comparativas (`pnl`, `exp`, `pf`, `maxDD`) e executa
-// `renderStrategyCompareCards(rows)` registrando consultas ao DOM, resumos e graficos em `calls`.
+// Auxiliar de renderizacao do comparador: monta os elementos da UI (com `includeWrap`
+// para testar o wrapper ausente), define 4 metricas comparativas (`pnl`, `exp`, `pf`,
+// `maxDD`) e executa `renderStrategyCompareCards(rows)` registrando consultas ao DOM,
+// resumos e graficos em `calls`.
 function render({rows = [], selectedA = '', selectedB = '', includeWrap = true} = {}) {
   const elements = {
     stStratA: element({value: selectedA}),
@@ -117,15 +129,16 @@ function render({rows = [], selectedA = '', selectedB = '', includeWrap = true} 
   return {elements, calls};
 }
 
-// Garante retorno imediato quando `stStratCompare` nao existe no DOM, sem consultar nenhum outro
-// elemento nem disparar metricas ou graficos.
+// Garante retorno imediato quando `stStratCompare` nao existe no DOM, sem consultar
+// nenhum outro elemento nem disparar metricas ou graficos.
 test('missing comparison wrapper returns before reading selections or metrics', () => {
   const {calls} = render({includeWrap: false});
   assert.deepEqual(calls, [['get', 'stStratCompare']]);
 });
 
-// Verifica o estado vazio (apenas A selecionada, sem linhas): mostra `stCmpEmpty` com a estrategia
-// escolhida e "Aguardando seleção", oculta `stCmpFull`, limpa os 3 blocos de resumo e nao gera graficos.
+// Verifica o estado vazio (apenas A selecionada, sem linhas): mostra `stCmpEmpty` com
+// a estrategia escolhida e "Aguardando seleção", oculta `stCmpFull`, limpa os 3
+// blocos de resumo e nao gera graficos.
 test('empty rows preserve guidance, selected labels and cleared summaries', () => {
   const {elements, calls} = render({selectedA: 'Breakout'});
   assert.equal(elements.stStratCompare.style.display, 'block');
@@ -142,8 +155,9 @@ test('empty rows preserve guidance, selected labels and cleared summaries', () =
   assert.equal(calls.some(call => call[0] === 'chart'), false);
 });
 
-// Testa o caso de borda de comparar a mesma estrategia em A e B: orienta o usuario a escolher
-// "duas estratégias diferentes", preenche ambos os cards detalhados (`stCmpA` e `stCmpB`) e pula graficos.
+// Testa o caso de borda de comparar a mesma estrategia em A e B: orienta o usuario a
+// escolher "duas estratégias diferentes", preenche ambos os cards detalhados
+// (`stCmpA` e `stCmpB`) e pula graficos.
 test('same strategy keeps the empty state and renders both detail cards', () => {
   const row = {name: 'Breakout', n: 4, wins: 2, pnl: 1, best: 2, lastDate: '2026-01-01', trades: []};
   const {elements, calls} = render({rows: [row], selectedA: row.name, selectedB: row.name});
@@ -153,9 +167,10 @@ test('same strategy keeps the empty state and renders both detail cards', () => 
   assert.equal(calls.some(call => call[0] === 'chart'), false);
 });
 
-// Exercita a comparacao completa entre `'Breakout'` e `'Pullback'`: exibe o grid completo,
-// preenche os cards, destaca `'Breakout'` como vencedor nos insights e tabela, e instancia os
-// 4 graficos (`Equity`, `MetricBars`, `Outcome`, `Timing`) e os 3 resumos de analise.
+// Exercita a comparacao completa entre `'Breakout'` e `'Pullback'`: exibe o grid
+// completo, preenche os cards, destaca `'Breakout'` como vencedor nos insights e
+// tabela, e instancia os 4 graficos (`Equity`, `MetricBars`, `Outcome`, `Timing`) e
+// os 3 resumos de analise.
 test('complete comparison preserves cards, winners, summaries and four charts', () => {
   const rows = [
     {name: 'Breakout', n: 12, wins: 7, pnl: 5, exp: 0.4, pf: 2, maxDD: 0.1, best: 2, lastDate: '2026-01-02', trades: []},

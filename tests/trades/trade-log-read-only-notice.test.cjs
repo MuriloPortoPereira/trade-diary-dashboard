@@ -1,28 +1,33 @@
 /*
  * Objetivo:
- *   Validar a renderizacao do aviso de "Modo visualizacao" (somente leitura) no historico
- *   de trades quando o usuario consulta outra conta ou "todas as contas".
+ *   Validar a renderizacao do aviso de "Modo visualizacao" (somente leitura) no
+ *   historico de trades quando o usuario consulta outra conta ou "todas as contas".
  *
  * Modulo testado:
- *   src/modules/trades/presentation/trade-log.js
- *   (funcao renderLogReadOnlyNotice, alem de confirmar a migracao do legado em app.js
- *   e o carregamento sincrono no index.html).
+ *   src/modules/trades/presentation/trade-log.js (funcao renderLogReadOnlyNotice,
+ *   alem de confirmar a migracao do legado em app.js e o carregamento sincrono no
+ *   index.html).
  *
  * Estrategia de isolamento:
  *   Executa o script em contexto node:vm com mocks para document.getElementById,
- *   getLogAccountEditLock (reaplicado apos runInContext para sobrescrever a versao real
- *   do proprio modulo) e escapeHtml, registrando o rastro completo de chamadas.
+ *   getLogAccountEditLock (reaplicado apos runInContext para sobrescrever a versao
+ *   real do proprio modulo) e escapeHtml, registrando o rastro completo de chamadas.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Sem o container logReadOnlyNotice, retorna antes de consultar getLogAccountEditLock.
- *   - Quando desbloqueado, oculta o container (display: 'none') e limpa innerHTML anterior.
- *   - Sempre invoca getLogAccountEditLock com {accountFilter, requireActivePage: false}.
- *   - No bloqueio para "todas as contas", escapa "todas as contas" e preserva o texto orientativo
- *     sem mutar o objeto `lock`.
- *   - No bloqueio para conta especifica, escapa o nome da conta nas duas ocorrencias da mensagem
- *     para prevenir XSS.
- *   - Carrega uma unica vez como script classico sincrono apos trade-form.js e antes de app.js.
+ *   - Sem o container logReadOnlyNotice, retorna antes de consultar
+ *     getLogAccountEditLock.
+ *   - Quando desbloqueado, oculta o container (display: 'none') e limpa innerHTML
+ *     anterior.
+ *   - Sempre invoca getLogAccountEditLock com {accountFilter, requireActivePage:
+ *     false}.
+ *   - No bloqueio para "todas as contas", escapa "todas as contas" e preserva o texto
+ *     orientativo sem mutar o objeto `lock`.
+ *   - No bloqueio para conta especifica, escapa o nome da conta nas duas ocorrencias
+ *     da mensagem para prevenir XSS.
+ *   - Carrega uma unica vez como script classico sincrono apos trade-form.js e antes
+ *     de app.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -36,9 +41,10 @@ const legacy = appSource.match(/^function renderLogReadOnlyNotice\([^]*?^\}/m)?.
 assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
-// Helper de renderizacao em VM: injeta o filtro de conta, o resultado simulado de lock,
-// o elemento alvo e o espiao de escapeHtml. Sobrescreve getLogAccountEditLock apos carregar
-// o modulo para controlar diretamente o cenario de bloqueio e normaliza `calls` via JSON.
+// Helper de renderizacao em VM: injeta o filtro de conta, o resultado simulado de
+// lock, o elemento alvo e o espiao de escapeHtml. Sobrescreve getLogAccountEditLock
+// apos carregar o modulo para controlar diretamente o cenario de bloqueio e normaliza
+// `calls` via JSON.
 function render({accountFilter = 'active', lock, target = {style: {display: 'before'}, innerHTML: 'before'}} = {}) {
   const calls = [];
   const context = vm.createContext({
@@ -53,15 +59,17 @@ function render({accountFilter = 'active', lock, target = {style: {display: 'bef
   return {target, calls: JSON.parse(JSON.stringify(calls))};
 }
 
-// Caso de borda sem o elemento logReadOnlyNotice no DOM: retorna imediatamente sem consultar
-// getLogAccountEditLock (e um Proxy garante que nenhum campo de `lock` seja lido).
+// Caso de borda sem o elemento logReadOnlyNotice no DOM: retorna imediatamente sem
+// consultar getLogAccountEditLock (e um Proxy garante que nenhum campo de `lock` seja
+// lido).
 test('missing read-only notice returns before calculating the account lock', () => {
   const {calls} = render({target: null, lock: new Proxy({}, {get() { throw new Error('lock accessed'); }})});
   assert.deepEqual(calls, [['target', 'logReadOnlyNotice']]);
 });
 
-// Cenario desbloqueado (conta consultada coincide com a ativa): oculta o aviso e limpa innerHTML,
-// confirmando passagem de requireActivePage: false para getLogAccountEditLock.
+// Cenario desbloqueado (conta consultada coincide com a ativa): oculta o aviso e
+// limpa innerHTML, confirmando passagem de requireActivePage: false para
+// getLogAccountEditLock.
 test('unlocked journal hides and clears the prior notice', () => {
   const lock = {locked: false};
   const {target, calls} = render({accountFilter: 'account-a', lock});
@@ -73,8 +81,9 @@ test('unlocked journal hides and clears the prior notice', () => {
   ]);
 });
 
-// Cenario de bloqueio para "todas as contas": exibe o alerta, usa o texto fixo "todas as contas"
-// passado por escapeHtml (ignorando accountName) e mantem o objeto `lock` imutavel.
+// Cenario de bloqueio para "todas as contas": exibe o alerta, usa o texto fixo "todas
+// as contas" passado por escapeHtml (ignorando accountName) e mantem o objeto `lock`
+// imutavel.
 test('all-accounts lock preserves the shared guidance and escaped target', () => {
   const lock = {locked: true, allAccounts: true, accountName: 'ignored'};
   const before = JSON.stringify(lock);
@@ -89,8 +98,9 @@ test('all-accounts lock preserves the shared guidance and escaped target', () =>
   assert.equal(JSON.stringify(lock), before);
 });
 
-// Cenario de bloqueio para conta especifica com caracteres HTML no nome ('Conta <A>'):
-// comprova que escapeHtml e chamado para ambas as ocorrencias do nome da conta no aviso.
+// Cenario de bloqueio para conta especifica com caracteres HTML no nome ('Conta
+// <A>'): comprova que escapeHtml e chamado para ambas as ocorrencias do nome da conta
+// no aviso.
 test('specific-account lock escapes both guidance and consulted account text', () => {
   const lock = {locked: true, allAccounts: false, accountName: 'Conta <A>'};
   const {target, calls} = render({accountFilter: 'account-a', lock});

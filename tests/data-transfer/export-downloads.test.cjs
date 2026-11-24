@@ -1,5 +1,6 @@
 /*
- * Testes unitarios e de contrato para exportacao de backups JSON, filtros e downloads CSV.
+ * Testes unitarios e de contrato para exportacao de backups JSON, filtros e downloads
+ * CSV.
  *
  * Modulos testados:
  * - `src/modules/data-transfer/infrastructure/browser-file-io.js`
@@ -7,18 +8,27 @@
  * - `src/modules/data-transfer/presentation/data-transfer-page.js`
  *
  * Estrategia de isolamento:
- * - Localiza as 10 funcoes de exportacao nos arquivos fonte e executa em uma sandbox `vm.createContext`.
- * - Simula APIs de navegador (`document.createElement`, `Blob`, `URL.createObjectURL/revokeObjectURL`,
- *   `setTimeout`) e fixa a data em 15/02/2024 (ano bissexto) via `FixedDate`.
- * - Captura todas as chamadas em ordem cronologica (`calls`) e enfileira timers (`tasks`) para disparo manual.
+ * - Localiza as 10 funcoes de exportacao nos arquivos fonte e executa em uma sandbox
+ *   `vm.createContext`.
+ * - Simula APIs de navegador (`document.createElement`, `Blob`,
+ *   `URL.createObjectURL/revokeObjectURL`, `setTimeout`) e fixa a data em 15/02/2024
+ *   (ano bissexto) via `FixedDate`.
+ * - Captura todas as chamadas em ordem cronologica (`calls`) e enfileira timers
+ *   (`tasks`) para disparo manual.
  *
  * Regras criticas garantidas:
- * - Ordem exata de criacao do anchor, Blob, Object URL, clique e revogacao agendada (1000 ms).
- * - Diferenca de tratamento quando `URL.revokeObjectURL` nao existe entre download de texto e JSON.
- * - Propagacao de erros de clique e serializacao circular sem agendar limpeza posterior.
- * - Filtros inclusivos de data, normalizacao de simbolos, aliases de conta e limites de ano bissexto (fev/2024 = dia 29).
- * - Carregamento limpo dos scripts em `index.html` sem IO na inicializacao e sem duplicatas em `app.js`.
+ * - Ordem exata de criacao do anchor, Blob, Object URL, clique e revogacao agendada
+ *   (1000 ms).
+ * - Diferenca de tratamento quando `URL.revokeObjectURL` nao existe entre download de
+ *   texto e JSON.
+ * - Propagacao de erros de clique e serializacao circular sem agendar limpeza
+ *   posterior.
+ * - Filtros inclusivos de data, normalizacao de simbolos, aliases de conta e limites
+ *   de ano bissexto (fev/2024 = dia 29).
+ * - Carregamento limpo dos scripts em `index.html` sem IO na inicializacao e sem
+ *   duplicatas em `app.js`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -36,24 +46,30 @@ const sources = [app, ...modulePaths.filter(file => fs.existsSync(path.join(root
   .map(file => fs.readFileSync(path.join(root, file), 'utf8'))];
 const names = ['exposeJsonExport', 'exportJSON', 'downloadTextFile', 'normalizeExportSymbols',
   'getTradesForCustomExport', 'readCustomExportFilters', 'exportTradesCSV', 'exportCSV', 'exportCSVCustom', 'exportCSVMonth'];
-// Extrai cada funcao alvo das fontes disponiveis garantindo que nenhuma esteja ausente.
+
+// Extrai cada funcao alvo das fontes disponiveis garantindo que nenhuma esteja
+// ausente.
 const declarations = names.map(name => {
   const declaration = sources.map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))?.[0]).find(Boolean);
   assert.ok(declaration, `Missing ${name}`);
   return declaration;
 }).join('\n');
 
-// Cria a sandbox VM com mocks de navegador, relogio congelado em 2024-02-15 (ano bissexto) e suporte a overrides por teste.
+// Cria a sandbox VM com mocks de navegador, relogio congelado em 2024-02-15 (ano
+// bissexto) e suporte a overrides por teste.
 function setup(overrides = {}) {
   const calls = [], tasks = [];
   const payload = {version: 2, trades: [{symbol: 'ES'}]};
+
   // Mock de tag <a> que registra atribuicoes de href/download e o clique sintetico.
   const anchor = {
     set href(value) { calls.push(['href', value]); },
     set download(value) { calls.push(['filename', value]); },
     click() { calls.push(['click']); },
   };
-  // Subclasse de Date que retorna 2024-02-15 quando instanciada sem argumentos, preservando datas explicitas.
+
+  // Subclasse de Date que retorna 2024-02-15 quando instanciada sem argumentos,
+  // preservando datas explicitas.
   class FixedDate extends Date {
     constructor(...args) { super(...(args.length ? args : [2024, 1, 15, 12])); }
     toISOString() { return '2024-02-15T12:00:00.000Z'; }
@@ -75,7 +91,8 @@ function setup(overrides = {}) {
   return {context, calls, tasks, payload};
 }
 
-// Verifica MIME padrao (`text/csv`), sequencia completa de download via anchor, revogacao adiada da URL e passagem direta de valores nulos.
+// Verifica MIME padrao (`text/csv`), sequencia completa de download via anchor,
+// revogacao adiada da URL e passagem direta de valores nulos.
 test('text download preserves MIME defaults, operation order and delayed URL revocation', () => {
   const {context, calls, tasks} = setup();
   assert.equal(context.downloadTextFile('a,b', 'trades.csv'), undefined);
@@ -90,7 +107,8 @@ test('text download preserves MIME defaults, operation order and delayed URL rev
   assert.deepEqual(calls[1], ['blob', [null], null]);
 });
 
-// Garante compatibilidade historica: downloadTextFile ignora o timer sem revokeObjectURL, enquanto exportJSON agenda e lanca no callback.
+// Garante compatibilidade historica: downloadTextFile ignora o timer sem
+// revokeObjectURL, enquanto exportJSON agenda e lanca no callback.
 test('missing revocation skips the text timer while JSON retains its existing callback error', () => {
   const {context, calls, tasks} = setup();
   delete context.URL.revokeObjectURL;
@@ -102,7 +120,8 @@ test('missing revocation skips the text timer while JSON retains its existing ca
   assert.throws(tasks[0], /revokeObjectURL/);
 });
 
-// Valida exportacao JSON formatada (2 espacos), atualizacao do resumo de backup, nome datado do arquivo e limpeza da Object URL.
+// Valida exportacao JSON formatada (2 espacos), atualizacao do resumo de backup, nome
+// datado do arquivo e limpeza da Object URL.
 test('JSON export keeps pretty payload, summary, filename and unguarded revocation order', () => {
   const {context, calls, tasks, payload} = setup();
   assert.equal(context.exposeJsonExport(), JSON.stringify(payload, null, 2));
@@ -116,7 +135,8 @@ test('JSON export keeps pretty payload, summary, filename and unguarded revocati
   assert.deepEqual(calls.at(-1), ['revoke', 'blob:export']);
 });
 
-// Confirma que falhas no clique ou JSON com referencia circular propagam a excecao sem deixar timers pendentes.
+// Confirma que falhas no clique ou JSON com referencia circular propagam a excecao
+// sem deixar timers pendentes.
 test('download and serialization errors propagate without scheduling later cleanup', () => {
   const failure = new Error('click failed');
   const text = setup({document: {createElement() { return {click() { throw failure; }}; }}});
@@ -129,7 +149,9 @@ test('download and serialization errors propagate without scheduling later clean
   assert.equal(json.tasks.length, 0);
 });
 
-// Testa normalizacao de simbolos e filtragem personalizada (datas inclusivas, case-insensitivity em status/simbolo, market exato, fallback de conta e imutabilidade).
+// Testa normalizacao de simbolos e filtragem personalizada (datas inclusivas,
+// case-insensitivity em status/simbolo, market exato, fallback de conta e
+// imutabilidade).
 test('export filters preserve inclusive dates, aliases, matching, references and source order', () => {
   const rows = [
     {date: '2024-02-01', symbol: 'es', status: 'win', market: 'futures'},
@@ -157,7 +179,8 @@ test('export filters preserve inclusive dates, aliases, matching, references and
   assert.throws(() => context.getTradesForCustomExport(null), /null/);
 });
 
-// Verifica leitura dos inputs de filtro no DOM tanto quando os elementos estao ausentes quanto quando preenchidos.
+// Verifica leitura dos inputs de filtro no DOM tanto quando os elementos estao
+// ausentes quanto quando preenchidos.
 test('export controls tolerate missing fields and retain raw date and account values', () => {
   const {context} = setup();
   assert.deepEqual(JSON.parse(JSON.stringify(context.readCustomExportFilters())), {from: '', to: '', accountId: ''});
@@ -166,7 +189,8 @@ test('export controls tolerate missing fields and retain raw date and account va
   assert.deepEqual(JSON.parse(JSON.stringify(context.readCustomExportFilters())), {from: values.exportStartDate, to: values.exportEndDate, accountId: 'chosen'});
 });
 
-// Testa as tres acoes de exportacao CSV (todos, personalizado e mes atual), validando calculo de ultimo dia em ano bissexto (29/02/2024) e nomes de arquivo.
+// Testa as tres acoes de exportacao CSV (todos, personalizado e mes atual), validando
+// calculo de ultimo dia em ano bissexto (29/02/2024) e nomes de arquivo.
 test('CSV actions preserve active/custom/month selection, leap-year limits and filenames', () => {
   const selected = [{symbol: 'ES'}];
   const {context, calls} = setup({getAccountTrades(id) { calls.push(['account', id]); return selected; }});
@@ -187,10 +211,13 @@ test('CSV actions preserve active/custom/month selection, leap-year limits and f
   assert.deepEqual(downloads.slice(1), [['CSV', 'trades_personalizado_2024-02-15.csv', 'text/csv;charset=utf-8'], ['CSV', 'trades_mes_2024-02-15.csv', 'text/csv;charset=utf-8']]);
 });
 
-// Garante ordem estrita de carregamento dos scripts classicos em index.html, ausencia de IO durante avaliacao inicial e remocao das funcoes legadas de app.js.
+// Garante ordem estrita de carregamento dos scripts classicos em index.html, ausencia
+// de IO durante avaliacao inicial e remocao das funcoes legadas de app.js.
 test('export scripts load once as classic globals without executing IO during initialization', () => {
   const sandbox = {};
-  // Intercepta qualquer acesso indevido a APIs de browser ou estado da aplicacao no momento da carga dos scripts.
+
+  // Intercepta qualquer acesso indevido a APIs de browser ou estado da aplicacao no
+  // momento da carga dos scripts.
   for (const name of ['document', 'localStorage', 'fetch', 'Blob', 'URL', 'setTimeout', 'activeAccountId', 'getAccountTrades']) {
     Object.defineProperty(sandbox, name, {get() { throw new Error(`unexpected initialization access: ${name}`); }});
   }

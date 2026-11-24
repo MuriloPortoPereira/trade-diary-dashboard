@@ -1,19 +1,20 @@
 /*
- * Cenários visuais para as grades principais de duas colunas das páginas de workspace:
- * Strategy Hub (`.strategy-hub-layout`), Perfil (`.profile-grid`) e Parceiros
- * (`.partner-config-grid`).
+ * Cenários visuais para as grades principais de duas colunas das páginas de
+ * workspace: Strategy Hub (`.strategy-hub-layout`), Perfil (`.profile-grid`) e
+ * Parceiros (`.partner-config-grid`).
  *
  * Objetivo:
  *   Validar transição responsiva de 2 colunas para 1 coluna no breakpoint `1420px`,
- *   espaçamento (`gap: 14px`), margem inferior condicional para último filho da página
- *   e ocultação da grade legada `#partnersGrid`.
+ *   espaçamento (`gap: 14px`), margem inferior condicional para último filho da
+ *   página e ocultação da grade legada `#partnersGrid`.
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos estados `workspace-grid-strategy`,
  *   `workspace-grid-profile` e `workspace-grid-partners`.
  *
  * Pontos-chave:
- *   - Operação estritamente de inspeção visual, validando fingerprint de estado e `localStorage`.
+ *   - Operação estritamente de inspeção visual, validando fingerprint de estado e
+ *     `localStorage`.
  */
 
 /*
@@ -33,7 +34,8 @@ function prepareWorkspaceGridStyleScenario(name) {
   const root = document.getElementById('page-' + page);
   if (!root?.classList.contains('active')) throw new Error('Workspace grid page did not open');
 
-  // Valida contagem de colunas (1 abaixo/igual a 1420px, 2 acima), gap e margem inferior.
+  // Valida contagem de colunas (1 abaixo/igual a 1420px, 2 acima), gap e margem
+  // inferior.
   const columns = matchMedia('(max-width: 1420px)').matches ? 1 : 2;
   let last;
   for (const selector of selectors) {

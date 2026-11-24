@@ -1,8 +1,8 @@
 /*
  * Objetivo do arquivo:
  *   Validar o sistema completo de internacionalizacao (i18n) e selecao de idioma:
- *   pureza e integridade por hash SHA-256 dos catalogos pt-BR e en-US, lista exata
- *   e ordem dos scripts locais no index.html, cadeia de fallback da funcao t(),
+ *   pureza e integridade por hash SHA-256 dos catalogos pt-BR e en-US, lista exata e
+ *   ordem dos scripts locais no index.html, cadeia de fallback da funcao t(),
  *   aplicacao de traducoes no DOM, persistencia e comportamento do menu suspenso.
  *
  * Modulos/arquivos testados:
@@ -10,24 +10,30 @@
  *   - src/modules/preferences/presentation/locales/pt-BR.js
  *   - src/modules/preferences/presentation/locales/en-US.js
  *   - src/modules/preferences/presentation/language-selector.js
- *   - Declaracao inicial de currentLanguage em app.js e ordem de scripts no index.html.
+ *   - Declaracao inicial de currentLanguage em app.js e ordem de scripts no
+ *     index.html.
  *
  * Estrategia de isolamento:
- *   Executa os scripts de catalogo primeiro em uma sandbox com armadilhas (getters que
- *   lancam erro) em window/document/localStorage/fetch/Chart/currentLanguage para provar
- *   que sao puramente declarativos; nos demais testes, usa createHarness() em node:vm
- *   com elementos data-i18n/data-i18n-html/data-i18n-ph e localStorage simulados.
+ *   Executa os scripts de catalogo primeiro em uma sandbox com armadilhas (getters
+ *   que lancam erro) em window/document/localStorage/fetch/Chart/currentLanguage para
+ *   provar que sao puramente declarativos; nos demais testes, usa createHarness() em
+ *   node:vm com elementos data-i18n/data-i18n-html/data-i18n-ph e localStorage
+ *   simulados.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Catalogos nao realizam IO nem poluem globais e preservam exatamente 585 chaves e
- *     hashes SHA-256 originais para pt-BR e en-US.
- *   - Precedencia de fallback em t(): idioma atual -> pt-BR -> fallback explicito (incluindo '') -> chave bruta.
- *   - initLanguageSelector() aplica traducoes em texto, placeholders e HTML sem gravar
- *     no storage nem disparar aviso/refresh.
- *   - setLanguage() valida o idioma, persiste em appLanguage, notifica, atualiza paginas
- *     e resumo de backup e fecha o menu; idiomas invalidos sao completamente ignorados.
- *   - Clique interno mantem o menu aberto, clique externo fecha e nos ausentes sao tolerados.
+ *   - Catalogos nao realizam IO nem poluem globais e preservam exatamente 585 chaves
+ *     e hashes SHA-256 originais para pt-BR e en-US.
+ *   - Precedencia de fallback em t(): idioma atual -> pt-BR -> fallback explicito
+ *     (incluindo '') -> chave bruta.
+ *   - initLanguageSelector() aplica traducoes em texto, placeholders e HTML sem
+ *     gravar no storage nem disparar aviso/refresh.
+ *   - setLanguage() valida o idioma, persiste em appLanguage, notifica, atualiza
+ *     paginas e resumo de backup e fecha o menu; idiomas invalidos sao completamente
+ *     ignorados.
+ *   - Clique interno mantem o menu aberto, clique externo fecha e nos ausentes sao
+ *     tolerados.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -47,8 +53,8 @@ assert.ok(stateDeclaration, 'Language state must remain initialized in app.js');
 const languageSource = sources.join('\n') + '\n' + stateDeclaration;
 
 // Prova que os scripts de catalogo sao estritamente orientados a dados (sem tocar em
-// globais de browser/estado nem criar propriedades extras no contexto) e valida a lista
-// ordenada completa de scripts locais sincronos no index.html.
+// globais de browser/estado nem criar propriedades extras no contexto) e valida a
+// lista ordenada completa de scripts locais sincronos no index.html.
 test('catalog scripts are data-only and load in order before selector and app.js', () => {
   const forbidden = ['window', 'document', 'localStorage', 'fetch', 'Chart', 'currentLanguage'];
   const sandbox = {};
@@ -117,9 +123,10 @@ test('catalog scripts are data-only and load in order before selector and app.js
   }
 });
 
-// Constroi um ambiente vm completo para o seletor de idiomas com idioma salvo opcional,
-// elementos simulados para [data-i18n], [data-i18n-html], [data-i18n-ph] e .lang-option,
-// localStorage instrumentado e captura de avisos, refreshAll e renderBackupSummary.
+// Constroi um ambiente vm completo para o seletor de idiomas com idioma salvo
+// opcional, elementos simulados para [data-i18n], [data-i18n-html], [data-i18n-ph] e
+// .lang-option, localStorage instrumentado e captura de avisos, refreshAll e
+// renderBackupSummary.
 function createHarness(savedLanguage = null) {
   const events = [], listeners = {};
   function element(properties = {}) {
@@ -166,13 +173,16 @@ function createHarness(savedLanguage = null) {
   return {context, events, listeners, elements, options, label, input, textarea, html, placeholder, storage, document};
 }
 
-// Verifica integridade exata dos dois catalogos (pt-BR e en-US): contagem de 585 entradas
-// e correspondencia de hash SHA-256 garantindo que textos e ordem das chaves nao regrediram.
+// Verifica integridade exata dos dois catalogos (pt-BR e en-US): contagem de 585
+// entradas e correspondencia de hash SHA-256 garantindo que textos e ordem das chaves
+// nao regrediram.
 test('catalogs preserve all 585 strings and key order per language', () => {
   const {context} = createHarness();
   const catalogs = vm.runInContext('TRANSLATIONS', context);
   assert.deepEqual(Object.keys(catalogs), ['pt-BR', 'en-US']);
-  // Impressoes digitais capturadas dos literais originais antes da extracao; incluem texto e ordem das chaves.
+
+  // Impressoes digitais capturadas dos literais originais antes da extracao; incluem
+  // texto e ordem das chaves.
   const hashes = {
     'pt-BR': '6804772ea1f3ed1a35e422af39544be901b506d4d8aef54ed323eb2b055f17b0',
     'en-US': '5437559df1cbfda47f14623008316eef5f3d50fdfc268885676797bca5898d8b',
@@ -183,8 +193,9 @@ test('catalogs preserve all 585 strings and key order per language', () => {
   }
 });
 
-// Confirma que a inicializacao de currentLanguage le somente 'appLanguage' do localStorage,
-// assumindo 'pt-BR' para null/'' e preservando valores salvos (mesmo desconhecidos).
+// Confirma que a inicializacao de currentLanguage le somente 'appLanguage' do
+// localStorage, assumindo 'pt-BR' para null/'' e preservando valores salvos (mesmo
+// desconhecidos).
 test('initial language reads only appLanguage and retains default/unknown values', () => {
   for (const [saved, expected] of [[null, 'pt-BR'], ['', 'pt-BR'], ['en-US', 'en-US'], ['unknown', 'unknown']]) {
     const {context, events} = createHarness(saved);
@@ -194,8 +205,8 @@ test('initial language reads only appLanguage and retains default/unknown values
 });
 
 // Testa todos os ramos de resolucao de t(key, fallback): traducao no idioma ativo,
-// valores falsy validos ('' e 0), fallback para pt-BR, fallback explicito, null -> chave
-// e idioma desconhecido caindo no catalogo pt-BR.
+// valores falsy validos ('' e 0), fallback para pt-BR, fallback explicito, null ->
+// chave e idioma desconhecido caindo no catalogo pt-BR.
 test('translation fallback keeps language, Portuguese, explicit fallback and raw key precedence', () => {
   const {context} = createHarness('en-US');
   assert.equal(context.t('nav.calendar'), 'Journal');
@@ -211,9 +222,10 @@ test('translation fallback keeps language, Portuguese, explicit fallback and raw
   assert.equal(context.t('nav.calendar'), 'Diário');
 });
 
-// Valida initLanguageSelector(): atualiza documentElement.lang, bandeira, textContent de
-// labels, placeholder de INPUT/TEXTAREA/[data-i18n-ph], innerHTML, classe .active e registra
-// listener global de click sem gravar no localStorage nem disparar aviso/refresh.
+// Valida initLanguageSelector(): atualiza documentElement.lang, bandeira, textContent
+// de labels, placeholder de INPUT/TEXTAREA/[data-i18n-ph], innerHTML, classe .active
+// e registra listener global de click sem gravar no localStorage nem disparar
+// aviso/refresh.
 test('selector init updates labels/placeholders/HTML without notice, refresh or write', () => {
   const h = createHarness('en-US');
   h.context.initLanguageSelector();
@@ -228,9 +240,9 @@ test('selector init updates labels/placeholders/HTML without notice, refresh or 
   assert.equal(typeof h.listeners.click, 'function');
 });
 
-// Garante que setLanguage('en-US') persiste a escolha, atualiza currentLanguage, fecha o
-// menu aberto e dispara em ordem: write -> showAppNotice -> refreshAll -> renderBackupSummary,
-// alem de permitir alternar de volta para pt-BR.
+// Garante que setLanguage('en-US') persiste a escolha, atualiza currentLanguage,
+// fecha o menu aberto e dispara em ordem: write -> showAppNotice -> refreshAll ->
+// renderBackupSummary, alem de permitir alternar de volta para pt-BR.
 test('setLanguage keeps storage, notice, refresh, backup and menu behavior', () => {
   const h = createHarness();
   h.elements.backupSummary.textContent = 'summary';
@@ -248,7 +260,8 @@ test('setLanguage keeps storage, notice, refresh, backup and menu behavior', () 
 });
 
 // Assegura que entradas invalidas ('unknown', '', null, undefined) em setLanguage sao
-// rejeitadas sem gravar no storage, sem alterar o idioma atual e sem fechar o menu aberto.
+// rejeitadas sem gravar no storage, sem alterar o idioma atual e sem fechar o menu
+// aberto.
 test('invalid language does not write, render, close menu or change current language', () => {
   const h = createHarness();
   h.context.toggleLangMenu();
@@ -258,8 +271,9 @@ test('invalid language does not write, render, close menu or change current lang
   assert.equal(vm.runInContext('currentLanguage', h.context), 'pt-BR');
 });
 
-// Testa a interacao de abertura/fechamento do menu (clique dentro mantem aberto; clique fora
-// fecha) e robustez quando langMenu, langFlag e backupSummary estao ausentes no DOM.
+// Testa a interacao de abertura/fechamento do menu (clique dentro mantem aberto;
+// clique fora fecha) e robustez quando langMenu, langFlag e backupSummary estao
+// ausentes no DOM.
 test('menu toggles, ignores internal click, closes outside and tolerates missing nodes', () => {
   const h = createHarness();
   h.context.initLanguageSelector();
@@ -276,8 +290,9 @@ test('menu toggles, ignores internal click, closes outside and tolerates missing
   h.context.applyLanguage('pt-BR', false);
 });
 
-// Verifica a separacao de responsabilidade de applyLanguage(lang, false): projeta o atributo
-// lang recebido e limpa opcoes ativas, mas le as traducoes a partir do currentLanguage global.
+// Verifica a separacao de responsabilidade de applyLanguage(lang, false): projeta o
+// atributo lang recebido e limpa opcoes ativas, mas le as traducoes a partir do
+// currentLanguage global.
 test('applyLanguage retains independent lang argument and global translation state', () => {
   const h = createHarness('en-US');
   h.context.applyLanguage('unknown', false);

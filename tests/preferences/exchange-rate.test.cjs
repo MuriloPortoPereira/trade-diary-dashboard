@@ -6,24 +6,25 @@
  *   e ordem de carregamento do script no index.html.
  *
  * Modulo/arquivo testado:
- *   src/modules/preferences/infrastructure/exchange-rate.js (com deteccao de
- *   fallback para declaracoes legadas em app.js).
+ *   src/modules/preferences/infrastructure/exchange-rate.js (com deteccao de fallback
+ *   para declaracoes legadas em app.js).
  *
  * Estrategia de isolamento:
- *   Carrega o modulo em uma sandbox node:vm com localStorage em memoria (Map),
- *   nos DOM simulados para inputs/badges/botao de atualizar, fetch substituivel,
+ *   Carrega o modulo em uma sandbox node:vm com localStorage em memoria (Map), nos
+ *   DOM simulados para inputs/badges/botao de atualizar, fetch substituivel,
  *   setInterval capturado e hooks opcionais do StudyHub (sh_hubSetCot / hubSetCot).
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Valores abaixo do piso valido (ex.: '0.5') sao ignorados; valores validos
- *     sao arredondados para 2 casas decimais, persistidos em 'appCotacao',
- *     refletidos nos inputs/badge e propagados ao StudyHub com precedencia sh_hubSetCot > hubSetCot.
- *   - fetchCotacao adiciona e sempre remove a classe 'spinning', mesmo em falha offline,
- *     sem alterar cotacaoAtual em caso de erro.
+ *   - Valores abaixo do piso valido (ex.: '0.5') sao ignorados; valores validos sao
+ *     arredondados para 2 casas decimais, persistidos em 'appCotacao', refletidos nos
+ *     inputs/badge e propagados ao StudyHub com precedencia sh_hubSetCot > hubSetCot.
+ *   - fetchCotacao adiciona e sempre remove a classe 'spinning', mesmo em falha
+ *     offline, sem alterar cotacaoAtual em caso de erro.
  *   - initCotacao restaura o valor salvo no input, dispara fetch imediato e agenda
  *     atualizacao automatica a cada 5 minutos (300000 ms).
  *   - Script classico unico carregado antes de bootstrap-app.js e app.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -70,8 +71,9 @@ function setup({stored = '5.80', fetchImpl, studyHub = 'sh'} = {}) {
   return {context, calls, nodes, storage};
 }
 
-// Verifica setCotacao: rejeita valor fora da faixa ('0.5'), arredonda '5.876' -> 5.88,
-// atualiza localStorage/inputs/badge e usa sh_hubSetCot quando presente, com fallback para hubSetCot.
+// Verifica setCotacao: rejeita valor fora da faixa ('0.5'), arredonda '5.876' ->
+// 5.88, atualiza localStorage/inputs/badge e usa sh_hubSetCot quando presente, com
+// fallback para hubSetCot.
 test('setting a quote preserves validation, rounding, storage and StudyHub precedence', () => {
   const current = setup();
   current.context.setCotacao('0.5');
@@ -105,8 +107,9 @@ test('fetch preserves success, silent failure and spinner cleanup', async () => 
   assert.deepEqual(failure.calls, [['add', 'spinning'], ['remove', 'spinning']]);
 });
 
-// Garante que initCotacao preenche o input com o valor salvo ('6.25'), agenda fetchCotacao
-// a cada 300000 ms (5 minutos) e dispara uma busca imediata (acionando o spinner).
+// Garante que initCotacao preenche o input com o valor salvo ('6.25'), agenda
+// fetchCotacao a cada 300000 ms (5 minutos) e dispara uma busca imediata (acionando o
+// spinner).
 test('initialization restores the input, fetches immediately and schedules five minutes', async () => {
   const current = setup({stored: '6.25'});
   current.context.initCotacao();

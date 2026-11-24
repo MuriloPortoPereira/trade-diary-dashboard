@@ -1,25 +1,34 @@
 /*
- * Testes de caracterizacao e paridade para serializacao e exportacao de trades em CSV.
+ * Testes de caracterizacao e paridade para serializacao e exportacao de trades em
+ * CSV.
  *
  * Modulos testados:
- * - `src/modules/data-transfer/infrastructure/trade-file-formats.js` (`TradeDiaryTradesCSV`)
+ * - `src/modules/data-transfer/infrastructure/trade-file-formats.js`
+ *   (`TradeDiaryTradesCSV`)
  * - Wrappers legados em `app.js` (`TRADE_CSV_HEADERS`, `csvCell`, `buildTradesCSV`)
- * - Consumidor de exportacao em `src/modules/data-transfer/presentation/data-transfer-page.js` (`exportTradesCSV`).
+ * - Consumidor de exportacao em
+ *   `src/modules/data-transfer/presentation/data-transfer-page.js`
+ *   (`exportTradesCSV`).
  *
  * Estrategia de isolamento:
- * - Usa `characterize(label, api)` para executar a mesma suite de 9 testes tanto contra o
- *   serializador isolado (`TradeDiaryTradesCSV`) quanto contra os wrappers legados de `app.js`,
- *   assegurando 100% de paridade comportamental.
- * - `loadSerializerContext` instala getters armadilha para 19 globais proibidos (DOM, storage, rede, `trades`, etc.)
- *   garantindo pureza total do modulo de serializacao.
+ * - Usa `characterize(label, api)` para executar a mesma suite de 9 testes tanto
+ *   contra o serializador isolado (`TradeDiaryTradesCSV`) quanto contra os wrappers
+ *   legados de `app.js`, assegurando 100% de paridade comportamental.
+ * - `loadSerializerContext` instala getters armadilha para 19 globais proibidos (DOM,
+ *   storage, rede, `trades`, etc.) garantindo pureza total do modulo de serializacao.
  *
  * Regras criticas garantidas:
- * - Todas as celulas sao envolvidas por aspas duplas, com escape `""`, preservando virgulas, CRLF, Unicode e formulas.
- * - Arrays sao unidos por `"; "` antes do escape; cabecalhos seguem ordem fixa de 22 colunas.
- * - `buildTradesCSV` nao muta entradas congeladas, mantem comportamento com `null`/primitivos/arrays esparsos
- *   e resolve `trades` atual quando chamada sem argumento.
- * - `exportTradesCSV` formata o nome datado com MIME UTF-8 e exibe aviso quando a lista filtrada esta vazia.
+ * - Todas as celulas sao envolvidas por aspas duplas, com escape `""`, preservando
+ *   virgulas, CRLF, Unicode e formulas.
+ * - Arrays sao unidos por `"; "` antes do escape; cabecalhos seguem ordem fixa de 22
+ *   colunas.
+ * - `buildTradesCSV` nao muta entradas congeladas, mantem comportamento com
+ *   `null`/primitivos/arrays esparsos e resolve `trades` atual quando chamada sem
+ *   argumento.
+ * - `exportTradesCSV` formata o nome datado com MIME UTF-8 e exibe aviso quando a
+ *   lista filtrada esta vazia.
  */
+
 const nodeTest = require('node:test');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
@@ -29,12 +38,15 @@ const appSource = fs.readFileSync(`${__dirname}/../../app.js`, 'utf8');
 const exportActionsSource = fs.readFileSync(`${__dirname}/../../src/modules/data-transfer/presentation/data-transfer-page.js`, 'utf8');
 const serializerPath = 'src/modules/data-transfer/infrastructure/trade-file-formats.js';
 const serializerSource = fs.readFileSync(`${__dirname}/../../${serializerPath}`, 'utf8');
-// Lista de globais de ambiente/navegador que o serializador puro e proibido de acessar.
+
+// Lista de globais de ambiente/navegador que o serializador puro e proibido de
+// acessar.
 const forbiddenGlobals = [
   'window', 'document', 'localStorage', 'sessionStorage', 'fetch', 'XMLHttpRequest',
   'WebSocket', 'navigator', 'indexedDB', 'caches', 'Chart', 'Blob', 'FileReader',
   'require', 'process', 'console', 'setTimeout', 'setInterval', 'trades',
 ];
+
 // Cabecalho canonico de 22 colunas esperado no CSV exportado.
 const header = 'date,symbol,direction,placedTime,openTime,exitDate,exitTime,entry,exit,stop,tp,qty,riskUsd,riskPct,r,pnl,status,market,strategy,emotion,errors,remarks';
 const emptyRow = Array(22).fill('""').join(',');
@@ -46,7 +58,8 @@ function declaration(name) {
   return match[0];
 }
 
-// Carrega `trade-file-formats.js` em uma sandbox estrita onde qualquer acesso aos globais proibidos lanca erro.
+// Carrega `trade-file-formats.js` em uma sandbox estrita onde qualquer acesso aos
+// globais proibidos lanca erro.
 function loadSerializerContext() {
   const sandbox = {};
   for (const name of forbiddenGlobals) {
@@ -59,7 +72,8 @@ function loadSerializerContext() {
   return context;
 }
 
-// Monta um contexto VM com os wrappers legados de `app.js` conectados ao serializador isolado.
+// Monta um contexto VM com os wrappers legados de `app.js` conectados ao serializador
+// isolado.
 function loadLegacyContext() {
   const context = vm.createContext({TradeDiaryTradesCSV: loadSerializerContext().TradeDiaryTradesCSV});
   const headers = appSource.match(/^const TRADE_CSV_HEADERS = .*;$/m);
@@ -71,11 +85,13 @@ function loadLegacyContext() {
   return context;
 }
 
-// Registra a bateria completa de testes de caracterizacao para validar paridade entre duas implementacoes/interfaces CSV.
+// Registra a bateria completa de testes de caracterizacao para validar paridade entre
+// duas implementacoes/interfaces CSV.
 function characterize(label, api) {
   const test = (name, callback) => nodeTest(`${label}: ${name}`, callback);
 
-  // Verifica que todos os tipos escalares (undefined, null, numeros, -0, NaN, Infinity, BigInt, Symbol, objetos) sao convertidos e cercados por aspas.
+  // Verifica que todos os tipos escalares (undefined, null, numeros, -0, NaN,
+  // Infinity, BigInt, Symbol, objetos) sao convertidos e cercados por aspas.
   test('quotes every cell and preserves scalar conversion', () => {
     for (const [value, expected] of [
       [undefined, '""'], [null, '""'], ['', '""'], ['  ', '"  "'],
@@ -85,27 +101,31 @@ function characterize(label, api) {
     ]) assert.equal(api.csvCell(value), expected);
   });
 
-  // Garante duplicacao de aspas internas (`""`) preservando virgulas, quebras CR/LF, caracteres Unicode e texto de formula sem sanitizacao silenciosa.
+  // Garante duplicacao de aspas internas (`""`) preservando virgulas, quebras CR/LF,
+  // caracteres Unicode e texto de formula sem sanitizacao silenciosa.
   test('escapes quotes but retains commas, CR, LF, Unicode and formula text', () => {
     assert.equal(api.csvCell('ação,"A"\r\nB\nC\rD'), '"ação,""A""\r\nB\nC\rD"');
     assert.equal(api.csvCell('=SUM(A1:A2)'), '"=SUM(A1:A2)"');
   });
 
-  // Valida serializacao de arrays (incluindo aninhados e esparsos) juntando elementos com `"; "` antes de aplicar escape e aspas.
+  // Valida serializacao de arrays (incluindo aninhados e esparsos) juntando elementos
+  // com `"; "` antes de aplicar escape e aspas.
   test('joins arrays with semicolon-space before quoting', () => {
     assert.equal(api.csvCell([]), '""');
     assert.equal(api.csvCell(['a,b', '"c"', null, undefined, '', 0, false]), '"a,b; ""c""; ; ; ; 0; false"');
     assert.equal(api.csvCell([['a', 'b'], , 'c']), '"a,b; ; c"');
   });
 
-  // Confirma que listas vazias ou valores nao-array emitem somente a linha de cabecalho terminada em LF.
+  // Confirma que listas vazias ou valores nao-array emitem somente a linha de
+  // cabecalho terminada em LF.
   test('empty or non-array lists emit only headers and LF', () => {
     for (const list of [[], null, false, 0, '', 'invalid', {}, {length: 1}]) {
       assert.equal(api.buildTradesCSV(list), header + '\n');
     }
   });
 
-  // Verifica que a ordem das colunas depende exclusivamente de `TRADE_CSV_HEADERS`, ignorando a ordem de insercao das chaves e propriedades extras.
+  // Verifica que a ordem das colunas depende exclusivamente de `TRADE_CSV_HEADERS`,
+  // ignorando a ordem de insercao das chaves e propriedades extras.
   test('keeps column order independently of object order and ignores extra fields', () => {
     const trade = {extra: 'ignored'};
     header.split(',').reverse().forEach(name => { trade[name] = name; });
@@ -113,14 +133,16 @@ function characterize(label, api) {
       '"date","symbol","direction","placedTime","openTime","exitDate","exitTime","entry","exit","stop","tp","qty","riskUsd","riskPct","r","pnl","status","market","strategy","emotion","errors","remarks"');
   });
 
-  // Valida ordem de linhas, celulas ausentes como `""`, separador LF e ausencia de nova linha extra apos a ultima linha.
+  // Valida ordem de linhas, celulas ausentes como `""`, separador LF e ausencia de
+  // nova linha extra apos a ultima linha.
   test('keeps row order, missing values, LF separators and no final row newline', () => {
     const first = {date: '2026-09-10', symbol: 'EURUSD', errors: ['pressa', '"erro"'], remarks: 'linha 1\nlinha 2'};
     const expectedFirst = ['"2026-09-10"', '"EURUSD"', ...Array(18).fill('""'), '"pressa; ""erro"""', '"linha 1\nlinha 2"'].join(',');
     assert.equal(api.buildTradesCSV([first, {}]), header + '\n' + expectedFirst + '\n' + emptyRow);
   });
 
-  // Garante fidelidade nos casos de borda: `null`/`undefined` na lista lancam TypeError, primitivos geram linha vazia e arrays esparsos preservam buracos.
+  // Garante fidelidade nos casos de borda: `null`/`undefined` na lista lancam
+  // TypeError, primitivos geram linha vazia e arrays esparsos preservam buracos.
   test('retains null-row TypeError and primitive/sparse-row behavior', () => {
     for (const row of [null, undefined]) {
       assert.throws(() => api.buildTradesCSV([row]), {name: 'TypeError'});
@@ -129,7 +151,8 @@ function characterize(label, api) {
     assert.equal(api.buildTradesCSV(Array(2)), header + '\n\n');
   });
 
-  // Confirma leitura de propriedades herdadas via prototipo e propagacao exata de erros lancados por `toString()`.
+  // Confirma leitura de propriedades herdadas via prototipo e propagacao exata de
+  // erros lancados por `toString()`.
   test('reads inherited fields and propagates conversion errors', () => {
     const trade = Object.create({date: 'inherited'});
     assert.equal(api.buildTradesCSV([trade]), header + '\n"inherited",' + Array(21).fill('""').join(','));
@@ -139,7 +162,8 @@ function characterize(label, api) {
     assert.throws(() => api.buildTradesCSV([{remarks: value}]), thrown => thrown === error);
   });
 
-  // Garante pureza e imutabilidade: listas, objetos e arrays congelados podem ser serializados repetidamente sem alteracao.
+  // Garante pureza e imutabilidade: listas, objetos e arrays congelados podem ser
+  // serializados repetidamente sem alteracao.
   test('does not mutate input lists, records or arrays', () => {
     const errors = Object.freeze(['a', 'b']);
     const record = Object.freeze({date: '2026-09-10', errors});
@@ -149,11 +173,13 @@ function characterize(label, api) {
   });
 }
 
-// Executa a mesma suite de caracterizacao tanto no namespace isolado quanto nos wrappers globais legados.
+// Executa a mesma suite de caracterizacao tanto no namespace isolado quanto nos
+// wrappers globais legados.
 characterize('isolated CSV serializer', loadSerializerContext().TradeDiaryTradesCSV);
 characterize('legacy CSV wrappers', loadLegacyContext());
 
-// Verifica a superficie exata de simbolos globais expostos por `trade-file-formats.js` (sem vazamento de helpers internos nem IO na carga).
+// Verifica a superficie exata de simbolos globais expostos por
+// `trade-file-formats.js` (sem vazamento de helpers internos nem IO na carga).
 nodeTest('format endpoint exposes existing globals and CSV namespace without helper leaks or initial IO', () => {
   const context = loadSerializerContext();
   assert.deepEqual(Object.getOwnPropertyNames(context).filter(name => !forbiddenGlobals.includes(name)).sort(), [
@@ -165,14 +191,16 @@ nodeTest('format endpoint exposes existing globals and CSV namespace without hel
   assert.equal(context.TradeDiaryTradesCSV.buildTradesCSV(), header + '\n');
 });
 
-// Confirma que a constante legada `TRADE_CSV_HEADERS` aponta para a mesma referencia de array do serializador isolado.
+// Confirma que a constante legada `TRADE_CSV_HEADERS` aponta para a mesma referencia
+// de array do serializador isolado.
 nodeTest('legacy header alias shares the serializer column array', () => {
   const context = loadLegacyContext();
   assert.equal(vm.runInContext('TRADE_CSV_HEADERS', context), context.TradeDiaryTradesCSV.TRADE_CSV_HEADERS);
   assert.equal(vm.runInContext('TRADE_CSV_HEADERS.join(",")', context), header);
 });
 
-// Valida em index.html que todos os scripts locais sao classicos/sincronos e que o serializador carrega entre simulacao e app.js.
+// Valida em index.html que todos os scripts locais sao classicos/sincronos e que o
+// serializador carrega entre simulacao e app.js.
 nodeTest('HTML loads serializer once between sizing and app.js as synchronous classic scripts', () => {
   const html = fs.readFileSync(`${__dirname}/../../index.html`, 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -189,7 +217,8 @@ nodeTest('HTML loads serializer once between sizing and app.js as synchronous cl
   }
 });
 
-// Garante que `buildTradesCSV()` sem argumento (ou `undefined`) resolve dinamicamente a variavel global `trades`, enquanto `null` gera apenas o cabecalho.
+// Garante que `buildTradesCSV()` sem argumento (ou `undefined`) resolve dinamicamente
+// a variavel global `trades`, enquanto `null` gera apenas o cabecalho.
 nodeTest('global buildTradesCSV keeps signature and resolves current trades on each default call', () => {
   const context = loadLegacyContext();
   assert.equal(context.buildTradesCSV.length, 0);
@@ -204,7 +233,8 @@ nodeTest('global buildTradesCSV keeps signature and resolves current trades on e
   assert.equal(context.buildTradesCSV(null), header + '\n');
 });
 
-// Verifica o consumidor `exportTradesCSV`: envia payload CSV, nome datado e MIME UTF-8 para `downloadTextFile`, ou mostra aviso quando a entrada e vazia/invalida.
+// Verifica o consumidor `exportTradesCSV`: envia payload CSV, nome datado e MIME
+// UTF-8 para `downloadTextFile`, ou mostra aviso quando a entrada e vazia/invalida.
 nodeTest('export consumer keeps CSV payload, filename, MIME and empty-list notice', () => {
   const context = loadLegacyContext();
   const downloads = [], notices = [];

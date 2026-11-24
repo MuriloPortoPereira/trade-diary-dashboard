@@ -1,14 +1,22 @@
 /*
- * Objetivo: Testar a renderizacao da listagem de contas cadastradas na tela de gerenciamento
- * de contas, incluindo metricas resumidas e acoes disponiveis por linha.
+ * Objetivo: Testar a renderizacao da listagem de contas cadastradas na tela de
+ * gerenciamento de contas, incluindo metricas resumidas e acoes disponiveis por
+ * linha.
+ *
  * Modulo/arquivo testado: funcao `renderAccountList` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em `app.js`).
- * Estrategia de isolamento: extrai apenas `renderAccountList` e a executa em `node:vm` com
- * mocks de DOM, busca de trades, calculo de risco, rotulo de tipo e formatacao monetaria.
- * Pontos-chave garantidos: saida imediata sem elemento alvo, mensagem legada para lista vazia
- * sem disparar calculos de risco, ocultacao do botao de exclusao quando ha apenas uma conta,
- * exibicao de exclusao para multiplas contas, imutabilidade da colecao e ordem de carregamento.
+ * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em
+ * `app.js`).
+ *
+ * Estrategia de isolamento: extrai apenas `renderAccountList` e a executa em
+ * `node:vm` com mocks de DOM, busca de trades, calculo de risco, rotulo de tipo e
+ * formatacao monetaria.
+ *
+ * Pontos-chave garantidos: saida imediata sem elemento alvo, mensagem legada para
+ * lista vazia sem disparar calculos de risco, ocultacao do botao de exclusao quando
+ * ha apenas uma conta, exibicao de exclusao para multiplas contas, imutabilidade da
+ * colecao e ordem de carregamento.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -24,9 +32,10 @@ const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = moduleSource.match(/^function renderAccountList\([^]*?^\}/m)[0];
 
 /*
- * Helper de renderizacao em sandbox: injeta o array `accounts` e stubs de trades/risco/formato
- * em um contexto `vm`, executa `renderAccountList()` e retorna o HTML resultante, o log de
- * chamadas e uma copia do estado final de `accounts` para checagem de imutabilidade.
+ * Helper de renderizacao em sandbox: injeta o array `accounts` e stubs de
+ * trades/risco/formato em um contexto `vm`, executa `renderAccountList()` e retorna o
+ * HTML resultante, o log de chamadas e uma copia do estado final de `accounts` para
+ * checagem de imutabilidade.
  */
 function render(accounts, visible = true) {
   const node = {innerHTML: 'before'};
@@ -57,8 +66,8 @@ function render(accounts, visible = true) {
 }
 
 /*
- * Guarda de DOM ausente: retorna `undefined` imediatamente se o container nao existir, sem
- * sequer exigir que a variavel global `accounts` esteja definida.
+ * Guarda de DOM ausente: retorna `undefined` imediatamente se o container nao
+ * existir, sem sequer exigir que a variavel global `accounts` esteja definida.
  */
 test('missing target returns before reading the account collection', () => {
   const context = vm.createContext({document: {getElementById() { return null; }}});
@@ -67,8 +76,8 @@ test('missing target returns before reading the account collection', () => {
 });
 
 /*
- * Colecao vazia: renderiza o paragrafo legado de nenhuma conta cadastrada sem consultar trades
- * nem executar `calcAccountRiskState`.
+ * Colecao vazia: renderiza o paragrafo legado de nenhuma conta cadastrada sem
+ * consultar trades nem executar `calcAccountRiskState`.
  */
 test('empty account list keeps the legacy message without risk work', () => {
   const {html, calls} = render([]);
@@ -77,9 +86,10 @@ test('empty account list keeps the legacy message without risk work', () => {
 });
 
 /*
- * Conta unica: exibe cor na borda esquerda, nome, tipo, contagem de trades, saldos, aportes
- * liquidos, meta e acoes de selecao/edicao, omitindo `deleteAccount` para proteger a ultima
- * conta ativa; valida tambem os argumentos passados ao calculo de risco e a nao mutacao.
+ * Conta unica: exibe cor na borda esquerda, nome, tipo, contagem de trades, saldos,
+ * aportes liquidos, meta e acoes de selecao/edicao, omitindo `deleteAccount` para
+ * proteger a ultima conta ativa; valida tambem os argumentos passados ao calculo de
+ * risco e a nao mutacao.
  */
 test('single account preserves fields, calculations and hides deletion', () => {
   const accounts = [{id: 'a', name: 'Conta <A>', type: 'cfd_pct', color: '#123456', goalPct: 12}];
@@ -98,9 +108,9 @@ test('single account preserves fields, calculations and hides deletion', () => {
 });
 
 /*
- * Multiplas contas: preserva a ordem de exibicao, habilita exatamente um botao `deleteAccount`
- * por linha, formata aportes liquidos negativos corretamente e dispara `getAccountTrades` e
- * `calcAccountRiskState` para cada conta.
+ * Multiplas contas: preserva a ordem de exibicao, habilita exatamente um botao
+ * `deleteAccount` por linha, formata aportes liquidos negativos corretamente e
+ * dispara `getAccountTrades` e `calcAccountRiskState` para cada conta.
  */
 test('multiple accounts preserve order and add one delete action per row', () => {
   const accounts = [
@@ -117,8 +127,9 @@ test('multiple accounts preserve order and add one delete action per row', () =>
 });
 
 /*
- * Contrato de carregamento: confirma script classico sincrono unico em `index.html` antes de
- * `app.js` e ordem interna onde `renderAccountList` precede `renderAccountsPage`.
+ * Contrato de carregamento: confirma script classico sincrono unico em `index.html`
+ * antes de `app.js` e ordem interna onde `renderAccountList` precede
+ * `renderAccountsPage`.
  */
 test('account list loads once as a synchronous classic script before accounts page', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

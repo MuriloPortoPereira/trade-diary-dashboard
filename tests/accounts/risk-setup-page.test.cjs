@@ -1,15 +1,23 @@
 /*
- * Objetivo: Testar a inicializacao e o preenchimento da pagina de configuracao de risco e setup
- * (`renderSetup`), garantindo precedencia entre conta ativa, `config` e valores padrao.
+ * Objetivo: Testar a inicializacao e o preenchimento da pagina de configuracao de
+ * risco e setup (`renderSetup`), garantindo precedencia entre conta ativa, `config` e
+ * valores padrao.
+ *
  * Modulo/arquivo testado: funcao `renderSetup` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de `app.js`).
- * Estrategia de isolamento: extrai apenas `renderSetup` e executa em `node:vm` com `FixedDate`
- * (`2026-10-07`), mapa configuravel de campos DOM (suportando campos ausentes) e spies para os
- * sub-renderizadores (`renderSetupRiskSummary`, `renderSetupCashflowList`, `renderTags`).
- * Pontos-chave garantidos: precedencia da conta ativa preservando zeros explicitos, manutencao
- * de data ja preenchida vs inicializacao automatica quando vazia, tolerancia a `null` e campos
- * ausentes sem interromper renderizadores filhos, e ordem de declaracao/carregamento do script.
+ * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de
+ * `app.js`).
+ *
+ * Estrategia de isolamento: extrai apenas `renderSetup` e executa em `node:vm` com
+ * `FixedDate` (`2026-10-07`), mapa configuravel de campos DOM (suportando campos
+ * ausentes) e spies para os sub-renderizadores (`renderSetupRiskSummary`,
+ * `renderSetupCashflowList`, `renderTags`).
+ *
+ * Pontos-chave garantidos: precedencia da conta ativa preservando zeros explicitos,
+ * manutencao de data ja preenchida vs inicializacao automatica quando vazia,
+ * tolerancia a `null` e campos ausentes sem interromper renderizadores filhos, e
+ * ordem de declaracao/carregamento do script.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -33,9 +41,10 @@ const fieldIds = [
 ];
 
 /*
- * Helper de renderizacao em sandbox: cria os inputs simulados (omitindo os listados em `missing`),
- * congela `Date.prototype.toISOString()` em 2026-10-07, registra chamadas em `calls`, executa
- * `renderSetup()` e retorna o estado resultante dos campos e dos renderizadores downstream.
+ * Helper de renderizacao em sandbox: cria os inputs simulados (omitindo os listados
+ * em `missing`), congela `Date.prototype.toISOString()` em 2026-10-07, registra
+ * chamadas em `calls`, executa `renderSetup()` e retorna o estado resultante dos
+ * campos e dos renderizadores downstream.
  */
 function render({account = null, config = {}, values = {}, missing = []} = {}) {
   const nodes = Object.fromEntries(fieldIds
@@ -60,9 +69,10 @@ function render({account = null, config = {}, values = {}, missing = []} = {}) {
 }
 
 /*
- * Precedencia da conta ativa: todos os campos numericos zerados na conta prevalecem sobre valores
- * positivos de `config`, `mult: 0` vira string vazia, data ja existente em `setup-flow-date` e
- * preservada e os sub-renderizadores executam na sequencia esperada.
+ * Precedencia da conta ativa: todos os campos numericos zerados na conta prevalecem
+ * sobre valores positivos de `config`, `mult: 0` vira string vazia, data ja existente
+ * em `setup-flow-date` e preservada e os sub-renderizadores executam na sequencia
+ * esperada.
  */
 test('account values take precedence while zero values and an existing date are preserved', () => {
   const account = {
@@ -84,9 +94,10 @@ test('account values take precedence while zero values and an existing date are 
 });
 
 /*
- * Fallback sem conta ativa: le campos de `config` quando disponiveis, aplica defaults legados
- * (`goal: 10`, `ddDaily: 2`, `ddWeekly: 5`, `ddMonthly: 8`, `dd: 10` inclusive sobre `dd: 0`) e
- * inicializa `setup-flow-date` vazio com a data ISO do dia (`2026-10-07`).
+ * Fallback sem conta ativa: le campos de `config` quando disponiveis, aplica defaults
+ * legados (`goal: 10`, `ddDaily: 2`, `ddWeekly: 5`, `ddMonthly: 8`, `dd: 10`
+ * inclusive sobre `dd: 0`) e inicializa `setup-flow-date` vazio com a data ISO do dia
+ * (`2026-10-07`).
  */
 test('missing account uses config and legacy defaults and initializes an empty date', () => {
   const config = {balance: 500, risk: 2, dd: 0, tf: 'H1', mult: 3, symDefault: 'WIN'};
@@ -105,8 +116,9 @@ test('missing account uses config and legacy defaults and initializes an empty d
 });
 
 /*
- * Resiliencia a `null` e DOM incompleto: valores `null` em `config` nao sobrescrevem o conteudo
- * previo dos inputs e a ausencia de campos opcionais nao impede a chamada de resumo, cashflows e tags.
+ * Resiliencia a `null` e DOM incompleto: valores `null` em `config` nao sobrescrevem
+ * o conteudo previo dos inputs e a ausencia de campos opcionais nao impede a chamada
+ * de resumo, cashflows e tags.
  */
 test('null values and missing fields stay untouched without skipping downstream renderers', () => {
   const {nodes, calls} = render({
@@ -122,9 +134,9 @@ test('null values and missing fields stay untouched without skipping downstream 
 });
 
 /*
- * Contrato de carregamento e ordenacao interna: confirma script classico sincrono unico antes de
- * `app.js` e que os componentes `renderSetupRiskSummary` e `renderSetupCashflowList` sao definidos
- * antes de `renderSetup`.
+ * Contrato de carregamento e ordenacao interna: confirma script classico sincrono
+ * unico antes de `app.js` e que os componentes `renderSetupRiskSummary` e
+ * `renderSetupCashflowList` sao definidos antes de `renderSetup`.
  */
 test('risk setup page loads once after its components and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

@@ -1,32 +1,40 @@
 /*
  * Objetivo:
- *   Validar a renderizacao completa da pagina de historico de trades (renderLog),
- *   a traducao de campos faltantes (fmtMissingField) e a geracao de linhas da tabela
- *   nos modos compacto e completo (tradeRow), alem de garantir que nao ha colisao com StudyHub.
+ *   Validar a renderizacao completa da pagina de historico de trades (renderLog), a
+ *   traducao de campos faltantes (fmtMissingField) e a geracao de linhas da tabela
+ *   nos modos compacto e completo (tradeRow), alem de garantir que nao ha colisao com
+ *   StudyHub.
  *
  * Modulo testado:
- *   src/modules/trades/presentation/trade-log.js
- *   (funcoes renderLog, fmtMissingField e tradeRow; tambem verifica isolamento do
- *   renderLog interno em src/modules/study-hub/presentation/study-hub-mental.js e
- *   remocao das declaracoes legadas em app.js).
+ *   src/modules/trades/presentation/trade-log.js (funcoes renderLog, fmtMissingField
+ *   e tradeRow; tambem verifica isolamento do renderLog interno em
+ *   src/modules/study-hub/presentation/study-hub-mental.js e remocao das declaracoes
+ *   legadas em app.js).
  *
  * Estrategia de isolamento:
- *   Carrega trade-log.js em um contexto node:vm com elementos DOM simulados (filtros, alerta,
- *   contador e tbody) e mocks/espias para colaboradores (renderLogReadOnlyNotice,
- *   getLogDateRangeFromControls, getLogFilteredTrades, getAccountTrades, renderLogMetrics,
- *   updateBulkBar, formatadores e traducao).
+ *   Carrega trade-log.js em um contexto node:vm com elementos DOM simulados (filtros,
+ *   alerta, contador e tbody) e mocks/espias para colaboradores
+ *   (renderLogReadOnlyNotice, getLogDateRangeFromControls, getLogFilteredTrades,
+ *   getAccountTrades, renderLogMetrics, updateBulkBar, formatadores e traducao).
  *
  * Pontos-chave e regras criticas garantidas:
- *   - trade-log.js carrega uma unica vez como script classico sincrono apos trade-form.js e antes de app.js.
- *   - A funcao renderLog do modulo StudyHub permanece privada e nao vaza para o escopo global.
- *   - renderLog reconstroi selects de conta/estrategia mantendo selecoes atuais e orquestra
- *     aviso de somente leitura -> filtro -> metricas -> tabela -> barra em lote na ordem correta.
- *   - No filtro "all", agrega trades incompletos de todas as contas e exibe o alerta correspondente.
+ *   - trade-log.js carrega uma unica vez como script classico sincrono apos
+ *     trade-form.js e antes de app.js.
+ *   - A funcao renderLog do modulo StudyHub permanece privada e nao vaza para o
+ *     escopo global.
+ *   - renderLog reconstroi selects de conta/estrategia mantendo selecoes atuais e
+ *     orquestra aviso de somente leitura -> filtro -> metricas -> tabela -> barra em
+ *     lote na ordem correta.
+ *   - No filtro "all", agrega trades incompletos de todas as contas e exibe o alerta
+ *     correspondente.
  *   - Tabela vazia oculta o alerta e exibe linha traduzida de estado vazio.
- *   - fmtMissingField traduz chaves conhecidas e mantem fallback para chaves customizadas.
- *   - tradeRow distingue modo compacto (sem checkbox) e completo (selecao, aviso de faltantes,
- *     fallback de mercado, formatacao percentual/monetaria e botoes de editar/duplicar/excluir).
+ *   - fmtMissingField traduz chaves conhecidas e mantem fallback para chaves
+ *     customizadas.
+ *   - tradeRow distingue modo compacto (sem checkbox) e completo (selecao, aviso de
+ *     faltantes, fallback de mercado, formatacao percentual/monetaria e botoes de
+ *     editar/duplicar/excluir).
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -54,8 +62,9 @@ test('trade log loads once as a classic script after its components and before a
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
-// Garante que nao ha colisao de nomes globais: app.js nao define mais renderLog, e o modulo
-// study-hub-mental.js encapsula seu proprio renderLog e LOG sem expor no escopo global.
+// Garante que nao ha colisao de nomes globais: app.js nao define mais renderLog, e o
+// modulo study-hub-mental.js encapsula seu proprio renderLog e LOG sem expor no
+// escopo global.
 test('StudyHub renderLog remains private inside the mental module', () => {
   assert.equal(appSource.includes('function renderLog(){'), false);
   const source = fs.readFileSync(path.join(root, 'src/modules/study-hub/presentation/study-hub-mental.js'), 'utf8');
@@ -66,14 +75,16 @@ test('StudyHub renderLog remains private inside the mental module', () => {
   assert.equal(context.LOG, undefined);
 });
 
-// Fabrica de no DOM simulado com propriedades basicas (style, innerHTML, textContent, value).
+// Fabrica de no DOM simulado com propriedades basicas (style, innerHTML, textContent,
+// value).
 function element(extra = {}) {
   return {style: {}, innerHTML: '', textContent: '', value: '', ...extra};
 }
 
-// Helper de ambiente em VM: configura os elementos da pagina de log, contas, estrategias,
-// trades filtrados/por conta e espias de colaboradores. Reatribui colaboradores declarados
-// no proprio trade-log.js apos runInContext para auditar exclusivamente a orquestracao de renderLog.
+// Helper de ambiente em VM: configura os elementos da pagina de log, contas,
+// estrategias, trades filtrados/por conta e espias de colaboradores. Reatribui
+// colaboradores declarados no proprio trade-log.js apos runInContext para auditar
+// exclusivamente a orquestracao de renderLog.
 function setup({
   accountValue = 'active',
   strategyValue = '',
@@ -117,9 +128,10 @@ function setup({
   return {context, elements, calls, selectedTrades};
 }
 
-// Fluxo nominal de renderLog: garante reconstrucao dos selects preservando valores selecionados,
-// ordem de orquestracao (aviso de leitura -> filtro com datas -> ... -> barra em lote),
-// contagem de registros e renderizacao do simbolo na tabela.
+// Fluxo nominal de renderLog: garante reconstrucao dos selects preservando valores
+// selecionados,
+// ordem de orquestracao (aviso de leitura -> filtro com datas -> ... -> barra em
+// lote), contagem de registros e renderizacao do simbolo na tabela.
 test('log renderer rebuilds filters and preserves orchestration order', () => {
   const row = {id: 'one', accountId: 'a1', date: '2026-01-02', symbol: 'WIN', status: 'WIN', pnl: 5};
   const {context, elements, calls} = setup({filtered: [row], accountTrades: [row], strategyValue: 'Breakout'});
@@ -137,8 +149,9 @@ test('log renderer rebuilds filters and preserves orchestration order', () => {
   assert.match(elements.logTbody.innerHTML, /WIN/);
 });
 
-// Cenario de consulta "todas as contas" (accountValue: 'all'): verifica que getAccountTrades e chamado
-// para cada conta cadastrada (a1 e a2), agregando trades incompletos para exibir o alerta e informar as metricas.
+// Cenario de consulta "todas as contas" (accountValue: 'all'): verifica que
+// getAccountTrades e chamado para cada conta cadastrada (a1 e a2), agregando trades
+// incompletos para exibir o alerta e informar as metricas.
 test('all-account log aggregates incomplete trades and shows the alert', () => {
   const incomplete = {id: 'i1', accountId: 'a2', incomplete: true};
   const {context, elements, calls} = setup({accountValue: 'all', accountTrades: [incomplete]});
@@ -149,8 +162,9 @@ test('all-account log aggregates incomplete trades and shows the alert', () => {
   assert.deepEqual(calls.filter(call => call[0] === 'accountTrades').map(call => call[1]), ['a1', 'a2']);
 });
 
-// Caso de borda de historico vazio: oculta o alerta de incompletos, mostra '0 registros',
-// renderiza a mensagem traduzida misc.noTrades e repassa lista vazia com 0 incompletos para metricas.
+// Caso de borda de historico vazio: oculta o alerta de incompletos, mostra '0
+// registros', renderiza a mensagem traduzida misc.noTrades e repassa lista vazia com
+// 0 incompletos para metricas.
 test('empty log hides incomplete alert and preserves translated empty row', () => {
   const {context, elements, calls} = setup();
   vm.runInContext('renderLog()', context);
@@ -160,8 +174,9 @@ test('empty log hides incomplete alert and preserves translated empty row', () =
   assert.deepEqual(calls.find(call => call[0] === 'metrics'), ['metrics', [], 0]);
 });
 
-// Valida o dicionario de fmtMissingField para chaves conhecidas ('entry' -> 'entrada',
-// 'followedPlan' -> 'plano') e preservacao literal para chaves desconhecidas ('custom').
+// Valida o dicionario de fmtMissingField para chaves conhecidas ('entry' ->
+// 'entrada', 'followedPlan' -> 'plano') e preservacao literal para chaves
+// desconhecidas ('custom').
 test('missing-field labels preserve known translations and unknown fallback', () => {
   const {context} = setup();
   assert.equal(vm.runInContext("fmtMissingField('entry')", context), 'entrada');
@@ -169,8 +184,9 @@ test('missing-field labels preserve known translations and unknown fallback', ()
   assert.equal(vm.runInContext("fmtMissingField('custom')", context), 'custom');
 });
 
-// Testa tradeRow no modo compacto (segundo parametro false): verifica formatacao de data,
-// badge de direcao LONG, R e PnL positivos com sinal '+', e ausencia de checkbox de selecao.
+// Testa tradeRow no modo compacto (segundo parametro false): verifica formatacao de
+// data, badge de direcao LONG, R e PnL positivos com sinal '+', e ausencia de
+// checkbox de selecao.
 test('compact trade row preserves defaults, badges and result formatting', () => {
   const {context} = setup();
   context.__trade = {date: '2026-01-02', symbol: 'WIN', direction: 'LONG', mode: 'absolute', entry: 10, exit: 12, r: 1.25, pnl: 5, emotion: 'Calmo', status: 'WIN'};
@@ -182,9 +198,10 @@ test('compact trade row preserves defaults, badges and result formatting', () =>
   assert.doesNotMatch(html, /type="checkbox"/);
 });
 
-// Testa tradeRow no modo completo (segundo parametro true): valida classes de selecao e trade incompleto,
-// checkbox marcado, resumo de campos faltantes, fallback de mercado via getMarket, percentuais de risco/PnL
-// e handlers inline de edicao, duplicacao e exclusao.
+// Testa tradeRow no modo completo (segundo parametro true): valida classes de selecao
+// e trade incompleto, checkbox marcado, resumo de campos faltantes, fallback de
+// mercado via getMarket, percentuais de risco/PnL e handlers inline de edicao,
+// duplicacao e exclusao.
 test('full trade row preserves selection, incomplete fields, fallbacks and actions', () => {
   const {context} = setup();
   context.__trade = {

@@ -1,17 +1,17 @@
 /*
  * Objetivo do arquivo:
- *   Validar o calculo e a projecao das estatisticas da barra superior (topbar):
- *   P/L semanal e mensal com percentuais sobre o capital base, drawdown atual,
- *   progresso de meta, saldo no badge principal e ajuste opcional de densidade.
+ *   Validar o calculo e a projecao das estatisticas da barra superior (topbar): P/L
+ *   semanal e mensal com percentuais sobre o capital base, drawdown atual, progresso
+ *   de meta, saldo no badge principal e ajuste opcional de densidade.
  *
  * Modulo/arquivo testado:
- *   Funcao updateTopbarStats (e auxiliares renderTopbarValue/renderTopbarAccount)
- *   em src/app/presentation/app-workspace.js, garantindo remocao do legado em app.js.
+ *   Funcao updateTopbarStats (e auxiliares renderTopbarValue/renderTopbarAccount) em
+ *   src/app/presentation/app-workspace.js, garantindo remocao do legado em app.js.
  *
  * Estrategia de isolamento:
- *   Carrega as funcoes da topbar em uma sandbox node:vm com Date fixado em
- *   2026-10-14 (quarta-feira), elementos opcionais de subtexto configuraveis e
- *   stubs rastreados para formatadores, risco, setTopbarValue e fitTopbarDensity.
+ *   Carrega as funcoes da topbar em uma sandbox node:vm com Date fixado em 2026-10-14
+ *   (quarta-feira), elementos opcionais de subtexto configuraveis e stubs rastreados
+ *   para formatadores, risco, setTopbarValue e fitTopbarDensity.
  *
  * Pontos-chave e regras criticas garantidas:
  *   - Fronteiras exatas de semana (segunda a domingo) e mes corrente, ignorando
@@ -23,6 +23,7 @@
  *   - Opcao {fit: false} suprime apenas a chamada final a fitTopbarDensity().
  *   - Script classico unico carregado antes de accounts-workspace.js e app.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -37,8 +38,8 @@ const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = legacyDeclaration ?? ["renderTopbarValue", "renderTopbarAccount", "updateTopbarStats"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 // Cria a sandbox vm com relogio congelado em 2026-10-14T12:00:00Z, trades de teste
-// cobrindo semana atual, semana anterior do mesmo mes, mes anterior e sem data,
-// alem de mocks de risco e registro completo de chamadas.
+// cobrindo semana atual, semana anterior do mesmo mes, mes anterior e sem data, alem
+// de mocks de risco e registro completo de chamadas.
 function setup({trades, risk, account, missingSubs = []} = {}) {
   const defaultTrades = [
     {date: '2026-10-12', pnl: 100},
@@ -76,9 +77,9 @@ function setup({trades, risk, account, missingSubs = []} = {}) {
   return {context, elements, calls, account: selectedAccount, trades: selectedTrades, risk: selectedRisk};
 }
 
-// Verifica os somatorios de fronteira (semana = 100 apenas de 12/10; mes = 100-20+50 = 130,
-// excluindo 30/09 e data vazia), percentuais sobre capitalBase=1000, drawdown, progresso
-// da meta (25%), badge verde do saldo e chamada final a fitTopbarDensity().
+// Verifica os somatorios de fronteira (semana = 100 apenas de 12/10; mes = 100-20+50
+// = 130, excluindo 30/09 e data vazia), percentuais sobre capitalBase=1000, drawdown,
+// progresso da meta (25%), badge verde do saldo e chamada final a fitTopbarDensity().
 test('topbar statistics preserve weekly and monthly boundaries and projections', () => {
   const {context, elements, calls} = setup();
   context.updateTopbarStats();
@@ -97,9 +98,9 @@ test('topbar statistics preserve weekly and monthly boundaries and projections',
   assert.equal(calls.at(-1)[0], 'fit');
 });
 
-// Testa dois casos de borda: (1) prejuizo com capitalBase=0 e goalTarget=0 gera 0% seguro
-// sem divisao por zero e tons de alerta/vermelho; (2) P/L acima da meta limita o percentual
-// a 100% com tom verde mantendo os valores reais no subtexto.
+// Testa dois casos de borda: (1) prejuizo com capitalBase=0 e goalTarget=0 gera 0%
+// seguro sem divisao por zero e tons de alerta/vermelho; (2) P/L acima da meta limita
+// o percentual a 100% com tom verde mantendo os valores reais no subtexto.
 test('losses, zero capital and missing goal retain legacy tones and zero percentages', () => {
   const risk = {capitalBase: 0, currentDdUsd: 0, currentDdPct: 0, goalTarget: 0, totalPnl: -10, currentBalance: 990};
   const {context, elements, calls} = setup({trades: [{date: '2026-10-14', pnl: -5}], risk});
@@ -119,8 +120,9 @@ test('losses, zero capital and missing goal retain legacy tones and zero percent
   assert.equal(reached.elements.tbGoalSub.textContent, 'money:250/money:200');
 });
 
-// Confirma que a ausencia de todos os quatro nos de subtexto nao impede o preenchimento
-// dos 5 indicadores principais nem a execucao do ajuste final de densidade.
+// Confirma que a ausencia de todos os quatro nos de subtexto nao impede o
+// preenchimento dos 5 indicadores principais nem a execucao do ajuste final de
+// densidade.
 test('optional sub targets do not prevent main values or density fitting', () => {
   const {context, calls} = setup({missingSubs: ['tbWeekSub', 'tbMonthSub', 'tbDDSub', 'tbGoalSub']});
   context.updateTopbarStats();
@@ -138,7 +140,8 @@ test('fit false skips only the final density pass', () => {
 });
 
 // Verifica que updateTopbarStats nao existe mais em app.js e que app-workspace.js
-// carrega uma unica vez como script classico sincrono antes de accounts-workspace.js e app.js.
+// carrega uma unica vez como script classico sincrono antes de accounts-workspace.js
+// e app.js.
 test('topbar functions load once in their cohesive classic script before account pages', () => {
   assert.equal(legacyDeclaration, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

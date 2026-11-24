@@ -1,17 +1,23 @@
 /*
- * Objetivo: Testar a renderizacao completa da pagina de documentos (`renderDocumentsPage`),
- * abrangendo arvore de pastas, lista de entradas, editor, contexto de trade vinculado e midia.
+ * Objetivo: Testar a renderizacao completa da pagina de documentos
+ * (`renderDocumentsPage`), abrangendo arvore de pastas, lista de entradas, editor,
+ * contexto de trade vinculado e midia.
+ *
  * Modulo/arquivo testado: funcao `renderDocumentsPage` em
- * `src/modules/documents/presentation/documents-page.js` (confirmando existencia do modulo e
- * remocao da declaracao legada em `app.js`).
- * Estrategia de isolamento: executa apenas `renderDocumentsPage` em `node:vm` com 13 nos DOM
- * simulados (permitindo omitir elementos especificos via `missing`), estado de pasta/documento
- * ativo e mocks rastreaveis para consultas de pastas, entradas, midia e trades.
- * Pontos-chave garantidos: auto-selecao da primeira entrada, fallback de pasta/ID invalidos para
- * `generalNotes`, preview com remocao de marcacao Markdown e escape HTML, modo somente-leitura
- * no titulo de documentos de trade com painel de contexto, guarda de no ausente no editor e
- * carregamento sincrono antes de `app.js`.
+ * `src/modules/documents/presentation/documents-page.js` (confirmando existencia do
+ * modulo e remocao da declaracao legada em `app.js`).
+ *
+ * Estrategia de isolamento: executa apenas `renderDocumentsPage` em `node:vm` com 13
+ * nos DOM simulados (permitindo omitir elementos especificos via `missing`), estado
+ * de pasta/documento ativo e mocks rastreaveis para consultas de pastas, entradas,
+ * midia e trades.
+ *
+ * Pontos-chave garantidos: auto-selecao da primeira entrada, fallback de pasta/ID
+ * invalidos para `generalNotes`, preview com remocao de marcacao Markdown e escape
+ * HTML, modo somente-leitura no titulo de documentos de trade com painel de contexto,
+ * guarda de no ausente no editor e carregamento sincrono antes de `app.js`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -27,9 +33,10 @@ const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = ["renderDocumentsPage"].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
 /*
- * Fabrica de harness em sandbox: instancia os 13 elementos DOM da pagina de documentos (menos os
- * indicados em `missing`), define `activeDocFolder` e `activeDocId` no contexto `vm`, injeta
- * mocks de pastas/entradas/midia/trades e devolve `{context, nodes, calls}`.
+ * Fabrica de harness em sandbox: instancia os 13 elementos DOM da pagina de
+ * documentos (menos os indicados em `missing`), define `activeDocFolder` e
+ * `activeDocId` no contexto `vm`, injeta mocks de pastas/entradas/midia/trades e
+ * devolve `{context, nodes, calls}`.
  */
 function harness({folder = 'generalNotes', selected = null, entries = [], folders, trade = null, missing = []} = {}) {
   const ids = ['docFolders', 'docCreateBtn', 'docDeleteBtn', 'docListTitle', 'docListCount', 'docEntries',
@@ -64,10 +71,11 @@ function harness({folder = 'generalNotes', selected = null, entries = [], folder
 }
 
 /*
- * Documentos gerais: seleciona automaticamente a primeira entrada quando `activeDocId` e nulo,
- * renderiza pastas e botao de criacao, escapa HTML no titulo da lista, limpa marcadores Markdown
- * no preview (`Texto importante…`), usa singular `'1 item'`, habilita titulo/corpo, oculta botao
- * de abrir trade e renderiza a midia da entrada.
+ * Documentos gerais: seleciona automaticamente a primeira entrada quando
+ * `activeDocId` e nulo, renderiza pastas e botao de criacao, escapa HTML no titulo da
+ * lista, limpa marcadores Markdown no preview (`Texto importante…`), usa singular `'1
+ * item'`, habilita titulo/corpo, oculta botao de abrir trade e renderiza a midia da
+ * entrada.
  */
 test('general documents select the first entry and render folder, list and editor', () => {
   const entry = {id: 'general:1', kind: 'general', title: 'Plano <A', meta: 'Hoje', body: 'Texto **importante**', hasContent: true};
@@ -87,9 +95,10 @@ test('general documents select the first entry and render folder, list and edito
 });
 
 /*
- * Fallback para pasta e selecao invalidas: corrige `activeDocFolder` para `'generalNotes'` e
- * `activeDocId` para `null`, exibe `'0 itens'` e estado vazio na lista/editor, desabilita o corpo,
- * mostra mensagem padrao de midia vazia e mantem `docTradeContext` inalterado.
+ * Fallback para pasta e selecao invalidas: corrige `activeDocFolder` para
+ * `'generalNotes'` e `activeDocId` para `null`, exibe `'0 itens'` e estado vazio na
+ * lista/editor, desabilita o corpo, mostra mensagem padrao de midia vazia e mantem
+ * `docTradeContext` inalterado.
  */
 test('invalid folder and selection fall back to empty general documents', () => {
   const {context, nodes, calls} = harness({folder: 'missing', selected: 'gone'});
@@ -107,9 +116,10 @@ test('invalid folder and selection fall back to empty general documents', () => 
 });
 
 /*
- * Documento vinculado a trade: oculta botoes de criacao/exclusao, bloqueia edicao do titulo
- * mantendo o corpo editavel, exibe `docOpenTradeBtn` e o banner `docTradeContext` com simbolo
- * escapado, R/P/L com sinal positivo e badge de status na listagem.
+ * Documento vinculado a trade: oculta botoes de criacao/exclusao, bloqueia edicao do
+ * titulo mantendo o corpo editavel, exibe `docOpenTradeBtn` e o banner
+ * `docTradeContext` com simbolo escapado, R/P/L com sinal positivo e badge de status
+ * na listagem.
  */
 test('trade document keeps editor read-only title and linked trade context', () => {
   const entry = {id: 'trade:7', kind: 'trade', title: 'Trade', meta: 'Hoje', body: 'Análise', tradeId: 7, status: 'WIN'};
@@ -129,8 +139,9 @@ test('trade document keeps editor read-only title and linked trade context', () 
 });
 
 /*
- * Guarda de editor ausente: se `#docEditorBody` nao existir no DOM, a lista ainda e renderizada,
- * mas a funcao retorna antes de atualizar `#docMedia` ou invocar `renderDocumentMedia`.
+ * Guarda de editor ausente: se `#docEditorBody` nao existir no DOM, a lista ainda e
+ * renderizada, mas a funcao retorna antes de atualizar `#docMedia` ou invocar
+ * `renderDocumentMedia`.
  */
 test('missing editor node returns after list rendering without media or trade work', () => {
   const entry = {id: 'general:1', kind: 'general', title: 'Nota', meta: 'Hoje', body: 'Texto'};
@@ -142,7 +153,8 @@ test('missing editor node returns after list rendering without media or trade wo
 });
 
 /*
- * Contrato de carregamento: confirma script classico sincrono unico em `index.html` antes de `app.js`.
+ * Contrato de carregamento: confirma script classico sincrono unico em `index.html`
+ * antes de `app.js`.
  */
 test('extracted documents renderer stays a synchronous classic script before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

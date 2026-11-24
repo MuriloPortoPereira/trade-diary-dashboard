@@ -1,16 +1,23 @@
 /*
- * Objetivo: Validar o agrupamento e a soma de P/L por janela temporal (dia, semana domingo-sabado,
- * mes calendario, ano e historico total) e o calculo da perda no escopo ativo (`scopeLoss`).
+ * Objetivo: Validar o agrupamento e a soma de P/L por janela temporal (dia, semana
+ * domingo-sabado, mes calendario, ano e historico total) e o calculo da perda no
+ * escopo ativo (`scopeLoss`).
+ *
  * Modulo/arquivo testado: `TradeDiaryRiskPeriodPnl` em
  * `src/modules/accounts/domain/account-risk-calculations.js` e sua integracao em
- * `calcAccountRiskState` em `src/modules/accounts/application/account-risk-workflows.js`.
- * Estrategia de isolamento: executa o modulo de dominio e o workflow em `node:vm` com relogio
- * fixo em quarta-feira 2026-10-14 e stubs para ordenacao, data ancora e fluxo de caixa; inclui
- * validacao de pureza do dominio com globais proibidas bloqueadas.
- * Pontos-chave garantidos: fronteiras exatas de semana (domingo a sabado) e mes, inclusao de
- * trades sem data em `year`/`all`/omisso, comparacao estrita de data ISO curta, preservacao da
- * concatenacao JS legada para P/L textual e ordem sincrona de scripts em `index.html`.
+ * `calcAccountRiskState` em
+ * `src/modules/accounts/application/account-risk-workflows.js`.
+ *
+ * Estrategia de isolamento: executa o modulo de dominio e o workflow em `node:vm` com
+ * relogio fixo em quarta-feira 2026-10-14 e stubs para ordenacao, data ancora e fluxo
+ * de caixa; inclui validacao de pureza do dominio com globais proibidas bloqueadas.
+ *
+ * Pontos-chave garantidos: fronteiras exatas de semana (domingo a sabado) e mes,
+ * inclusao de trades sem data em `year`/`all`/omisso, comparacao estrita de data ISO
+ * curta, preservacao da concatenacao JS legada para P/L textual e ordem sincrona de
+ * scripts em `index.html`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -23,9 +30,9 @@ const workflowPath = 'src/modules/accounts/application/account-risk-workflows.js
 const workflowSource = fs.readFileSync(path.join(root, workflowPath), 'utf8');
 
 /*
- * Helper de execucao em sandbox: fixa a data ancora em 2026-10-14, carrega o dominio e
- * `calcAccountRiskState`, executa o calculo para o `period` informado e retorna os 6 campos de
- * P/L por periodo junto com a ordem das chamadas auxiliares.
+ * Helper de execucao em sandbox: fixa a data ancora em 2026-10-14, carrega o dominio
+ * e `calcAccountRiskState`, executa o calculo para o `period` informado e retorna os
+ * 6 campos de P/L por periodo junto com a ordem das chamadas auxiliares.
  */
 function periodState(trades, period) {
   const calls = [];
@@ -49,9 +56,10 @@ function periodState(trades, period) {
 }
 
 /*
- * Fixture de trades multi-data cobrindo limites criticos ao redor de 2026-10-14 (quarta-feira):
- * sabado anterior (10/10), domingo inicio da semana (10/11), dia ancora (10/14), sabado fim da
- * semana (10/17), domingo seguinte (10/18), bordas de mes (09/30, 10/01, 10/31, 11/01) e trade sem data.
+ * Fixture de trades multi-data cobrindo limites criticos ao redor de 2026-10-14
+ * (quarta-feira): sabado anterior (10/10), domingo inicio da semana (10/11), dia
+ * ancora (10/14), sabado fim da semana (10/17), domingo seguinte (10/18), bordas de
+ * mes (09/30, 10/01, 10/31, 11/01) e trade sem data.
  */
 const trades = [
   {date: '2026-10-10', pnl: -10},
@@ -67,8 +75,9 @@ const trades = [
 ];
 
 /*
- * Fronteiras de calendario: confirma `dayPnl` (-5), `weekPnl` domingo a sabado (20 - 5 - 7 = 8)
- * e `monthPnl` de outubro (16), alem de selecionar `scopePnl` e `scopeLoss` conforme o periodo.
+ * Fronteiras de calendario: confirma `dayPnl` (-5), `weekPnl` domingo a sabado (20 -
+ * 5 - 7 = 8) e `monthPnl` de outubro (16), alem de selecionar `scopePnl` e
+ * `scopeLoss` conforme o periodo.
  */
 test('risk P/L keeps Sunday-Saturday and calendar-month boundaries', () => {
   assert.deepEqual(periodState(trades, 'today').values, [-5, 8, 16, -5, 5, 'today']);
@@ -77,8 +86,9 @@ test('risk P/L keeps Sunday-Saturday and calendar-month boundaries', () => {
 });
 
 /*
- * Escopos amplos e fallback: `year`, `all` e periodo omitido (que assume `'all'`) somam todos
- * os trades incluindo o registro sem data (`total = 24`), preservando a ordem das chamadas.
+ * Escopos amplos e fallback: `year`, `all` e periodo omitido (que assume `'all'`)
+ * somam todos os trades incluindo o registro sem data (`total = 24`), preservando a
+ * ordem das chamadas.
  */
 test('year, all and absent periods include every trade, including undated trades', () => {
   assert.deepEqual(periodState(trades, 'year').values, [-5, 8, 16, 24, 0, 'year']);
@@ -88,8 +98,9 @@ test('year, all and absent periods include every trade, including undated trades
 });
 
 /*
- * Correspondencia de data e P/L vazio: timestamp completo (`2026-10-14T00:00:00`) nao casa com
- * a comparacao exata de dia, valores `null`/ausentes somam 0 e lista vazia mantem tudo zerado.
+ * Correspondencia de data e P/L vazio: timestamp completo (`2026-10-14T00:00:00`) nao
+ * casa com a comparacao exata de dia, valores `null`/ausentes somam 0 e lista vazia
+ * mantem tudo zerado.
  */
 test('date matching and empty P/L retain exact fallback behavior', () => {
   const rows = [{date: '2026-10-14T00:00:00', pnl: 99}, {date: '2026-10-14', pnl: null}, {date: '2026-10-14'}];
@@ -98,8 +109,8 @@ test('date matching and empty P/L retain exact fallback behavior', () => {
 });
 
 /*
- * Caracterizacao de P/L textual: mantem a ordem de reducao com concatenacao JS (`'05-2'`) e a
- * coercao resultante `NaN` para `scopeLoss`.
+ * Caracterizacao de P/L textual: mantem a ordem de reducao com concatenacao JS
+ * (`'05-2'`) e a coercao resultante `NaN` para `scopeLoss`.
  */
 test('text P/L keeps reduction order and scope loss coercion', () => {
   const rows = [{date: '2026-10-14', pnl: '5'}, {date: '2026-10-14', pnl: -2}];
@@ -107,9 +118,10 @@ test('text P/L keeps reduction order and scope loss coercion', () => {
 });
 
 /*
- * Pureza e contrato de carregamento: valida que `TradeDiaryRiskPeriodPnl` nao acessa globais
- * proibidas, aceita entradas congeladas, e carregado uma vez sincronamente antes dos consumidores
- * em `index.html` e que `calcAccountRiskState` foi movida de `app.js` para o workflow.
+ * Pureza e contrato de carregamento: valida que `TradeDiaryRiskPeriodPnl` nao acessa
+ * globais proibidas, aceita entradas congeladas, e carregado uma vez sincronamente
+ * antes dos consumidores em `index.html` e que `calcAccountRiskState` foi movida de
+ * `app.js` para o workflow.
  */
 test('risk period domain is isolated and loads once before classic consumers', () => {
   const modulePath = 'src/modules/accounts/domain/account-risk-calculations.js';

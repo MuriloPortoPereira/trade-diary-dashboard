@@ -1,8 +1,8 @@
 /*
  * Objetivo do arquivo:
  *   Testar o sistema central de dialogos da aplicacao (abertura, fechamento,
- *   confirmacao com validacao de texto obrigatorio e wrappers de confirmacao,
- *   aviso e prompt com fallback nativo).
+ *   confirmacao com validacao de texto obrigatorio e wrappers de confirmacao, aviso e
+ *   prompt com fallback nativo).
  *
  * Modulo/arquivo testado:
  *   Funcoes openAppDialog, closeAppDialog, confirmAppDialog, showAppConfirm,
@@ -20,10 +20,12 @@
  *   - Validacao exata (case-sensitive) de requiredValue antes de aceitar confirmacao.
  *   - Fechamento do modal e limpeza de appDialogState antes de invocar onConfirm,
  *     evitando reentrada em cliques duplicados.
- *   - Fallback transparente para window.confirm/alert/prompt quando o modal HTML
- *     nao esta presente no DOM.
- *   - Ordem de carregamento no index.html antes de consumidores como accounts-workspace.js.
+ *   - Fallback transparente para window.confirm/alert/prompt quando o modal HTML nao
+ *     esta presente no DOM.
+ *   - Ordem de carregamento no index.html antes de consumidores como
+ *     accounts-workspace.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -56,8 +58,8 @@ function element(extra = {}) {
 }
 
 // Configura a sandbox vm com todos os elementos do modal de dialogo (ou sem o
-// container principal quando withModal=false para testar fallbacks nativos),
-// alem de interceptar setTimeout, confirm, alert e prompt.
+// container principal quando withModal=false para testar fallbacks nativos), alem de
+// interceptar setTimeout, confirm, alert e prompt.
 function setup({withModal = true, confirmResult = false, promptResult = null} = {}) {
   const elements = {
     appDialogModal: withModal ? element() : null,
@@ -83,7 +85,8 @@ function setup({withModal = true, confirmResult = false, promptResult = null} = 
 }
 
 // Garante que openAppDialog preenche titulo, mensagem, campo de entrada, rotulo,
-// placeholder, estilo btn-danger, classe 'open', estado interno e agenda foco no input.
+// placeholder, estilo btn-danger, classe 'open', estado interno e agenda foco no
+// input.
 test('open dialog projects defaults, options, state and deferred input focus', () => {
   const {context, elements, calls} = setup();
   const action = () => {};
@@ -109,7 +112,8 @@ test('open dialog projects defaults, options, state and deferred input focus', (
 });
 
 // Valida os textos e estilos padrao quando nenhuma opcao e passada (sem input visivel
-// e botao primario) e confirma retorno false sem alterar estado caso o modal nao exista.
+// e botao primario) e confirma retorno false sem alterar estado caso o modal nao
+// exista.
 test('open dialog keeps legacy defaults and returns false without the modal', () => {
   const present = setup();
   assert.equal(present.context.openAppDialog(), true);
@@ -134,7 +138,8 @@ test('close dialog removes the class and clears state', () => {
 });
 
 // Verifica a trava de seguranca para confirmacoes destrutivas: divergencia de caixa
-// ('apagar' vs 'APAGAR') exibe a mensagem de erro, mantem o modal aberto e nao chama onConfirm.
+// ('apagar' vs 'APAGAR') exibe a mensagem de erro, mantem o modal aberto e nao chama
+// onConfirm.
 test('confirmation enforces the exact required value and keeps dialog open', () => {
   const {context, elements} = setup();
   let called = false;
@@ -146,8 +151,9 @@ test('confirmation enforces the exact required value and keeps dialog open', () 
   assert.equal(called, false);
 });
 
-// Garante a ordem critica na confirmacao valida: primeiro fecha o modal e limpa o estado,
-// depois entrega o valor digitado ao callback; uma segunda chamada subsequente vira no-op.
+// Garante a ordem critica na confirmacao valida: primeiro fecha o modal e limpa o
+// estado, depois entrega o valor digitado ao callback; uma segunda chamada
+// subsequente vira no-op.
 test('successful confirmation closes before delivering the input value', () => {
   const {context, elements} = setup();
   const calls = [];
@@ -181,8 +187,9 @@ test('confirm, notice and prompt wrappers preserve modal option mapping', () => 
   assert.equal(value, 'X');
 });
 
-// Verifica o caminho de fallback quando o modal nao existe no DOM: delega para confirm,
-// alert e prompt nativos do navegador, disparando callbacks apenas quando aceito.
+// Verifica o caminho de fallback quando o modal nao existe no DOM: delega para
+// confirm, alert e prompt nativos do navegador, disparando callbacks apenas quando
+// aceito.
 test('wrappers retain native confirm, alert and prompt fallbacks', () => {
   const accepted = setup({withModal: false, confirmResult: true, promptResult: 'Resposta'});
   const values = [];
@@ -201,8 +208,8 @@ test('wrappers retain native confirm, alert and prompt fallbacks', () => {
   assert.equal(called, false);
 });
 
-// Valida que as funcoes de dialogo foram removidas de app.js e que app-workspace.js
-// e incluido uma unica vez como script sincrono apos language-selector.js e antes de
+// Valida que as funcoes de dialogo foram removidas de app.js e que app-workspace.js e
+// incluido uma unica vez como script sincrono apos language-selector.js e antes de
 // accounts-workspace.js e app.js no index.html.
 test('application dialog loads once as a classic script before every consumer and leaves app.js clean', () => {
   for (const part of legacyParts) assert.equal(part, undefined);

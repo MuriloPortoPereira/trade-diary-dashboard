@@ -1,32 +1,40 @@
 /*
  * Objetivo:
  *   Validar toda a logica de horarios, duracoes e estatisticas temporais de trades
- *   (normalizacao de relogio, conversao para minutos, formatacao, calculo de duracao com
- *   virada de meia-noite/multiplos dias, estatisticas agregadas por status e estrategia,
- *   e isolamento da fabrica pura TradeDiaryTradeTiming).
+ *   (normalizacao de relogio, conversao para minutos, formatacao, calculo de duracao
+ *   com virada de meia-noite/multiplos dias, estatisticas agregadas por status e
+ *   estrategia, e isolamento da fabrica pura TradeDiaryTradeTiming).
  *
  * Modulos testados:
- *   - src/modules/trades/domain/trade-rules.js (fabrica TradeDiaryTradeTiming.createTradeTiming)
- *   - src/modules/data-transfer/infrastructure/trade-file-formats.js (normalizador de data usado na inicializacao)
+ *   - src/modules/trades/domain/trade-rules.js (fabrica
+ *     TradeDiaryTradeTiming.createTradeTiming)
+ *   - src/modules/data-transfer/infrastructure/trade-file-formats.js (normalizador de
+ *     data usado na inicializacao)
  *   - app.js (inicializador tradeTimingDomain e wrappers globais legados)
  *
  * Estrategia de isolamento:
- *   Carrega trade-rules.js, o normalizador de datas e os wrappers extraidos de app.js dentro de
- *   um contexto node:vm limpo para testar a integracao via API global. Tambem carrega trade-rules.js
- *   isoladamente com getters armadilha em globals proibidos (document, localStorage, fetch, Chart)
- *   para comprovar pureza do dominio.
+ *   Carrega trade-rules.js, o normalizador de datas e os wrappers extraidos de app.js
+ *   dentro de um contexto node:vm limpo para testar a integracao via API global.
+ *   Tambem carrega trade-rules.js isoladamente com getters armadilha em globals
+ *   proibidos (document, localStorage, fetch, Chart) para comprovar pureza do
+ *   dominio.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - normalizeClockTime aceita Date, 'H:MM:SS', 'H.MM.SS', 'HMM', preserva faixas frouxas legadas ('25:61')
- *     e rejeita texto invalido retornando ''.
- *   - formatClockMinutes faz wrap modular em 1440 minutos e arredondamento; formatDurationMinutes trata
- *     arredondamento para hora cheia e rejeita negativos/nao-finitos com '—'.
- *   - getTradeDurationMinutes lida com mesmo dia, virada de meia-noite, datas explicitas distintas,
- *     intervalos invalidos/invertidos (null), duracao zero e TypeError em null.
- *   - getTradeTimingStats considera apenas fechados, calcula medias por grupo/estrategia, usa
- *     'Sem estratégia' como fallback e preserva a imutabilidade dos dados de entrada.
- *   - O modulo de dominio carrega uma unica vez antes dos consumidores e mantem os 9 wrappers globais em app.js.
+ *   - normalizeClockTime aceita Date, 'H:MM:SS', 'H.MM.SS', 'HMM', preserva faixas
+ *     frouxas legadas ('25:61') e rejeita texto invalido retornando ''.
+ *   - formatClockMinutes faz wrap modular em 1440 minutos e arredondamento;
+ *     formatDurationMinutes trata arredondamento para hora cheia e rejeita
+ *     negativos/nao-finitos com '—'.
+ *   - getTradeDurationMinutes lida com mesmo dia, virada de meia-noite, datas
+ *     explicitas distintas, intervalos invalidos/invertidos (null), duracao zero e
+ *     TypeError em null.
+ *   - getTradeTimingStats considera apenas fechados, calcula medias por
+ *     grupo/estrategia, usa 'Sem estratégia' como fallback e preserva a imutabilidade
+ *     dos dados de entrada.
+ *   - O modulo de dominio carrega uma unica vez antes dos consumidores e mantem os 9
+ *     wrappers globais em app.js.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -39,7 +47,8 @@ const modulePath = 'src/modules/trades/domain/trade-rules.js';
 const moduleFile = path.join(root, modulePath);
 const normalizerFile = path.join(root, 'src/modules/data-transfer/infrastructure/trade-file-formats.js');
 
-// Utilitario para extrair uma fatia de codigo-fonte entre dois marcadores, falhando caso o trecho suma.
+// Utilitario para extrair uma fatia de codigo-fonte entre dois marcadores, falhando
+// caso o trecho suma.
 function between(source, start, end) {
   const from = source.indexOf(start);
   const to = source.indexOf(end, from);
@@ -47,8 +56,9 @@ function between(source, start, end) {
   return source.slice(from, to);
 }
 
-// Helper de carregamento em VM: carrega trade-rules.js, o arquivo de formatos de data/hora,
-// a linha `const tradeTimingDomain=...` e os 9 wrappers globais de app.js no mesmo contexto isolado.
+// Helper de carregamento em VM: carrega trade-rules.js, o arquivo de formatos de
+// data/hora, a linha `const tradeTimingDomain=...` e os 9 wrappers globais de app.js
+// no mesmo contexto isolado.
 function loadTiming() {
   const context = vm.createContext({});
   if (fs.existsSync(moduleFile)) {
@@ -67,13 +77,15 @@ function loadTiming() {
   return context;
 }
 
-// Converte valores produzidos dentro da VM em objetos planos do realm local para assert.deepEqual.
+// Converte valores produzidos dentro da VM em objetos planos do realm local para
+// assert.deepEqual.
 function plain(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-// Valida normalizeClockTime e clockToMinutes: null, formatos com ':', '.', sem separador ('930'),
-// objetos Date criados no realm da VM, strings invalidas e preservacao de horarios legados fora de 24h ('25:61' -> 1561 min).
+// Valida normalizeClockTime e clockToMinutes: null, formatos com ':', '.', sem
+// separador ('930'), objetos Date criados no realm da VM, strings invalidas e
+// preservacao de horarios legados fora de 24h ('25:61' -> 1561 min).
 test('clock normalization preserves dates, supported text shapes and legacy loose ranges', () => {
   const api = loadTiming();
   assert.equal(api.normalizeClockTime(null), '');
@@ -88,8 +100,9 @@ test('clock normalization preserves dates, supported text shapes and legacy loos
   assert.equal(api.clockToMinutes('25:61'), 1561);
 });
 
-// Valida formatClockMinutes e formatDurationMinutes: wrap negativo (-1 -> '23:59') e em 1440 ('00:00'),
-// arredondamento (90.6 -> '01:31', 59.6 -> '1h'), horas exatas sem '0min' e fallback '—' para valores invalidos.
+// Valida formatClockMinutes e formatDurationMinutes: wrap negativo (-1 -> '23:59') e
+// em 1440 ('00:00'), arredondamento (90.6 -> '01:31', 59.6 -> '1h'), horas exatas sem
+// '0min' e fallback '—' para valores invalidos.
 test('clock and duration formatting preserve rounding, wrapping and invalid fallbacks', () => {
   const api = loadTiming();
   assert.equal(api.formatClockMinutes(-1), '23:59');
@@ -102,9 +115,10 @@ test('clock and duration formatting preserve rounding, wrapping and invalid fall
   assert.equal(api.formatDurationMinutes(120), '2h');
 });
 
-// Testa getTradeDurationMinutes em todos os cenarios: intraday, virada de meia-noite (23:30 -> 00:30 = 60 min),
-// varios dias via exitDate explicita (1590 min), exitDate anterior a entrada (null), duracao 0, horario vazio (null)
-// e erro TypeError ao receber null.
+// Testa getTradeDurationMinutes em todos os cenarios: intraday, virada de meia-noite
+// (23:30 -> 00:30 = 60 min), varios dias via exitDate explicita (1590 min), exitDate
+// anterior a entrada (null), duracao 0, horario vazio (null) e erro TypeError ao
+// receber null.
 test('trade duration preserves same-day, midnight rollover, explicit dates and invalid ranges', () => {
   const api = loadTiming();
   assert.equal(api.getTradeDurationMinutes({date: '2026-01-02', openTime: '09:15', exitTime: '11:45'}), 150);
@@ -116,9 +130,10 @@ test('trade duration preserves same-day, midnight rollover, explicit dates and i
   assert.throws(() => api.getTradeDurationMinutes(null), {name: 'TypeError'});
 });
 
-// Valida getTradeTimingStats: exclui trades OPEN, calcula contagens e medias para overall, wins e losses
-// (incluindo trades BE sem horarios que influenciam o denominador conforme regra atual), ordena estrategias
-// por contagem decrescente e preserva a imutabilidade do array original.
+// Valida getTradeTimingStats: exclui trades OPEN, calcula contagens e medias para
+// overall, wins e losses (incluindo trades BE sem horarios que influenciam o
+// denominador conforme regra atual), ordena estrategias por contagem decrescente e
+// preserva a imutabilidade do array original.
 test('timing statistics retain closed-status groups, averages and strategy ordering', () => {
   const api = loadTiming();
   const source = [
@@ -136,8 +151,9 @@ test('timing statistics retain closed-status groups, averages and strategy order
   assert.equal(JSON.stringify(source), before);
 });
 
-// Casos de borda de getTradeTimingStats: entrada null retorna grupos zerados com medias null e byStrategy vazio;
-// trade sem estrategia preenchida e agrupado sob o rotulo 'Sem estratégia'.
+// Casos de borda de getTradeTimingStats: entrada null retorna grupos zerados com
+// medias null e byStrategy vazio; trade sem estrategia preenchida e agrupado sob o
+// rotulo 'Sem estratégia'.
 test('timing statistics preserve empty inputs and the missing-strategy label', () => {
   const api = loadTiming();
   assert.deepEqual(plain(api.getTradeTimingStats(null)), {
@@ -150,8 +166,9 @@ test('timing statistics preserve empty inputs and the missing-strategy label', (
   assert.deepEqual(result.byStrategy.map(row => [row.name, row.count]), [['Sem estratégia', 1]]);
 });
 
-// Prova pureza e encapsulamento de trade-rules.js: bloqueia acesso a DOM/storage/rede/Chart via getters,
-// confirma os simbolos exatos expostos no escopo global e valida a fabrica createTradeTiming com normalizeDate injetado.
+// Prova pureza e encapsulamento de trade-rules.js: bloqueia acesso a
+// DOM/storage/rede/Chart via getters, confirma os simbolos exatos expostos no escopo
+// global e valida a fabrica createTradeTiming com normalizeDate injetado.
 test('isolated timing domain exposes one factory without UI, storage or IO access', () => {
   const forbidden = ['document', 'localStorage', 'fetch', 'Chart'];
   const sandbox = {};
@@ -169,8 +186,9 @@ test('isolated timing domain exposes one factory without UI, storage or IO acces
   assert.equal(api.getTradeDurationMinutes({date: '2026-01-02', openTime: '23:30', exitTime: '00:30'}), 60);
 });
 
-// Verifica no index.html que trade-rules.js carrega uma unica vez de forma sincrona antes dos consumidores
-// de apresentacao (trade-form.js, analytics-workspace.js e app.js) e que todos os 9 wrappers globais seguem em app.js.
+// Verifica no index.html que trade-rules.js carrega uma unica vez de forma sincrona
+// antes dos consumidores de apresentacao (trade-form.js, analytics-workspace.js e
+// app.js) e que todos os 9 wrappers globais seguem em app.js.
 test('timing domain loads once before presentation consumers and legacy wrappers remain global', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({

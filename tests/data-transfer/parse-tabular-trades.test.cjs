@@ -1,24 +1,33 @@
 /*
- * Testes unitarios abrangentes para parsers tabulares de trades (MT5, MT4, HTML e planilhas genericas).
+ * Testes unitarios abrangentes para parsers tabulares de trades (MT5, MT4, HTML e
+ * planilhas genericas).
  *
  * Modulos testados:
- * - `src/modules/data-transfer/infrastructure/trade-file-formats.js`
- *   (`parseMT5Rows`, `parseGenericTradeRows`, `parseSpreadsheetRows`, `parseMT4Raw`)
- * - Colabora com `src/modules/trades/domain/trade-rules.js` (`TradeDiaryTradeTiming`, `getMarket`)
- *   e helpers de normalizacao tabular.
+ * - `src/modules/data-transfer/infrastructure/trade-file-formats.js` (`parseMT5Rows`,
+ *   `parseGenericTradeRows`, `parseSpreadsheetRows`, `parseMT4Raw`)
+ * - Colabora com `src/modules/trades/domain/trade-rules.js` (`TradeDiaryTradeTiming`,
+ *   `getMarket`) e helpers de normalizacao tabular.
  *
  * Estrategia de isolamento:
- * - Extrai os parsers e suas dependencias diretas, carregando-os em `vm.createContext` com
- *   relogio congelado (`FixedDate`), gerador sequencial de IDs (`uid`) e `trades` vazio.
- * - Usa fixtures compactas para layouts de posicao MT5, tabela HTML MT5, extrato MT4 e cabecalho generico.
+ * - Extrai os parsers e suas dependencias diretas, carregando-os em
+ *   `vm.createContext` com relogio congelado (`FixedDate`), gerador sequencial de IDs
+ *   (`uid`) e `trades` vazio.
+ * - Usa fixtures compactas para layouts de posicao MT5, tabela HTML MT5, extrato MT4
+ *   e cabecalho generico.
  *
  * Regras criticas garantidas:
- * - Mapeamento completo dos campos de trades MT5/MT4/HTML (R-multiplo para Long/Short, taxas, arredondamento, horarios).
- * - Rejeicao de linhas de deals (`in`/`out`/`in/out`), saldo (`BALANCE`), volumes divididos/nulos e precos invalidos.
- * - Deduplicacao de `positionId` no parser MT considerando todas as contas e preservando tipagem estrita.
- * - Busca de cabecalho generico com prioridade de aliases (ate a linha 20), suporte a acentos e datas Excel.
- * - Despacho de `parseSpreadsheetRows` tentando MT primeiro e fazendo fallback para o parser generico.
+ * - Mapeamento completo dos campos de trades MT5/MT4/HTML (R-multiplo para
+ *   Long/Short, taxas, arredondamento, horarios).
+ * - Rejeicao de linhas de deals (`in`/`out`/`in/out`), saldo (`BALANCE`), volumes
+ *   divididos/nulos e precos invalidos.
+ * - Deduplicacao de `positionId` no parser MT considerando todas as contas e
+ *   preservando tipagem estrita.
+ * - Busca de cabecalho generico com prioridade de aliases (ate a linha 20), suporte a
+ *   acentos e datas Excel.
+ * - Despacho de `parseSpreadsheetRows` tentando MT primeiro e fazendo fallback para o
+ *   parser generico.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -33,7 +42,8 @@ const sources = [app, fs.readFileSync(path.join(root, 'src/modules/trades/applic
 if (fs.existsSync(moduleFile)) sources.push(fs.readFileSync(moduleFile, 'utf8'));
 const parserNames = ['parseMT5Rows', 'parseGenericTradeRows', 'parseSpreadsheetRows', 'parseMT4Raw'];
 
-// Busca a declaracao de uma funcao (uma linha ou bloco multilinha) nas fontes carregadas.
+// Busca a declaracao de uma funcao (uma linha ou bloco multilinha) nas fontes
+// carregadas.
 function declaration(name) {
   const patterns = [new RegExp(`^function ${name}\\([^\\n]*\\}[^\\S\\n]*$`, 'm'),
     new RegExp(`^function ${name}\\([^]*?^\\}`, 'm')];
@@ -41,10 +51,12 @@ function declaration(name) {
   assert.ok(found, `Missing ${name}`);
   return found;
 }
+
 // Normaliza objetos oriundos da sandbox VM para comparacao profunda segura.
 const plain = value => JSON.parse(JSON.stringify(value));
 
-// Inicializa o contexto VM com Date congelado, contador de IDs, regras de dominio de timing/mercado e os 4 parsers tabulares.
+// Inicializa o contexto VM com Date congelado, contador de IDs, regras de dominio de
+// timing/mercado e os 4 parsers tabulares.
 function setup() {
   let ids = 0;
   class FixedDate extends Date {
@@ -58,16 +70,22 @@ function setup() {
     declaration('normalizeClockTime'), ...parserNames.map(declaration)].join('\n'), context);
   return {context, idCount: () => ids};
 }
-// Fixture de linha padrao de Posicoes do MetaTrader 5 (13 colunas, numeros em formato europeu/BR com virgula).
+
+// Fixture de linha padrao de Posicoes do MetaTrader 5 (13 colunas, numeros em formato
+// europeu/BR com virgula).
 const mtPosition = (id = '1001') => ['2024.02.01 09:15:10', id, ' EUR USD ', 'buy', '0,50', '1,1000',
   '1,0900', '1,1300', '2024.02.01 10:30:20', '1,1200', '(1,25)', '-0,50', '10,126'];
-// Fixture de linha exportada em HTML do MetaTrader (14 colunas, com coluna extra de tipo/direcao 'position').
+
+// Fixture de linha exportada em HTML do MetaTrader (14 colunas, com coluna extra de
+// tipo/direcao 'position').
 const mtHTML = () => ['2024.02.01 09:00', '2001', 'US500', 'sell', 'position', '1', '100', '102', '94',
   '2024.02.02 10:00', '96', '-1', '0,25', '4,50'];
+
 // Cabecalho minimo reutilizado nos testes do parser generico de planilhas.
 const genericHeader = ['date', 'symbol', 'entry', 'stop', 'exit', 'pnl', 'ticket'];
 
-// Valida o registro completo gerado a partir de uma linha MT5 congelada: campos derivados, soma de taxas, arredondamento de PnL, R=2 e horarios HH:MM.
+// Valida o registro completo gerado a partir de uma linha MT5 congelada: campos
+// derivados, soma de taxas, arredondamento de PnL, R=2 e horarios HH:MM.
 test('MT position layout preserves full record shape, locale numbers, fees, rounding and clocks', () => {
   const {context, idCount} = setup();
   const row = Object.freeze(mtPosition());
@@ -82,7 +100,8 @@ test('MT position layout preserves full record shape, locale numbers, fees, roun
   assert.equal(idCount(), 1);
 });
 
-// Verifica o deslocamento de colunas especifico de relatorios HTML MT5 e extratos MT4 (incluindo calculo de R em operacoes Short e soma de comissao/imposto/swap).
+// Verifica o deslocamento de colunas especifico de relatorios HTML MT5 e extratos MT4
+// (incluindo calculo de R em operacoes Short e soma de comissao/imposto/swap).
 test('MT HTML and MT4 statement layouts keep their column offsets, short R and tax handling', () => {
   const {context} = setup();
   const mt4 = ['2024.02.01 09:00', '3001', 'sell', '1', 'XAUUSD', '2000', '2010', '1970',
@@ -92,7 +111,9 @@ test('MT HTML and MT4 statement layouts keep their column offsets, short R and t
     [['2001', 'Short', 2, -0.75, 4.5, '2024-02-02'], ['3001', 'Short', 2, -1, -6.79, '2024-02-02']]);
 });
 
-// Garante descarte silencioso (sem consumir IDs) de linhas invalidas: curtas, ticket nao numerico, tipo balance, volume zero/fracionado, precos zerados e deals (`in`/`out`/`in/out`).
+// Garante descarte silencioso (sem consumir IDs) de linhas invalidas: curtas, ticket
+// nao numerico, tipo balance, volume zero/fracionado, precos zerados e deals
+// (`in`/`out`/`in/out`).
 test('MT rejects deal rows, split/nonpositive volumes, invalid IDs, prices and balance entries', () => {
   const {context, idCount} = setup();
   const invalid = [null, [], ['short']];
@@ -104,7 +125,8 @@ test('MT rejects deal rows, split/nonpositive volumes, invalid IDs, prices and b
   assert.equal(idCount(), 0);
 });
 
-// Confirma tratamento de stop/TP ausentes ou <= 0 (marcados como null + `incomplete: true` + `missing_fields: ['stop']`) e lucro vazio permanecendo `OPEN`.
+// Confirma tratamento de stop/TP ausentes ou <= 0 (marcados como null + `incomplete:
+// true` + `missing_fields: ['stop']`) e lucro vazio permanecendo `OPEN`.
 test('MT missing/nonpositive stops retain incomplete markers and null profit remains OPEN', () => {
   const {context} = setup();
   const row = mtPosition(); row[6] = '-1'; row[7] = '0'; row[12] = '';
@@ -119,7 +141,9 @@ test('MT missing/nonpositive stops retain incomplete markers and null profit rem
   assert.deepEqual(Array.from(trade.missing_fields), ['stop']);
 });
 
-// Verifica deduplicacao no parser MT: compara `positionId` estritamente (numero 1002 != string '1002'), verifica todas as contas, mantem a primeira ocorrencia e nao muta entradas.
+// Verifica deduplicacao no parser MT: compara `positionId` estritamente (numero 1002
+// != string '1002'), verifica todas as contas, mantem a primeira ocorrencia e nao
+// muta entradas.
 test('MT duplicate detection keeps typed existing IDs, all-account lookup and first-row order', () => {
   const {context, idCount} = setup();
   const existing = [{positionId: '1001', accountId: 'other-account'}, {positionId: 1002}];
@@ -132,7 +156,9 @@ test('MT duplicate detection keeps typed existing IDs, all-account lookup and fi
   assert.equal(JSON.stringify(rows), before);
 });
 
-// Testa o parser generico com cabecalhos em portugues acentuados, preambulo acima da tabela, direcao 'venda' -> Short, moeda R$, parenteses e extracao de horarios das datas.
+// Testa o parser generico com cabecalhos em portugues acentuados, preambulo acima da
+// tabela, direcao 'venda' -> Short, moeda R$, parenteses e extracao de horarios das
+// datas.
 test('generic parser locates accented headers and retains aliases, fields and date/time fallbacks', () => {
   const {context} = setup();
   const headers = ['Data', 'Símbolo', 'Direção', 'Entrada', 'SL', 'Saída', 'Lucro', 'Taxas', 'Lote',
@@ -148,7 +174,8 @@ test('generic parser locates accented headers and retains aliases, fields and da
   assert.equal(trade.createdAt, '2026-10-15T12:00:00.000Z');
 });
 
-// Valida prioridade entre aliases (`date` vence `data` independentemente da ordem das colunas) e o limite de busca de cabecalho ate a linha 20 (indice 19).
+// Valida prioridade entre aliases (`date` vence `data` independentemente da ordem das
+// colunas) e o limite de busca de cabecalho ate a linha 20 (indice 19).
 test('generic aliases use alias priority and header search stops before row 21', () => {
   const {context} = setup();
   const priority = [['data', 'date', 'symbol', 'entry'], ['2020-01-01', '2024-01-01', 'ES', '100']];
@@ -158,7 +185,8 @@ test('generic aliases use alias priority and header search stops before row 21',
   assert.equal(context.parseGenericTradeRows([...preamble, ['preamble'], genericHeader, ['2024-01-01', 'ES', 100]]).length, 0);
 });
 
-// Confirma protecoes do parser generico contra entradas invalidas/BALANCE/linhas sem dados numericos, tratando zeros explicitos (`'0'`) como valores completos (`BE`).
+// Confirma protecoes do parser generico contra entradas invalidas/BALANCE/linhas sem
+// dados numericos, tratando zeros explicitos (`'0'`) como valores completos (`BE`).
 test('generic guards skip unusable rows without IDs and retain numeric zero as complete data', () => {
   const {context, idCount} = setup();
   for (const rows of [null, undefined, {}, [], [['symbol']]]) assert.equal(context.parseGenericTradeRows(rows).length, 0);
@@ -171,7 +199,9 @@ test('generic guards skip unusable rows without IDs and retain numeric zero as c
   assert.equal(result[0].incomplete, false);
 });
 
-// Verifica comportamento legado no parser generico: arredondamento de `-0.004` para `-0` (`BE`), marcacao de `entry`/`stop` faltantes e nao-deduplicacao de tickets repetidos (arrays e IDs independentes).
+// Verifica comportamento legado no parser generico: arredondamento de `-0.004` para
+// `-0` (`BE`), marcacao de `entry`/`stop` faltantes e nao-deduplicacao de tickets
+// repetidos (arrays e IDs independentes).
 test('generic negative-zero rounding, absent entry/stop and duplicate tickets retain legacy behavior', () => {
   const {context} = setup();
   context.trades = [{positionId: 'same'}];
@@ -187,7 +217,8 @@ test('generic negative-zero rounding, absent entry/stop and duplicate tickets re
   assert.notEqual(result[0].id, result[1].id);
 });
 
-// Garante que o parser generico interpreta seriais do Excel e datas textuais soltas de modo identico independentemente do nome do arquivo, sem mutar `rows`.
+// Garante que o parser generico interpreta seriais do Excel e datas textuais soltas
+// de modo identico independentemente do nome do arquivo, sem mutar `rows`.
 test('generic parsing preserves Excel dates and loose textual dates without using the filename', () => {
   const first = setup(), second = setup();
   const rows = [genericHeader, [45292, 'ES', 1], ['2024.13.40', 'ES', 2]];
@@ -198,7 +229,9 @@ test('generic parsing preserves Excel dates and loose textual dates without usin
   assert.equal(JSON.stringify(rows), before);
 });
 
-// Valida o roteamento de `parseSpreadsheetRows`: tenta `parseMT5Rows` primeiro com filename padrao `'spreadsheet'` e so recorre ao parser generico quando MT retorna vazio.
+// Valida o roteamento de `parseSpreadsheetRows`: tenta `parseMT5Rows` primeiro com
+// filename padrao `'spreadsheet'` e so recorre ao parser generico quando MT retorna
+// vazio.
 test('spreadsheet dispatch tries MT first and forwards the original input and default filename', () => {
   const {context} = setup();
   const calls = [], rows = [], mt = [{}], generic = [{}];
@@ -211,7 +244,8 @@ test('spreadsheet dispatch tries MT first and forwards the original input and de
   assert.deepEqual(calls.slice(1), [['mt', rows, 'custom'], ['generic', rows, 'custom']]);
 });
 
-// Confirma que erros em entrada nula no dispatcher ou excecoes lancadas por `parseMTNumber` propagam sem ser engolidos.
+// Confirma que erros em entrada nula no dispatcher ou excecoes lancadas por
+// `parseMTNumber` propagam sem ser engolidos.
 test('parser errors propagate, including spreadsheet null input before generic guards', () => {
   const {context} = setup();
   assert.throws(() => context.parseSpreadsheetRows(null), /null/);
@@ -220,7 +254,9 @@ test('parser errors propagate, including spreadsheet null input before generic g
   assert.throws(() => context.parseMT5Rows([mtPosition()]), error => error === failure);
 });
 
-// Verifica o adaptador de texto MT4: divide ingenuamente por virgula/tab/ponto-e-virgula removendo aspas, delega com fonte `'text'` e lanca erro em entrada nula.
+// Verifica o adaptador de texto MT4: divide ingenuamente por
+// virgula/tab/ponto-e-virgula removendo aspas, delega com fonte `'text'` e lanca erro
+// em entrada nula.
 test('MT4 text adapter preserves naive delimiter splitting and the text source argument', () => {
   const {context} = setup();
   const calls = [], returned = [];
@@ -232,7 +268,8 @@ test('MT4 text adapter preserves naive delimiter splitting and the text source a
   assert.throws(() => context.parseMT4Raw(null), /null/);
 });
 
-// Confirma isolamento na carga do modulo, aridade publica dos 4 parsers, remocao de duplicatas em app.js e ordem sincrona em index.html.
+// Confirma isolamento na carga do modulo, aridade publica dos 4 parsers, remocao de
+// duplicatas em app.js e ordem sincrona em index.html.
 test('tabular parser APIs load once as classic globals without initial IO or state access', () => {
   assert.ok(fs.existsSync(moduleFile));
   const sandbox = {};

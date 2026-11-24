@@ -1,22 +1,27 @@
 /*
- * Teste de fumaça (smoke test) isolado em navegador headless para a aplicação estática.
+ * Teste de fumaça (smoke test) isolado em navegador headless para a aplicação
+ * estática.
  *
  * Objetivo:
  *   Validar em um Chrome/Chromium real (sem dependências npm externas) se a aplicação
  *   carrega sem erros de script ou recursos ausentes e se os principais fluxos de
- *   navegação, renderização, importação/exportação, persistência e StudyHub funcionam.
+ *   navegação, renderização, importação/exportação, persistência e StudyHub
+ *   funcionam.
  *
  * Papel na verificação:
- *   Atua como barreira rápida de integração fim a fim no navegador, injetando uma sonda
- *   (`browserProbe`) no `<head>` do `index.html` servido localmente por um servidor HTTP
- *   temporário e verificando todas as 113 asserções via `--dump-dom`.
+ *   Atua como barreira rápida de integração fim a fim no navegador, injetando uma
+ *   sonda (`browserProbe`) no `<head>` do `index.html` servido localmente por um
+ *   servidor HTTP temporário e verificando todas as 113 asserções via `--dump-dom`.
  *
  * Pontos-chave:
- *   - Usa perfil temporário do Chrome em `os.tmpdir()` para garantir isolamento completo.
- *   - Intercepta `console.error`, `error` e `unhandledrejection` antes dos scripts da app.
- *   - Valida integridade de `localStorage` e restaura estados mutados durante testes de
- *     backup, upload, StudyHub e round-trip de persistência.
+ *   - Usa perfil temporário do Chrome em `os.tmpdir()` para garantir isolamento
+ *     completo.
+ *   - Intercepta `console.error`, `error` e `unhandledrejection` antes dos scripts da
+ *     app.
+ *   - Valida integridade de `localStorage` e restaura estados mutados durante testes
+ *     de backup, upload, StudyHub e round-trip de persistência.
  */
+
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { createServer } = require('node:http');
@@ -24,16 +29,17 @@ const { readFile, mkdtemp, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 
-// Diretório raiz da aplicação e binário do Chrome/Chromium configuráveis via ambiente.
+// Diretório raiz da aplicação e binário do Chrome/Chromium configuráveis via
+// ambiente.
 const root = path.resolve(process.env.APP_ROOT || path.join(__dirname, '../..'));
 const chrome = process.env.CHROME_BIN || 'google-chrome';
 
 /*
- * Sonda executada dentro do navegador (serializada e injetada no `<head>`).
- * Registra listeners globais de erro e, após o evento `load`, executa uma bateria
- * sequencial de verificações funcionais em páginas, gráficos, filtros, CSV/XLSX/HTML,
- * backup, i18n, StudyHub legado/nativo e persistência, gravando o resultado em JSON
- * dentro de `<pre id="architecture-smoke-result">`.
+ * Sonda executada dentro do navegador (serializada e injetada no `<head>`). Registra
+ * listeners globais de erro e, após o evento `load`, executa uma bateria sequencial
+ * de verificações funcionais em páginas, gráficos, filtros, CSV/XLSX/HTML, backup,
+ * i18n, StudyHub legado/nativo e persistência, gravando o resultado em JSON dentro de
+ * `<pre id="architecture-smoke-result">`.
  */
 function browserProbe() {
   // Acumuladores de erros globais e de erros específicos do módulo legado StudyHub.
@@ -55,7 +61,8 @@ function browserProbe() {
       passed.push(name);
     };
     try {
-      // 1. Verificações iniciais de carregamento (Chart.js, dashboard e renderer do log).
+      // 1. Verificações iniciais de carregamento (Chart.js, dashboard e renderer do
+      //    log).
       check('Chart.js loaded', typeof Chart === 'function' && Chart.version === '4.4.1');
       check('dashboard active', document.querySelector('#page-dashboard.active'));
       check('trade log global stays on diary renderer', typeof renderLog === 'function' && renderLog.toString().includes('filterAccount') && !renderLog.toString().includes('LOG.length'));
@@ -84,7 +91,8 @@ function browserProbe() {
       check('stop USD', document.getElementById('simStopDay').value === '30.00');
       check('legacy API', calculateSimulationSizing({balance: 1000, riskPct: 1}).riskUsd === 10);
 
-      // 3. Serialização/importação CSV, adaptador tabular MetaTrader, backup e exportação.
+      // 3. Serialização/importação CSV, adaptador tabular MetaTrader, backup e
+      //    exportação.
       const csvHeader = 'date,symbol,direction,placedTime,openTime,exitDate,exitTime,entry,exit,stop,tp,qty,riskUsd,riskPct,r,pnl,status,market,strategy,emotion,errors,remarks';
       const csvRow = ['"2026-09-10"', ...Array(19).fill('""'), '"pressa; ""erro"""', '"a,b\nlinha 2"'].join(',');
       check('CSV global serialization', buildTradesCSV([{date: '2026-09-10', errors: ['pressa', '"erro"'], remarks: 'a,b\nlinha 2'}]) === csvHeader + '\n' + csvRow);
@@ -104,7 +112,9 @@ function browserProbe() {
       } finally {
         ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = backupPayload);
       }
-      // Intercepta criação de links `<a>` para verificar downloads JSON/CSV sem gravar arquivos.
+
+      // Intercepta criação de links `<a>` para verificar downloads JSON/CSV sem
+      // gravar arquivos.
       const downloads = [];
       const originalCreateElement = document.createElement;
       try {
@@ -128,7 +138,8 @@ function browserProbe() {
       check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
         Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
 
-      // 4. Retorno ao Dashboard: painel de risco, métricas, gráficos, estratégias e mini-calendário.
+      // 4. Retorno ao Dashboard: painel de risco, métricas, gráficos, estratégias e
+      //    mini-calendário.
       showPage('dashboard');
       check('dashboard return', document.querySelector('#page-dashboard.active'));
       check('risk board global and ideal risk', typeof renderRiskBoard === 'function' && document.getElementById('riskIdealTrade').textContent.trim().length > 0);
@@ -159,7 +170,8 @@ function browserProbe() {
       check('dashboard calendar cell navigates to journal', document.querySelector('#page-calendar.active'));
       showPage('dashboard');
 
-      // 5. Internacionalização (pt-BR/en-US), menu de idioma, sidebar mobile e análise de taxas/stop.
+      // 5. Internacionalização (pt-BR/en-US), menu de idioma, sidebar mobile e
+      //    análise de taxas/stop.
       document.querySelector('.lang-option[data-lang="en-US"]').click();
       check('English language handler', document.documentElement.lang === 'en-US' && localStorage.getItem('appLanguage') === 'en-US' && document.getElementById('langFlag').textContent === '🇺🇸');
       check('English catalog rendered', document.querySelector('[data-i18n="nav.calendar"]').textContent === 'Journal' && t('nav.calendar') === 'Journal');
@@ -187,7 +199,8 @@ function browserProbe() {
       refreshAll();
       check('stop fee refresh renders four cards', document.querySelectorAll('#statsRiskLeakageRows .risk-insight-item').length === 4);
 
-      // 6. Navegação e renderização das páginas Perfil, Parceiros, Contas e Calendário.
+      // 6. Navegação e renderização das páginas Perfil, Parceiros, Contas e
+      //    Calendário.
       const profileNav = document.querySelector('.nav-item[onclick="showPage(\'profile\')"]');
       profileNav.click();
       check('profile navigation and global renderer', document.querySelector('#page-profile.active') && typeof renderProfilePage === 'function');
@@ -239,7 +252,8 @@ function browserProbe() {
       calNav(1);
       check('calendar navigation crosses year', calYear === 2027 && calMonth === 0);
 
-      // 7. Páginas Notificações, Psicologia, Strategy Hub, Pré-Mercado, Documentos e Exportação.
+      // 7. Páginas Notificações, Psicologia, Strategy Hub, Pré-Mercado, Documentos e
+      //    Exportação.
       showPage('notifications');
       check('notifications navigation and global renderer', document.querySelector('#page-notifications.active') && typeof renderNotificationsPage === 'function');
       check('notification feed uses shared status list', document.querySelectorAll('#notificationFeed .status-item').length > 0);
@@ -293,7 +307,8 @@ function browserProbe() {
       check('export account options rendered', document.getElementById('exportAccount').options.length === accounts.length + 1);
       check('export account default remains all', document.getElementById('exportAccount').value === '');
 
-      // 8. StudyHub: estado nativo, simulação determinística, abas legadas e ponte intraday.
+      // 8. StudyHub: estado nativo, simulação determinística, abas legadas e ponte
+      //    intraday.
       showPage('studyHub');
       const nativeMerge = mergeStudyHubState({plan: {title: 'Smoke StudyHub'}});
       check('StudyHub native state merge retains defaults and partial plan', nativeMerge.plan.title === 'Smoke StudyHub' &&
@@ -333,7 +348,8 @@ function browserProbe() {
         studyRows[1].allGainValue === 40 && studyRows[1].hitTarget && !studyRows[1].hitStop && studyRows[2].hitStop);
       check('StudyHub legacy initialization and calculators report no captured errors', studyHubErrors.length === 0);
 
-      // 9. Fluxos reais de upload (CSV, relatório HTML UTF-16 e planilha XLSX via SheetJS) sem persistir.
+      // 9. Fluxos reais de upload (CSV, relatório HTML UTF-16 e planilha XLSX via
+      //    SheetJS) sem persistir.
       const persistedKeys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
       const persistedBefore = persistedKeys.map(key => localStorage.getItem(key));
       const previousPending = pendingImport;
@@ -392,7 +408,8 @@ function browserProbe() {
         previewNodes.forEach((node, index) => { node.innerHTML = previewHTML[index]; });
       }
 
-      // 10. Round-trip de persistência (`save()` -> limpa memória -> `load()`) e restauração.
+      // 10. Round-trip de persistência (`save()` -> limpa memória -> `load()`) e
+      //     restauração.
       const stateBeforeRoundtrip = {trades, config, preMarketData, accounts, activeAccountId, studyHubState};
       const storageBeforeRoundtrip = persistedKeys.map(key => localStorage.getItem(key));
       try {
@@ -417,6 +434,7 @@ function browserProbe() {
     } catch (error) {
       errors.push(error.stack || String(error));
     }
+
     // Publica o resumo estruturado no DOM para coleta pelo `--dump-dom` do Chrome.
     const result = document.createElement('pre');
     result.id = 'architecture-smoke-result';
@@ -426,17 +444,22 @@ function browserProbe() {
 }
 
 /*
- * Orquestra o servidor HTTP local restrito, executa o Chrome headless com `--dump-dom`
- * contra `/__smoke.html`, valida a contagem exata de 113 checagens e limpa recursos.
+ * Orquestra o servidor HTTP local restrito, executa o Chrome headless com
+ * `--dump-dom` contra `/__smoke.html`, valida a contagem exata de 113 checagens e
+ * limpa recursos.
  */
 async function main() {
   const profile = await mkdtemp(path.join(tmpdir(), 'trade-diary-smoke-'));
   const html = await readFile(path.join(root, 'index.html'), 'utf8');
   const probe = `<script>(${browserProbe.toString()})()</script>`;
-  // Instala a captura de erros antes dos scripts da aplicação; os demais recursos permanecem inalterados.
+
+  // Instala a captura de erros antes dos scripts da aplicação; os demais recursos
+  // permanecem inalterados.
   const smokeHtml = html.replace('<head>', '<head>' + probe);
   const missing = [];
-  // Servidor HTTP local que expõe apenas `app.js`, `styles.css`, `src/**/*.{js,css}` e a página de smoke.
+
+  // Servidor HTTP local que expõe apenas `app.js`, `styles.css`, `src/**/*.{js,css}`
+  // e a página de smoke.
   const server = createServer(async (request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     if (pathname === '/__smoke.html') {
@@ -446,7 +469,9 @@ async function main() {
     }
     if (pathname === '/favicon.ico') { response.writeHead(204); response.end(); return; }
     const relative = pathname.slice(1);
-    // Serve apenas ativos da aplicação; nunca expõe configurações de ferramentas ou metadados do repositório.
+
+    // Serve apenas ativos da aplicação; nunca expõe configurações de ferramentas ou
+    // metadados do repositório.
     const allowed = ['app.js', 'styles.css'].includes(relative) || /^src\/[\w/.-]+\.(js|css)$/.test(relative);
     const filename = path.resolve(root, relative);
     if (!allowed || !filename.startsWith(root + path.sep)) {
@@ -464,7 +489,9 @@ async function main() {
   try {
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     const url = `http://127.0.0.1:${server.address().port}/__smoke.html`;
-    // Inicia Chrome headless com orçamento de tempo virtual para executar a sonda e despejar o DOM final.
+
+    // Inicia Chrome headless com orçamento de tempo virtual para executar a sonda e
+    // despejar o DOM final.
     browser = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
       '--no-first-run', `--user-data-dir=${profile}`, '--dump-dom', '--timeout=20000',
       '--virtual-time-budget=5000', url], {stdio: ['ignore', 'pipe', 'pipe']});
@@ -484,7 +511,8 @@ async function main() {
     assert.equal(result.passed.length, 113, 'Smoke checks incomplete');
     console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
   } finally {
-    // Encerra o processo do navegador, fecha o servidor HTTP e remove o perfil temporário.
+    // Encerra o processo do navegador, fecha o servidor HTTP e remove o perfil
+    // temporário.
     if (browser && browser.exitCode === null) browser.kill('SIGKILL');
     server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));

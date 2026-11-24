@@ -1,14 +1,20 @@
 /*
- * Objetivo: Validar a geracao de icones SVG decorativos das pastas e acoes do modulo de
- * documentos (`renderDocFolderIcon`).
+ * Objetivo: Validar a geracao de icones SVG decorativos das pastas e acoes do modulo
+ * de documentos (`renderDocFolderIcon`).
+ *
  * Modulo/arquivo testado: funcao `renderDocFolderIcon` em
- * `src/modules/documents/presentation/documents-page.js` (confirmando remocao de `app.js`).
- * Estrategia de isolamento: extrai as funcoes auxiliares de documentos e executa em contexto
- * `node:vm` puro, sem necessidade de DOM ou estado global.
- * Pontos-chave garantidos: wrapper `.doc-folder-icon` com `aria-hidden="true"` para acessibilidade,
- * geometria SVG distinta para cada tipo suportado (`plus`, `calendar`, `file`, `folder`), fallback
- * para `'file'` em entradas invalidas/ausentes e carregamento sincrono antes de `app.js`.
+ * `src/modules/documents/presentation/documents-page.js` (confirmando remocao de
+ * `app.js`).
+ *
+ * Estrategia de isolamento: extrai as funcoes auxiliares de documentos e executa em
+ * contexto `node:vm` puro, sem necessidade de DOM ou estado global.
+ *
+ * Pontos-chave garantidos: wrapper `.doc-folder-icon` com `aria-hidden="true"` para
+ * acessibilidade, geometria SVG distinta para cada tipo suportado (`plus`,
+ * `calendar`, `file`, `folder`), fallback para `'file'` em entradas
+ * invalidas/ausentes e carregamento sincrono antes de `app.js`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -25,8 +31,9 @@ const sources = [moduleSource, fs.readFileSync(path.join(root, 'src/modules/trad
 const source = ["formatDocDate", "normalizeDocImages", "formatDocumentSelection", "getDocumentEntryImages", "renderDocumentMedia", "renderDocFolderIcon"].map(name => sources.map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).find(Boolean)[0]).join('\n\n');
 
 /*
- * Helper de execucao em sandbox: cria um contexto `vm` minimo, avalia o codigo extraido e invoca
- * `renderDocFolderIcon` passando `type` ou sem argumentos (`useArgument: false`).
+ * Helper de execucao em sandbox: cria um contexto `vm` minimo, avalia o codigo
+ * extraido e invoca `renderDocFolderIcon` passando `type` ou sem argumentos
+ * (`useArgument: false`).
  */
 function icon(type, useArgument = true) {
   const context = vm.createContext({type});
@@ -35,8 +42,9 @@ function icon(type, useArgument = true) {
 }
 
 /*
- * Contrato estrutural e de acessibilidade: todos os quatro tipos suportados compartilham o mesmo
- * wrapper `<span class="doc-folder-icon">` envolvendo um `<svg viewBox="0 0 24 24" aria-hidden="true">`.
+ * Contrato estrutural e de acessibilidade: todos os quatro tipos suportados
+ * compartilham o mesmo wrapper `<span class="doc-folder-icon">` envolvendo um `<svg
+ * viewBox="0 0 24 24" aria-hidden="true">`.
  */
 test('folder icons keep the shared wrapper and accessible SVG contract', () => {
   for (const type of ['plus', 'calendar', 'file', 'folder']) {
@@ -47,8 +55,8 @@ test('folder icons keep the shared wrapper and accessible SVG contract', () => {
 });
 
 /*
- * Identidade visual por tipo: garante que `plus`, `calendar`, `file` e `folder` mantem seus
- * respectivos comandos de `path` SVG sem regressoes.
+ * Identidade visual por tipo: garante que `plus`, `calendar`, `file` e `folder`
+ * mantem seus respectivos comandos de `path` SVG sem regressoes.
  */
 test('each supported folder type preserves its distinct path data', () => {
   assert.match(icon('plus'), /M12 5v14M5 12h14/);
@@ -58,8 +66,8 @@ test('each supported folder type preserves its distinct path data', () => {
 });
 
 /*
- * Fallback defensivo: tipo desconhecido (`'missing'`), string vazia, `null` e chamada sem
- * argumento devem produzir exatamente o mesmo HTML do icone `'file'`.
+ * Fallback defensivo: tipo desconhecido (`'missing'`), string vazia, `null` e chamada
+ * sem argumento devem produzir exatamente o mesmo HTML do icone `'file'`.
  */
 test('unknown, empty, null and omitted types retain the file fallback', () => {
   const file = icon('file');
@@ -70,8 +78,8 @@ test('unknown, empty, null and omitted types retain the file fallback', () => {
 });
 
 /*
- * Contrato de carregamento: assegura que `documents-page.js` aparece uma unica vez como script
- * classico sincrono em `index.html` antes de `app.js`.
+ * Contrato de carregamento: assegura que `documents-page.js` aparece uma unica vez
+ * como script classico sincrono em `index.html` antes de `app.js`.
  */
 test('folder icons load once as a synchronous classic script before documents page', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

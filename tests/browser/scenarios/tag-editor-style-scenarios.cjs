@@ -1,17 +1,21 @@
 /*
- * Cenários visuais para o editor de tags (página Setup) e nuvem de tags (página Perfil).
+ * Cenários visuais para o editor de tags (página Setup) e nuvem de tags (página
+ * Perfil).
  *
  * Objetivo:
- *   Validar tags editáveis com botões de editar/remover e contadores (`.tag-edit-btn`,
- *   `.tag-delete-btn`, `.tag-count`), o botão descartável `.tag-add`, tags somente-leitura
- *   no Perfil e os três blocos de nuvem de tags (padrão, vazio e rótulos extensos).
+ *   Validar tags editáveis com botões de editar/remover e contadores
+ *   (`.tag-edit-btn`, `.tag-delete-btn`, `.tag-count`), o botão descartável
+ *   `.tag-add`, tags somente-leitura no Perfil e os três blocos de nuvem de tags
+ *   (padrão, vazio e rótulos extensos).
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos estados `tag-editor-*` e `tag-cloud-*`.
  *
  * Pontos-chave:
- *   - Usa tags já renderizadas em Setup/Perfil mais um único nó descartável `#styleTagAddFixture`.
- *   - Não muta `config` de forma permanente (restaura no `finally` nos cenários de nuvem).
+ *   - Usa tags já renderizadas em Setup/Perfil mais um único nó descartável
+ *     `#styleTagAddFixture`.
+ *   - Não muta `config` de forma permanente (restaura no `finally` nos cenários de
+ *     nuvem).
  */
 
 /*
@@ -22,8 +26,9 @@ function resetTagEditorStyleState() {
 }
 
 /*
- * Inspeciona e valida estilos computados das tags em Setup (estratégias/emoções) e Perfil,
- * retornando o seletor CSS de `:hover` nos casos de botão de excluir ou editar.
+ * Inspeciona e valida estilos computados das tags em Setup (estratégias/emoções) e
+ * Perfil, retornando o seletor CSS de `:hover` nos casos de botão de excluir ou
+ * editar.
  */
 function prepareTagEditorStyleScenario(name) {
   const before = JSON.stringify({config, accounts, trades, storage: Object.keys(localStorage).sort().map(key => [key, localStorage.getItem(key)])});
@@ -35,7 +40,8 @@ function prepareTagEditorStyleScenario(name) {
   const remove = tag?.querySelector('.tag-delete-btn');
   if (!list || !tag || (!profile && !remove) || (!profile && !secondary && !edit)) throw new Error('Rendered tag controls missing');
 
-  // Insere chip descartável `.tag-add` nas listas editáveis para cobrir seu estilo sem alterar `config`.
+  // Insere chip descartável `.tag-add` nas listas editáveis para cobrir seu estilo
+  // sem alterar `config`.
   const add = document.createElement('span');
   add.id = 'styleTagAddFixture';
   add.className = 'tag-add';
@@ -77,8 +83,9 @@ function prepareTagEditorStyleScenario(name) {
 }
 
 /*
- * Prepara os cenários da nuvem de tags no Perfil (`tag-cloud-default`, `tag-cloud-empty`
- * e `tag-cloud-long`), re-renderizando com `config` temporário e restaurando no `finally`.
+ * Prepara os cenários da nuvem de tags no Perfil (`tag-cloud-default`,
+ * `tag-cloud-empty` e `tag-cloud-long`), re-renderizando com `config` temporário e
+ * restaurando no `finally`.
  */
 function prepareTagCloudStyleScenario(name) {
   const fingerprint = () => JSON.stringify({accounts, trades, config, preMarketData, studyHubState,
@@ -86,7 +93,8 @@ function prepareTagCloudStyleScenario(name) {
   const before = fingerprint();
   const previousConfig = config;
   try {
-    // Ajusta temporariamente listas de estratégias, emoções e mercados para o cenário.
+    // Ajusta temporariamente listas de estratégias, emoções e mercados para o
+    // cenário.
     if (name === 'tag-cloud-empty') config = {...config, strategies: [], emotions: [], markets: []};
     if (name === 'tag-cloud-long') config = {...config,
       strategies: ['Estratégia de caracterização com texto extenso para observar a quebra de linha no perfil'],
@@ -99,6 +107,7 @@ function prepareTagCloudStyleScenario(name) {
       block.querySelectorAll('.tag').length !== (name === 'tag-cloud-empty' ? 0 : name === 'tag-cloud-long' ? 1 : config[['strategies', 'emotions', 'markets'][index]].length))) {
       throw new Error('Profile tag cloud groups changed');
     }
+
     // Verifica espaçamento entre blocos e tipografia dos títulos de seção da nuvem.
     for (const [index, block] of blocks.entries()) {
       const heading = block.querySelector('.tag-cloud-title');

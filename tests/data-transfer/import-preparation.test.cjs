@@ -2,24 +2,34 @@
  * Testes unitarios para regras de dominio e preparacao de trades importados.
  *
  * Modulos testados:
- * - `src/modules/data-transfer/domain/import-trade-rules.js` (`TradeDiaryImportTradeRules`)
+ * - `src/modules/data-transfer/domain/import-trade-rules.js`
+ *   (`TradeDiaryImportTradeRules`)
  * - `src/modules/data-transfer/application/transfer-workflows.js`
  *   (`prepareImportedTrades`, `setPendingImport`, `clearPendingImport`,
- *    `getPendingImportAccountId`, `getTradeImportPositionKey`)
- * - Funcoes auxiliares compartilhadas de `src/modules/trades/domain/trade-rules.js` e `app.js`.
+ *   `getPendingImportAccountId`, `getTradeImportPositionKey`)
+ * - Funcoes auxiliares compartilhadas de `src/modules/trades/domain/trade-rules.js` e
+ *   `app.js`.
  *
  * Estrategia de isolamento:
- * - Carrega as regras de dominio e as funcoes extraidas em `vm.createContext`, substituindo
- *   `Date`, `uid`, `getMarket`, `mtTradeStatus` e `normalizeClockTime` por stubs rastreaveis.
- * - Usa `Object.freeze` em entradas para garantir que a preparacao nao muta os objetos originais.
+ * - Carrega as regras de dominio e as funcoes extraidas em `vm.createContext`,
+ *   substituindo `Date`, `uid`, `getMarket`, `mtTradeStatus` e `normalizeClockTime`
+ *   por stubs rastreaveis.
+ * - Usa `Object.freeze` em entradas para garantir que a preparacao nao muta os
+ *   objetos originais.
  *
  * Regras criticas garantidas:
- * - Calculo de campos obrigatorios ausentes (`missing_fields`) respeitando `exit: 0` valido e status fechado vs aberto.
- * - Clonagem apenas dos arrays esperados (`errors`, `missing_fields`, `images`), preservando zeros/booleans e campos extras.
- * - Atomicidade de `setPendingImport`: falhas durante preparacao nao corrompem `pendingImport` nem `pendingImportMeta`.
- * - Deduplicacao via `createImportedTradeFilter` distinguindo tipos de ID (numero vs string) e sem consumir chaves de posicoes rejeitadas.
- * - Carregamento puro e sem IO dos scripts classicos em `index.html` antes da camada de apresentacao.
+ * - Calculo de campos obrigatorios ausentes (`missing_fields`) respeitando `exit: 0`
+ *   valido e status fechado vs aberto.
+ * - Clonagem apenas dos arrays esperados (`errors`, `missing_fields`, `images`),
+ *   preservando zeros/booleans e campos extras.
+ * - Atomicidade de `setPendingImport`: falhas durante preparacao nao corrompem
+ *   `pendingImport` nem `pendingImportMeta`.
+ * - Deduplicacao via `createImportedTradeFilter` distinguindo tipos de ID (numero vs
+ *   string) e sem consumir chaves de posicoes rejeitadas.
+ * - Carregamento puro e sem IO dos scripts classicos em `index.html` antes da camada
+ *   de apresentacao.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -34,16 +44,21 @@ const candidates = [app, fs.readFileSync(path.join(root, 'src/modules/trades/dom
 if (fs.existsSync(path.join(root, preparationPath))) candidates.push(fs.readFileSync(path.join(root, preparationPath), 'utf8'));
 const names = ['calcImportMissingFields', 'prepareImportedTrades', 'setPendingImport', 'clearPendingImport',
   'getPendingImportAccountId', 'getTradeImportPositionKey', 'normalizeDocImages'];
-// Extrai cada funcao necessaria das fontes candidatas para composicao controlada na VM.
+
+// Extrai cada funcao necessaria das fontes candidatas para composicao controlada na
+// VM.
 const declarations = names.map(name => {
   const match = candidates.map(source => source.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).find(Boolean);
   assert.ok(match, `Missing ${name}`);
   return match[0];
 }).join('\n');
-// Converte valores oriundos da VM em objetos planos do realm principal para comparacao profunda.
+
+// Converte valores oriundos da VM em objetos planos do realm principal para
+// comparacao profunda.
 const plain = value => JSON.parse(JSON.stringify(value));
 
-// Prepara sandbox VM com relogio sequencial e stubs instrumentados para auditar ordem e argumentos das dependencias.
+// Prepara sandbox VM com relogio sequencial e stubs instrumentados para auditar ordem
+// e argumentos das dependencias.
 function setup() {
   const calls = [];
   let sequence = 0;
@@ -60,7 +75,8 @@ function setup() {
   return {context, calls};
 }
 
-// Verifica a ordem dos campos faltantes, diferenca entre status fechados (exigem `exit` nao nulo, aceitando 0) e abertos, e erro em trade nulo.
+// Verifica a ordem dos campos faltantes, diferenca entre status fechados (exigem
+// `exit` nao nulo, aceitando 0) e abertos, e erro em trade nulo.
 test('missing import fields preserve truthiness, order, closed statuses and nullable exit semantics', () => {
   const {context} = setup();
   assert.deepEqual(Array.from(context.calcImportMissingFields({}, 'WIN')), ['entry', 'stop', 'strategy', 'emotion', 'followedPlan', 'exit']);
@@ -72,7 +88,8 @@ test('missing import fields preserve truthiness, order, closed statuses and null
   assert.throws(() => context.calcImportMissingFields(null, 'WIN'), /null/);
 });
 
-// Garante que trade congelado com valores falsy validos (0, false) preserva dados extras, clona arrays, normaliza imagens e evita gerar ID/timestamps desnecessarios.
+// Garante que trade congelado com valores falsy validos (0, false) preserva dados
+// extras, clona arrays, normaliza imagens e evita gerar ID/timestamps desnecessarios.
 test('preparation retains extra data and zero/false values while cloning only the existing array fields', () => {
   const {context, calls} = setup();
   const errors = Object.freeze(['one']);
@@ -102,7 +119,9 @@ test('preparation retains extra data and zero/false values while cloning only th
   assert.deepEqual(calls, [['clock', undefined], ['clock', undefined], ['clock', undefined]]);
 });
 
-// Valida a ordem exata de chamada das dependencias (status -> uid -> market -> horarios -> createdAt/updatedAt) e os valores padrao quando campos faltam ou sao invalidos.
+// Valida a ordem exata de chamada das dependencias (status -> uid -> market ->
+// horarios -> createdAt/updatedAt) e os valores padrao quando campos faltam ou sao
+// invalidos.
 test('preparation keeps dependency order, independent timestamp calls and falsey defaults', () => {
   const {context, calls} = setup();
   const prepared = context.prepareImportedTrades([{pnl: 7, symbol: 'ES', placedTime: '9', openTime: 0, exitTime: '10',
@@ -125,7 +144,8 @@ test('preparation keeps dependency order, independent timestamp calls and falsey
   assert.equal(prepared.updatedAt, '2026-10-15T00:00:02.000Z');
 });
 
-// Testa casos de borda na lista de entrada: nao-arrays retornam vazio, arrays esparsos mantem buracos, fallback dinamico de conta ativa e propagacao de erros.
+// Testa casos de borda na lista de entrada: nao-arrays retornam vazio, arrays
+// esparsos mantem buracos, fallback dinamico de conta ativa e propagacao de erros.
 test('preparation preserves list guards, sparse holes, current account defaults and thrown errors', () => {
   const {context, calls} = setup();
   for (const list of [undefined, null, {}, 'invalid']) assert.equal(context.prepareImportedTrades(list).length, 0);
@@ -145,7 +165,9 @@ test('preparation preserves list guards, sparse holes, current account defaults 
   assert.throws(() => context.prepareImportedTrades([{}]), error => error === failure);
 });
 
-// Verifica o ciclo de vida do estado pendente (`setPendingImport`, `getPendingImportAccountId`, `clearPendingImport`) e precedencia na resolucao da conta destino.
+// Verifica o ciclo de vida do estado pendente (`setPendingImport`,
+// `getPendingImportAccountId`, `clearPendingImport`) e precedencia na resolucao da
+// conta destino.
 test('pending imports preserve target precedence, per-trade preparation and clearing', () => {
   const {context} = setup();
   const list = [{id: 'one'}, {id: 'two', accountId: 'own'}];
@@ -167,7 +189,8 @@ test('pending imports preserve target precedence, per-trade preparation and clea
   assert.deepEqual(plain(context.pendingImportMeta), {accountId: 'explicit', source: 'import'});
 });
 
-// Garante atomicidade: se um item falhar durante a preparacao, os dados anteriores de `pendingImport` e `pendingImportMeta` permanecem intocados.
+// Garante atomicidade: se um item falhar durante a preparacao, os dados anteriores de
+// `pendingImport` e `pendingImportMeta` permanecem intocados.
 test('pending state stays intact when preparation fails before the replacement is complete', () => {
   const {context} = setup();
   const previous = [{id: 'old'}], meta = {accountId: 'old'};
@@ -178,7 +201,9 @@ test('pending state stays intact when preparation fails before the replacement i
   assert.strictEqual(context.pendingImportMeta, meta);
 });
 
-// Valida geracao da chave composta `<accountId>::<positionId>`, ignorando posicoes falsy (0, '') e respeitando precedencia `trade.accountId -> fallback -> activeAccountId -> default`.
+// Valida geracao da chave composta `<accountId>::<positionId>`, ignorando posicoes
+// falsy (0, '') e respeitando precedencia `trade.accountId -> fallback ->
+// activeAccountId -> default`.
 test('position keys preserve falsey positions and account fallback order without coercing IDs', () => {
   const {context} = setup();
   for (const trade of [undefined, null, {}, {positionId: 0}, {positionId: ''}]) assert.equal(context.getTradeImportPositionKey(trade), '');
@@ -189,7 +214,8 @@ test('position keys preserve falsey positions and account fallback order without
   assert.equal(context.getTradeImportPositionKey({positionId: 7}, null), 'default::7');
 });
 
-// Comprova que o modulo de regras de dominio e 100% puro, executando sem acesso a DOM, storage, relogio, gerador de ID ou estado global.
+// Comprova que o modulo de regras de dominio e 100% puro, executando sem acesso a
+// DOM, storage, relogio, gerador de ID ou estado global.
 test('import rules initialize and run without DOM, clocks, IDs or application state', () => {
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'fetch', 'Date', 'uid', 'trades', 'pendingImport', 'activeAccountId']) {
@@ -204,7 +230,9 @@ test('import rules initialize and run without DOM, clocks, IDs or application st
   assert.deepEqual(candidates.filter(rules.createImportedTradeFilter([{id: 'old'}], () => '')), [candidates[1]]);
 });
 
-// Testa deduplicacao em detalhes: distincao estrita entre `1` e `'1'`, nao marcacao de posicao quando trade e rejeitado por ID, imutabilidade e propagacao de erros do resolver.
+// Testa deduplicacao em detalhes: distincao estrita entre `1` e `'1'`, nao marcacao
+// de posicao quando trade e rejeitado por ID, imutabilidade e propagacao de erros do
+// resolver.
 test('deduplication preserves ID types, rejected-position reuse, input references and resolver errors', () => {
   const {context} = setup();
   const rules = context.TradeDiaryImportTradeRules;
@@ -224,7 +252,8 @@ test('deduplication preserves ID types, rejected-position reuse, input reference
   assert.throws(() => predicate({}), error => error === failure);
 });
 
-// Confirma ordem de carregamento em index.html (regras -> workflows -> apresentacao), ausencia de IO na inicializacao e limpeza das funcoes legadas em app.js.
+// Confirma ordem de carregamento em index.html (regras -> workflows -> apresentacao),
+// ausencia de IO na inicializacao e limpeza das funcoes legadas em app.js.
 test('preparation and rules load once before consumers as classic scripts without initial IO', () => {
   const sandbox = {};
   for (const name of ['document', 'localStorage', 'FileReader', 'fetch', 'activeAccountId', 'pendingImport']) {

@@ -3,21 +3,24 @@
  *
  * Objetivo:
  *   Cobrir todas as combinações de apresentação do hub de parceiros: estado vazio,
- *   populado (afiliados + QR code BTC), somente afiliados e somente QR code, verificando
- *   responsividade em 720px/1420px e ocultação da grade legada `#partnersGrid`.
+ *   populado (afiliados + QR code BTC), somente afiliados e somente QR code,
+ *   verificando responsividade em 720px/1420px e ocultação da grade legada
+ *   `#partnersGrid`.
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos estados `partner-presentation-*`.
  *
  * Pontos-chave:
- *   - Substitui `config.partnerHub` apenas em memória com imagem SVG inline determinística
- *     e restaura `config` no `finally`.
- *   - Aguarda `imageEl.decode()` quando há QR code para evitar screenshots incompletos.
+ *   - Substitui `config.partnerHub` apenas em memória com imagem SVG inline
+ *     determinística e restaura `config` no `finally`.
+ *   - Aguarda `imageEl.decode()` quando há QR code para evitar screenshots
+ *     incompletos.
  */
 
 /*
- * Configura `config.partnerHub` em memória conforme `name`, renderiza a página de Parceiros,
- * valida cards de afiliados, estados vazios, pré-visualização de QR code e integridade dos dados.
+ * Configura `config.partnerHub` em memória conforme `name`, renderiza a página de
+ * Parceiros, valida cards de afiliados, estados vazios, pré-visualização de QR code e
+ * integridade dos dados.
  */
 async function preparePartnerStyleScenario(name) {
   const fingerprint = () => JSON.stringify({accounts, trades, config, preMarketData, studyHubState,
@@ -26,6 +29,7 @@ async function preparePartnerStyleScenario(name) {
   const previousConfig = config;
   const affiliates = name === 'partner-presentation-populated' || name === 'partner-presentation-affiliate-only';
   const qr = name === 'partner-presentation-populated' || name === 'partner-presentation-qr-only';
+
   // QR code sintético em SVG inline para renderização determinística sem rede.
   const image = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="148" height="148"><rect width="148" height="148" fill="#1a3c4b"/><path d="M20 20h108v108H20z" fill="#d6f3e7"/></svg>');
   try {
@@ -42,7 +46,8 @@ async function preparePartnerStyleScenario(name) {
     }};
     renderPartnersPage();
 
-    // Valida estrutura geral da página e confirma que a grade legada `#partnersGrid` segue oculta.
+    // Valida estrutura geral da página e confirma que a grade legada `#partnersGrid`
+    // segue oculta.
     const root = document.getElementById('page-partners');
     const editor = document.getElementById('partnerAffiliatesEditor');
     const preview = document.getElementById('partnerBtcQrPreview');
@@ -77,7 +82,8 @@ async function preparePartnerStyleScenario(name) {
       throw new Error('Partner affiliate empty state changed');
     }
 
-    // Valida pré-visualização do QR code (aguardando decodificação) ou estado vazio do QR.
+    // Valida pré-visualização do QR code (aguardando decodificação) ou estado vazio
+    // do QR.
     if (qr) {
       const shell = preview.querySelector('.partner-qr-shell');
       const imageEl = preview.querySelector('.partner-qr-image');

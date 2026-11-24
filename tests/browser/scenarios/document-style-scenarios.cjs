@@ -2,18 +2,20 @@
  * Cenários visuais da página de Documentos (`#page-documents`).
  *
  * Objetivo:
- *   Cobrir a casca de 3/2/1 colunas (`.doc-shell`), pastas (`generalNotes`, `dailyNotes`,
- *   `tradeNotes`), estado vazio, notas de trade (WIN, LOSS, R ausente), galeria de mídia
- *   SVG, truncamento de títulos/prévia, foco no editor, estados de hover e overflow com rolagem.
+ *   Cobrir a casca de 3/2/1 colunas (`.doc-shell`), pastas (`generalNotes`,
+ *   `dailyNotes`, `tradeNotes`), estado vazio, notas de trade (WIN, LOSS, R ausente),
+ *   galeria de mídia SVG, truncamento de títulos/prévia, foco no editor, estados de
+ *   hover e overflow com rolagem.
  *
  * Papel na verificação visual:
- *   Consumido por `shell-style-check.cjs` em múltiplos breakpoints (1080px, 1240px e 1420px)
- *   para validar o layout responsivo e os controles do editor de documentos.
+ *   Consumido por `shell-style-check.cjs` em múltiplos breakpoints (1080px, 1240px e
+ *   1420px) para validar o layout responsivo e os controles do editor de documentos.
  *
  * Pontos-chave:
  *   - Gera documentos e imagens SVG inline determinísticas em memória e restaura
  *     `config`, `trades` e `preMarketData` no `finally`.
- *   - Guarda e restaura `activeDocFolder` e `activeDocId` entre casos via `resetDocumentStyleState`.
+ *   - Guarda e restaura `activeDocFolder` e `activeDocId` entre casos via
+ *     `resetDocumentStyleState`.
  */
 
 /*
@@ -39,7 +41,8 @@ async function prepareDocumentStyleScenario(name) {
   const saved = {config, trades, preMarketData};
   window.documentStyleRestore = {folder: activeDocFolder, id: activeDocId};
 
-  // Fixture sintético longo (70 linhas) e 9 miniaturas SVG para exercitar truncamento e overflow.
+  // Fixture sintético longo (70 linhas) e 9 miniaturas SVG para exercitar truncamento
+  // e overflow.
   const body = Array.from({length: 70}, (_, i) => `Linha ${i + 1}: observações de caracterização do documento e planejamento.`).join('\n');
   const images = Array.from({length: 9}, (_, i) => ({name: `Mídia ${i + 1}`, dataUrl:
     'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="160" height="96"><rect width="160" height="96" fill="${i % 2 ? '#245c70' : '#345746'}"/><circle cx="80" cy="48" r="24" fill="#b9dcc8"/></svg>`)}));
@@ -67,7 +70,8 @@ async function prepareDocumentStyleScenario(name) {
     }
     await Promise.all([...document.querySelectorAll('#docMedia img')].map(img => img.decode()));
 
-    // Valida colunas da casca, cards laterais/editor e controles da barra de formatação.
+    // Valida colunas da casca, cards laterais/editor e controles da barra de
+    // formatação.
     const css = selector => getComputedStyle(document.querySelector(selector));
     const shell = css('.doc-shell'), width = innerWidth;
     const columns = width <= 1080 ? 1 : width <= 1240 ? 2 : 3;
@@ -93,7 +97,8 @@ async function prepareDocumentStyleScenario(name) {
       throw new Error('Document toolbar typography changed');
     }
 
-    // Valida estado vazio ou truncamento de entradas, opacidade de nota vazia e galeria de mídia.
+    // Valida estado vazio ou truncamento de entradas, opacidade de nota vazia e
+    // galeria de mídia.
     if (empty) {
       if (!document.querySelector('#docEntries .doc-empty') || !document.querySelector('#docMedia .doc-media-empty') ||
         css('.doc-empty').borderRadius !== '18px') throw new Error('Empty document presentation changed');
@@ -111,13 +116,16 @@ async function prepareDocumentStyleScenario(name) {
         }
       }
     }
-    // Confere exibição condicional do cabeçalho de contexto de trade (`#docTradeContext`).
+
+    // Confere exibição condicional do cabeçalho de contexto de trade
+    // (`#docTradeContext`).
     if ((css('#docTradeContext').display === 'flex') !== trade ||
       (trade && (css('#docTradeContext').flexWrap !== 'wrap' || !document.querySelector('.doc-entry-badge')))) {
       throw new Error('Document trade context changed');
     }
 
-    // Aplica interações específicas: foco no editor, alvos de hover ou rolagem de overflow.
+    // Aplica interações específicas: foco no editor, alvos de hover ou rolagem de
+    // overflow.
     if (name === 'documents-focus') { editor.focus(); editor.scrollIntoView({block: 'center'}); }
     if (name === 'documents-toolbar-hover') hover = '.doc-toolbar-btn';
     if (name === 'documents-folder-hover') hover = '#docFolders [onclick*="dailyNotes"]';

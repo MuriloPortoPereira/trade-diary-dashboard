@@ -1,17 +1,19 @@
 /*
  * Cenários visuais para a barra de ações em lote (`#bulkBar`, `#bulkHint`) da tabela
- * de trades e para o cabeçalho de fluxo sequencial do modal de trade (`#tradeModalFlow`).
+ * de trades e para o cabeçalho de fluxo sequencial do modal de trade
+ * (`#tradeModalFlow`).
  *
  * Objetivo:
- *   Validar os estados de ações em lote ocultas (dica visível), selecionadas (barra ativa)
- *   e fluxo guiado no modal de cadastro/edição, sem mutar dados persistidos.
+ *   Validar os estados de ações em lote ocultas (dica visível), selecionadas (barra
+ *   ativa) e fluxo guiado no modal de cadastro/edição, sem mutar dados persistidos.
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos estados `trade-actions-hidden`,
  *   `trade-actions-selected` e `trade-actions-modal-flow`.
  *
  * Pontos-chave:
- *   - `resetTradeActionStyleState` limpa o estilo inline de exibição de `#tradeModalFlow`.
+ *   - `resetTradeActionStyleState` limpa o estilo inline de exibição de
+ *     `#tradeModalFlow`.
  *   - Confirma que dados de conta, trades e `localStorage` permanecem intactos.
  */
 

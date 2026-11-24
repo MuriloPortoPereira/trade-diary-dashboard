@@ -1,20 +1,29 @@
 /*
- * Objetivo: Validar a renderizacao do painel de risco (`renderRiskBoard`), incluindo risco ideal
- * por trade, quatro barras de progresso de limites/meta e chips de alerta de saude da conta.
+ * Objetivo: Validar a renderizacao do painel de risco (`renderRiskBoard`), incluindo
+ * risco ideal por trade, quatro barras de progresso de limites/meta e chips de alerta
+ * de saude da conta.
+ *
  * Modulo/arquivo testado: funcao `renderRiskBoard` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de `app.js`).
- * Estrategia de isolamento: executa o modulo em `node:vm` com um estado completo de risco
- * sobrescrevivel por caso de teste, nos DOM simulados (com suporte a omissao individual) e stubs
- * para `calcAccountRiskState`, `fR`, `f2`, `usageTone`, `TIPS` e `mkTip`.
- * Pontos-chave garantidos: ordem e largura minima das 4 barras, badges `EXCEDEU` e larguras sem
- * teto em violacoes, limiares inclusivos de alerta (`warn`/`safe`), metas atingidas por ciclo,
- * fallbacks para bases/limites zerados, guarda atomica de alvos obrigatorios e ordem de script.
+ * `src/modules/accounts/presentation/accounts-workspace.js` (confirmando remocao de
+ * `app.js`).
+ *
+ * Estrategia de isolamento: executa o modulo em `node:vm` com um estado completo de
+ * risco sobrescrevivel por caso de teste, nos DOM simulados (com suporte a omissao
+ * individual) e stubs para `calcAccountRiskState`, `fR`, `f2`, `usageTone`, `TIPS` e
+ * `mkTip`.
+ *
+ * Pontos-chave garantidos: ordem e largura minima das 4 barras, badges `EXCEDEU` e
+ * larguras sem teto em violacoes, limiares inclusivos de alerta (`warn`/`safe`),
+ * metas atingidas por ciclo, fallbacks para bases/limites zerados, guarda atomica de
+ * alvos obrigatorios e ordem de script.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/accounts/presentation/accounts-workspace.js';
 const legacy = fs.readFileSync(path.join(root, 'app.js'), 'utf8').match(/^function renderRiskBoard\([^]*?^\}/m)?.[0];
@@ -22,9 +31,10 @@ assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const source = fs.readFileSync(path.join(root, modulePath), 'utf8');
 
 /*
- * Helper de renderizacao: monta um objeto `state` padrao representando conta saudavel, aceita
- * `overrides` para simular perdas/alertas/metas, omite opcionalmente um alvo (`missing`) ou o
- * seletor `dashPeriod`, executa `renderRiskBoard(account, trades)` e retorna os nos e chamadas.
+ * Helper de renderizacao: monta um objeto `state` padrao representando conta
+ * saudavel, aceita `overrides` para simular perdas/alertas/metas, omite opcionalmente
+ * um alvo (`missing`) ou o seletor `dashPeriod`, executa `renderRiskBoard(account,
+ * trades)` e retorna os nos e chamadas.
  */
 function render(overrides = {}, {missing, period = 'month', account = {risk: 1, ddDaily: 2, ddWeekly: 5, ddTotal: 10, goalPct: 10}} = {}) {
   const state = {
@@ -55,9 +65,9 @@ function render(overrides = {}, {missing, period = 'month', account = {risk: 1, 
 }
 
 /*
- * Estado neutro inicial: valida o titulo do risco ideal, subtexto com saldo e risco/trade, 4
- * blocos de progresso na ordem canonica com largura minima visual de 4%, classe neutra da meta
- * e ausencia de badges `EXCEDEU` ou `ATINGIDA`.
+ * Estado neutro inicial: valida o titulo do risco ideal, subtexto com saldo e
+ * risco/trade, 4 blocos de progresso na ordem canonica com largura minima visual de
+ * 4%, classe neutra da meta e ausencia de badges `EXCEDEU` ou `ATINGIDA`.
  */
 test('risk board renders mini stats, four ordered progress bars and neutral goal', () => {
   const {nodes, calls} = render();
@@ -75,9 +85,10 @@ test('risk board renders mini stats, four ordered progress bars and neutral goal
 });
 
 /*
- * Cenario de violacao de limites: exibe 3 badges `EXCEDEU`, percentuais brutos acima de 100%
- * (`160.00% de 2.00%`), larguras nao truncadas (`width:150%`), texto de excesso em dolares/%,
- * 3 chips de perigo (`danger`) e destaque em vermelho no resumo.
+ * Cenario de violacao de limites: exibe 3 badges `EXCEDEU`, percentuais brutos acima
+ * de 100% (`160.00% de 2.00%`), larguras nao truncadas (`width:150%`), texto de
+ * excesso em dolares/%, 3 chips de perigo (`danger`) e destaque em vermelho no
+ * resumo.
  */
 test('excess losses preserve danger badges, raw percentages and uncapped widths', () => {
   const {nodes} = render({dayPnl: -30, totalPnl: -150, weekPnl: -60,
@@ -93,8 +104,9 @@ test('excess losses preserve danger badges, raw percentages and uncapped widths'
 });
 
 /*
- * Limiares de alerta (`safe` vs `warn`): confirma que `0.849` (DD total) e `0.799` (sessao) ainda
- * ficam em `safe`, enquanto exatamente `0.85`, `0.80` e `weekPnl` negativo ativam os 3 chips `warn`.
+ * Limiares de alerta (`safe` vs `warn`): confirma que `0.849` (DD total) e `0.799`
+ * (sessao) ainda ficam em `safe`, enquanto exatamente `0.85`, `0.80` e `weekPnl`
+ * negativo ativam os 3 chips `warn`.
  */
 test('signal warning thresholds are inclusive and negative week remains warning', () => {
   const low = render({totalUsage: 0.849, dayUsage: 0.799}).nodes.riskSignals.innerHTML;
@@ -106,8 +118,9 @@ test('signal warning thresholds are inclusive and negative week remains warning'
 });
 
 /*
- * Meta atingida acima de 100%: renderiza badge `ATINGIDA`, rotulo de `Ciclo 3` (indice + 1),
- * largura nao limitada (`width:120%`), texto de proximo alvo e chip celebrando o ciclo 3.
+ * Meta atingida acima de 100%: renderiza badge `ATINGIDA`, rotulo de `Ciclo 3`
+ * (indice + 1), largura nao limitada (`width:120%`), texto de proximo alvo e chip
+ * celebrando o ciclo 3.
  */
 test('achieved goal keeps cycle labels and clamps remaining target without clamping width', () => {
   const {nodes} = render({goalProgress: 1.2, pnlNoCiclo: 120, cicloAtual: 2});
@@ -119,8 +132,9 @@ test('achieved goal keeps cycle labels and clamps remaining target without clamp
 });
 
 /*
- * Bases e limites zerados + seletor ausente: sem `dashPeriod` usa `'all'`, exibe `(—%)` quando a
- * base e zero e recorre aos percentuais padrao legados (`2.00%`, `5.00%`, `10.00%`).
+ * Bases e limites zerados + seletor ausente: sem `dashPeriod` usa `'all'`, exibe
+ * `(—%)` quando a base e zero e recorre aos percentuais padrao legados (`2.00%`,
+ * `5.00%`, `10.00%`).
  */
 test('zero bases and zero account limits keep legacy formatting defaults', () => {
   const {nodes, calls} = render({capitalBase: 0, ddBase: 0, cicloBase: 0}, {period: null, account: {risk: 0, ddDaily: 0, ddWeekly: 0, ddTotal: 0, goalPct: 0}});
@@ -132,8 +146,9 @@ test('zero bases and zero account limits keep legacy formatting defaults', () =>
 });
 
 /*
- * Guarda atomica de elementos obrigatorios: a ausencia de qualquer um dos 4 containers impede a
- * chamada a `calcAccountRiskState` e deixa todos os demais nos intactos.
+ * Guarda atomica de elementos obrigatorios: a ausencia de qualquer um dos 4
+ * containers impede a chamada a `calcAccountRiskState` e deixa todos os demais nos
+ * intactos.
  */
 test('any missing required target returns before risk calculation or mutation', () => {
   for (const missing of ['riskIdealTrade', 'riskIdealTradeSub', 'riskProgress', 'riskSignals']) {
@@ -144,8 +159,8 @@ test('any missing required target returns before risk calculation or mutation', 
 });
 
 /*
- * Contrato de carregamento: verifica tag `<script>` unica e sincrona em `index.html` antes de
- * `analytics-workspace.js`.
+ * Contrato de carregamento: verifica tag `<script>` unica e sincrona em `index.html`
+ * antes de `analytics-workspace.js`.
  */
 test('risk board loads once as a synchronous classic script before dashboard', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

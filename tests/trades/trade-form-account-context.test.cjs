@@ -5,23 +5,28 @@
  *   resumo da conta e inferencia automatica de mercado a partir do simbolo).
  *
  * Modulo testado:
- *   src/modules/trades/presentation/trade-form.js
- *   (funcoes onAccountChange e updateMarketFromSymbol, alem da verificacao de que
- *   nao restam definicoes legadas em app.js e de que a ordem de scripts no index.html esta correta).
+ *   src/modules/trades/presentation/trade-form.js (funcoes onAccountChange e
+ *   updateMarketFromSymbol, alem da verificacao de que nao restam definicoes legadas
+ *   em app.js e de que a ordem de scripts no index.html esta correta).
  *
  * Estrategia de isolamento:
  *   Cria uma sandbox node:vm contendo elementos DOM simulados (com suporte a ocultar
- *   campos opcionais via lista `missing`), contas de fixture e espias para servicos externos
- *   (getActiveAccount, isFuturesAccount, getAccountTrades, calcAccountRiskState, fR, calcRR, getMarket).
+ *   campos opcionais via lista `missing`), contas de fixture e espias para servicos
+ *   externos (getActiveAccount, isFuturesAccount, getAccountTrades,
+ *   calcAccountRiskState, fR, calcRR, getMarket).
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Selecionar uma conta projeta risco, multiplicador (com fallback para 1 quando 0),
- *     modo de exibicao de campos, resumo formatado da conta e dispara calcRR().
- *   - Contas de futuros invertem a visibilidade entre modePercentFields e modeAbsFields.
+ *   - Selecionar uma conta projeta risco, multiplicador (com fallback para 1 quando
+ *     0), modo de exibicao de campos, resumo formatado da conta e dispara calcRR().
+ *   - Contas de futuros invertem a visibilidade entre modePercentFields e
+ *     modeAbsFields.
  *   - Conta inexistente ou ausente no select recorre a getActiveAccount().
- *   - Campos opcionais ausentes pulam apenas sua propria atualizacao sem impedir calcRR().
- *   - updateMarketFromSymbol atualiza o select de mercado apenas quando getMarket retorna valor truthy.
+ *   - Campos opcionais ausentes pulam apenas sua propria atualizacao sem impedir
+ *     calcRR().
+ *   - updateMarketFromSymbol atualiza o select de mercado apenas quando getMarket
+ *     retorna valor truthy.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -36,9 +41,10 @@ const legacyParts = names.map(name => appSource.match(new RegExp(`^function ${na
 const legacy = legacyParts.every(Boolean) ? legacyParts.join('\n\n') : undefined;
 const source = legacy ?? fs.readFileSync(path.join(root, modulePath), 'utf8');
 
-// Helper de montagem do ambiente de formulario em VM: cria os inputs e containers padrao,
-// remove IDs listados em `missing`, injeta duas contas de exemplo e registra todas as chamadas
-// feitas as dependencias. Reatribui calcRR apos carregar o modulo para interceptar a chamada real.
+// Helper de montagem do ambiente de formulario em VM: cria os inputs e containers
+// padrao, remove IDs listados em `missing`, injeta duas contas de exemplo e registra
+// todas as chamadas feitas as dependencias. Reatribui calcRR apos carregar o modulo
+// para interceptar a chamada real.
 function setup({selectedId = 'a2', missing = [], futures = false, market = 'EUA'} = {}) {
   const elements = {
     't-account': {value: selectedId},
@@ -74,9 +80,10 @@ function setup({selectedId = 'a2', missing = [], futures = false, market = 'EUA'
   return {context, elements, calls, accounts, active, risk};
 }
 
-// Fluxo nominal de onAccountChange para conta nao-futuros: verifica projecao de risco (0.5),
-// fallback do multiplicador 0 para 1, visibilidade dos campos percentuais, HTML formatado de saldo/aportes/meta
-// e a ordem completa das chamadas de calculo e recalculo de RR.
+// Fluxo nominal de onAccountChange para conta nao-futuros: verifica projecao de risco
+// (0.5), fallback do multiplicador 0 para 1, visibilidade dos campos percentuais,
+// HTML formatado de saldo/aportes/meta e a ordem completa das chamadas de calculo e
+// recalculo de RR.
 test('selected account projects risk, multiplier, field mode and formatted summary', () => {
   const {context, elements, calls} = setup();
   context.onAccountChange();
@@ -91,7 +98,8 @@ test('selected account projects risk, multiplier, field mode and formatted summa
   ]);
 });
 
-// Garante que contas de futuros ocultam os campos percentuais e exibem os campos absolutos.
+// Garante que contas de futuros ocultam os campos percentuais e exibem os campos
+// absolutos.
 test('futures presentation swaps percent and absolute field visibility', () => {
   const {context, elements} = setup({futures: true});
   context.onAccountChange();
@@ -99,8 +107,9 @@ test('futures presentation swaps percent and absolute field visibility', () => {
   assert.equal(elements.modeAbsFields.style.display, '');
 });
 
-// Casos de borda de resolucao de conta: tanto um ID desconhecido quanto a ausencia do select t-account
-// devem cair no fallback getActiveAccount() e preencher os dados da conta ativa (a1).
+// Casos de borda de resolucao de conta: tanto um ID desconhecido quanto a ausencia do
+// select t-account devem cair no fallback getActiveAccount() e preencher os dados da
+// conta ativa (a1).
 test('unknown or missing selection falls back to the active account', () => {
   const unknown = setup({selectedId: 'missing'});
   unknown.context.onAccountChange();
@@ -112,8 +121,9 @@ test('unknown or missing selection falls back to the active account', () => {
   assert.equal(missing.elements['t-riskpct'].value, 1);
 });
 
-// Verifica tolerancia a alvos opcionais no DOM: quando todos os campos de projecao faltam,
-// evita consultas desnecessarias de futuros/trades/risco, mas ainda executa calcRR().
+// Verifica tolerancia a alvos opcionais no DOM: quando todos os campos de projecao
+// faltam, evita consultas desnecessarias de futuros/trades/risco, mas ainda executa
+// calcRR().
 test('optional targets skip only their own projection and still recalculate RR', () => {
   const missing = ['t-riskpct', 't-mult', 'modePercentFields', 'modeAbsFields', 't-acct-info'];
   const {context, calls} = setup({missing});
@@ -121,8 +131,9 @@ test('optional targets skip only their own projection and still recalculate RR',
   assert.deepEqual(calls, [['rr']]);
 });
 
-// Testa updateMarketFromSymbol em tres cenarios: mercado reconhecido atualiza t-market;
-// mercado vazio preserva o valor anterior ('old'); campos ausentes ainda consultam getMarket(undefined) sem falhar.
+// Testa updateMarketFromSymbol em tres cenarios: mercado reconhecido atualiza
+// t-market; mercado vazio preserva o valor anterior ('old'); campos ausentes ainda
+// consultam getMarket(undefined) sem falhar.
 test('symbol change preserves market lookup and conditional select update', () => {
   const present = setup({market: 'EUA'});
   present.context.updateMarketFromSymbol();
@@ -136,8 +147,8 @@ test('symbol change preserves market lookup and conditional select update', () =
   assert.deepEqual(missing.calls, [['market', undefined]]);
 });
 
-// Confirma que as funcoes legadas sairam de app.js e que trade-form.js carrega uma unica vez,
-// de forma sincrona, antes de trade-log.js e app.js no index.html.
+// Confirma que as funcoes legadas sairam de app.js e que trade-form.js carrega uma
+// unica vez, de forma sincrona, antes de trade-log.js e app.js no index.html.
 test('trade form account context shares the cohesive form script before consumers', () => {
   for (const part of legacyParts) assert.equal(part, undefined);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

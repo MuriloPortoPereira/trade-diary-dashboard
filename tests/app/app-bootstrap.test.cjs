@@ -9,22 +9,23 @@
  *   legado de window.addEventListener('load', ...) em app.js).
  *
  * Estrategia de isolamento:
- *   Executa o codigo-fonte diretamente em um contexto isolado via node:vm,
- *   injetando uma data deterministica (FixedDate), um mock minimo de window com
- *   registro de listeners e stubs espiados para cada funcao de persistencia,
- *   normalizacao e renderizacao.
+ *   Executa o codigo-fonte diretamente em um contexto isolado via node:vm, injetando
+ *   uma data deterministica (FixedDate), um mock minimo de window com registro de
+ *   listeners e stubs espiados para cada funcao de persistencia, normalizacao e
+ *   renderizacao.
  *
  * Pontos-chave e regras criticas garantidas:
  *   - Sem dados previos, carrega dados de exemplo, cria e normaliza conta padrao,
  *     semeia os documentos gerais padrao com carimbo de data/hora consistente e
  *     inicializa a configuracao do Partner Hub na ordem exata de renderizacao.
- *   - Com estado ja existente, nao carrega dados de exemplo, remove apenas
- *     documentos em branco recem-criados automaticamente e preserva conta ativa.
- *   - No redimensionamento, fecha a sidebar apenas em telas largas (> breakpoint)
- *     e sempre recalcula a densidade da barra superior (fitTopbarDensity).
+ *   - Com estado ja existente, nao carrega dados de exemplo, remove apenas documentos
+ *     em branco recem-criados automaticamente e preserva conta ativa.
+ *   - No redimensionamento, fecha a sidebar apenas em telas largas (> breakpoint) e
+ *     sempre recalcula a densidade da barra superior (fitTopbarDensity).
  *   - Garante que o script permanece classico, sincrono e posicionado corretamente
  *     entre app-workspace.js e app.js no index.html.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -44,7 +45,8 @@ class FixedDate extends Date {
 }
 
 // Monta o ambiente isolado de execucao (sandbox vm) com estado inicial configuravel,
-// captura de listeners registrados em window e registro cronologico de chamadas (calls).
+// captura de listeners registrados em window e registro cronologico de chamadas
+// (calls).
 function setup({trades = [], accounts = [], config = {}, activeAccountId = ''} = {}) {
   const calls = [];
   const listeners = {};
@@ -87,10 +89,10 @@ function setup({trades = [], accounts = [], config = {}, activeAccountId = ''} =
 }
 
 // Verifica o cenario de primeiro acesso (estado vazio): antes do 'load' apenas o
-// listener e registrado; ao disparar 'load', cria conta 'default' normalizada,
-// gera os dois documentos padrao com timestamp fixo, inicializa parceiros e executa
-// toda a cadeia de renderizacao; no 'resize' em tela larga (1200px), fecha a sidebar
-// e reajusta a densidade da barra superior.
+// listener e registrado; ao disparar 'load', cria conta 'default' normalizada, gera
+// os dois documentos padrao com timestamp fixo, inicializa parceiros e executa toda a
+// cadeia de renderizacao; no 'resize' em tela larga (1200px), fecha a sidebar e
+// reajusta a densidade da barra superior.
 test('empty state preserves sample loading, account and document seeds, and render order', () => {
   const {context, calls, listeners} = setup();
   assert.deepEqual(calls, [['listen', 'load']]);
@@ -112,9 +114,10 @@ test('empty state preserves sample loading, account and document seeds, and rend
 });
 
 // Verifica o cenario com dados ja salvos: impede novo carregamento de dados demo,
-// persiste alteracoes de higienizacao (save), remove documento vazio generico ('blank')
-// mantendo tanto o customizado quanto o padrao 'playbook' mesmo vazio, preserva a conta
-// ativa e, em viewport estreita (900px), executa apenas 'fit' sem tocar na sidebar.
+// persiste alteracoes de higienizacao (save), remove documento vazio generico
+// ('blank') mantendo tanto o customizado quanto o padrao 'playbook' mesmo vazio,
+// preserva a conta ativa e, em viewport estreita (900px), executa apenas 'fit' sem
+// tocar na sidebar.
 test('existing state saves, normalizes and removes only auto-created blank documents', () => {
   const docs = [
     {id: 'blank', title: '', content: ''},
@@ -139,7 +142,8 @@ test('existing state saves, normalizes and removes only auto-created blank docum
 });
 
 // Confirma no index.html que o modulo extraido de bootstrap e carregado uma unica vez
-// como script classico sincrono (sem async/defer/module), apos app-workspace.js e antes de app.js.
+// como script classico sincrono (sem async/defer/module), apos app-workspace.js e
+// antes de app.js.
 test('bootstrap remains one synchronous classic script before navigation and app.js', () => {
   if (legacy) return;
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

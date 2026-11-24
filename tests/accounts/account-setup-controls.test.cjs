@@ -1,23 +1,32 @@
 /*
- * Objetivo: Testar os 13 controles interativos de gerenciamento de contas, configuracao de risco,
- * movimentacoes financeiras na tela de setup, gerenciamento de tags e salvamento de configuracoes.
+ * Objetivo: Testar os 13 controles interativos de gerenciamento de contas,
+ * configuracao de risco, movimentacoes financeiras na tela de setup, gerenciamento de
+ * tags e salvamento de configuracoes.
+ *
  * Modulo/arquivo testado: funcoes `selectAccount`, `saveAccount`, `deleteAccount`,
  * `setupRiskNumber`, `readSetupRiskFormValues`, `applySetupRiskToActiveAccount`,
- * `previewSetupRiskFromForm`, `addSetupCashflowToActiveAccount`, `addSetupCashflowFromForm`,
- * `deleteSetupCashflow`, `addTag`, `removeTag` e `saveConfig` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (verificando unicidade contra `app.js`).
- * Estrategia de isolamento: extrai cada funcao garantindo declaracao unica no repositorio e executa
- * em `node:vm` com `Date.now() === 123`, DOM controlado por mapa `nodes` e spies em `calls` para
- * todas as dependencias de persistencia, dialogos e re-renderizacao.
- * Pontos-chave garantidos: validacao/normalizacao e clonagem no CRUD de contas, protecao da
- * ultima conta e preservacao de trades na exclusao, sincronizacao conta/config, confirmacoes
- * assincronas via callback sem mutacao antecipada, normalizacao de estrategias e ordem dos efeitos.
+ * `previewSetupRiskFromForm`, `addSetupCashflowToActiveAccount`,
+ * `addSetupCashflowFromForm`, `deleteSetupCashflow`, `addTag`, `removeTag` e
+ * `saveConfig` em `src/modules/accounts/presentation/accounts-workspace.js`
+ * (verificando unicidade contra `app.js`).
+ *
+ * Estrategia de isolamento: extrai cada funcao garantindo declaracao unica no
+ * repositorio e executa em `node:vm` com `Date.now() === 123`, DOM controlado por
+ * mapa `nodes` e spies em `calls` para todas as dependencias de persistencia,
+ * dialogos e re-renderizacao.
+ *
+ * Pontos-chave garantidos: validacao/normalizacao e clonagem no CRUD de contas,
+ * protecao da ultima conta e preservacao de trades na exclusao, sincronizacao
+ * conta/config, confirmacoes assincronas via callback sem mutacao antecipada,
+ * normalizacao de estrategias e ordem dos efeitos.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+
 const root = path.resolve(__dirname, '../..');
 const modules = ['src/modules/accounts/presentation/accounts-workspace.js'];
 const names = ['selectAccount', 'saveAccount', 'deleteAccount', 'setupRiskNumber', 'readSetupRiskFormValues', 'applySetupRiskToActiveAccount', 'previewSetupRiskFromForm', 'addSetupCashflowToActiveAccount', 'addSetupCashflowFromForm', 'deleteSetupCashflow', 'addTag', 'removeTag', 'saveConfig'];
@@ -26,15 +35,18 @@ const source = names.map(name => {
   const matches = candidates.map(text => text.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))).filter(Boolean);
   assert.equal(matches.length, 1, name); return matches[0][0];
 }).join('\n');
+
 /*
- * Helper de serializacao: converte valores oriundos do realm `vm` para objetos planos do host
- * Node antes das assercoes com `assert.deepEqual`.
+ * Helper de serializacao: converte valores oriundos do realm `vm` para objetos planos
+ * do host Node antes das assercoes com `assert.deepEqual`.
  */
 const plain = value => JSON.parse(JSON.stringify(value));
+
 /*
- * Helper de ambiente em sandbox: cria o contexto `vm` com estado inicial de contas/trades/config,
- * `Date.now()` deterministico (`123`), simulacao de campos DOM via helper `set(id, value)` e
- * registro detalhado de chamadas em `calls` para todas as operacoes de UI e persistencia.
+ * Helper de ambiente em sandbox: cria o contexto `vm` com estado inicial de
+ * contas/trades/config, `Date.now()` deterministico (`123`), simulacao de campos DOM
+ * via helper `set(id, value)` e registro detalhado de chamadas em `calls` para todas
+ * as operacoes de UI e persistencia.
  */
 function setup() {
   const calls = [], nodes = {};
@@ -56,19 +68,23 @@ function setup() {
   const set = (id, value) => nodes[id] = {value, style: {display: 'block'}};
   return {c, calls, nodes, set};
 }
+
 /*
- * Selecao de conta: mesmo para ID desconhecido, atualiza `activeAccountId`, reseta as flags
- * legadas (`statsAccountPinned`, `_incompleteBannerDismissed`) e executa os efeitos na ordem exata.
+ * Selecao de conta: mesmo para ID desconhecido, atualiza `activeAccountId`, reseta as
+ * flags legadas (`statsAccountPinned`, `_incompleteBannerDismissed`) e executa os
+ * efeitos na ordem exata.
  */
 test('selection sets legacy flags and preserves effect order even for an unknown id', () => {
   const {c, calls} = setup(); assert.equal(c.selectAccount('missing'), undefined);
   assert.equal(c.activeAccountId, 'missing'); assert.equal(c.statsAccountPinned, false); assert.equal(c._incompleteBannerDismissed, false);
   assert.deepEqual(calls, [['save'], ['updateTopbarStats'], ['closeModal', 'accountModal'], ['renderTopbarAccount'], ['refreshAll']]);
 });
+
 /*
- * Criacao e edicao de conta: bloqueia nome vazio com aviso, normaliza tipo e defaults legados
- * (incluindo saldo negativo aceito e `risk: 0` caindo para 1), clona cashflows, oculta formulario,
- * atualiza conta existente via `editingAccountId` e ignora silenciosamente edicao de ID inexistente.
+ * Criacao e edicao de conta: bloqueia nome vazio com aviso, normaliza tipo e defaults
+ * legados (incluindo saldo negativo aceito e `risk: 0` caindo para 1), clona
+ * cashflows, oculta formulario, atualiza conta existente via `editingAccountId` e
+ * ignora silenciosamente edicao de ID inexistente.
  */
 test('account save validates, normalizes types and legacy defaults, and clones form cashflows', () => {
   const {c, calls, set, nodes} = setup(); c.saveAccount(); assert.equal(calls.at(-1)[0], 'notice'); assert.equal(c.accounts.length, 0);
@@ -82,10 +98,12 @@ test('account save validates, normalizes types and legacy defaults, and clones f
   c.editingAccountId = 'a123'; set('af-name', 'Edited'); c.saveAccount(); assert.equal(c.accounts.length, 1); assert.equal(c.accounts[0].name, 'Edited');
   c.editingAccountId = 'missing'; c.saveAccount(); assert.equal(c.accounts.length, 1);
 });
+
 /*
- * Exclusao de conta: impede excluir a unica conta restante exibindo aviso; com mais de uma conta,
- * exige confirmacao perigosa, adia a remocao ate o callback, troca `activeAccountId` para a conta
- * remanescente, preserva os trades historicos e dispara o fluxo de atualizacao da UI.
+ * Exclusao de conta: impede excluir a unica conta restante exibindo aviso; com mais
+ * de uma conta, exige confirmacao perigosa, adia a remocao ate o callback, troca
+ * `activeAccountId` para a conta remanescente, preserva os trades historicos e
+ * dispara o fluxo de atualizacao da UI.
  */
 test('account deletion blocks the final account and defers removal while retaining trades', () => {
   const {c, calls} = setup(); c.accounts = [{id: 'a'}]; c.deleteAccount('a'); assert.equal(calls.at(-1)[0], 'notice');
@@ -93,10 +111,12 @@ test('account deletion blocks the final account and defers removal while retaini
   assert.deepEqual(plain(confirm[4]), {danger: true, confirmText: 'Excluir'}); confirm[3](); assert.equal(c.activeAccountId, 'b'); assert.deepEqual(plain(c.accounts), [{id: 'b'}]); assert.equal(c.trades.length, 1);
   assert.deepEqual(calls.slice(-4), [['save'], ['renderAccountList'], ['renderTopbarAccount'], ['renderAccountsPage']]);
 });
+
 /*
- * Parsing de numeros de risco e sincronizacao conta/config: valida `setupRiskNumber` (aceitando
- * zero e prefixos numericos como `'2.5x'`, rejeitando negativos/vazios/Infinity/null), valores
- * padrao sem conta ativa e sincronizacao bidirecional com `config` preservando campos extras.
+ * Parsing de numeros de risco e sincronizacao conta/config: valida `setupRiskNumber`
+ * (aceitando zero e prefixos numericos como `'2.5x'`, rejeitando
+ * negativos/vazios/Infinity/null), valores padrao sem conta ativa e sincronizacao
+ * bidirecional com `config` preservando campos extras.
  */
 test('risk parsing retains zero, permissive numeric prefixes, defaults and account/config synchronization', () => {
   const {c} = setup();
@@ -106,10 +126,12 @@ test('risk parsing retains zero, permissive numeric prefixes, defaults and accou
   const account = c.applySetupRiskToActiveAccount({balance: '0', risk: '-1', ddDaily: '4', goal: '12', ddTotal: '0'});
   assert.equal(account, c.accounts[0]); assert.equal(account.balance, 0); assert.equal(account.risk, 3); assert.equal(account.goalPct, 12); assert.equal(account.ddTotal, 0); assert.equal(account.extra, true); assert.equal(c.config.risk, 3); assert.equal(c.config.goal, 12); assert.equal(c.config.dd, 0);
 });
+
 /*
- * Leitura do formulario e preview ao vivo: campos ausentes retornam string vazia, o preview aplica
- * os valores na conta ativa e dispara a cadeia exata de atualizacoes (com `{fit: false}` na topbar),
- * funcionando tambem quando nao ha contas cadastradas.
+ * Leitura do formulario e preview ao vivo: campos ausentes retornam string vazia, o
+ * preview aplica os valores na conta ativa e dispara a cadeia exata de atualizacoes
+ * (com `{fit: false}` na topbar), funcionando tambem quando nao ha contas
+ * cadastradas.
  */
 test('form reading and preview preserve missing fields and exact projection order', () => {
   const {c, calls, set} = setup(); set('cfg-balance', '300'); set('cfg-risk', '0');
@@ -119,9 +141,11 @@ test('form reading and preview preserve missing fields and exact projection orde
   assert.deepEqual(plain(calls.at(-1)[1]), {fit: false});
   c.accounts = []; calls.length = 0; c.previewSetupRiskFromForm(); assert.equal(calls[0][0], 'renderSetupRiskSummary'); assert.equal(calls[1][1], undefined);
 });
+
 /*
- * Adicao programatica de cashflow no setup: retorna `null` sem conta ativa ou para valor invalido;
- * quando bem-sucedida, projeta todos os paineis dependentes sem chamar um `save` redundante.
+ * Adicao programatica de cashflow no setup: retorna `null` sem conta ativa ou para
+ * valor invalido; quando bem-sucedida, projeta todos os paineis dependentes sem
+ * chamar um `save` redundante.
  */
 test('cashflow addition returns missing/invalid guards and projects successful entry without an extra save', () => {
   const {c, calls} = setup(); assert.equal(c.addSetupCashflowToActiveAccount({amount: 1}), null); assert.deepEqual(calls, []);
@@ -129,10 +153,11 @@ test('cashflow addition returns missing/invalid guards and projects successful e
   calls.length = 0; const result = c.addSetupCashflowToActiveAccount({amount: 3}); assert.equal(result.id, 'new-flow');
   assert.deepEqual(calls.map(call => call[0]), ['add', 'renderSetupRiskSummary', 'renderSetupCashflowList', 'trades', 'syncAccountBalanceChrome', 'updateTopbarStats']);
 });
+
 /*
- * Formulario de cashflow no setup: valida antes de abrir dialogo de confirmacao formatado com
- * valor/data/nota, preserva os campos caso a adicao falhe no callback (sem conta ativa) e limpa
- * valor/nota chamando `refreshAll` somente apos sucesso.
+ * Formulario de cashflow no setup: valida antes de abrir dialogo de confirmacao
+ * formatado com valor/data/nota, preserva os campos caso a adicao falhe no callback
+ * (sem conta ativa) e limpa valor/nota chamando `refreshAll` somente apos sucesso.
  */
 test('cashflow form validates before confirmation and clears fields only after successful addition', () => {
   const {c, calls, nodes, set} = setup(); c.addSetupCashflowFromForm(); assert.equal(calls.at(-1)[0], 'notice');
@@ -141,10 +166,11 @@ test('cashflow form validates before confirmation and clears fields only after s
   confirm[3](); assert.equal(calls.at(-1)[0], 'notice'); assert.equal(nodes['setup-flow-amount'].value, '25');
   c.accounts = [{id: 'a'}]; confirm[3](); assert.equal(nodes['setup-flow-amount'].value, ''); assert.equal(nodes['setup-flow-note'].value, ''); assert.equal(calls.at(-1)[0], 'refreshAll');
 });
+
 /*
- * Exclusao de cashflow no setup: captura o ID da conta no momento da solicitacao (mantendo o
- * alvo `'a'` mesmo se `activeAccountId` mudar antes da confirmacao) e so dispara `refreshAll`
- * quando `deleteAccountCashflow` retorna sucesso.
+ * Exclusao de cashflow no setup: captura o ID da conta no momento da solicitacao
+ * (mantendo o alvo `'a'` mesmo se `activeAccountId` mudar antes da confirmacao) e so
+ * dispara `refreshAll` quando `deleteAccountCashflow` retorna sucesso.
  */
 test('cashflow deletion captures account before confirmation and refreshes only on success', () => {
   const {c, calls} = setup(); c.deleteSetupCashflow('missing'); assert.deepEqual(calls, []);
@@ -152,10 +178,12 @@ test('cashflow deletion captures account before confirmation and refreshes only 
   c.deleteSetupCashflow('flow'); const confirm = calls.at(-1); assert.match(confirm[2], /retirada de money:4/); c.activeAccountId = 'b'; confirm[3](); assert.deepEqual(calls.slice(-2), [['delete-flow', 'a', 'flow'], ['refreshAll']]);
   c.activeAccountId = 'a'; c.deleteSetupCashflow('failed'); const failed = calls.at(-1); failed[3](); assert.equal(calls.at(-1)[0], 'delete-flow');
 });
+
 /*
- * Gerenciamento de tags: ignora entrada vazia, mantem comparacao sensivel a maiusculas para
- * emocoes (`Calm` vs `calm`), usa normalizacao case-insensitive para estrategias (`Setup` vs
- * `' setup '`) e realiza remocao apenas apos confirmacao perigosa.
+ * Gerenciamento de tags: ignora entrada vazia, mantem comparacao sensivel a
+ * maiusculas para emocoes (`Calm` vs `calm`), usa normalizacao case-insensitive para
+ * estrategias (`Setup` vs `' setup '`) e realiza remocao apenas apos confirmacao
+ * perigosa.
  */
 test('tags preserve strategy normalization, case-sensitive other tags, and deferred removal', () => {
   const {c, calls, set, nodes} = setup(); c.addTag('emotion'); assert.deepEqual(calls, []);
@@ -164,10 +192,12 @@ test('tags preserve strategy normalization, case-sensitive other tags, and defer
   c.config.strategys = ['Setup']; set('newStrategy', ' setup '); c.addTag('strategy'); assert.equal(calls.at(-1)[0], 'notice'); assert.equal(c.config.strategys.length, 1);
   c.removeTag('emotion', 0); const confirm = calls.at(-1); assert.equal(c.config.emotions.length, 2); assert.deepEqual(plain(confirm[4]), {danger: true, confirmText: 'Remover'}); confirm[3](); assert.deepEqual(plain(c.config.emotions), ['calm']); assert.deepEqual(calls.slice(-2), [['save'], ['renderTags', 'emotion']]);
 });
+
 /*
- * Salvamento de configuracoes: aplica risco na conta ativa, preserva fallbacks legados de `mult`
- * (mantendo valor anterior `4` quando o campo e `'0'` e recorrendo a `0.2` se tambem for 0),
- * atualiza `tf` e `symDefault` e garante a ordem `save -> refreshAll -> notice`.
+ * Salvamento de configuracoes: aplica risco na conta ativa, preserva fallbacks
+ * legados de `mult` (mantendo valor anterior `4` quando o campo e `'0'` e recorrendo
+ * a `0.2` se tambem for 0), atualiza `tf` e `symDefault` e garante a ordem `save ->
+ * refreshAll -> notice`.
  */
 test('config save applies risk, preserves legacy mult fallbacks and orders persistence before refresh/notice', () => {
   const {c, calls, set} = setup(); c.config.mult = 4; c.accounts = [{id: 'a'}]; set('cfg-balance', '0'); set('cfg-mult', '0'); c.saveConfig();

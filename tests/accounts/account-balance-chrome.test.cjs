@@ -1,14 +1,21 @@
 /*
- * Objetivo: Validar a sincronizacao dos indicadores de saldo da conta na barra lateral
- * (saldo atual, variacao/cor do resultado e contagem de trades).
+ * Objetivo: Validar a sincronizacao dos indicadores de saldo da conta na barra
+ * lateral (saldo atual, variacao/cor do resultado e contagem de trades).
+ *
  * Modulo/arquivo testado: funcao `syncAccountBalanceChrome` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em `app.js`).
- * Estrategia de isolamento: executa apenas o bloco da funcao extraido via regex em um contexto
- * `node:vm` com mocks de leitura de conta, trades, calculo de risco, formatadores e `document`.
- * Pontos-chave garantidos: retorno antecipado sem conta ativa, ordem de carregamento do script
- * classico em `index.html`, sequencia exata de chamadas, coloracao verde/vermelha conforme P/L
- * e fluxo de caixa, e tolerancia a elementos DOM opcionais ausentes.
+ * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em
+ * `app.js`).
+ *
+ * Estrategia de isolamento: executa apenas o bloco da funcao extraido via regex em um
+ * contexto `node:vm` com mocks de leitura de conta, trades, calculo de risco,
+ * formatadores e `document`.
+ *
+ * Pontos-chave garantidos: retorno antecipado sem conta ativa, ordem de carregamento
+ * do script classico em `index.html`, sequencia exata de chamadas, coloracao
+ * verde/vermelha conforme P/L e fluxo de caixa, e tolerancia a elementos DOM
+ * opcionais ausentes.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -24,9 +31,9 @@ const source = fs.readFileSync(path.join(root, modulePath), 'utf8').match(/^func
 
 /*
  * Helper de execucao em sandbox: cria um contexto `vm` com dependencias simuladas
- * (`getActiveAccount`, `getAccountTrades`, `calcAccountRiskState`, formatadores e DOM),
- * registra a ordem de invocacoes em `calls` e chama `syncAccountBalanceChrome` com parametros
- * padrao (`useDefaults: true`) ou explicitos.
+ * (`getActiveAccount`, `getAccountTrades`, `calcAccountRiskState`, formatadores e
+ * DOM), registra a ordem de invocacoes em `calls` e chama `syncAccountBalanceChrome`
+ * com parametros padrao (`useDefaults: true`) ou explicitos.
  */
 function render({account = {id: 'acct-1'}, trades = [{id: 'trade-1'}], risk, elements = {}, useDefaults = false} = {}) {
   const calls = [];
@@ -48,9 +55,10 @@ function render({account = {id: 'acct-1'}, trades = [{id: 'trade-1'}], risk, ele
 }
 
 /*
- * Caso de borda: quando nao ha conta ativa padrao (`account: null`), a avaliacao dos argumentos
- * padrao ainda resolve `getActiveAccount()` e `getAccountTrades(undefined)`, mas a funcao retorna
- * `null` imediatamente antes de calcular risco ou tocar no DOM.
+ * Caso de borda: quando nao ha conta ativa padrao (`account: null`), a avaliacao dos
+ * argumentos padrao ainda resolve `getActiveAccount()` e
+ * `getAccountTrades(undefined)`, mas a funcao retorna `null` imediatamente antes de
+ * calcular risco ou tocar no DOM.
  */
 test('missing default account still resolves its trades and returns before risk or DOM work', () => {
   const {calls, result} = render({account: null, useDefaults: true});
@@ -59,8 +67,8 @@ test('missing default account still resolves its trades and returns before risk 
 });
 
 /*
- * Contrato de carregamento: garante que `accounts-workspace.js` aparece exatamente uma vez em
- * `index.html` e e carregado antes de `analytics-workspace.js` e `app.js`.
+ * Contrato de carregamento: garante que `accounts-workspace.js` aparece exatamente
+ * uma vez em `index.html` e e carregado antes de `analytics-workspace.js` e `app.js`.
  */
 test('account balance chrome classic script loads once before dashboard and app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -71,9 +79,9 @@ test('account balance chrome classic script loads once before dashboard and app.
 });
 
 /*
- * Fluxo principal: com conta ativa e elementos DOM presentes, atualiza saldo formatado, texto e
- * cor positiva (`var(--green)`) da variacao e contagem de trades, retornando o estado de risco
- * e respeitando a ordem exata das chamadas.
+ * Fluxo principal: com conta ativa e elementos DOM presentes, atualiza saldo
+ * formatado, texto e cor positiva (`var(--green)`) da variacao e contagem de trades,
+ * retornando o estado de risco e respeitando a ordem exata das chamadas.
  */
 test('default account updates balance, positive change and trade count and returns risk', () => {
   const account = {id: 'acct-1'};
@@ -103,8 +111,9 @@ test('default account updates balance, positive change and trade count and retur
 });
 
 /*
- * Regra visual de sinal: verifica que tanto P/L total negativo (mesmo com cashflow positivo)
- * quanto P/L zerado acompanhado de cashflow liquido negativo aplicam a cor `var(--red)`.
+ * Regra visual de sinal: verifica que tanto P/L total negativo (mesmo com cashflow
+ * positivo) quanto P/L zerado acompanhado de cashflow liquido negativo aplicam a cor
+ * `var(--red)`.
  */
 test('negative result or zero result with negative cashflow keeps the negative change color', () => {
   const pnlChange = {textContent: '', style: {color: ''}};
@@ -123,9 +132,9 @@ test('negative result or zero result with negative cashflow keeps the negative c
 });
 
 /*
- * Resiliencia a DOM parcial: quando os tres alvos opcionais nao existem no documento, os
- * formatadores (`fR` e `formatAccountBalanceChange`) nao sao chamados, mas os tres IDs sao
- * consultados e o objeto `risk` calculado continua sendo retornado.
+ * Resiliencia a DOM parcial: quando os tres alvos opcionais nao existem no documento,
+ * os formatadores (`fR` e `formatAccountBalanceChange`) nao sao chamados, mas os tres
+ * IDs sao consultados e o objeto `risk` calculado continua sendo retornado.
  */
 test('optional targets skip their formatters without changing the calculated return', () => {
   const risk = {currentBalance: 100, totalPnl: -1, cashflowNet: 0};

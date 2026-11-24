@@ -1,14 +1,22 @@
 /*
- * Objetivo: Testar a renderizacao da pagina consolidada de contas (`renderAccountsPage`),
- * cobrindo os cards de metricas gerais e os cards individuais de visao geral de cada conta.
+ * Objetivo: Testar a renderizacao da pagina consolidada de contas
+ * (`renderAccountsPage`), cobrindo os cards de metricas gerais e os cards individuais
+ * de visao geral de cada conta.
+ *
  * Modulo/arquivo testado: `renderAccountsPage` em
- * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em `app.js`).
- * Estrategia de isolamento: executa o modulo em `node:vm` com mocks de DOM (`accountsMetrics` e
- * `accountsOverview`), colecao de contas, trades, estados de risco, metricas e formatadores.
- * Pontos-chave garantidos: soma de capital e trades totais, escape HTML contra XSS em nomes,
- * badge de conta ativa, acoes `selectAccount`/`editAccount`, barras de uso de risco, estado vazio,
- * independencia entre containers opcionais e ordem sincrona de carregamento em `index.html`.
+ * `src/modules/accounts/presentation/accounts-workspace.js` (e remocao do legado em
+ * `app.js`).
+ *
+ * Estrategia de isolamento: executa o modulo em `node:vm` com mocks de DOM
+ * (`accountsMetrics` e `accountsOverview`), colecao de contas, trades, estados de
+ * risco, metricas e formatadores.
+ *
+ * Pontos-chave garantidos: soma de capital e trades totais, escape HTML contra XSS em
+ * nomes, badge de conta ativa, acoes `selectAccount`/`editAccount`, barras de uso de
+ * risco, estado vazio, independencia entre containers opcionais e ordem sincrona de
+ * carregamento em `index.html`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -24,9 +32,9 @@ const source = extracted ? fs.readFileSync(path.join(root, accountsPath), 'utf8'
 assert.ok(source, 'renderAccountsPage must remain available');
 
 /*
- * Fabrica de harness em sandbox: prepara duas contas padrao (uma delas com `<` no nome para
- * validar escape HTML), trades, risco e metricas simulados, alem de permitir escolher quais
- * containers DOM (`visible`) existem no documento.
+ * Fabrica de harness em sandbox: prepara duas contas padrao (uma delas com `<` no
+ * nome para validar escape HTML), trades, risco e metricas simulados, alem de
+ * permitir escolher quais containers DOM (`visible`) existem no documento.
  */
 function createHarness({accounts, visible = ['accountsMetrics', 'accountsOverview']} = {}) {
   const rows = accounts ?? [
@@ -60,9 +68,10 @@ function createHarness({accounts, visible = ['accountsMetrics', 'accountsOvervie
 }
 
 /*
- * Fluxo principal com multiplas contas: confere os 4 cards de resumo (capital total `R:3000`,
- * conta ativa escapada, 3 trades totais), os 2 cards de overview (cor, badge "Ativa", botoes de
- * selecao/edicao, cashflows com sinal/cor, DD 4.20%, barra 90%) e a contagem exata de chamadas.
+ * Fluxo principal com multiplas contas: confere os 4 cards de resumo (capital total
+ * `R:3000`, conta ativa escapada, 3 trades totais), os 2 cards de overview (cor,
+ * badge "Ativa", botoes de selecao/edicao, cashflows com sinal/cor, DD 4.20%, barra
+ * 90%) e a contagem exata de chamadas.
  */
 test('multiple accounts render capital, action buttons, signed results and risk bars', () => {
   const {calls, nodes, context} = createHarness();
@@ -88,8 +97,9 @@ test('multiple accounts render capital, action buttons, signed results and risk 
 });
 
 /*
- * Lista vazia de contas: mantem os 4 cards de resumo com fallback `—` para conta em foco e
- * contagem 0, limpa o overview e nao dispara `calcAccountRiskState` nem `calcMetrics`.
+ * Lista vazia de contas: mantem os 4 cards de resumo com fallback `—` para conta em
+ * foco e contagem 0, limpa o overview e nao dispara `calcAccountRiskState` nem
+ * `calcMetrics`.
  */
 test('empty account list keeps four summary cards and an empty overview', () => {
   const {calls, nodes, context} = createHarness({accounts: []});
@@ -103,9 +113,9 @@ test('empty account list keeps four summary cards and an empty overview', () => 
 });
 
 /*
- * Independencia dos containers DOM: quando apenas `accountsMetrics` existe, `calcMetrics` e
- * pulado; quando apenas `accountsOverview` existe, `getActiveAccount` nao e chamado e os 2
- * cards individuais sao renderizados normalmente.
+ * Independencia dos containers DOM: quando apenas `accountsMetrics` existe,
+ * `calcMetrics` e pulado; quando apenas `accountsOverview` existe, `getActiveAccount`
+ * nao e chamado e os 2 cards individuais sao renderizados normalmente.
  */
 test('optional containers control independent summary and overview work', () => {
   const summaryOnly = createHarness({visible: ['accountsMetrics']});
@@ -120,8 +130,9 @@ test('optional containers control independent summary and overview work', () => 
 });
 
 /*
- * Contrato de script classico: confirma remocao da declaracao legada em `app.js`, inclusao unica
- * e sincrona em `index.html` imediatamente antes de `analytics-workspace.js`.
+ * Contrato de script classico: confirma remocao da declaracao legada em `app.js`,
+ * inclusao unica e sincrona em `index.html` imediatamente antes de
+ * `analytics-workspace.js`.
  */
 test('extracted accounts renderer stays a synchronous classic script before app.js', () => {
   if (!extracted) return;

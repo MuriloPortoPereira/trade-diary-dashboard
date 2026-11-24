@@ -2,15 +2,17 @@
  * Cenários de layout executados no navegador para a grade do Dashboard.
  *
  * Objetivo:
- *   Validar o estado de hover sobre cartões de gráfico (`.chart-card`) e o comportamento
- *   de rolagem horizontal/vertical do contêiner de trades recentes (`.dashboard-table-scroll`).
+ *   Validar o estado de hover sobre cartões de gráfico (`.chart-card`) e o
+ *   comportamento de rolagem horizontal/vertical do contêiner de trades recentes
+ *   (`.dashboard-table-scroll`).
  *
  * Papel na verificação visual:
  *   Consumido por `shell-style-check.cjs` nos casos `layout-chart-hover` e
  *   `layout-table-scroll`, reutilizando o fixture isolado do Dashboard.
  *
  * Pontos-chave:
- *   - Confere `overflow-x: auto` e `overflow-y: auto` além do deslocamento efetivo de rolagem.
+ *   - Confere `overflow-x: auto` e `overflow-y: auto` além do deslocamento efetivo de
+ *     rolagem.
  */
 
 /*
@@ -24,7 +26,9 @@ function prepareDashboardLayoutScenario(name) {
     card.scrollIntoView({block: 'center'});
     return '.dashboard-chart-stack .chart-grid-3 .chart-card';
   }
-  // Exercita rolagem máxima horizontal e vertical no contêiner da tabela de trades recentes.
+
+  // Exercita rolagem máxima horizontal e vertical no contêiner da tabela de trades
+  // recentes.
   const panel = document.querySelector('.dashboard-lower-grid');
   const scroller = panel.querySelector('.dashboard-table-scroll');
   panel.scrollIntoView({block: 'start'});

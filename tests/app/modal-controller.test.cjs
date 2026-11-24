@@ -19,13 +19,14 @@
  *     imediatamente sem tocar em editingId ou no DOM.
  *   - Ao editar trade existente, executa lock -> populate -> reset -> fill -> flow;
  *     se o ID nao for encontrado, pula apenas fill.
- *   - Ao criar novo trade, define editingId=null, preenche data atual (YYYY-MM-DD)
- *     e recalcula duracao antes de atualizar a UI de fluxo.
+ *   - Ao criar novo trade, define editingId=null, preenche data atual (YYYY-MM-DD) e
+ *     recalcula duracao antes de atualizar a UI de fluxo.
  *   - accountModal oculta o formulario e renderiza lista de contas; modais genericos
  *     apenas alternam a classe 'open'.
- *   - closeModal limpa o fluxo em lote (clearBulkIncompleteFlow) exclusivamente
- *     para tradeModal.
+ *   - closeModal limpa o fluxo em lote (clearBulkIncompleteFlow) exclusivamente para
+ *     tradeModal.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -51,8 +52,9 @@ function classList() {
   };
 }
 
-// Monta a sandbox vm com modais simulados, data fixa ('2026-10-13'), estado de bloqueio
-// configuravel e callbacks instrumentados para verificar a ordem de execucao.
+// Monta a sandbox vm com modais simulados, data fixa ('2026-10-13'), estado de
+// bloqueio configuravel e callbacks instrumentados para verificar a ordem de
+// execucao.
 function setup({locked = false, trades = [{id: 't1'}]} = {}) {
   const elements = {
     tradeModal: {classList: classList()},
@@ -83,8 +85,9 @@ function setup({locked = false, trades = [{id: 't1'}]} = {}) {
   return {context, elements, calls};
 }
 
-// Garante que, com a trava de conta ativa, tanto editar quanto adicionar no tradeModal
-// retornam false antes de modificar editingId ou adicionar a classe 'open'.
+// Garante que, com a trava de conta ativa, tanto editar quanto adicionar no
+// tradeModal retornam false antes de modificar editingId ou adicionar a classe
+// 'open'.
 test('trade modal lock returns false before changing state or DOM', () => {
   const {context, elements, calls} = setup({locked: true});
   assert.equal(context.openModal('tradeModal', 't1'), false);
@@ -96,8 +99,8 @@ test('trade modal lock returns false before changing state or DOM', () => {
   assert.deepEqual(calls, [['lock', 'adicionar']]);
 });
 
-// Verifica o fluxo completo de edicao de um trade encontrado: define editingId, abre o
-// modal e dispara em ordem lock('editar'), populate, reset, fill(trade) e flow.
+// Verifica o fluxo completo de edicao de um trade encontrado: define editingId, abre
+// o modal e dispara em ordem lock('editar'), populate, reset, fill(trade) e flow.
 test('editing a trade preserves lookup and form effect order', () => {
   const trade = {id: 't1', symbol: 'US30'};
   const {context, elements, calls} = setup({trades: [trade]});
@@ -109,8 +112,8 @@ test('editing a trade preserves lookup and form effect order', () => {
   ]);
 });
 
-// Caso o ID informado para edicao nao exista na lista de trades, mantem populate, reset
-// e flow sem chamar fillForm com valor indefinido.
+// Caso o ID informado para edicao nao exista na lista de trades, mantem populate,
+// reset e flow sem chamar fillForm com valor indefinido.
 test('missing edited trade still resets and updates flow without filling', () => {
   const {context, calls} = setup({trades: []});
   context.openModal('tradeModal', 'missing');
@@ -130,7 +133,8 @@ test('new trade applies current date and duration before flow update', () => {
 });
 
 // Confirma comportamentos independentes: accountModal esconde accountForm e chama
-// renderAccountList; modais genericos como csvConfirmModal abrem sem efeitos colaterais.
+// renderAccountList; modais genericos como csvConfirmModal abrem sem efeitos
+// colaterais.
 test('account and generic modals preserve their independent behavior', () => {
   const account = setup();
   account.context.openModal('accountModal', 'unexpected-id');

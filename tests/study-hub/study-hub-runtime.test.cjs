@@ -1,25 +1,35 @@
 /*
- * Testes de integracao para o runtime legado do Study Hub e o aprimoramento de impacto intraday.
+ * Testes de integracao para o runtime legado do Study Hub e o aprimoramento de
+ * impacto intraday.
  *
  * Modulos testados:
- * - `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` (montagem do template,
- *   closure de inicializacao e pontes `window.sh_*`)
- * - `src/modules/study-hub/presentation/study-hub-intraday.js` (`studyHubBuildIntradayRows`,
- *   `studyHubEnhanceIntradayImpact`)
- * - Colaboracao com todos os modulos de dominio, storage, template e ferramentas do Study Hub.
+ * - `src/modules/study-hub/presentation/study-hub-legacy-runtime.js` (montagem do
+ *   template, closure de inicializacao e pontes `window.sh_*`)
+ * - `src/modules/study-hub/presentation/study-hub-intraday.js`
+ *   (`studyHubBuildIntradayRows`, `studyHubEnhanceIntradayImpact`)
+ * - Colaboracao com todos os modulos de dominio, storage, template e ferramentas do
+ *   Study Hub.
  *
  * Estrategia de isolamento:
- * - Carrega as dependencias do Study Hub em `vm.createContext` com uma arvore DOM simulada (`node()`),
- *   `window` com listeners rastreados, `localStorage`, `setTimeout` e `requestAnimationFrame`.
- * - Permite executar apenas a IIFE inicial de montagem (`runtime.slice(0, mountEnd)`) ou o runtime completo.
+ * - Carrega as dependencias do Study Hub em `vm.createContext` com uma arvore DOM
+ *   simulada (`node()`), `window` com listeners rastreados, `localStorage`,
+ *   `setTimeout` e `requestAnimationFrame`.
+ * - Permite executar apenas a IIFE inicial de montagem (`runtime.slice(0, mountEnd)`)
+ *   ou o runtime completo.
  *
  * Regras criticas garantidas:
- * - Montagem do template e idempotente (ignora host ausente ou ja marcado com `dataset.loaded = '1'`).
- * - A closure do runtime expoe apenas pontes `window.sh_*` sem vazar funcoes privadas no escopo global.
- * - `studyHubBuildIntradayRows` calcula projecoes de ganho/stop/alternado e respeita o limite maximo de 20 linhas.
- * - `studyHubEnhanceIntradayImpact` envolve cada ponte no maximo uma vez (idempotente), preservando argumentos e retornos.
- * - Ordem estrita e sincrona de todos os scripts do Study Hub em `index.html` apos `app.js`.
+ * - Montagem do template e idempotente (ignora host ausente ou ja marcado com
+ *   `dataset.loaded = '1'`).
+ * - A closure do runtime expoe apenas pontes `window.sh_*` sem vazar funcoes privadas
+ *   no escopo global.
+ * - `studyHubBuildIntradayRows` calcula projecoes de ganho/stop/alternado e respeita
+ *   o limite maximo de 20 linhas.
+ * - `studyHubEnhanceIntradayImpact` envolve cada ponte no maximo uma vez
+ *   (idempotente), preservando argumentos e retornos.
+ * - Ordem estrita e sincrona de todos os scripts do Study Hub em `index.html` apos
+ *   `app.js`.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -31,10 +41,13 @@ const runtimePath = 'src/modules/study-hub/presentation/study-hub-legacy-runtime
 const intradayPath = 'src/modules/study-hub/presentation/study-hub-intraday.js';
 const runtime = fs.readFileSync(path.join(root, runtimePath), 'utf8');
 const intraday = fs.readFileSync(path.join(root, intradayPath), 'utf8');
-// Delimita o fim da primeira IIFE do runtime (responsavel exclusivamente pela montagem do HTML no container host).
+
+// Delimita o fim da primeira IIFE do runtime (responsavel exclusivamente pela
+// montagem do HTML no container host).
 const mountEnd = runtime.indexOf('\n})();') + '\n})();'.length;
 
-// Cria um elemento DOM simulado com suporte a `classList`, `dataset`, `children` e `value`.
+// Cria um elemento DOM simulado com suporte a `classList`, `dataset`, `children` e
+// `value`.
 function node(value = '') {
   const classes = new Set();
   return {
@@ -51,7 +64,8 @@ function node(value = '') {
   };
 }
 
-// Configura sandbox VM com todos os submodulos do Study Hub carregados antes do runtime legado e do enhancer intraday.
+// Configura sandbox VM com todos os submodulos do Study Hub carregados antes do
+// runtime legado e do enhancer intraday.
 function setup({host = node(), readyState = 'loading'} = {}) {
   const elements = new Map([
     ['studyHubLegacyApp', host], ['hubCotBadge', node()], ['hubCot', node('5.8')],
@@ -86,7 +100,8 @@ function setup({host = node(), readyState = 'loading'} = {}) {
   return {context, window, elements, listeners, timers, frames, errors, writes, host};
 }
 
-// Garante idempotencia da montagem do template: pula host `null` ou ja carregado, injeta os 4 modulos com `embed-mode` na primeira vez e nao sobrescreve na segunda.
+// Garante idempotencia da montagem do template: pula host `null` ou ja carregado,
+// injeta os 4 modulos com `embed-mode` na primeira vez e nao sobrescreve na segunda.
 test('StudyHub mounting skips absent/already loaded hosts and initializes an empty host once', () => {
   for (const host of [null, Object.assign(node(), {dataset: {loaded: '1'}, innerHTML: 'kept'})]) {
     const h = setup({host});
@@ -105,7 +120,8 @@ test('StudyHub mounting skips absent/already loaded hosts and initializes an emp
   assert.equal(h.host.innerHTML, 'kept');
 });
 
-// Verifica encapsulamento da closure (sem vazar renderizadores internos), ausencia de erros/escritas precoces e funcionamento das pontes de navegacao, taxas e cotacao.
+// Verifica encapsulamento da closure (sem vazar renderizadores internos), ausencia de
+// erros/escritas precoces e funcionamento das pontes de navegacao, taxas e cotacao.
 test('StudyHub closure exports bridges without leaking private renderers and preserves navigation', () => {
   const h = setup();
   vm.runInContext(runtime, h.context);
@@ -129,7 +145,8 @@ test('StudyHub closure exports bridges without leaking private renderers and pre
   assert.equal(h.elements.get('hubCotBadge').textContent, 'R$ 6,25');
 });
 
-// Valida o calculo da tabela intraday: ganho consecutivo, perda consecutiva, cenario alternado, flags `hitTarget`/`hitStop`, saldo restante e teto de 20 linhas.
+// Valida o calculo da tabela intraday: ganho consecutivo, perda consecutiva, cenario
+// alternado, flags `hitTarget`/`hitStop`, saldo restante e teto de 20 linhas.
 test('intraday rows retain target/stop thresholds, capital projections and row limits', () => {
   const h = setup();
   vm.runInContext(intraday, h.context);
@@ -147,7 +164,8 @@ test('intraday rows retain target/stop thresholds, capital projections and row l
   assert.equal(h.window.studyHubBuildIntradayRows({stopAt: 100, targetAt: 1}).length, 20);
 });
 
-// Confirma em `index.html` a sequencia exata dos 8 scripts sincronos classicos do Study Hub carregados imediatamente apos `app.js`.
+// Confirma em `index.html` a sequencia exata dos 8 scripts sincronos classicos do
+// Study Hub carregados imediatamente apos `app.js`.
 test('StudyHub scripts execute synchronously after app.js with runtime before intraday', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(match => ({
@@ -168,7 +186,9 @@ test('StudyHub scripts execute synchronously after app.js with runtime before in
   }
 });
 
-// Garante que chamar `studyHubEnhanceIntradayImpact()` multiplas vezes nao re-envolve `sh_buildIntraday` nem `sh_tsRunAll`, preservando argumentos, retornos e agendamentos em rAF.
+// Garante que chamar `studyHubEnhanceIntradayImpact()` multiplas vezes nao re-envolve
+// `sh_buildIntraday` nem `sh_tsRunAll`, preservando argumentos, retornos e
+// agendamentos em rAF.
 test('intraday enhancer wraps each bridge once and preserves arguments and return values', () => {
   const h = setup();
   const calls = [];

@@ -2,32 +2,39 @@
  * Objetivo do arquivo:
  *   Testar os controles interativos do modulo de calendario: navegacao mensal com
  *   virada de ano (calNav), selecao direta de mes (calGoToMonth), sincronizacao do
- *   input picker (syncCalPicker), alternancia de visao (setCalView) e detalhamento
- *   de trades de um dia especifico (showCalDay).
+ *   input picker (syncCalPicker), alternancia de visao (setCalView) e detalhamento de
+ *   trades de um dia especifico (showCalDay).
  *
  * Modulo/arquivo testado:
  *   Funcoes calNav, calGoToMonth, syncCalPicker, setCalView e showCalDay em
- *   src/modules/calendar/presentation/calendar-page.js (garantindo ausencia em app.js).
+ *   src/modules/calendar/presentation/calendar-page.js (garantindo ausencia em
+ *   app.js).
  *
  * Estrategia de isolamento:
- *   Extrai as cinco funcoes de controle e executa-as em uma sandbox node:vm com
- *   nos DOM simulados (permitindo omitir controles opcionais via parametro missing),
- *   rastreamento de chamadas classList.toggle e stubs para renderCalendar, getAccountTrades,
- *   fDate e fR.
+ *   Extrai as cinco funcoes de controle e executa-as em uma sandbox node:vm com nos
+ *   DOM simulados (permitindo omitir controles opcionais via parametro missing),
+ *   rastreamento de chamadas classList.toggle e stubs para renderCalendar,
+ *   getAccountTrades, fDate e fR.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Virada de dezembro -> janeiro e janeiro -> dezembro sincronizando o picker antes de renderizar.
- *   - calGoToMonth ignora entradas vazias/null e preserva a semantica parseInt (incluindo NaN).
- *   - syncCalPicker e setCalView toleram botoes/picker ausentes no DOM sem lancar erro.
- *   - showCalDay filtra estritamente por data da conta ativa sem mutar o array de entrada,
- *     mantem ordem original, trata preco 0 como '—', R nao finito e status OPEN.
+ *   - Virada de dezembro -> janeiro e janeiro -> dezembro sincronizando o picker
+ *     antes de renderizar.
+ *   - calGoToMonth ignora entradas vazias/null e preserva a semantica parseInt
+ *     (incluindo NaN).
+ *   - syncCalPicker e setCalView toleram botoes/picker ausentes no DOM sem lancar
+ *     erro.
+ *   - showCalDay filtra estritamente por data da conta ativa sem mutar o array de
+ *     entrada, mantem ordem original, trata preco 0 como '—', R nao finito e status
+ *     OPEN.
  *   - Dia sem trades oculta calDayDetail preservando titulo e tabela anteriores.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/calendar/presentation/calendar-page.js';
 const names = ['calNav', 'calGoToMonth', 'syncCalPicker', 'setCalView', 'showCalDay'];
@@ -54,8 +61,9 @@ function harness(rows = [], missing = []) {
   return {context, nodes, calls, toggles};
 }
 
-// Verifica que calNav(+1) em dezembro/2026 avanca para janeiro/2027 (2027-01) e calNav(-1)
-// volta para dezembro/2026 (2026-12), atualizando o picker antes de chamar renderCalendar.
+// Verifica que calNav(+1) em dezembro/2026 avanca para janeiro/2027 (2027-01) e
+// calNav(-1) volta para dezembro/2026 (2026-12), atualizando o picker antes de chamar
+// renderCalendar.
 test('calendar navigation crosses years and synchronizes picker before rendering', () => {
   const {context, nodes, calls} = harness();
   vm.runInContext('calYear=2026; calMonth=11; calNav(1); calNav(-1)', context);
@@ -64,8 +72,9 @@ test('calendar navigation crosses years and synchronizes picker before rendering
   assert.equal(vm.runInContext('calNav(0)', context), undefined);
 });
 
-// Valida calGoToMonth: entradas vazias/null sao ignoradas sem renderizar; strings com sufixo
-// ('2025-03extra') seguem parseInt (mes 0-based = 2); entrada invalida produz NaN.
+// Valida calGoToMonth: entradas vazias/null sao ignoradas sem renderizar; strings com
+// sufixo ('2025-03extra') seguem parseInt (mes 0-based = 2); entrada invalida produz
+// NaN.
 test('month selection preserves empty no-op and parseInt behavior before render', () => {
   const {context, calls} = harness();
   vm.runInContext('calGoToMonth(""); calGoToMonth(null)', context);
@@ -79,8 +88,9 @@ test('month selection preserves empty no-op and parseInt behavior before render'
   assert.ok(Number.isNaN(context.calMonth));
 });
 
-// Garante tolerancia a elementos opcionais ausentes (calMonthPicker e calBtnMonth) ao chamar
-// syncCalPicker e setCalView, inclusive desativando todos os botoes para modo desconhecido.
+// Garante tolerancia a elementos opcionais ausentes (calMonthPicker e calBtnMonth) ao
+// chamar syncCalPicker e setCalView, inclusive desativando todos os botoes para modo
+// desconhecido.
 test('picker sync and mode toggles tolerate optional controls without changing API', () => {
   const {context, calls, toggles} = harness([], ['calMonthPicker', 'calBtnMonth']);
   vm.runInContext('syncCalPicker(); setCalView("biweek")', context);
@@ -92,8 +102,9 @@ test('picker sync and mode toggles tolerate optional controls without changing A
   assert.deepEqual(toggles.slice(-2).map(item => item[2]), [false, false]);
 });
 
-// Testa showCalDay(9) em fevereiro/2024: filtra apenas trades de 2024-02-09 preservando ordem,
-// renderiza titulo com contagem, placeholder '—' para entry=0, sinais +/- em R e P/L, sem mutar rows.
+// Testa showCalDay(9) em fevereiro/2024: filtra apenas trades de 2024-02-09
+// preservando ordem, renderiza titulo com contagem, placeholder '—' para entry=0,
+// sinais +/- em R e P/L, sem mutar rows.
 test('day detail preserves date/account filter, row order, signs and zero-price placeholders', () => {
   const rows = [
     {date: '2024-02-09', symbol: 'FIRST', direction: 'BUY', entry: 0, exit: 2, r: 1.5, pnl: 12, emotion: 'Calmo', status: 'WIN'},
@@ -119,8 +130,8 @@ test('day detail preserves date/account filter, row order, signs and zero-price 
   assert.equal(JSON.stringify(rows), before);
 });
 
-// Verifica os fallbacks para campos ausentes ou nao finitos no detalhe diario: status padrao
-// OPEN, R=Infinity renderizado como '—' e P/L zero exibido como '+$0.00'.
+// Verifica os fallbacks para campos ausentes ou nao finitos no detalhe diario: status
+// padrao OPEN, R=Infinity renderizado como '—' e P/L zero exibido como '+$0.00'.
 test('day detail keeps OPEN and missing/nonfinite value fallbacks', () => {
   const {context, nodes} = harness([{date: '2024-02-09', symbol: 'MISSING', r: Infinity, pnl: 0}]);
   vm.runInContext('showCalDay(9)', context);
@@ -129,8 +140,8 @@ test('day detail keeps OPEN and missing/nonfinite value fallbacks', () => {
   assert.match(nodes.calDayTbody.innerHTML, /\+\$0\.00/);
 });
 
-// Quando nao ha trades no dia selecionado, oculta o painel (display='none') sem sobrescrever
-// o titulo nem o HTML previo do corpo da tabela.
+// Quando nao ha trades no dia selecionado, oculta o painel (display='none') sem
+// sobrescrever o titulo nem o HTML previo do corpo da tabela.
 test('empty day hides detail while preserving prior title and table', () => {
   const {context, nodes} = harness();
   vm.runInContext('showCalDay(9)', context);
@@ -139,7 +150,8 @@ test('empty day hides detail while preserving prior title and table', () => {
   assert.equal(nodes.calDayTbody.innerHTML, 'before');
 });
 
-// Confirma no index.html que calendar-page.js aparece uma unica vez como script sincrono antes de app.js.
+// Confirma no index.html que calendar-page.js aparece uma unica vez como script
+// sincrono antes de app.js.
 test('calendar controls loads once as a synchronous classic script before calendar renderer', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].filter(match => match[1].includes(`src="${modulePath}"`));

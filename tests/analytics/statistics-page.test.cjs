@@ -1,32 +1,43 @@
 /*
  * Objetivo:
- *   Validar a renderizacao principal da pagina de Estatisticas (`renderStats`), incluindo
- *   reconstrucao do seletor de contas, comportamento de fixacao (`statsAccountPinned`),
- *   escopo de risco por conta, cards, tabelas, graficos base, histograma e heatmaps de horario/dia.
+ *   Validar a renderizacao principal da pagina de Estatisticas (`renderStats`),
+ *   incluindo reconstrucao do seletor de contas, comportamento de fixacao
+ *   (`statsAccountPinned`), escopo de risco por conta, cards, tabelas, graficos base,
+ *   histograma e heatmaps de horario/dia.
  *
  * Modulo da aplicacao testado:
- *   - `src/modules/analytics/presentation/analytics-workspace.js` (funcao `renderStats`)
- *   - Remocao da declaracao legada em `app.js` e ordem de declaracao/carregamento em `index.html`
+ *   - `src/modules/analytics/presentation/analytics-workspace.js` (funcao
+ *     `renderStats`)
+ *   - Remocao da declaracao legada em `app.js` e ordem de declaracao/carregamento em
+ *     `index.html`
  *
  * Estrategia de isolamento:
- *   - Extrai apenas `renderStats` de `analytics-workspace.js` e a executa em `node:vm`.
- *   - Usa um `Proxy` para criar sob demanda qualquer no DOM consultado via `getElementById`,
- *     junto com stubs para metricas, estrategias, timing, graficos e simulacao.
+ *   - Extrai apenas `renderStats` de `analytics-workspace.js` e a executa em
+ *     `node:vm`.
+ *   - Usa um `Proxy` para criar sob demanda qualquer no DOM consultado via
+ *     `getElementById`, junto com stubs para metricas, estrategias, timing, graficos
+ *     e simulacao.
  *
  * Pontos-chave e regras criticas garantidas:
- *   - Quando `statsAccountPinned` e falso, o seletor de contas e reconstruido e volta para `activeAccountId`.
- *   - Quando `'all'` esta fixado, a analise de risco (`renderStopFeeAnalysis`) ainda recebe apenas os trades da conta ativa.
- *   - Estado vazio preserva 8 cards, 16 linhas na tabela de metricas, 4 de sequencias, mensagens vazias e 10 graficos base.
- *   - Estado populado adiciona o histograma (`stHistChart`), tabela de simbolos, heatmap por hora e tabela por dia da semana.
+ *   - Quando `statsAccountPinned` e falso, o seletor de contas e reconstruido e volta
+ *     para `activeAccountId`.
+ *   - Quando `'all'` esta fixado, a analise de risco (`renderStopFeeAnalysis`) ainda
+ *     recebe apenas os trades da conta ativa.
+ *   - Estado vazio preserva 8 cards, 16 linhas na tabela de metricas, 4 de
+ *     sequencias, mensagens vazias e 10 graficos base.
+ *   - Estado populado adiciona o histograma (`stHistChart`), tabela de simbolos,
+ *     heatmap por hora e tabela por dia da semana.
  *   - `renderSimulation` e invocado ao final do ciclo de renderizacao.
  */
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-// Confirma que `renderStats` foi movida de `app.js` para `analytics-workspace.js` e extrai sua declaracao.
+// Confirma que `renderStats` foi movida de `app.js` para `analytics-workspace.js` e
+// extrai sua declaracao.
 const root = path.resolve(__dirname, '../..');
 const modulePath = 'src/modules/analytics/presentation/analytics-workspace.js';
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
@@ -35,8 +46,9 @@ assert.equal(legacy, undefined, 'legacy declaration must be moved');
 const moduleSource = fs.readFileSync(path.join(root, modulePath), 'utf8');
 const source = ['renderStats'].map(name => moduleSource.match(new RegExp(`^function ${name}\\([^]*?^\\}`, 'm'))[0]).join('\n\n');
 
-// Garante carregamento unico e sincrono classico em `index.html` antes de `app.js` e que
-// `renderStrategyCompareCards` e declarado antes de `renderStats` dentro do modulo.
+// Garante carregamento unico e sincrono classico em `index.html` antes de `app.js` e
+// que `renderStrategyCompareCards` e declarado antes de `renderStats` dentro do
+// modulo.
 test('statistics page loads once as a classic script after strategy comparison and before app.js', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const tags = [...html.matchAll(/<script\b([^>]*)>/gi)]
@@ -47,8 +59,9 @@ test('statistics page loads once as a classic script after strategy comparison a
   assert.ok(html.indexOf(modulePath) < html.indexOf('src=\"app.js\"'));
 });
 
-// Fabrica um elemento DOM minimo com `style`, `innerHTML`, `textContent`, `value` e metodos
-// de consulta (`closest`, `querySelectorAll`) para suportar o Proxy de elementos.
+// Fabrica um elemento DOM minimo com `style`, `innerHTML`, `textContent`, `value` e
+// metodos de consulta (`closest`, `querySelectorAll`) para suportar o Proxy de
+// elementos.
 function element(extra = {}) {
   return {
     style: {}, innerHTML: '', textContent: '', value: '',
@@ -58,8 +71,9 @@ function element(extra = {}) {
   };
 }
 
-// Calcula um objeto de metricas deterministico e enxuto a partir da lista de trades fechados
-// para alimentar `calcMetrics` no harness sem depender da implementacao completa de `app.js`.
+// Calcula um objeto de metricas deterministico e enxuto a partir da lista de trades
+// fechados para alimentar `calcMetrics` no harness sem depender da implementacao
+// completa de `app.js`.
 function metrics(closed = []) {
   const wins = closed.filter(row => row.status === 'WIN');
   const losses = closed.filter(row => row.status === 'LOSS');
@@ -73,8 +87,9 @@ function metrics(closed = []) {
   };
 }
 
-// Harness principal de `renderStats`: usa um `Proxy` para auto-instaciar elementos DOM consultados,
-// injeta stubs de dominio/formatacao/graficos/comparacao/simulacao e registra todas as chamadas em `calls`.
+// Harness principal de `renderStats`: usa um `Proxy` para auto-instaciar elementos
+// DOM consultados, injeta stubs de dominio/formatacao/graficos/comparacao/simulacao e
+// registra todas as chamadas em `calls`.
 function render({
   rows = [],
   accounts = [{id: 'a1', name: 'Principal'}, {id: 'a2', name: 'Reserva'}],
@@ -137,8 +152,9 @@ function render({
   return {elements, calls, calculated};
 }
 
-// Quando `statsAccountPinned` e `false`, o dropdown `statAccount` e repovoado com todas as contas
-// e redirecionado para `activeAccountId` (`'a1'`), encadeando metricas, analise de risco, comparacao e simulacao.
+// Quando `statsAccountPinned` e `false`, o dropdown `statAccount` e repovoado com
+// todas as contas e redirecionado para `activeAccountId` (`'a1'`), encadeando
+// metricas, analise de risco, comparacao e simulacao.
 test('unpinned statistics rebuild accounts and fall back to the active account', () => {
   const {elements, calls} = render();
   assert.match(elements.statAccount.innerHTML, /Principal/);
@@ -150,9 +166,9 @@ test('unpinned statistics rebuild accounts and fall back to the active account',
   assert.deepEqual(calls.at(-1), ['simulation']);
 });
 
-// Quando `'all'` esta fixado (`pinned: true`), a selecao global e preservada no controle, mas
-// `renderStopFeeAnalysis` filtra os trades para passar apenas os da conta ativa (`a1`), mantendo
-// o escopo de risco coerente com os limites da conta.
+// Quando `'all'` esta fixado (`pinned: true`), a selecao global e preservada no
+// controle, mas `renderStopFeeAnalysis` filtra os trades para passar apenas os da
+// conta ativa (`a1`), mantendo o escopo de risco coerente com os limites da conta.
 test('all-accounts selection stays pinned while risk receives only the scoped account trades', () => {
   const rows = [
     {accountId: 'a1', status: 'WIN', pnl: 10, date: '2026-01-01'},
@@ -165,8 +181,9 @@ test('all-accounts selection stays pinned while risk receives only the scoped ac
   assert.equal(calls.find(call => call[0] === 'strategies')[2], 'a1');
 });
 
-// Valida o estado vazio completo: 8 cards de KPI, 16 linhas na tabela de metricas, 4 linhas de
-// sequencias, placeholders de simbolos/horarios sem dados e exatamente os 10 graficos base (sem histograma).
+// Valida o estado vazio completo: 8 cards de KPI, 16 linhas na tabela de metricas, 4
+// linhas de sequencias, placeholders de simbolos/horarios sem dados e exatamente os
+// 10 graficos base (sem histograma).
 test('empty statistics preserve cards, base charts, tables and empty timing output', () => {
   const {elements, calls} = render();
   assert.equal((elements.statsMetrics.innerHTML.match(/<card>/g) || []).length, 8);
@@ -181,8 +198,9 @@ test('empty statistics preserve cards, base charts, tables and empty timing outp
   ]);
 });
 
-// Valida o estado populado com dois trades fechados em dias e horarios distintos: habilita o
-// histograma (`stHistChart`), preenche simbolos, heatmap por hora (`10h`) e tabela por dia (`Seg`, `Ter`).
+// Valida o estado populado com dois trades fechados em dias e horarios distintos:
+// habilita o histograma (`stHistChart`), preenche simbolos, heatmap por hora (`10h`)
+// e tabela por dia (`Seg`, `Ter`).
 test('populated statistics add histogram, symbol, weekday and hour detail', () => {
   const rows = [
     {accountId: 'a1', status: 'WIN', pnl: 10, r: 1, date: '2026-01-05', symbol: 'WIN', openTime: '10:15'},
