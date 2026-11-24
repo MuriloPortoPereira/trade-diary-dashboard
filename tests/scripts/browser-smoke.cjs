@@ -1,0 +1,440 @@
+// Isolated browser smoke for the static app. Requires Chrome/Chromium, no npm packages.
+const assert = require('node:assert/strict');
+const { spawn } = require('node:child_process');
+const { createServer } = require('node:http');
+const { readFile, mkdtemp, rm } = require('node:fs/promises');
+const { tmpdir } = require('node:os');
+const path = require('node:path');
+
+const root = path.resolve(process.env.APP_ROOT || path.join(__dirname, '../..'));
+const chrome = process.env.CHROME_BIN || 'google-chrome';
+
+function browserProbe() {
+  const errors = [];
+  const studyHubErrors = [];
+  const originalConsoleError = console.error;
+  console.error = function(...args) {
+    if (args[0] === '[StudyHub Legacy]') studyHubErrors.push(String(args[1]));
+    return originalConsoleError.apply(this, args);
+  };
+  window.addEventListener('error', event => {
+    errors.push(event.message || `Resource failed: ${event.target?.src || event.target?.href}`);
+  }, true);
+  window.addEventListener('unhandledrejection', event => errors.push(String(event.reason)));
+  window.addEventListener('load', () => setTimeout(async () => {
+    const passed = [];
+    const check = (name, condition) => {
+      if (!condition) throw new Error(name);
+      passed.push(name);
+    };
+    try {
+      check('Chart.js loaded', typeof Chart === 'function' && Chart.version === '4.4.1');
+      check('dashboard active', document.querySelector('#page-dashboard.active'));
+      check('trade log global stays on diary renderer', typeof renderLog === 'function' && renderLog.toString().includes('filterAccount') && !renderLog.toString().includes('LOG.length'));
+      const storageBefore = Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]));
+      const nav = document.querySelector('.nav-item[onclick*="\'stats\'"]');
+      check('stats navigation exists', nav);
+      nav.click();
+      check('stats navigation works', document.querySelector('#page-stats.active'));
+      switchStatTab('psych');
+      check('psychology statistics global and tab', typeof renderStatsPsych === 'function' && document.getElementById('statTab-psych').style.display === 'block');
+      check('psychology statistics four cards', document.querySelectorAll('#statPsychCards .metric-card').length === 4);
+      check('psychology statistics five charts', ['statEmoWRChart','statEmoPnlChart','statDiscWRChart','statErrorsChart','statPlanChart'].every(id => Chart.getChart(id)));
+      check('psychology statistics summaries and table', document.getElementById('statDiscSummary').innerHTML.length > 0 && document.getElementById('statPlanSummary').innerHTML.length > 0 && document.getElementById('statEmoBody').innerHTML.length > 0);
+      check('psychology summaries use shared renderer', typeof renderAnalysisSummary === 'function' && document.querySelectorAll('#statDiscSummary .analysis-summary-chip').length > 0 && document.querySelectorAll('#statPlanSummary .analysis-summary-chip').length > 0);
+
+      document.querySelector('[onclick="switchStatTab(\'simulation\',this)"]').click();
+      check('simulation tab visible', document.getElementById('statTab-simulation').style.display === 'block');
+      document.getElementById('simAccount').value = 'manual';
+      const fields = {simBalance: '1000', simRiskPct: '1', simGoalPct: '5', simStopPct: '3'};
+      for (const [id, value] of Object.entries(fields)) document.getElementById(id).value = value;
+      document.getElementById('simRiskPct').dispatchEvent(new Event('input', {bubbles: true}));
+      check('risk USD', document.getElementById('simRisk').value === '10.00');
+      check('goal USD', document.getElementById('simGoalDay').value === '50.00');
+      check('stop USD', document.getElementById('simStopDay').value === '30.00');
+      check('legacy API', calculateSimulationSizing({balance: 1000, riskPct: 1}).riskUsd === 10);
+      const csvHeader = 'date,symbol,direction,placedTime,openTime,exitDate,exitTime,entry,exit,stop,tp,qty,riskUsd,riskPct,r,pnl,status,market,strategy,emotion,errors,remarks';
+      const csvRow = ['"2026-09-10"', ...Array(19).fill('""'), '"pressa; ""erro"""', '"a,b\nlinha 2"'].join(',');
+      check('CSV global serialization', buildTradesCSV([{date: '2026-09-10', errors: ['pressa', '"erro"'], remarks: 'a,b\nlinha 2'}]) === csvHeader + '\n' + csvRow);
+      check('CSV import row split', JSON.stringify(splitDelimitedRows('Date;Symbol\n2026-10-14;ES')) === JSON.stringify([['Date','Symbol'],['2026-10-14','ES']]) && normalizeCSVRow(' "ES" ') === 'ES');
+      check('tabular value normalizers preserve locale numbers, Excel dates and headers', parseMTNumber('(1.234,56)') === -1234.56 && normalizeDate('45292,75') === '2024-01-01' && normalizeImportHeader(' Horário de Entrada (%) ') === 'horariodeentrada%' && cleanMTCell(' a\n b ') === 'a b');
+      let mtTicket = '00000987654321';
+      while (trades.some(trade => trade.positionId === mtTicket)) mtTicket += '0';
+      const mtRows = parseSpreadsheetRows([['2024.02.01 09:15', mtTicket, 'ES', 'buy', '1', '100', '95', '120',
+        '2024.02.01 10:30', '110', '-1', '-0.5', '25.5']], 'smoke-mt5');
+      check('MT tabular adapter parses a position through spreadsheet dispatch', mtRows.length === 1 && mtRows[0].positionId === mtTicket && mtRows[0].r === 2 && mtRows[0].pnl === 25.5 && mtRows[0].fees === -1.5 && mtRows[0].openTime === '09:15');
+      const backupPayload = createBackupPayload();
+      check('backup format globals', backupPayload.version === 2 && backupPayload.trades === trades && summarizeBackupData(backupPayload).trades === trades.length && validateBackupData(backupPayload) === undefined);
+      try {
+        const restoredTrades = [];
+        const restoredSummary = restoreBackupData({trades: restoredTrades});
+        check('partial backup restoration global', trades === restoredTrades && accounts === backupPayload.accounts && activeAccountId === backupPayload.activeAccountId && restoredSummary.trades === 0 && restoredSummary.accounts === accounts.length);
+      } finally {
+        ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = backupPayload);
+      }
+      const downloads = [];
+      const originalCreateElement = document.createElement;
+      try {
+        document.createElement = function(tag, ...args) {
+          const element = originalCreateElement.call(this, tag, ...args);
+          if (tag === 'a') element.click = () => downloads.push({filename: element.download, url: element.href});
+          return element;
+        };
+        document.querySelector('[onclick="exportJSON()"]').click();
+        document.querySelector('[onclick="exportCSV()"]').click();
+        check('JSON and CSV export handlers use native download URLs', downloads.length === 2 && /^tradelog_backup_\d{4}-\d{2}-\d{2}\.json$/.test(downloads[0].filename) && /^trades_todos_\d{4}-\d{2}-\d{2}\.csv$/.test(downloads[1].filename) && downloads.every(download => download.url.startsWith('blob:')));
+      } finally {
+        document.createElement = originalCreateElement;
+        downloads.forEach(download => URL.revokeObjectURL(download.url));
+      }
+      check('CSV default trades', buildTradesCSV() === buildTradesCSV(trades));
+      check('CSV helper compatibility', csvCell(['a', 'b']) === '"a; b"' && TRADE_CSV_HEADERS.join(',') === csvHeader);
+      const importCandidates = [{id: 'existing'}, {id: 'new'}, {id: 'new'}];
+      const uniqueImports = importCandidates.filter(TradeDiaryImportTradeRules.createImportedTradeFilter([{id: 'existing'}], () => ''));
+      check('import deduplication domain retains first new record', uniqueImports.length === 1 && uniqueImports[0] === importCandidates[1]);
+      check('no storage mutation', JSON.stringify(storageBefore) === JSON.stringify(
+        Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)]))));
+      showPage('dashboard');
+      check('dashboard return', document.querySelector('#page-dashboard.active'));
+      check('risk board global and ideal risk', typeof renderRiskBoard === 'function' && document.getElementById('riskIdealTrade').textContent.trim().length > 0);
+      check('risk board four progress bars and signals', document.querySelectorAll('#riskProgress .risk-progress-item').length === 4 && document.querySelectorAll('#riskSignals .risk-alert-chip').length === 4);
+      const riskProgress = document.getElementById('riskProgress').innerHTML;
+      refreshAll();
+      check('risk board refresh preserves progress', document.getElementById('riskProgress').innerHTML === riskProgress);
+
+      check('dashboard global renderer and four cards', typeof renderDashboard === 'function' && document.querySelectorAll('#dashMetrics .metric-card').length === 4);
+      check('dashboard seven charts and recent rows', ['equityChart','wlChart','rBarChart','wdayChart','monthEvChart','stratDashChart','emoDashChart'].every(id => Chart.getChart(id)) && document.querySelectorAll('#recentTrades tr').length > 0);
+      const previousEqMode = eqMode;
+      toggleEqMode();
+      check('dashboard equity mode toggles', eqMode !== previousEqMode && Chart.getChart('equityChart').data.datasets[0].data[0] === 0);
+      toggleEqMode();
+      check('dashboard equity mode restores', eqMode === previousEqMode && document.querySelectorAll('#dashMetrics .metric-card').length === 4);
+
+      check('strategy rows global and dashboard board', typeof renderStrategyRows === 'function' && document.querySelectorAll('#dashStrategyBoard .strategy-row').length > 0 && document.querySelectorAll('#dashStrategyBoard .strategy-row').length <= 5);
+      const strategyBoard = document.getElementById('dashStrategyBoard').innerHTML;
+      refreshAll();
+      check('strategy dashboard refresh preserves rows', document.getElementById('dashStrategyBoard').innerHTML === strategyBoard);
+
+      check('dashboard calendar global and cells', typeof renderDashboardCalendar === 'function' && document.querySelectorAll('#dashCalendarMini .dash-cal-cell[onclick]').length >= 28);
+      check('dashboard calendar title and week totals', document.getElementById('dashCalendarMonth').textContent.trim().length > 0 && document.querySelectorAll('#dashWeekBreakdown .week-row').length >= 4);
+      const miniCalendar = document.getElementById('dashCalendarMini').innerHTML;
+      refreshAll();
+      check('dashboard calendar refresh preserves grid', document.getElementById('dashCalendarMini').innerHTML === miniCalendar);
+      document.querySelector('#dashCalendarMini .dash-cal-cell[onclick]').click();
+      check('dashboard calendar cell navigates to journal', document.querySelector('#page-calendar.active'));
+      showPage('dashboard');
+
+      document.querySelector('.lang-option[data-lang="en-US"]').click();
+      check('English language handler', document.documentElement.lang === 'en-US' && localStorage.getItem('appLanguage') === 'en-US' && document.getElementById('langFlag').textContent === '🇺🇸');
+      check('English catalog rendered', document.querySelector('[data-i18n="nav.calendar"]').textContent === 'Journal' && t('nav.calendar') === 'Journal');
+      document.querySelector('.lang-option[data-lang="pt-BR"]').click();
+      check('Portuguese language handler', document.documentElement.lang === 'pt-BR' && localStorage.getItem('appLanguage') === 'pt-BR' && document.querySelector('[data-i18n="nav.calendar"]').textContent === 'Diário');
+      const withoutLanguage = values => Object.fromEntries(Object.entries(values).filter(([key]) => key !== 'appLanguage'));
+      check('language changes preserve application data', JSON.stringify(withoutLanguage(storageBefore)) === JSON.stringify(withoutLanguage(
+        Object.fromEntries(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)])))));
+      document.getElementById('langBtn').click();
+      check('language menu opens', document.getElementById('langMenu').classList.contains('open'));
+      document.querySelector('main').click();
+      check('outside click closes language menu', !document.getElementById('langMenu').classList.contains('open'));
+      document.getElementById('hamburger').click();
+      check('sidebar opens with overlay', document.getElementById('sidebar').classList.contains('open') &&
+        document.getElementById('sidebar-overlay').classList.contains('show'));
+      document.getElementById('sidebar-overlay').click();
+      check('overlay closes sidebar', !document.getElementById('sidebar').classList.contains('open') &&
+        !document.getElementById('sidebar-overlay').classList.contains('show'));
+      document.getElementById('hamburger').click();
+      nav.click();
+      check('navigation closes sidebar', document.querySelector('#page-stats.active') && nav.classList.contains('active') &&
+        !document.getElementById('sidebar').classList.contains('open') && !document.getElementById('sidebar-overlay').classList.contains('show'));
+      check('stop fee global renderer and four cards', typeof renderStopFeeAnalysis === 'function' && document.querySelectorAll('#statsRiskLeakageRows .risk-insight-item').length === 4);
+      check('stop fee labels rendered', document.getElementById('statsRiskLeakageRows').textContent.includes('Taxas pagas') && document.getElementById('statsRiskLeakageRows').textContent.includes('Edge removido'));
+      refreshAll();
+      check('stop fee refresh renders four cards', document.querySelectorAll('#statsRiskLeakageRows .risk-insight-item').length === 4);
+      const profileNav = document.querySelector('.nav-item[onclick="showPage(\'profile\')"]');
+      profileNav.click();
+      check('profile navigation and global renderer', document.querySelector('#page-profile.active') && typeof renderProfilePage === 'function');
+      check('profile status list uses shared renderer', typeof renderStatusList === 'function' && document.querySelectorAll('#profileFocus .status-item').length > 0);
+      check('profile hero and risk rendered', document.getElementById('profileHero').textContent.includes('P/L total') &&
+        document.getElementById('profileRiskPanel').textContent.includes('Mandatos de risco'));
+      check('profile tags and focus rendered', document.querySelectorAll('#profileTags .tag-cloud-block').length === 3 &&
+        document.getElementById('profileFocus').textContent.trim().length > 0);
+      refreshAll();
+      check('profile refresh renders again', document.querySelector('#page-profile.active') &&
+        document.getElementById('profileHero').textContent.includes('P/L total'));
+      const partnersNav = document.querySelector('.nav-item[onclick="showPage(\'partners\')"]');
+      partnersNav.click();
+      check('partners navigation and global renderer', document.querySelector('#page-partners.active') && typeof renderPartnersPage === 'function');
+      check('partners affiliates and QR rendered', document.getElementById('partnerAffiliatesEditor').textContent.trim().length > 0 &&
+        document.getElementById('partnerBtcQrPreview').textContent.trim().length > 0);
+      check('partners legacy grid hidden', getComputedStyle(document.getElementById('partnersGrid')).display === 'none');
+      refreshAll();
+      check('partners refresh renders again', document.querySelector('#page-partners.active') &&
+        document.getElementById('partnerAffiliatesEditor').textContent.trim().length > 0);
+      const accountsNav = document.querySelector('.nav-item[onclick="showPage(\'accounts\')"]');
+      accountsNav.click();
+      check('accounts navigation and global renderer', document.querySelector('#page-accounts.active') && typeof renderAccountCashflowList === 'function' && typeof renderSetupRiskSummary === 'function' && typeof renderSetupCashflowList === 'function' && typeof renderSetup === 'function' && typeof renderAccountList === 'function' && typeof renderTopbarAccount === 'function' && typeof renderAccountsPage === 'function');
+      check('accounts metrics rendered', document.querySelectorAll('#accountsMetrics .metric-card').length === 4);
+      check('accounts overview rendered', document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      refreshAll();
+      check('accounts refresh renders again', document.querySelector('#page-accounts.active') &&
+        document.querySelectorAll('#accountsOverview .account-overview-card').length > 0);
+      showPage('calendar');
+      check('calendar navigation and global renderer', document.querySelector('#page-calendar.active') && typeof renderCalendar === 'function');
+      calGoToMonth('2024-02');
+      setCalView('month');
+      check('calendar leap month rendered', document.querySelectorAll('#calGridWrap .cal-day[onclick]').length === 29 && document.getElementById('calTitle').textContent.includes('2024'));
+      setCalView('week');
+      check('calendar weekly rows rendered', document.querySelectorAll('#calGridWrap .cal-week-label').length === 5);
+      setCalView('biweek');
+      check('calendar fortnight blocks rendered', document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
+      refreshAll();
+      check('calendar refresh preserves fortnight mode', document.querySelector('#page-calendar.active') && document.querySelectorAll('#calGridWrap .cal-biweek-block').length === 2);
+      const dayTrade = getAccountTrades(activeAccountId).find(trade => trade.date);
+      check('calendar controls globals and fixture', ['calNav','calGoToMonth','syncCalPicker','setCalView','showCalDay'].every(name => typeof window[name] === 'function') && dayTrade);
+      calGoToMonth(dayTrade.date.slice(0, 7));
+      document.querySelector('#calGridWrap [onclick="showCalDay(' + Number(dayTrade.date.slice(8, 10)) + ')"]').click();
+      check('calendar day click renders account trades', document.getElementById('calDayDetail').style.display === 'block' && document.querySelectorAll('#calDayTbody tr').length === getAccountTrades(activeAccountId).filter(trade => trade.date === dayTrade.date).length);
+      calGoToMonth('2099-02');
+      showCalDay(1);
+      check('calendar empty day hides detail', document.getElementById('calDayDetail').style.display === 'none');
+      calGoToMonth('2026-12');
+      calNav(1);
+      check('calendar navigation crosses year', calYear === 2027 && calMonth === 0);
+      showPage('notifications');
+      check('notifications navigation and global renderer', document.querySelector('#page-notifications.active') && typeof renderNotificationsPage === 'function');
+      check('notification feed uses shared status list', document.querySelectorAll('#notificationFeed .status-item').length > 0);
+      check('notifications feed rendered', document.getElementById('notificationFeed').textContent.trim().length > 0);
+      const notificationFeed = document.getElementById('notificationFeed').innerHTML;
+      refreshAll();
+      check('notifications refresh preserves feed', document.querySelector('#page-notifications.active') &&
+        document.getElementById('notificationFeed').innerHTML === notificationFeed);
+      showPage('psych');
+      check('psychology navigation and global renderer', document.querySelector('#page-psych.active') && typeof renderPsych === 'function');
+      check('psychology summaries rendered', document.getElementById('bestEmotion').textContent.trim().length > 0 &&
+        document.getElementById('followedPlanRate').textContent.trim().length > 0);
+      check('psychology charts and table rendered', document.getElementById('emotionChart') &&
+        document.getElementById('discChart') && document.getElementById('psychTbody').innerHTML.length > 0);
+      refreshAll();
+      check('psychology refresh renders again', document.querySelector('#page-psych.active') &&
+        document.getElementById('psychTbody').innerHTML.length > 0);
+      const strategyNav = document.querySelector('.nav-item[onclick="showPage(\'strategyHub\')"]');
+      strategyNav.click();
+      check('strategy hub navigation and global renderer', document.querySelector('#page-strategyHub.active') && typeof renderStrategyHub === 'function');
+      check('strategy hub focus uses shared status list', document.querySelectorAll('#strategyHubFocus .status-item').length > 0);
+      check('strategy hub metrics rendered', document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
+      check('strategy hub rows and table agree', document.querySelectorAll('#strategyHubBoard .strategy-row').length === document.querySelectorAll('#strategyHubTable tr').length);
+
+      check('strategy hub board and focus rendered', document.getElementById('strategyHubBoard').innerHTML.length > 0 &&
+        document.getElementById('strategyHubFocus').innerHTML.length > 0);
+      refreshAll();
+      check('strategy hub refresh renders again', document.querySelector('#page-strategyHub.active') &&
+        document.querySelectorAll('#strategyHubMetrics .metric-card').length === 4);
+      const premarketNav = document.querySelector('.nav-item[onclick="showPage(\'premarket\')"]');
+      premarketNav.click();
+      check('premarket navigation and global renderer', document.querySelector('#page-premarket.active') && typeof renderPremarket === 'function');
+      check('premarket month results rendered', document.getElementById('pmMonthLabel').textContent.trim().length > 0 &&
+        document.getElementById('pmResultStats').textContent.includes('Trades no mês'));
+      check('premarket habit grid rendered', document.querySelectorAll('#pmHabitGrid .pm-grid-day').length >= 28);
+      refreshAll();
+      check('premarket refresh renders again', document.querySelector('#page-premarket.active') &&
+        document.querySelectorAll('#pmHabitGrid .pm-grid-day').length >= 28);
+      const documentsNav = document.querySelector('.nav-item[onclick="showPage(\'documents\')"]');
+      documentsNav.click();
+      check('documents navigation and global renderer', document.querySelector('#page-documents.active') && typeof renderDocumentMedia === 'function' && typeof renderDocFolderIcon === 'function' && typeof renderDocumentsPage === 'function');
+      check('documents folders rendered', document.querySelectorAll('#docFolders .doc-folder').length > 0);
+      check('documents list and editor rendered', document.getElementById('docEntries').innerHTML.length > 0 &&
+        document.getElementById('docEditorHeading').textContent.trim().length > 0);
+      refreshAll();
+      check('documents refresh renders again', document.querySelector('#page-documents.active') &&
+        document.querySelectorAll('#docFolders .doc-folder').length > 0);
+      showPage('import');
+      switchImportTab('export');
+      check('export navigation and account filter global', document.querySelector('#page-import.active') && document.getElementById('importTab-export').style.display !== 'none' && typeof renderExportAccountFilter === 'function');
+      check('export account options rendered', document.getElementById('exportAccount').options.length === accounts.length + 1);
+      check('export account default remains all', document.getElementById('exportAccount').value === '');
+      showPage('studyHub');
+      const nativeMerge = mergeStudyHubState({plan: {title: 'Smoke StudyHub'}});
+      check('StudyHub native state merge retains defaults and partial plan', nativeMerge.plan.title === 'Smoke StudyHub' &&
+        nativeMerge.propfirm.accountSize === 100000 && nativeMerge.simulator.rrr === 1.1 && nativeMerge.mental.focus === 4);
+      const nativeProjection = buildStudySimulation({capital: 100, riskPct: 10, winRate: 100,
+        rrr: 2, runs: 20, trades: 5, seed: 1});
+      check('StudyHub native seeded simulation retains compounded result', nativeProjection.labels.length === 6 &&
+        Math.abs(nativeProjection.p50[5] - 248.832) < 1e-10 && nativeProjection.positiveRate === 1);
+      for (const tab of ['propfirm', 'plano', 'tradesim', 'mental']) {
+        document.querySelector(`#studyHubTabs [onclick*="'${tab}'"]`).click();
+        check(`StudyHub ${tab} tab`, document.querySelector('#page-studyHub.active') &&
+          document.getElementById('studyHubLegacyApp').dataset.loaded === '1' &&
+          document.getElementById(`mod-${tab}`).classList.contains('active'));
+      }
+      const studyInputs = {s_conta: '10000', s_ddmax: '10', s_dddaily: '2', s_stops: '20', s_rrr: '2', s_fim: '10'};
+      const studyBefore = Object.fromEntries(Object.keys(studyInputs).map(id => [id, document.getElementById(id).value]));
+      const pfStateBefore = localStorage.getItem('pfState');
+      try {
+        for (const [id, value] of Object.entries(studyInputs)) document.getElementById(id).value = value;
+        window.sh_calcSimulador();
+        check('StudyHub legacy calculator bridge produces deterministic sizing',
+          document.getElementById('s_risco_usd').textContent === '$50,00' &&
+          document.getElementById('s_alvo_usd').textContent === '$100,00' &&
+          document.getElementById('s_meta_trades').textContent === '10 trades');
+        const savedStudy = JSON.parse(localStorage.getItem('pfState'));
+        check('StudyHub calculator preserves pfState persistence', savedStudy.s_conta === '10000' &&
+          savedStudy.s_stops === '20' && savedStudy.s_rrr === '2' && savedStudy.v === '1.0');
+      } finally {
+        for (const [id, value] of Object.entries(studyBefore)) document.getElementById(id).value = value;
+        window.sh_calcSimulador();
+        if (pfStateBefore === null) localStorage.removeItem('pfState');
+        else localStorage.setItem('pfState', pfStateBefore);
+      }
+      const studyRows = window.studyHubBuildIntradayRows({capital: 1000, riskPct: 1, accountGainPct: 2,
+        dailyStopPct: 3, dailyTargetPct: 4, stopAt: 3, targetAt: 2});
+      check('StudyHub intraday bridge preserves thresholds and financial projection', studyRows.length === 8 &&
+        studyRows[1].allGainValue === 40 && studyRows[1].hitTarget && !studyRows[1].hitStop && studyRows[2].hitStop);
+      check('StudyHub legacy initialization and calculators report no captured errors', studyHubErrors.length === 0);
+      const persistedKeys = ['tl_trades', 'tl_config', 'tl_pm', 'tl_accounts', 'tl_activeAccount', 'tl_studyhub'];
+      const persistedBefore = persistedKeys.map(key => localStorage.getItem(key));
+      const previousPending = pendingImport;
+      const previousPendingMeta = pendingImportMeta;
+      const NativeFileReader = window.FileReader;
+      const previewNodes = ['csvConfirmPreview', 'csvPreview', 'importCount'].map(id => document.getElementById(id)).filter(Boolean);
+      const previewHTML = previewNodes.map(node => node.innerHTML);
+      try {
+        const uploadComplete = new Promise((resolve, reject) => {
+          window.FileReader = class extends NativeFileReader {
+            constructor() {
+              super();
+              this.addEventListener('loadend', resolve, {once: true});
+              this.addEventListener('error', () => reject(this.error), {once: true});
+            }
+          };
+        });
+        const file = new File([buildTradesCSV([trades[0]])], 'smoke.csv', {type: 'text/csv'});
+        handleCSVUpload({target: {files: [file]}});
+        await uploadComplete;
+        check('native CSV upload stages one trade and opens preview without saving', pendingImport.length === 1 && pendingImportMeta.source === 'csv' && pendingImportMeta.accountId === activeAccountId && document.getElementById('csvConfirmModal').classList.contains('open') && document.querySelectorAll('#csvConfirmPreview tbody tr').length === 1 && persistedKeys.every((key, index) => localStorage.getItem(key) === persistedBefore[index]));
+        const reportRows = [['date','symbol','direction','entry','exit','stop','qty','pnl','strategy','ticket'],
+          ['2024-02-01','ES','buy','100','110','95','1','25.5','smoke report',mtTicket]];
+        const awaitReportRead = start => new Promise((resolve, reject) => {
+          window.FileReader = class extends NativeFileReader {
+            constructor() {
+              super();
+              this.addEventListener('loadend', resolve, {once: true});
+              this.addEventListener('error', () => reject(this.error), {once: true});
+            }
+          };
+          start();
+        });
+        const reportHTML = '<table>' + reportRows.map(row => '<tr>' + row.map(value => '<td>' + value + '</td>').join('') + '</tr>').join('') + '</table>';
+        const utf16 = new Uint8Array(2 + reportHTML.length * 2);
+        utf16.set([255, 254]);
+        const view = new DataView(utf16.buffer);
+        for(let i = 0; i < reportHTML.length; i++) view.setUint16(2 + i * 2, reportHTML.charCodeAt(i), true);
+        await awaitReportRead(() => handleHistoryUpload({target: {files: [new File([utf16], 'smoke.HTML', {type: 'text/html'})]}}));
+        const validReportPreview = () => pendingImport.length === 1 && pendingImport[0].symbol === 'ES' && pendingImport[0].pnl === 25.5 && pendingImportMeta.source === 'upload' && pendingImportMeta.accountId === activeAccountId && document.getElementById('csvConfirmModal').classList.contains('open') && document.querySelectorAll('#csvConfirmPreview tbody tr').length === 1 && persistedKeys.every((key, index) => localStorage.getItem(key) === persistedBefore[index]);
+        check('native UTF-16 HTML report upload parses DOM rows and stages without saving', validReportPreview());
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('SheetJS load timeout')), 12000);
+          loadSheetJS(() => { clearTimeout(timer); resolve(); });
+        });
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(reportRows), 'History');
+        const spreadsheet = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+        await awaitReportRead(() => handleMT5Upload({target: {files: [new File([spreadsheet], 'smoke.XLSX')]}}));
+        check('native XLSX report upload reads real workbook and stages without saving', validReportPreview());
+      } finally {
+        window.FileReader = NativeFileReader;
+        pendingImport = previousPending;
+        pendingImportMeta = previousPendingMeta;
+        closeModal('csvConfirmModal');
+        previewNodes.forEach((node, index) => { node.innerHTML = previewHTML[index]; });
+      }
+      const stateBeforeRoundtrip = {trades, config, preMarketData, accounts, activeAccountId, studyHubState};
+      const storageBeforeRoundtrip = persistedKeys.map(key => localStorage.getItem(key));
+      try {
+        const expectedWrites = [JSON.stringify(trades), JSON.stringify(config), JSON.stringify(preMarketData),
+          JSON.stringify(accounts), String(activeAccountId), JSON.stringify(studyHubState)];
+        const expectedTradeIds = JSON.stringify(trades.map(trade => trade.id));
+        const expectedAccountIds = JSON.stringify(accounts.map(account => account.id));
+        save();
+        const serialized = persistedKeys.every((key, index) => localStorage.getItem(key) === expectedWrites[index]);
+        trades = [];
+        accounts = [];
+        activeAccountId = '';
+        load();
+        check('native app storage round-trip preserves six formats and restores trades/accounts', serialized && JSON.stringify(trades.map(trade => trade.id)) === expectedTradeIds && JSON.stringify(accounts.map(account => account.id)) === expectedAccountIds && activeAccountId === stateBeforeRoundtrip.activeAccountId);
+      } finally {
+        ({trades, config, preMarketData, accounts, activeAccountId, studyHubState} = stateBeforeRoundtrip);
+        persistedKeys.forEach((key, index) => {
+          if (storageBeforeRoundtrip[index] === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, storageBeforeRoundtrip[index]);
+        });
+      }
+    } catch (error) {
+      errors.push(error.stack || String(error));
+    }
+    const result = document.createElement('pre');
+    result.id = 'architecture-smoke-result';
+    result.textContent = JSON.stringify({passed, errors});
+    document.body.append(result);
+  }, 250));
+}
+
+async function main() {
+  const profile = await mkdtemp(path.join(tmpdir(), 'trade-diary-smoke-'));
+  const html = await readFile(path.join(root, 'index.html'), 'utf8');
+  const probe = `<script>(${browserProbe.toString()})()</script>`;
+  // Install error capture before app scripts. All other app resources are unchanged.
+  const smokeHtml = html.replace('<head>', '<head>' + probe);
+  const missing = [];
+  const server = createServer(async (request, response) => {
+    const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+    if (pathname === '/__smoke.html') {
+      response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+      response.end(smokeHtml);
+      return;
+    }
+    if (pathname === '/favicon.ico') { response.writeHead(204); response.end(); return; }
+    const relative = pathname.slice(1);
+    // Serve application assets only; never expose tool configuration or repository metadata.
+    const allowed = ['app.js', 'styles.css'].includes(relative) || /^src\/[\w/.-]+\.(js|css)$/.test(relative);
+    const filename = path.resolve(root, relative);
+    if (!allowed || !filename.startsWith(root + path.sep)) {
+      response.writeHead(404); response.end(); missing.push(pathname); return;
+    }
+    try {
+      const content = await readFile(filename);
+      response.writeHead(200, {'Content-Type': relative.endsWith('.css') ? 'text/css' : 'text/javascript'});
+      response.end(content);
+    } catch {
+      missing.push(pathname); response.writeHead(404); response.end();
+    }
+  });
+  let browser;
+  try {
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    const url = `http://127.0.0.1:${server.address().port}/__smoke.html`;
+    browser = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
+      '--no-first-run', `--user-data-dir=${profile}`, '--dump-dom', '--timeout=20000',
+      '--virtual-time-budget=5000', url], {stdio: ['ignore', 'pipe', 'pipe']});
+    let output = '', stderr = '';
+    browser.stdout.on('data', data => { output += data; });
+    browser.stderr.on('data', data => { stderr = (stderr + data).slice(-3000); });
+    const timer = setTimeout(() => browser.kill('SIGKILL'), 35000);
+    const code = await new Promise((resolve, reject) => {
+      browser.on('error', reject); browser.on('close', resolve);
+    }).finally(() => clearTimeout(timer));
+    assert.equal(code, 0, `Chrome failed (${code}): ${stderr}`);
+    const match = output.match(/<pre id="architecture-smoke-result">([\s\S]*?)<\/pre>/);
+    assert.ok(match, `Browser did not finish smoke checks: ${stderr}`);
+    const result = JSON.parse(match[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+    assert.deepEqual(missing, [], 'Missing application assets');
+    assert.deepEqual(result.errors, [], 'Browser errors');
+    assert.equal(result.passed.length, 113, 'Smoke checks incomplete');
+    console.log(`PASS: ${result.passed.length} browser checks; no script errors or missing local assets.`);
+  } finally {
+    if (browser && browser.exitCode === null) browser.kill('SIGKILL');
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+    await rm(profile, {recursive: true, force: true, maxRetries: 5, retryDelay: 200});
+  }
+}
+main().catch(error => { console.error(error.message); process.exitCode = 1; });
